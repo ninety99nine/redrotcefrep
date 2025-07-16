@@ -1,0 +1,152 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Models\Product;
+use App\Services\ProductService;
+use App\Http\Resources\ProductResource;
+use App\Http\Resources\ProductResources;
+use App\Http\Requests\Product\ShowProductRequest;
+use App\Http\Requests\Product\ShowProductsRequest;
+use App\Http\Requests\Product\CreateProductRequest;
+use App\Http\Requests\Product\UpdateProductRequest;
+use App\Http\Requests\Product\DeleteProductRequest;
+use App\Http\Requests\Product\DeleteProductsRequest;
+use App\Http\Requests\Product\ShowProductVariationsRequest;
+use App\Http\Requests\Product\UpdateProductVisibilityRequest;
+use App\Http\Requests\Product\CreateProductVariationsRequest;
+use App\Http\Requests\Product\UpdateProductArrangementRequest;
+
+class ProductController extends Controller
+{
+    /**
+     * @var ProductService
+     */
+    protected $service;
+
+    /**
+     * ProductController constructor.
+     *
+     * @param ProductService $service
+     */
+    public function __construct(ProductService $service)
+    {
+        $this->service = $service;
+    }
+
+    /**
+     * Show products.
+     *
+     * @param ShowProductsRequest $request
+     * @return ProductResources|array
+     */
+    public function showProducts(ShowProductsRequest $request): ProductResources|array
+    {
+        return $this->service->showProducts($request->validated());
+    }
+
+    /**
+     * Create product.
+     *
+     * @param CreateProductRequest $request
+     * @return array
+     */
+    public function createProduct(CreateProductRequest $request): array
+    {
+        return $this->service->createProduct($request->validated());
+    }
+
+    /**
+     * Delete multiple products.
+     *
+     * @param DeleteProductsRequest $request
+     * @return array
+     */
+    public function deleteProducts(DeleteProductsRequest $request): array
+    {
+        $productIds = request()->input('product_ids', []);
+        return $this->service->deleteProducts($productIds);
+    }
+
+    /**
+     * Update product visibility.
+     *
+     * @param UpdateProductVisibilityRequest $request
+     * @return array
+     */
+    public function updateProductVisibility(UpdateProductVisibilityRequest $request): array
+    {
+        return $this->service->updateProductVisibility($request->validated());
+    }
+
+    /**
+     * Update product arrangement.
+     *
+     * @param UpdateProductArrangementRequest $request
+     * @return array
+     */
+    public function updateProductArrangement(UpdateProductArrangementRequest $request): array
+    {
+        return $this->service->updateProductArrangement($request->validated());
+    }
+
+    /**
+     * Show single product.
+     *
+     * @param ShowProductRequest $request
+     * @param Product $product
+     * @return ProductResource
+     */
+    public function showProduct(ShowProductRequest $request, Product $product): ProductResource
+    {
+        return $this->service->showProduct($product);
+    }
+
+    /**
+     * Update product.
+     *
+     * @param UpdateProductRequest $request
+     * @param Product $product
+     * @return array
+     */
+    public function updateProduct(UpdateProductRequest $request, Product $product): array
+    {
+        return $this->service->updateProduct($product, $request->validated());
+    }
+
+    /**
+     * Delete product.
+     *
+     * @param DeleteProductRequest $request
+     * @param Product $product
+     * @return array
+     */
+    public function deleteProduct(DeleteProductRequest $request, Product $product): array
+    {
+        return $this->service->deleteProduct($product);
+    }
+
+    /**
+     * Show product variations.
+     *
+     * @param ShowProductVariationsRequest $request
+     * @param Product $product
+     * @return ProductResources|array
+     */
+    public function showProductVariations(ShowProductVariationsRequest $request, Product $product): ProductResources|array
+    {
+        return $this->service->showProductVariations($product);
+    }
+
+    /**
+     * Create product variations.
+     *
+     * @param CreateProductVariationsRequest $request
+     * @param Product $product
+     * @return ProductResources|array
+     */
+    public function createProductVariations(CreateProductVariationsRequest $request, Product $product): ProductResources|array
+    {
+        return $this->service->createProductVariations($product, $request->validated());
+    }
+}

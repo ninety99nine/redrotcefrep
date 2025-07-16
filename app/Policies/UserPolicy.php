@@ -1,0 +1,89 @@
+<?php
+
+namespace App\Policies;
+
+use App\Models\User;
+
+class UserPolicy extends BasePolicy
+{
+    /**
+     * Grant all permissions to super admins who have roles not tied to any store.
+     *
+     * @param User $user
+     * @param string $ability
+     * @return bool|null
+     */
+    public function before(User $user, string $ability): bool|null
+    {
+        return $this->authService->isSuperAdmin($user) ?: null;
+    }
+
+    /**
+     * Determine whether the user can view any users.
+     *
+     * @param User $user
+     * @return bool
+     */
+    public function viewAny(User $user): bool
+    {
+        return true;
+    }
+
+    /**
+     * Determine whether the user can view the user.
+     *
+     * @param User $user
+     * @param User $_user
+     * @return bool
+     */
+    public function view(User $user, User $_user): bool
+    {
+        return true;
+    }
+
+    /**
+     * Determine whether the user can create users.
+     *
+     * @param User $user
+     * @return bool
+     */
+    public function create(User $user): bool
+    {
+        return true;
+    }
+
+    /**
+     * Determine whether the user can update the user.
+     *
+     * @param User $user
+     * @param User $_user
+     * @return bool
+     */
+    public function update(User $user, User $_user): bool
+    {
+        return true;
+    }
+
+    /**
+     * Determine whether the user can delete the user.
+     *
+     * @param User $user
+     * @param User $_user
+     * @return bool
+     */
+    public function delete(User $user, User $_user): bool
+    {
+        return true;
+    }
+
+    /**
+     * Determine whether the user can delete any users.
+     *
+     * @param User $user
+     * @return bool
+     */
+    public function deleteAny(User $user): bool
+    {
+        return true;
+    }
+}

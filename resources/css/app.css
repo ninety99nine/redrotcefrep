@@ -1,0 +1,115 @@
+@import 'tailwindcss';
+
+/* Preline UI */
+@import "../../node_modules/preline/variants.css";
+@source "../../node_modules/preline/dist/*.js";
+
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+@source '../../storage/framework/views/*.php';
+@source '../**/*.blade.php';
+@source '../**/*.js';
+
+/* Required styles for Vue Flow */
+@import '@vue-flow/core/dist/style.css';
+
+/* Optional: Default theme for Vue Flow (includes basic styling for nodes and edges) */
+@import '@vue-flow/core/dist/theme-default.css';
+
+@theme {
+    --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
+        'Segoe UI Symbol', 'Noto Color Emoji';
+}
+
+/**
+ *  Overide mobile number inputs using the intl-tel-input package to display in full-width.
+ *  Refer to: resources/js/partials/inputs/MobileNumberInput.vue
+ */
+.iti { width: 100% !important; }
+
+.iti .iti__selected-dial-code {
+    @apply text-sm leading-6 font-medium text-gray-700;
+}
+
+.iti .iti__search-input {
+    @apply py-2 px-2.5
+}
+
+/* Animated Gradient Border Effect - Part 1: Define border angle */
+@property --border-angle {
+    syntax: '<angle>';
+    inherits: false;
+    initial-value: 0deg;
+}
+
+/* Animated Gradient Border Effect - Part 2: Define animation */
+@keyframes borderAnimation {
+    to {
+        --border-angle: 360deg;
+    }
+}
+
+.animated-border-cyan {
+    background: linear-gradient(45deg, #ffffff, #ffffff, #ffffff) padding-box,
+                conic-gradient(from var(--border-angle),
+                rgba(255, 255, 255, 0) 25%,     /* Start transparent (longer fade-in) */
+                #58d8ff 80%,                    /* Begin streak */
+                #26ccff 88%,                    /* Peak intensity */
+                #58d8ff 92%,                    /* Start fading */
+                rgba(255, 255, 255, 0) 100%) border-box;    /* End transparent (longer fade-out) */
+    border-radius: 16px;
+    border: 1px solid transparent; /* Ensure border is visible */
+    animation: borderAnimation 4s linear infinite;
+}
+
+/* Animated Gradient Border Effect - Part 3: Define border */
+.animated-border-blue {
+    background: linear-gradient(45deg, #ffffff, #ffffff, #ffffff) padding-box,
+                conic-gradient(from var(--border-angle),
+                rgba(255, 255, 255, 0) 25%,     /* Start transparent (longer fade-in) */
+                #48a8ff 80%,                    /* Begin streak */
+                #2692ff 88%,                    /* Peak intensity */
+                #48a8ff 92%,                    /* Start fading */
+                rgba(255, 255, 255, 0) 100%) border-box;    /* End transparent (longer fade-out) */
+    border-radius: 16px;
+    border: 1px solid transparent; /* Ensure border is visible */
+    animation: borderAnimation 4s linear infinite;
+}
+
+.animated-border-green {
+    background: linear-gradient(45deg, #ffffff, #ffffff, #ffffff) padding-box,
+                conic-gradient(from var(--border-angle),
+                rgba(255, 255, 255, 0) 25%,     /* Start transparent (longer fade-in) */
+                #37ff6c 80%,                    /* Begin streak */
+                #26ff60 88%,                    /* Peak intensity */
+                #37ff6c 92%,                    /* Start fading */
+                rgba(255, 255, 255, 0) 100%) border-box;    /* End transparent (longer fade-out) */
+    border-radius: 16px;
+    border: 1px solid transparent; /* Ensure border is visible */
+    animation: borderAnimation 4s linear infinite;
+}
+
+.animated-border-pink {
+    background: linear-gradient(45deg, #ffffff, #ffffff, #ffffff) padding-box,
+                conic-gradient(from var(--border-angle),
+                rgba(255, 255, 255, 0) 25%,     /* Start transparent (longer fade-in) */
+                #fc48ff 80%,                    /* Begin streak */
+                #fb26ff 88%,                    /* Peak intensity */
+                #fc48ff 92%,                    /* Start fading */
+                rgba(255, 255, 255, 0) 100%) border-box;    /* End transparent (longer fade-out) */
+    border-radius: 16px;
+    border: 1px solid transparent; /* Ensure border is visible */
+    animation: borderAnimation 4s linear infinite;
+}
+
+.animated-border-red {
+    background: linear-gradient(45deg, #ffffff, #ffffff, #ffffff) padding-box,
+                conic-gradient(from var(--border-angle),
+                rgba(255, 255, 255, 0) 25%,     /* Start transparent (longer fade-in) */
+                #ff3a4a 80%,                    /* Begin streak */
+                #ff2638 88%,                    /* Peak intensity */
+                #ff3a4a 92%,                    /* Start fading */
+                rgba(255, 255, 255, 0) 100%) border-box;    /* End transparent (longer fade-out) */
+    border-radius: 16px;
+    border: 1px solid transparent; /* Ensure border is visible */
+    animation: borderAnimation 4s linear infinite;
+}
