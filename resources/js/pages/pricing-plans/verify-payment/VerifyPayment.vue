@@ -192,7 +192,7 @@
             navigateToStoreHome() {
                 this.$router.push({
                     name: 'show-store-home',
-                    params: { 'store_id': this.store.id }
+                    params: { store_id: this.store.id }
                 });
             },
             async showTransaction() {
@@ -203,8 +203,8 @@
 
                     let config = {
                         params: {
-                            'store_id': this.store.id,
-                            '_relationships': ['owner'].join(',')
+                            store_id: this.store.id,
+                            _relationships: ['owner'].join(',')
                         }
                     };
 
@@ -237,7 +237,7 @@
                     this.isRenewTransactionPaymentLink = true;
 
                     let data = {
-                        'store_id': this.store.id
+                        store_id: this.store.id
                     };
 
                     const response = await axios.post(`/api/transactions/${this.transaction.id}/renew`, data);
@@ -262,7 +262,7 @@
                     const transactionId = this.$route.query.transaction_id;
 
                     let data = {
-                        'store_id': this.store.id
+                        store_id: this.store.id
                     };
 
                     const response = await axios.post(`/api/pricing-plans/${this.pricingPlan.id}/pay/verify/${transactionId}`, data);

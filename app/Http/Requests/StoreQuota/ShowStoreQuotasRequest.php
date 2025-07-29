@@ -46,7 +46,7 @@ class ShowStoreQuotasRequest extends FormRequest
             'store_quota_id.exists' => 'The specified store quota does not exist.',
             'store_id.uuid' => 'The store ID must be a valid UUID.',
             'store_id.exists' => 'The specified store does not exist.',
-            'association.enum' => 'The association must be one of: ' . Arr::join([Association::ASSOCIATED->value, Association::UNASSOCIATED->value], ',', 'or'),
+            'association.enum' => 'The association must be one of: ' . Arr::join([Association::ASSOCIATED->value, Association::UNASSOCIATED->value], ', ', ' or '),
         ];
     }
 }

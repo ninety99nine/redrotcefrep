@@ -65,7 +65,7 @@ class CourierController extends Controller
     }
 
     /**
-     * Show single courier.
+     * Show courier.
      *
      * @param ShowCourierRequest $request
      * @param Courier $courier

@@ -164,10 +164,14 @@ class DeliveryMethodService extends BaseService
             'days_of_week_disabled' => $showAllDates ? [] : $deliveryMethod->daysOfWeekDisabled(),
         ];
 
+        /*
+        dd($deliveryMethod->minDate(), $deliveryMethod->maxDate(), $deliveryMethod->datesDisabled(), $deliveryMethod->daysOfWeekDisabled());
+
         if($deliveryDate) {
             dd($scheduleOptions);
 
         }
+        */
 
         $availableDays = collect($deliveryMethod->operational_hours)
             ->filter(fn($day) => $showAllDates ?? $day['available'])

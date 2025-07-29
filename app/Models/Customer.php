@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Casts\Money;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Attributes\Scope;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -51,7 +52,7 @@ class Customer extends Model
      * @return void
      */
     #[Scope]
-    public function scopeSearch(Builder $query, string $searchTerm): void
+    protected function search(Builder $query, string $searchTerm): void
     {
         $query->where('first_name', 'like', '%' . $searchTerm . '%')
               ->orWhere('last_name', 'like', '%' . $searchTerm . '%')
@@ -77,5 +78,17 @@ class Customer extends Model
     public function store(): BelongsTo
     {
         return $this->belongsTo(Store::class);
+    }
+
+    /**
+     * Get the customer's full name.
+     *
+     * @return Attribute
+     */
+    protected function name(): Attribute
+    {
+        return Attribute::make(
+            get: fn () => trim("{$this->first_name} {$this->last_name}")
+        );
     }
 }

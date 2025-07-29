@@ -65,7 +65,7 @@ class UserController extends Controller
     }
 
     /**
-     * Show single user.
+     * Show user.
      *
      * @param ShowUserRequest $request
      * @param User $user

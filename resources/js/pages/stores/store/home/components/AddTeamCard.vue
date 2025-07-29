@@ -52,7 +52,7 @@
                 this.$router.push({
                     name: 'invite-store-team-member',
                     params: {
-                        'store_id': this.store.id
+                        store_id: this.store.id
                     }
                 });
             },

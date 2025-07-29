@@ -51,7 +51,7 @@ class UpdateAddressRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'type.enum' => 'The address type must be one of: ' . Arr::join(AddressType::values(), ',', 'or'),
+            'type.enum' => 'The address type must be one of: ' . Arr::join(AddressType::values(), ', ', ' or '),
             'address_line.string' => 'The address line must be a string.',
             'address_line.max' => 'The address line must not exceed 255 characters.',
             'address_line2.string' => 'The second address line must be a string.',
@@ -73,7 +73,7 @@ class UpdateAddressRequest extends FormRequest
             'longitude.min' => 'The longitude must be at least -180.',
             'longitude.max' => 'The longitude must not exceed 180.',
             'owner_id.uuid' => 'The owner ID must be a valid UUID.',
-            'owner_type.in' => 'The owner type must be one of: ' . Arr::join(['store', 'customer'], ',', 'or'),
+            'owner_type.in' => 'The owner type must be one of: ' . Arr::join(['store', 'customer'], ', ', ' or '),
         ];
     }
 }

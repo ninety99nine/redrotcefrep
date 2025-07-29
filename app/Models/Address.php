@@ -2,8 +2,10 @@
 
 namespace App\Models;
 
+use App\Services\CountryService;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Attributes\Scope;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
@@ -63,5 +65,23 @@ class Address extends Model
     public function mediable(): MorphTo
     {
         return $this->morphTo();
+    }
+
+    /**
+     * Get the complete address.
+     *
+     * @return Attribute
+     */
+    protected function completeAddress(): Attribute
+    {
+        return Attribute::make(
+            get: function() {
+                $countryName = function() {
+                    if(empty($this->country)) return '';
+                    return CountryService::findCountryNameByTwoLetterCountryCode($this->country) ?? '';
+                };
+                return collect([$this->address_line, $this->address_line2, $this->city, $this->state, $this->postal_code, $countryName()])->map('trim')->filter()->unique()->join(', ');
+            }
+        );
     }
 }

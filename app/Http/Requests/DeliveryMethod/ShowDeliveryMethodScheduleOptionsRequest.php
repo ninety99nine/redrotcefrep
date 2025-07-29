@@ -48,6 +48,9 @@ class ShowDeliveryMethodScheduleOptionsRequest extends FormRequest
             'earliest_delivery_time_value' => ['required', 'integer', 'min:1', 'max:255'],
             'require_minimum_notice_for_orders' => ['required', 'boolean'],
             'restrict_maximum_notice_for_orders' => ['required', 'boolean'],
+            'delivery_date' => ['nullable', 'date'],
+            'show_all_dates' => ['sometimes', 'boolean'],
+            'show_all_timeslots' => ['sometimes', 'boolean'],
         ];
     }
 
@@ -63,7 +66,7 @@ class ShowDeliveryMethodScheduleOptionsRequest extends FormRequest
             'store_id.uuid' => 'The store ID must be a valid UUID.',
             'store_id.exists' => 'The specified store does not exist.',
             'schedule_type.required' => 'The schedule type is required.',
-            'schedule_type.enum' => 'The schedule type must be one of: ' . Arr::join(DeliveryMethodScheduleType::values(), ',', 'or'),
+            'schedule_type.enum' => 'The schedule type must be one of: ' . Arr::join(DeliveryMethodScheduleType::values(), ', ', ' or '),
             'daily_order_limit.required_if' => 'The daily order limit is required when set_daily_order_limit is true.',
             'daily_order_limit.integer' => 'The daily order limit must be an integer.',
             'daily_order_limit.min' => 'The daily order limit must be at least 0.',
@@ -88,7 +91,7 @@ class ShowDeliveryMethodScheduleOptionsRequest extends FormRequest
             'set_daily_order_limit.required' => 'The set daily order limit option is required.',
             'set_daily_order_limit.boolean' => 'The set daily order limit option must be a boolean.',
             'time_slot_interval_unit.required' => 'The time slot interval unit is required.',
-            'time_slot_interval_unit.enum' => 'The time slot interval unit must be one of: ' . Arr::join(AutoGenerateTimeSlotsUnit::values(), ',', 'or'),
+            'time_slot_interval_unit.enum' => 'The time slot interval unit must be one of: ' . Arr::join(AutoGenerateTimeSlotsUnit::values(), ', ', ' or '),
             'auto_generate_time_slots.required' => 'The auto generate time slots option is required.',
             'auto_generate_time_slots.boolean' => 'The auto generate time slots option must be a boolean.',
             'time_slot_interval_value.required_if' => 'The time slot interval value is required when auto_generate_time_slots is true.',
@@ -100,7 +103,7 @@ class ShowDeliveryMethodScheduleOptionsRequest extends FormRequest
             'latest_delivery_time_value.min' => 'The latest delivery time value must be at least 1.',
             'latest_delivery_time_value.max' => 'The latest delivery time value must not exceed 255.',
             'earliest_delivery_time_unit.required' => 'The earliest delivery time unit is required.',
-            'earliest_delivery_time_unit.enum' => 'The earliest delivery time unit must be one of: ' . Arr::join(DeliveryTimeUnit::values(), ',', 'or'),
+            'earliest_delivery_time_unit.enum' => 'The earliest delivery time unit must be one of: ' . Arr::join(DeliveryTimeUnit::values(), ', ', ' or '),
             'earliest_delivery_time_value.required' => 'The earliest delivery time value is required.',
             'earliest_delivery_time_value.integer' => 'The earliest delivery time value must be an integer.',
             'earliest_delivery_time_value.min' => 'The earliest delivery time value must be at least 1.',

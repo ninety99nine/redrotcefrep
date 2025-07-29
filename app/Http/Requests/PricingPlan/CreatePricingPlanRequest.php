@@ -64,7 +64,7 @@ class CreatePricingPlanRequest extends FormRequest
             'type.max' => 'The type may not be greater than 255 characters.',
             'description.string' => 'The description must be a string.',
             'billing_type.required' => 'The billing type field is required.',
-            'billing_type.enum' => 'The billing type must be one of: ' . Arr::join(PricingPlanBillingType::values(), ',', 'or'),
+            'billing_type.enum' => 'The billing type must be one of: ' . Arr::join(PricingPlanBillingType::values(), ', ', ' or '),
             'currency.required' => 'The currency field is required.',
             'currency.size' => 'The currency must be exactly 3 characters.',
             'price.required' => 'The price field is required.',

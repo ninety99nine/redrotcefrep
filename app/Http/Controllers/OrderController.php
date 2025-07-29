@@ -91,7 +91,7 @@ class OrderController extends Controller
     }
 
     /**
-     * Show single order.
+     * Show order.
      *
      * @param ShowOrderRequest $request
      * @param Order $order

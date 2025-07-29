@@ -12,6 +12,7 @@ use App\Http\Requests\Address\CreateAddressRequest;
 use App\Http\Requests\Address\UpdateAddressRequest;
 use App\Http\Requests\Address\DeleteAddressRequest;
 use App\Http\Requests\Address\DeleteAddressesRequest;
+use App\Http\Requests\Address\ValidateAddressRequest;
 use App\Http\Requests\Address\ShowCountryAddressOptionsRequest;
 
 class AddressController extends Controller
@@ -66,6 +67,17 @@ class AddressController extends Controller
     }
 
     /**
+     * Validate address.
+     *
+     * @param ValidateAddressRequest $request
+     * @return AddressResource
+     */
+    public function validateAddress(ValidateAddressRequest $request): AddressResource
+    {
+        return $this->service->validateAddress($request->validated());
+    }
+
+    /**
      * Show country address options.
      *
      * @param ShowCountryAddressOptionsRequest $request
@@ -77,7 +89,7 @@ class AddressController extends Controller
     }
 
     /**
-     * Show single address.
+     * Show address.
      *
      * @param ShowAddressRequest $request
      * @param Address $address

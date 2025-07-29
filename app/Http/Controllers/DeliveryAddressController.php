@@ -65,7 +65,7 @@ class DeliveryAddressController extends Controller
     }
 
     /**
-     * Show single delivery address.
+     * Show delivery address.
      *
      * @param ShowDeliveryAddressRequest $request
      * @param DeliveryAddress $deliveryAddress

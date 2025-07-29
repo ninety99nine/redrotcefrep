@@ -81,7 +81,7 @@ class StoreController extends Controller
     }
 
     /**
-     * Show single store.
+     * Show store.
      *
      * @param ShowStoreRequest $request
      * @param Store $store

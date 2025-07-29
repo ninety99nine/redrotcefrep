@@ -66,7 +66,7 @@ class TransactionController extends Controller
     }
 
     /**
-     * Show single transaction.
+     * Show transaction.
      *
      * @param ShowTransactionRequest $request
      * @param Transaction $transaction

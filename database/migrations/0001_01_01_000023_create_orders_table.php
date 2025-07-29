@@ -83,7 +83,7 @@ return new class extends Migration
             $table->string('cancellation_reason')->nullable();
             $table->timestamp('cancelled_at')->nullable();
 
-            $table->string('customer_first_name');
+            $table->string('customer_first_name')->nullable();
             $table->string('customer_last_name')->nullable();
             $table->string('customer_mobile_number', 20)->nullable();
             $table->string('customer_email')->nullable();

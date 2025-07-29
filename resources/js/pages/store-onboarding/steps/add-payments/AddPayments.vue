@@ -317,8 +317,8 @@
 
                     let config = {
                         params: {
-                            'store_id': this.store.id,
-                            '_relationships': 'paymentMethod,logo,photo'
+                            store_id: this.store.id,
+                            _relationships: 'paymentMethod,logo,photo'
                         }
                     };
 
@@ -403,8 +403,8 @@
 
                     let config = {
                         params: {
-                            'store_id': this.store.id,
-                            'association': 'unassociated'
+                            store_id: this.store.id,
+                            association: 'unassociated'
                         }
                     };
 
@@ -516,11 +516,6 @@
 
                     const [message] = configSchemaEntity.validation_rules.qr_code;
 
-                    console.log('value');
-                    console.log(value);
-                    console.log(`value?.file_path?.startsWith('blob:') && value?.valid_qr === false`);
-                    console.log(value?.file_path?.startsWith('blob:') && value?.valid_qr === false);
-
                     if (value?.file_path?.startsWith('blob:') && value?.valid_qr === false) {
                         errors.push(message);
                     }
@@ -568,7 +563,7 @@
                     const match = condition.match(/^([^!=]+)(!=|=)(.+)$/);
 
                     if (!match) {
-                        console.warn(`Invalid condition format: ${condition}`);
+                        console.log(`Invalid condition format: ${condition}`);
                         return false;
                     }
 
@@ -737,7 +732,7 @@
                 try {
 
                     if (retryCount > 2) {
-                        console.warn(`❌ Image upload for '${paymentMethod.name}' failed after 3 attempts.`);
+                        console.log(`❌ Image upload for '${paymentMethod.name}' failed after 3 attempts.`);
                         paymentMethod.configs[attribute].uploaded = false;
                         paymentMethod.configs[attribute].error_message = error?.response?.data?.message || error?.message || `Something went wrong while uploading ${attribute}`;
                         return Promise.reject(`Failed after 3 attempts`);
@@ -815,7 +810,7 @@
             navigateToAddSocials() {
                 this.$router.push({
                     name: 'add-socials',
-                    params: { 'store_id': this.store.id }
+                    params: { store_id: this.store.id }
                 });
             }
         },

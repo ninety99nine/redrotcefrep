@@ -65,7 +65,7 @@ class PromotionController extends Controller
     }
 
     /**
-     * Show single promotion.
+     * Show promotion.
      *
      * @param ShowPromotionRequest $request
      * @param Promotion $promotion

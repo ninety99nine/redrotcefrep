@@ -53,7 +53,7 @@ class ShowOrdersRequest extends FormRequest
             'store_id.exists' => 'The specified store does not exist.',
             'customer_id.uuid' => 'The customer ID must be a valid UUID.',
             'customer_id.exists' => 'The specified customer does not exist.',
-            'association.enum' => 'The association must be one of: ' . Arr::join([Association::SUPER_ADMIN->value, Association::TEAM_MEMBER->value], ',', 'or'),
+            'association.enum' => 'The association must be one of: ' . Arr::join([Association::SUPER_ADMIN->value, Association::TEAM_MEMBER->value], ', ', ' or '),
         ];
     }
 }

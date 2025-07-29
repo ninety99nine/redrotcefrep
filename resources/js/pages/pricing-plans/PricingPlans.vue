@@ -223,7 +223,7 @@
                     this.isGeneratingPaymentLink = true;
 
                     let data = {
-                        'store_id': this.store.id,
+                        store_id: this.store.id,
                         'payment_method_type': 'dpo'
                     };
 

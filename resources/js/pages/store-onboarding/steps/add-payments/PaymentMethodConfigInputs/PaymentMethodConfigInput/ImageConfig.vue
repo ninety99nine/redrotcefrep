@@ -288,7 +288,7 @@
                 };
 
                 if (!configs[attribute]) {
-                    console.warn(`⚠️ No valid config found for '${attribute}'`);
+                    console.log(`⚠️ No valid config found for '${attribute}'`);
                     return;
                 }
 
@@ -297,7 +297,7 @@
                 if (!validationErrors.length) {
                     await this.uploadSinglePaymentMethodImage(this.paymentMethod, attribute);
                 } else {
-                    console.warn(`❌ Upload prevented due to validation errors:`, validationErrors);
+                    console.log(`❌ Upload prevented due to validation errors:`, validationErrors);
                 }
             }
         }

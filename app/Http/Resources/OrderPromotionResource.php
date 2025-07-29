@@ -30,6 +30,7 @@ class OrderPromotionResource extends JsonResource
             'hours_of_day' => $this->hours_of_day,
             'days_of_the_week' => $this->days_of_the_week,
             'days_of_the_month' => $this->days_of_the_month,
+            'discount_rate_type' => $this->discount_rate_type,
             'months_of_the_year' => $this->months_of_the_year,
             'discount_flat_rate' => $this->discount_flat_rate,
             'remaining_quantity' => $this->remaining_quantity,
@@ -63,9 +64,9 @@ class OrderPromotionResource extends JsonResource
             'promotion' => UserResource::collection($this->whenLoaded('promotion')),
 
             '_links' => [
-                'show' => route('show.order_promotion', ['order_promotion' => $this->id]),
-                'update' => route('update.order_promotion', ['order_promotion' => $this->id]),
-                'delete' => route('delete.order_promotion', ['order_promotion' => $this->id]),
+                //  'show' => route('show.order_promotion', ['order_promotion' => $this->id]),
+                //  'update' => route('update.order_promotion', ['order_promotion' => $this->id]),
+                //  'delete' => route('delete.order_promotion', ['order_promotion' => $this->id]),
             ],
         ];
     }

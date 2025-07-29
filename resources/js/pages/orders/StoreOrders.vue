@@ -30,8 +30,7 @@
                 @updatedPerPage="updatedPerPage"
                 :filterExpressions="filterExpressions"
                 :sortingExpressions="sortingExpressions"
-                searchPlaceholder="Search by customer, product, order number or phone"
-                v-if="isLoadingOrders || ((pagination ?? {}).meta ?? {}).total > 0 || hasSearchTerm || hasFilterExpressions || hasSortingExpressions">
+                searchPlaceholder="Search by customer, product, order number or phone">
 
                 <template #afterRefreshButton>
 
@@ -295,37 +294,41 @@
 
                 </template>
 
-            </Table>
+                <!-- No Orders -->
+                <template #noResults>
 
-            <!-- No Orders -->
-            <div v-else class="flex justify-center">
+                    <div class="flex justify-between items-end p-10 bg-blue-50 border-t border-blue-200">
 
-                <div
-                    class="animated-border-blue w-96 bg-white py-4 px-4 shadow-sm space-y-4 rounded-xl">
+                        <div>
 
-                    <h1 class="text-xl font-bold">
-                        Ready For Your First Sale?
-                    </h1>
+                            <h1 class="text-2xl font-bold mb-4">
+                                Ready For Your First Sale?
+                            </h1>
 
-                    <p class="text-sm text-gray-500">
-                        Your orders will appear here once customers start shopping. Start promoting your store to attract buyers and generate sales. Promote your store on as many platforms as possible.
-                    </p>
+                            <p class="text-sm text-gray-500">
+                                Your orders will appear here once customers start shopping.
+                            </p>
 
-                    <div class="flex justify-end">
+                        </div>
 
-                        <!-- Add Button -->
-                        <Button
-                            size="sm"
-                            type="primary"
-                            :leftIcon="Plus"
-                            :action="onAddOrder">
-                            <span>Add Order</span>
-                        </Button>
+                        <div>
+
+                            <!-- Add Button -->
+                            <Button
+                                size="lg"
+                                type="primary"
+                                :leftIcon="Plus"
+                                :action="onAddOrder">
+                                <span>Add Order</span>
+                            </Button>
+
+                        </div>
 
                     </div>
-                </div>
 
-            </div>
+                </template>
+
+            </Table>
 
         </div>
 
@@ -336,7 +339,7 @@
             ref="exportOrdersModal"
             approveText="Export Orders"
             :approveAction="exportOrders"
-            :approveIcon="ArrowDownToLine"
+            :leftApproveIcon="ArrowDownToLine"
             :approveLoading="isExportingOrders">
 
             <template #content>
@@ -398,6 +401,7 @@
         <Modal
             approveText="Assign"
             approveType="primary"
+            :scrollOnContent="false"
             ref="assignTeamMemberModal"
             :approveLoading="isUpdatingOrders"
             :approveAction="() => updateOrders('Assign Team Member')">
@@ -433,9 +437,9 @@
         <Modal
             approveType="primary"
             ref="updateOrdersModal"
-            :approveIcon="RefreshCcw"
             :scrollOnContent="false"
             approveText="Change Status"
+            :leftApproveIcon="RefreshCcw"
             :approveLoading="isUpdatingOrders"
             :approveAction="() => updateOrders('Change Status')">
 
@@ -571,8 +575,8 @@
             approveType="primary"
             ref="downloadPdfModal"
             approveText="Download PDF"
-            :approveIcon="ArrowDownToLine"
             :approveAction="downloadOrders"
+            :leftApproveIcon="ArrowDownToLine"
             :approveLoading="isDownloadingOrders">
 
             <template #content>
@@ -595,8 +599,8 @@
         <Modal
             ref="printPdfModal"
             approveType="primary"
-            :approveIcon="Printer"
             approveText="Print PDF"
+            :leftApproveIcon="Printer"
             :approveAction="printOrders"
             :approveLoading="isDownloadingOrders">
 
@@ -619,8 +623,8 @@
         <!-- Delete Orders -->
         <Modal
             approveType="danger"
-            :approveIcon="Trash"
             ref="deleteOrdersModal"
+            :leftApproveIcon="Trash"
             :approveAction="deleteOrders"
             :approveLoading="isDeletingOrders"
             :approveText="totalCheckedRows == 1 ? 'Delete Order' : 'Delete Orders'">
@@ -677,12 +681,11 @@
     import Table from '@Partials/table/Table.vue';
     import { VueDraggableNext } from 'vue-draggable-next';
     import Status from '@Pages/orders/order/components/order-header/Status.vue';
+    import { formattedDatetime, formattedRelativeDate } from '@Utils/dateUtils.js';
     import NoDataPlaceholder from '@Partials/table/components/NoDataPlaceholder.vue';
     import { Info, Plus, Trash, Printer, RefreshCcw, ArrowDownToLine } from 'lucide-vue-next';
     import PaymentStatus from '@Pages/orders/order/components/order-header/PaymentStatus.vue';
     import CollectionStatus from '@Pages/orders/order/components/order-header/CollectionStatus.vue';
-
-    import { formattedDatetime, formattedRelativeDate } from '@Utils/dateUtils.js';
 
     export default {
         inject: ['formState', 'storeState', 'notificationState'],
@@ -705,6 +708,7 @@
                 pagination: null,
                 searchTerm: null,
                 selectAll: false,
+                latestRequestId: 0,
                 teamMemberId: null,
                 exportLimit: '100',
                 exportFormat: 'csv',
@@ -714,6 +718,7 @@
                 sortingExpressions: [],
                 isDeletingOrderIds: [],
                 isLoadingOrders: false,
+                cancelTokenSource: null,
                 isUpdatingOrders: false,
                 exportWithFilters: true,
                 exportWithSorting: true,
@@ -894,7 +899,7 @@
                 this.$refs.sendToWhatsappModal.showModal();
             },
             showAssignTeamMemberModal() {
-                this.getTeamMembers();
+                this.showTeamMembers();
                 this.$refs.actionDropdown.hideDropdown();
                 this.$refs.assignTeamMemberModal.showModal();
             },
@@ -923,11 +928,11 @@
             onAddOrder() {
                 this.$router.push({
                     name: 'create-order',
-                    query: { 'store_id': this.store.id }
+                    query: { store_id: this.store.id }
                 });
             },
-            paginate(url) {
-                this.getOrders(url);
+            paginate(page) {
+                this.getOrders(page);
             },
             search(searchTerm) {
                 this.searchTerm = searchTerm;
@@ -954,53 +959,66 @@
                 this.perPage = perPage;
                 this.getOrders();
             },
-            async getOrders(url = null) {
+            async getOrders(page = 1) {
+
+                const currentRequestId = ++this.latestRequestId;
 
                 try {
 
                     this.isLoadingOrders = true;
 
-                    let config = {};
-
-                    if(url == null) {
-
-                        url = `/api/orders`;
-
-                        config = {
-                            params: {
-                                'per_page': this.perPage,
-                                'store_id': this.store.id
-                            }
-                        }
-
-                        if(this.hasSearchTerm) config.params['search'] = this.searchTerm;
-
-                        if(this.hasFilterExpressions) {
-                            config.params['_filters'] = this.filterExpressions.join('|');
-                        }
-
-                        if(this.hasSortingExpressions) {
-                            config.params['_sort'] = this.sortingExpressions.join('|');
-                        }
-
+                    if (this.cancelTokenSource) {
+                        this.cancelTokenSource.cancel('Request superseded by a newer one'); // Cancel previous request if it exists
                     }
 
-                    const response = await axios.get(url, config);
+                    this.cancelTokenSource = axios.CancelToken.source(); // Create a new cancel token source
+
+                    const config = {
+                        params: {
+                            'page': page,
+                            store_id: this.store.id,
+                            'per_page': this.perPage
+                        },
+                        cancelToken: this.cancelTokenSource.token // Attach cancel token
+                    }
+
+                    if(this.hasSearchTerm) config.params['search'] = this.searchTerm;
+
+                    if(this.hasFilterExpressions) {
+                        config.params['_filters'] = this.filterExpressions.join('|');
+                    }
+
+                    if(this.hasSortingExpressions) {
+                        config.params['_sort'] = this.sortingExpressions.join('|');
+                    }
+
+                    const response = await axios.get(`/api/orders`, config);
+
+                    // Only process response if it matches the latest request
+                    if (currentRequestId !== this.latestRequestId) return;
 
                     this.pagination = response.data;
                     this.orders = this.pagination.data;
+
                     this.checkedRows = this.orders.reduce((acc, order) => {
                         acc[order.id] = false;
                         return acc;
                     }, {});
 
                 } catch (error) {
+
+                    if (axios.isCancel(error)) return; // Ignore canceled requests
+
+                    if (currentRequestId !== this.latestRequestId) return;
+
                     const message = error?.response?.data?.message || error?.message || 'Something went wrong while fetching orders';
                     this.notificationState.showWarningNotification(message);
                     this.formState.setServerFormErrors(error);
                     console.error('Failed to fetch orders:', error);
                 } finally {
+                    if (currentRequestId !== this.latestRequestId) return;
                     this.isLoadingOrders = false;
+                    this.cancelTokenSource = null;
                 }
 
             },
@@ -1014,7 +1032,7 @@
                     let config = {
                         params: {
                             '_export': '1',
-                            'store_id': this.store.id,
+                            store_id: this.store.id,
                             'export_mode': this.exportMode,
                             'export_limit': this.exportLimit,
                             'export_format': this.exportFormat
@@ -1074,7 +1092,7 @@
                         if(this.status != 'no change') data['status'] = this.status.toLowerCase();
                         if(this.paymentStatus != 'no change') data['payment_status'] = this.paymentStatus.toLowerCase();
                     }else if(isAssigningTeamMember) {
-                        if(this.teamMemberId) data['assigned_to_user_id'] = this.teamMemberId;
+                        data['assigned_to_user_id'] = this.teamMemberId;
                     }
 
                     if(Object.keys(data).length == 2) return;
@@ -1088,8 +1106,12 @@
                     if(isChangingStatus) {
                         this.notificationState.showSuccessNotification('Order status updated');
                     }else if(isAssigningTeamMember) {
-                        const teamMember = this.teamMembers.find(teamMember => teamMember.value === this.teamMemberId);
-                        if (teamMember) this.notificationState.showSuccessNotification(`Orders assigned to ${teamMember.first_name}`);
+                        if(this.teamMemberId)  {
+                            const teamMember = this.teamMembers.find(teamMember => teamMember.value === this.teamMemberId);
+                            if (teamMember) this.notificationState.showSuccessNotification(`Orders assigned to ${teamMember.first_name}`);
+                        }else{
+                            this.notificationState.showSuccessNotification(`No team member unassigned`);
+                        }
                     }
 
                     // Uncheck only the related rows
@@ -1109,6 +1131,7 @@
                 } finally {
                     this.isUpdatingOrders = false;
                     this.$refs.updateOrdersModal.hideModal();
+                    this.$refs.assignTeamMemberModal.hideModal();
                 }
 
             },
@@ -1266,52 +1289,66 @@
 
                     this.isDeletingOrderIds.push(this.deletableOrder.id);
 
-                    await axios.delete(`/api/orders/${this.deletableOrder.id}`);
+                    const config = {
+                        data: {
+                            store_id: this.store.id
+                        }
+                    }
+
+                    await axios.delete(`/api/orders/${this.deletableOrder.id}`, config);
 
                     this.notificationState.showSuccessNotification('Order deleted');
                     this.orders = this.orders.filter(order => order.id != this.deletableOrder.id);
                     if(this.orders.length == 0) this.getOrders();
 
                 } catch (error) {
-                    const message = error?.response?.data?.message || error?.message || 'Something went wrong while deleting orders';
+                    const message = error?.response?.data?.message || error?.message || 'Something went wrong while deleting order';
                     this.notificationState.showWarningNotification(message);
                     this.formState.setServerFormErrors(error);
-                    console.error('Failed to delete orders:', error);
+                    console.error('Failed to delete order:', error);
                 } finally {
-                    this.isDeletingOrderIds.splice(this.isDeletingOrderIds.findIndex((id) => id == this.deletableOrder.id, 1));
+                    this.isDeletingOrderIds.splice(this.isDeletingOrderIds.findIndex((id) => id == this.deletableOrder.id), 1);
                     this.$refs.deleteOrderModal.hideModal();
                 }
 
             },
-            async getTeamMembers() {
+            async showTeamMembers() {
+                try {
 
-                this.isLoadingTeamMembers = true;
+                    this.isLoadingTeamMembers = true;
 
-                await axios.get(this.store._links.showStoreTeamMembers).then(response => {
+                    let config = {
+                        params: {
+                            store_id: this.store.id
+                        }
+                    };
 
-                    if(response.status == 200) {
-                        const pagination = response.data;
-                        this.teamMembers = pagination.data.map(function(teamMember) {
+                    const response = await axios.get('/api/users', config);
+
+                    const pagination = response.data;
+                    this.teamMembers = [
+                        {
+                            'label': 'Unassigned',
+                            'value': null
+                        },
+                        ...pagination.data.map(function(teamMember) {
                             return {
                                 value: teamMember.id,
                                 label: teamMember.name,
                                 first_name: teamMember.first_name
                             }
-                        });
-                        this.teamMemberId = this.teamMembers[0].value;
-                    }else{
+                        })
+                    ];
+                    this.teamMemberId = this.teamMembers[0].value;
 
-                        this.formState.setFormError('general', response.data.message);
-                        this.notificationState.showWarningNotification(response.data.message);
-
-                    }
-
-                }).catch(errorException => {
-                    this.formState.setServerFormErrors(errorException);
-                });
-
-                this.isLoadingTeamMembers = false;
-
+                } catch (error) {
+                    const message = error?.response?.data?.message || error?.message || 'Something went wrong while fetching team members';
+                    this.notificationState.showWarningNotification(message);
+                    this.formState.setServerFormErrors(error);
+                    console.error('Failed to fetch team members:', error);
+                } finally {
+                    this.isLoadingTeamMembers = false;
+                }
             },
             async sendToWhatsapp() {
 
@@ -1375,7 +1412,7 @@
                                     orderMessage += `${checkedOrders[i].created_at}\n`;
                                     break;
                                 case "Order Link":
-                                    orderMessage += `${window.location.origin + this.$router.resolve({ name: 'show-order', params: { 'store_id': this.store.id, 'order_id': checkedOrders[i].id } }).href}\n`;
+                                    orderMessage += `${window.location.origin + this.$router.resolve({ name: 'show-order', params: { store_id: this.store.id, 'order_id': checkedOrders[i].id } }).href}\n`;
                                     break;
                             }
 

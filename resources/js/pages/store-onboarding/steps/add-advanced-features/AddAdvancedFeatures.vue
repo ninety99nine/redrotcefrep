@@ -746,8 +746,8 @@
 
                     let config = {
                         params: {
-                            'store_id': this.store.id,
-                            '_relationships': 'workflowSteps'
+                            store_id: this.store.id,
+                            _relationships: 'workflowSteps'
                         }
                     };
 
@@ -774,7 +774,7 @@
 
                     let config = {
                         params: {
-                            'store_id': this.store.id
+                            store_id: this.store.id
                         }
                     };
 
@@ -804,7 +804,7 @@
             navigateToShare() {
                 this.$router.push({
                     name: 'share',
-                    params: { 'store_id': this.store.id }
+                    params: { store_id: this.store.id }
                 });
             }
         },

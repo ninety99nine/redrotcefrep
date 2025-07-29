@@ -17,5 +17,6 @@ Route::prefix('media-files')
             Route::get('/', 'showMediaFile')->name('show.media.file');
             Route::put('/', 'updateMediaFile')->name('update.media.file');
             Route::delete('/', 'deleteMediaFile')->name('delete.media.file');
+            Route::get('/download', 'downloadMediaFile')->name('download.media.file');
         });
     });

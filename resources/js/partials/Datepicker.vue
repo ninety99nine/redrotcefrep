@@ -70,10 +70,12 @@
                 :max-date="maxDate"
                 :min-time="minTime"
                 :max-time="maxTime"
+                :disabled="disabled"
                 :model-type="modelType"
                 :year-range="yearRange"
                 :start-time="startTime"
                 v-model="localModelValue"
+                :placeholder="placeholder"
                 :reverse-years="reverseYears"
                 :allowed-dates="allowedDates"
                 :disabled-dates="disabledDates"
@@ -157,6 +159,14 @@
             externalLinkUrl: {
                 type: [String, null],
                 default: null
+            },
+            placeholder: {
+                type: [String, null],
+                default: null
+            },
+            disabled: {
+                type: Boolean,
+                default: false
             },
             errorText: {
                 type: [String, null],

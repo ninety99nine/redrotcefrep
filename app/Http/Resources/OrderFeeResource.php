@@ -32,9 +32,9 @@ class OrderFeeResource extends JsonResource
             'store' => UserResource::collection($this->whenLoaded('store')),
 
             '_links' => [
-                'show' => route('show.order_fee', ['order_fee' => $this->id]),
-                'update' => route('update.order_fee', ['order_fee' => $this->id]),
-                'delete' => route('delete.order_fee', ['order_fee' => $this->id]),
+                //  'show' => route('show.order_fee', ['order_fee' => $this->id]),
+                //  'update' => route('update.order_fee', ['order_fee' => $this->id]),
+                //  'delete' => route('delete.order_fee', ['order_fee' => $this->id]),
             ],
         ];
     }

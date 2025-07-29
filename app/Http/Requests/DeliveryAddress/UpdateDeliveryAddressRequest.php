@@ -50,7 +50,7 @@ class UpdateDeliveryAddressRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'type.enum' => 'The address type must be one of: ' . Arr::join(AddressType::values(), ',', 'or'),
+            'type.enum' => 'The address type must be one of: ' . Arr::join(AddressType::values(), ', ', ' or '),
             'address_line.string' => 'The address line must be a string.',
             'address_line.max' => 'The address line must not exceed 255 characters.',
             'address_line2.string' => 'The second address line must be a string.',

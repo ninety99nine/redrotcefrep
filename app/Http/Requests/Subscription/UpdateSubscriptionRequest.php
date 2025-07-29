@@ -54,7 +54,7 @@ class UpdateSubscriptionRequest extends FormRequest
             'pricing_plan_id.uuid' => 'The pricing plan ID must be a valid UUID.',
             'pricing_plan_id.exists' => 'The specified pricing plan does not exist.',
             'owner_id.uuid' => 'The owner ID must be a valid UUID.',
-            'owner_type.in' => 'The owner type must be one of: ' . Arr::join(['user', 'store'], ',', 'or'),
+            'owner_type.in' => 'The owner type must be one of: ' . Arr::join(['user', 'store'], ', ', ' or '),
         ];
     }
 }

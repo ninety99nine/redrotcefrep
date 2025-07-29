@@ -65,7 +65,7 @@ class AiAssistantController extends Controller
     }
 
     /**
-     * Show single AI assistant.
+     * Show AI assistant.
      *
      * @param ShowAiAssistantRequest $request
      * @param AiAssistant $aiAssistant

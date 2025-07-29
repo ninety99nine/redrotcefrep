@@ -82,8 +82,8 @@
 
                     let config = {
                         params: {
-                            'association': 'team member',
-                            '_relationships': ['logo', 'activeSubscription'].join(',')
+                            association: 'team member',
+                            _relationships: ['logo', 'activeSubscription'].join(',')
                         }
                     };
 

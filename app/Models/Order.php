@@ -6,10 +6,12 @@ use App\Casts\Money;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Attributes\Scope;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Propaganistas\LaravelPhone\Casts\E164PhoneNumberCast;
 
@@ -180,11 +182,11 @@ class Order extends Model
     /**
      * Get the delivery address.
      *
-     * @return BelongsTo
+     * @return HasOne
      */
-    public function deliveryAddress(): BelongsTo
+    public function deliveryAddress(): HasOne
     {
-        return $this->belongsTo(DeliveryAddress::class);
+        return $this->hasOne(DeliveryAddress::class);
     }
 
     /**
@@ -238,16 +240,6 @@ class Order extends Model
     }
 
     /**
-     * Get the order history.
-     *
-     * @return HasMany
-     */
-    public function orderHistory(): HasMany
-    {
-        return $this->hasMany(OrderHistory::class);
-    }
-
-    /**
      * Get the order comments.
      *
      * @return HasMany
@@ -255,6 +247,16 @@ class Order extends Model
     public function orderComments(): HasMany
     {
         return $this->hasMany(OrderComment::class);
+    }
+
+    /**
+     * Get the transactions.
+     *
+     * @return MorphMany
+     */
+    public function transactions(): MorphMany
+    {
+        return $this->morphMany(Transaction::class, 'owner');
     }
 
     /**

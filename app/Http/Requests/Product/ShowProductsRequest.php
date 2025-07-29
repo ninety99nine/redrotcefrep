@@ -43,7 +43,7 @@ class ShowProductsRequest extends FormRequest
         return [
             'product_id.uuid' => 'The product ID must be a valid UUID.',
             'product_id.exists' => 'The specified product does not exist.',
-            'association.enum' => 'The association must be one of: ' . Arr::join([Association::SUPER_ADMIN->value, Association::TEAM_MEMBER->value, Association::SHOPPER->value], ',', 'or'),
+            'association.enum' => 'The association must be one of: ' . Arr::join([Association::SUPER_ADMIN->value, Association::TEAM_MEMBER->value, Association::SHOPPER->value], ', ', ' or '),
         ];
     }
 }

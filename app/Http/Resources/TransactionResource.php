@@ -48,10 +48,13 @@ class TransactionResource extends JsonResource
             'manually_verified_by_user_id' => $this->manually_verified_by_user_id,
 
             'store' => new StoreResource($this->whenLoaded('store')),
+            'photo' => new MediaFileResource($this->whenLoaded('photo')),
             'customer' => new CustomerResource($this->whenLoaded('customer')),
+            'photos' => MediaFileResource::collection($this->whenLoaded('photos')),
             'owner' => $this->whenLoaded('owner', fn() => $this->getOwnerResource()),
             'ai_assistant' => new AiAssistantResource($this->whenLoaded('aiAssistant')),
             'requested_by_user' => new UserResource($this->whenLoaded('requestedByUser')),
+            'media_files' => MediaFileResource::collection($this->whenLoaded('mediaFiles')),
             'payment_method' => new PaymentMethodResource($this->whenLoaded('paymentMethod')),
             'manually_verified_by_user' => new UserResource($this->whenLoaded('manuallyVerifiedByUser')),
 

@@ -22,7 +22,7 @@
         <button
             v-if="dismissable"
             @click.prevent.stop="visible = false"
-            class="ms-auto flex items-center justify-center size-5 rounded-lg border border-transparent text-gray-500 hover:bg-gray-100 hover:text-gray-800 focus:outline-none dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
+            class="ms-auto flex items-center justify-center size-5 rounded-lg border border-transparent text-gray-500 hover:bg-white/80 hover:text-gray-800 focus:outline-none dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white cursor-pointer"
         >
             <span class="sr-only">Close</span>
             <svg class="size-3" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">

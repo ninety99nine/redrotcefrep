@@ -46,7 +46,7 @@ class ShowAiAssistantsRequest extends FormRequest
             'ai_assistant_id.exists' => 'The specified AI assistant does not exist.',
             'user_id.uuid' => 'The user ID must be a valid UUID.',
             'user_id.exists' => 'The specified user does not exist.',
-            'association.enum' => 'The association must be one of: ' . Arr::join([Association::ASSOCIATED->value, Association::UNASSOCIATED->value], ',', 'or'),
+            'association.enum' => 'The association must be one of: ' . Arr::join([Association::ASSOCIATED->value, Association::UNASSOCIATED->value], ', ', ' or '),
         ];
     }
 }

@@ -31,9 +31,9 @@ class BasePolicy
      */
     protected function isStoreUserWithPermission(User $user, string $ability): bool
     {
-        // StorePermission Middleware sets the store id as the team id
-        if (!getPermissionsTeamId()) return false;
+        $storeId = getPermissionsTeamId();  // StorePermission Middleware sets the store id as the team id
+        $isStoreMember = $storeId && $user->stores()->where('stores.id', $storeId)->exists();
 
-        return $user->hasPermissionTo($ability);
+        return $isStoreMember && $user->hasPermissionTo($ability);
     }
 }

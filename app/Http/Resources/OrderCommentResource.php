@@ -25,14 +25,17 @@ class OrderCommentResource extends JsonResource
             'created_at' => $this->created_at->toDateTimeString(),
             'updated_at' => $this->updated_at->toDateTimeString(),
 
-            'order' => UserResource::collection($this->whenLoaded('order')),
-            'store' => UserResource::collection($this->whenLoaded('store')),
-            'user' => UserResource::collection($this->whenLoaded('user')),
+            'user' => new UserResource($this->whenLoaded('user')),
+            'store' => new StoreResource($this->whenLoaded('store')),
+            'order' => new OrderResource($this->whenLoaded('order')),
+            'photo' => new MediaFileResource($this->whenLoaded('photo')),
+            'photos' => MediaFileResource::collection($this->whenLoaded('photos')),
+            'media_files' => MediaFileResource::collection($this->whenLoaded('mediaFiles')),
 
             '_links' => [
-                'show' => route('show.order_comment', ['order_comment' => $this->id]),
-                'update' => route('update.order_comment', ['order_comment' => $this->id]),
-                'delete' => route('delete.order_comment', ['order_comment' => $this->id]),
+                //  'show' => route('show.order_comment', ['order_comment' => $this->id]),
+                //  'update' => route('update.order_comment', ['order_comment' => $this->id]),
+                //  'delete' => route('delete.order_comment', ['order_comment' => $this->id]),
             ],
         ];
     }

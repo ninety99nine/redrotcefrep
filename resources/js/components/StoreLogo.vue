@@ -87,18 +87,14 @@
         },
         methods: {
             triggerFileUpload() {
-                console.log('stage 1');
                 this.$refs.fileInput.click();
             },
             handleFileUpload(event) {
-                console.log('stage 2');
                 const file = event.target.files[0];
                 if (file) {
-                console.log('stage 3');
                     this.filePath = URL.createObjectURL(file);
                     this.$emit('selectedFile', this.$refs.fileInput.files[0]);
                     if(this.localStore) {
-                console.log('stage 4');
                         this.uploadStoreLogo();
                     }
                 }

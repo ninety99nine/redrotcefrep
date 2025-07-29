@@ -104,7 +104,7 @@ class UpdatePromotionRequest extends FormRequest
             'hours_of_day.array' => 'The hours of day must be an array.',
             'hours_of_day.*.regex' => 'Each hour of day must be in HH:MM format (e.g., 09:00).',
             'days_of_the_week.array' => 'The days of the week must be an array.',
-            'days_of_the_week.*.in' => 'Each day of the week must be one of: ' . Arr::join(DaysOfTheWeek::values(), ',', 'or'),
+            'days_of_the_week.*.in' => 'Each day of the week must be one of: ' . Arr::join(DaysOfTheWeek::values(), ', ', ' or '),
             'days_of_the_month.array' => 'The days of the month must be an array.',
             'days_of_the_month.*.integer' => 'Each day of the month must be an integer.',
             'days_of_the_month.*.min' => 'Each day of the month must be at least 1.',
@@ -117,7 +117,7 @@ class UpdatePromotionRequest extends FormRequest
             'store_id.exists' => 'The specified store does not exist.',
             'user_id.uuid' => 'The user ID must be a valid UUID.',
             'user_id.exists' => 'The specified user does not exist.',
-            'discount_rate_type.enum' => 'The discount rate type must be one of: ' . Arr::join(RateType::values(), ',', 'or'),
+            'discount_rate_type.enum' => 'The discount rate type must be one of: ' . Arr::join(RateType::values(), ', ', ' or '),
         ];
     }
 }

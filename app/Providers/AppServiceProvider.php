@@ -25,6 +25,7 @@ use Illuminate\Support\Facades\Event;
 use Illuminate\Foundation\Http\Kernel;
 use Illuminate\Support\ServiceProvider;
 use App\Http\Middleware\StorePermission;
+use App\Models\OrderComment;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Routing\Middleware\SubstituteBindings;
@@ -46,9 +47,12 @@ class AppServiceProvider extends ServiceProvider
     {
         Relation::enforceMorphMap([
             'user' => 'App\Models\User',
+            'order' => 'App\Models\Order',
             'store' => 'App\Models\Store',
             'product' => 'App\Models\Product',
-            'pricing plan' => 'App\Models\PricingPlan'
+            'transaction' => 'App\Models\Transaction',
+            'pricing plan' => 'App\Models\PricingPlan',
+            'order comment' => 'App\Models\OrderComment'
         ]);
 
         JsonResource::withoutWrapping();
@@ -103,6 +107,12 @@ class AppServiceProvider extends ServiceProvider
         Route::bind('order', function ($value) {
             $allowedRoutes = ['show.order'];
             return $this->applyEagerLoading(Order::query(), $allowedRoutes)->findOrFail($value);
+        });
+
+        // Bind OrderComment model
+        Route::bind('orderComment', function ($value) {
+            $allowedRoutes = ['show.order.comment'];
+            return $this->applyEagerLoading(OrderComment::query(), $allowedRoutes)->findOrFail($value);
         });
 
         // Bind Address model

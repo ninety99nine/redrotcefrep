@@ -112,7 +112,7 @@
                             name: 'show-order',
                             query: query,
                             params: {
-                                'store_id': this.store.id,
+                                store_id: this.store.id,
                                 'order_id': this.pagination.data[currentIndex + 1].id
                             }
                         });
@@ -133,7 +133,7 @@
                             name: 'show-order',
                             query: query,
                             params: {
-                                'store_id': this.store.id,
+                                store_id: this.store.id,
                                 'order_id': this.pagination.data[currentIndex - 1].id
                             }
                         });
@@ -163,7 +163,7 @@
                         config = {
                             params: {
                                 'per_page': this.perPage,
-                                'store_id': this.store.id
+                                store_id: this.store.id
                             }
                         }
 

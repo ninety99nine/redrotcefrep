@@ -39,7 +39,7 @@ class ShowSortingRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'type.enum' => 'The type must be one of: ' . Arr::join(SortResourceType::values(), ',', 'or'),
+            'type.enum' => 'The type must be one of: ' . Arr::join(SortResourceType::values(), ', ', ' or '),
         ];
     }
 }

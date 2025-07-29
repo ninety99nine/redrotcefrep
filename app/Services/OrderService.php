@@ -92,9 +92,15 @@ class OrderService extends BaseService
     {
         $storeId = $data['store_id'];
         $store = Store::find($storeId);
+        $inspect = $data['inspect'] ?? false;
 
         $shoppingCartInstance = (new ShoppingCartService)->startInspection($store);
-        $inspectedShoppingCart = $shoppingCartInstance->getShoppingCart();
+
+        if($inspect) {
+            return $shoppingCartInstance->getShoppingCart();
+        }else{
+            $inspectedShoppingCart = $shoppingCartInstance->getShoppingCart(false);
+        }
 
         $totalOrderProducts = $inspectedShoppingCart['totals_summary']['order_products']['total_products'];
         if($totalOrderProducts == 0) throw new Exception('The shopping cart does not have products to place an order');
@@ -109,7 +115,7 @@ class OrderService extends BaseService
         $orderDiscounts = $this->syncOrderDiscounts($order, $inspectedShoppingCart);
         $orderFees = $this->syncOrderFees($order, $inspectedShoppingCart);
 
-        $this->addOrderHistoryComment($order, 'Order created');
+        $this->addOrderComment($order, 'Order created');
         $order->setRelations([
             'store' => $store,
             'customer' => $customer,
@@ -247,7 +253,7 @@ class OrderService extends BaseService
             $store = $order->store;
 
             $shoppingCartInstance = (new ShoppingCartService)->startInspection($store);
-            $inspectedShoppingCart = $shoppingCartInstance->getShoppingCart();
+            $inspectedShoppingCart = $shoppingCartInstance->getShoppingCart(false);
 
             $totalOrderProducts = $inspectedShoppingCart['totals_summary']['order_products']['total_products'];
             if($totalOrderProducts == 0) return ['updated' => false, 'message' => 'The shopping cart does not have products to update order'];
@@ -265,7 +271,7 @@ class OrderService extends BaseService
             $orderDiscounts = $this->syncOrderDiscounts($order, $inspectedShoppingCart, true);
             $orderFees = $this->syncOrderFees($order, $inspectedShoppingCart, true);
 
-            $this->addOrderHistoryComment($order, 'Order updated');
+            $this->addOrderComment($order, 'Order updated');
 
             $order->setRelations([
                 'store' => $store,
@@ -569,6 +575,8 @@ class OrderService extends BaseService
         $createdByUserId = ($uncreatedOrder && $isTeamMember) ? Auth::user()->id : $order->created_by_user_id;
         $placedByUserId = $createdByUserId ? $createdByUserId : ($order->placed_by_user_id ?? Auth::user()?->id);
 
+        $deliveryMethodOption = collect($isc['delivery_method_options'])->firstWhere(fn($deliveryMethodOption) => $deliveryMethodOption['is_selected']);
+
         $orderPayload = [
             'summary' => null,
             'currency' => $store->currency,
@@ -603,36 +611,26 @@ class OrderService extends BaseService
             'total_uncancelled_promotions' => $isc['totals_summary']['order_promotions']['total_uncancelled_promotions'],
             'applied_promotion_code' => isset($isc['promotion_code']['applied']) && $isc['promotion_code']['applied'] == true,
 
-            'delivery_method_id' =>  is_null($isc['delivery']['method']) ? null : $isc['delivery']['method']['id'],
-            'delivery_method_name' =>  is_null($isc['delivery']['method']) ? null : $isc['delivery']['method']['name'],
+            'delivery_method_id' =>  is_null($deliveryMethodOption) ? null : $deliveryMethodOption['id'],
+            'delivery_method_name' =>  is_null($deliveryMethodOption) ? null : $deliveryMethodOption['name'],
 
-            'delivery_distance_value' => is_null($isc['delivery']['distance']) ? null : $isc['delivery']['distance']['value'],
-            'delivery_distance_unit' => is_null($isc['delivery']['distance']) ? null : $isc['delivery']['distance']['unit'],
-            'delivery_distance_text' => is_null($isc['delivery']['distance']) ? null : $isc['delivery']['distance']['text'],
+            'delivery_distance_value' => is_null($deliveryMethodOption) || is_null($deliveryMethodOption['distance']) ? null :$deliveryMethodOption['distance']['value'],
+            'delivery_distance_unit' => is_null($deliveryMethodOption) || is_null($deliveryMethodOption['distance']) ? null : $deliveryMethodOption['distance']['unit'],
+            'delivery_distance_text' => is_null($deliveryMethodOption) || is_null($deliveryMethodOption['distance']) ? null : $deliveryMethodOption['distance']['text'],
 
-            'delivery_duration_value' => is_null($isc['delivery']['duration']) ? null : $isc['delivery']['duration']['value'],
-            'delivery_duration_text' => is_null($isc['delivery']['duration']) ? null : $isc['delivery']['duration']['text'],
+            'delivery_duration_value' => is_null($deliveryMethodOption) || is_null($deliveryMethodOption['duration']) ? null :$deliveryMethodOption['duration']['value'],
+            'delivery_duration_text' => is_null($deliveryMethodOption) || is_null($deliveryMethodOption['duration']) ? null :$deliveryMethodOption['duration']['text'],
 
-            'delivery_weight_value' => is_null($isc['delivery']['weight']) ? null : $isc['delivery']['weight']['value'],
-            'delivery_weight_unit' => is_null($isc['delivery']['weight']) ? null : $isc['delivery']['weight']['unit'],
-            'delivery_weight_text' => is_null($isc['delivery']['weight']) ? null : $isc['delivery']['weight']['text'],
+            'delivery_weight_value' => is_null($deliveryMethodOption) || is_null($deliveryMethodOption['weight']) ? null :$deliveryMethodOption['weight']['value'],
+            'delivery_weight_unit' => is_null($deliveryMethodOption) || is_null($deliveryMethodOption['weight']) ? null :$deliveryMethodOption['weight']['unit'],
+            'delivery_weight_text' => is_null($deliveryMethodOption) || is_null($deliveryMethodOption['weight']) ? null :$deliveryMethodOption['weight']['text'],
 
-            'free_delivery' =>  $isc['delivery']['free_delivery'],
+            'free_delivery' => $isc['free_delivery'],
 
-            'delivery_date' => $isc['delivery']['date'],
-            'delivery_timeslot' => $isc['delivery']['timeslot'],
+            'delivery_date' =>  is_null($deliveryMethodOption) ? null : $deliveryMethodOption['date'],
+            'delivery_timeslot' =>  is_null($deliveryMethodOption) ? null : $deliveryMethodOption['timeslot'],
 
             'collection_code' => null,
-            'collection_qr_code' => null,
-            'collection_code_expires_at' => null,
-            'collection_verified' => false,
-            'collection_verified_at' => null,
-            'collection_verified_by_user_id' => null,
-            'collection_note' => null,
-
-            'cancelled_at' => null,
-            'cancellation_reason' => null,
-            'other_cancellation_reason' => null,
 
             'customer_id' => $customer?->id,
             'customer_email' => $customerEmail,
@@ -641,15 +639,8 @@ class OrderService extends BaseService
             'customer_mobile_number' => $customerMobileNumber,
             'customer_note' => $data['customer_note'] ?? null,
 
-            'total_views_by_team' => 0,
-            'first_viewed_by_team_at' => null,
-            'last_viewed_by_team_at' => null,
-
             'placed_by_user_id' => $placedByUserId,
             'created_by_user_id' => $createdByUserId,
-
-            'remark' => $data['remark'] ?? null,
-            'internal_note' => $data['internal_note'] ?? null,
 
             'store_id' => $store->id
         ];
@@ -661,23 +652,18 @@ class OrderService extends BaseService
                 'total_views_by_team' => ($order?->total_views_by_team ?? 0) + 1,
                 'first_viewed_by_team_at' => $order?->first_viewed_by_team_at ?? now(),
 
-                'collection_qr_code' => $order?->collection_qr_code ?? $orderPayload['collection_qr_code'],
-                'collection_verified' => $order?->collection_verified ?? $orderPayload['collection_verified'],
-                'remark' => isset($data['remark']) ? $data['remark'] : $order?->remark ?? $orderPayload['remark'],
-                'status' => isset($data['status']) ? $data['status'] : $order?->status ?? $orderPayload['status'],
-                'collection_verified_at' => $order?->collection_verified_at ?? $orderPayload['collection_verified_at'],
-                'collection_code_expires_at' => $order?->collection_code_expires_at ?? $orderPayload['collection_code_expires_at'],
-                'courier_id' => isset($data['courier_id']) ? $data['courier_id'] : $order?->courier_id ?? $orderPayload['courier_id'],
-                'collection_verified_by_user_id' => $order?->collection_verified_by_user_id ?? $orderPayload['collection_verified_by_user_id'],
-                'internal_note' => isset($data['internal_note']) ? $data['internal_note'] : $order?->internal_note ?? $orderPayload['internal_note'],
-                'payment_status' => isset($data['payment_status']) ? $data['payment_status'] : $order?->payment_status ?? $orderPayload['payment_status'],
-                'collection_note' => isset($data['collection_note']) ? $data['collection_note'] : $order?->collection_note ?? $orderPayload['collection_note'],
-                'tracking_number' => isset($data['tracking_number']) ? $data['tracking_number'] : $order?->tracking_number ?? $orderPayload['tracking_number'],
-                'assigned_to_user_id' => isset($data['assigned_to_user_id']) ? $data['assigned_to_user_id'] : $order?->assigned_to_user_id ?? $orderPayload['assigned_to_user_id'],
+                'remark' => array_key_exists('remark', $data) ? $data['remark'] : $order?->remark,
+                'status' => array_key_exists('status', $data) ? $data['status'] : $order?->status,
+                'courier_id' => array_key_exists('courier_id', $data) ? $data['courier_id'] : $order?->courier_id,
+                'internal_note' => array_key_exists('internal_note', $data) ? $data['internal_note'] : $order?->internal_note,
+                'payment_status' => array_key_exists('payment_status', $data) ? $data['payment_status'] : $order?->payment_status,
+                'collection_note' => array_key_exists('collection_note', $data) ? $data['collection_note'] : $order?->collection_note,
+                'tracking_number' => array_key_exists('tracking_number', $data) ? $data['tracking_number'] : $order?->tracking_number,
+                'assigned_to_user_id' => array_key_exists('assigned_to_user_id', $data) ? $data['assigned_to_user_id'] : $order?->assigned_to_user_id,
 
-                'cancellation_reason' => isset($data['cancellation_reason']) ? $data['cancellation_reason'] : $order?->cancellation_reason,
-                'cancelled_at' => isset($data['status']) && $data['status'] == OrderStatus::CANCELLED->value ? now() : $order?->cancelled_at,
-                'other_cancellation_reason' => isset($data['other_cancellation_reason']) ? $data['other_cancellation_reason'] : $order?->other_cancellation_reason,
+                'cancellation_reason' => array_key_exists('cancellation_reason', $data) ? $data['cancellation_reason'] : $order?->cancellation_reason,
+                'cancelled_at' => array_key_exists('status', $data) && $data['status'] == OrderStatus::CANCELLED->value ? now() : $order?->cancelled_at,
+                'other_cancellation_reason' => array_key_exists('other_cancellation_reason', $data) ? $data['other_cancellation_reason'] : $order?->other_cancellation_reason,
             ]);
 
         }
@@ -775,9 +761,9 @@ class OrderService extends BaseService
      * @param string $comment
      * @return void
      */
-    public function addOrderHistoryComment(Order $order, string $comment): void
+    public function addOrderComment(Order $order, string $comment): void
     {
-        $order->orderHistory()->create([
+        $order->orderComments()->create([
             'comment' => $comment,
             'store_id' => $order->store_id
         ]);
@@ -831,23 +817,20 @@ class OrderService extends BaseService
 
             $data = $data['delivery_address'];
 
-            if(isset($data['address_line'])) {
-
-                return [
-                    'order_id' => $order->id,
-                    'type' => $data['type'] ?? null,
-                    'city' => $data['city'] ?? null,
-                    'state' => $data['state'] ?? null,
-                    'country' => $data['country'] ?? null,
-                    'address_line' => $data['address_line'],
-                    'latitude' => $data['latitude'] ?? null,
-                    'place_id' => $data['place_id'] ?? null,
-                    'longitude' => $data['longitude'] ?? null,
-                    'description' => $data['description'] ?? null,
-                    'postal_code' => $data['postal_code'] ?? null,
-                    'address_line2' => $data['address_line2'] ?? null
-                ];
-            }
+            return [
+                'order_id' => $order->id,
+                'type' => $data['type'] ?? null,
+                'city' => $data['city'] ?? null,
+                'state' => $data['state'] ?? null,
+                'country' => $data['country'] ?? null,
+                'address_line' => $data['address_line'],
+                'latitude' => $data['latitude'] ?? null,
+                'place_id' => $data['place_id'] ?? null,
+                'longitude' => $data['longitude'] ?? null,
+                'description' => $data['description'] ?? null,
+                'postal_code' => $data['postal_code'] ?? null,
+                'address_line2' => $data['address_line2'] ?? null
+            ];
         }
 
         return null;
@@ -929,7 +912,7 @@ class OrderService extends BaseService
         $pendingPercentage = (int) ($grandTotal > 0 ? ($pendingTotal / $grandTotal * 100) : 0);
 
         //  Calculate the order balance outstanding payment
-        $outstandingTotal = $grandTotal - $paidTotal;
+        $outstandingTotal = $grandTotal - $paidTotal < 0 ? 0 : $grandTotal - $paidTotal;
         $outstandingPercentage = (int) ($grandTotal > 0 ? ($outstandingTotal / $grandTotal * 100) : 0);
 
         if( $pendingPercentage != 0 ) {
@@ -943,7 +926,6 @@ class OrderService extends BaseService
         }
 
         $order->update([
-            'grand_total' => $grandTotal,
             'payment_status' => $paymentStatus->value,
 
             'paid_total' => $paidTotal,

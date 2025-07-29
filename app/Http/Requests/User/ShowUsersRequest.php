@@ -41,9 +41,10 @@ class ShowUsersRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'user_id.uuid' => 'The user ID must be a valid UUID.',
-            'user_id.exists' => 'The specified user does not exist.',
-            'association.enum' => 'The association must be one of: ' . Arr::join([Association::SUPER_ADMIN->value], ',', 'or'),
+            'store_id.required_without' => 'The store ID is required when association is not provided.',
+            'store_id.uuid' => 'The store ID must be a valid UUID.',
+            'store_id.exists' => 'The specified store does not exist.',
+            'association.enum' => 'The association must be one of: ' . Arr::join([Association::SUPER_ADMIN->value], ', ', ' or '),
         ];
     }
 }

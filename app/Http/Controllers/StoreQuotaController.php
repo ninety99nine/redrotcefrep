@@ -65,7 +65,7 @@ class StoreQuotaController extends Controller
     }
 
     /**
-     * Show single store quota.
+     * Show store quota.
      *
      * @param ShowStoreQuotaRequest $request
      * @param StoreQuota $storeQuota

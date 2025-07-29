@@ -65,7 +65,7 @@ class CustomerController extends Controller
     }
 
     /**
-     * Show single customer.
+     * Show customer.
      *
      * @param ShowCustomerRequest $request
      * @param Customer $customer

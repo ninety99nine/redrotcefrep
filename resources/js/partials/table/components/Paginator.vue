@@ -1,12 +1,11 @@
 <template>
 
     <ul class="inline-flex -space-x-px rtl:space-x-reverse text-sm h-8">
-        <li v-for="(link, index) in pagination.links" :key="index">
+        <li v-for="(link, index) in pagination.meta.links" :key="index">
             <a :href="link.url ?? '#'" @click.prevent="onClick(link)" :disabled="isDisabled(link)" :class="getLinkClass(index, link)">
                 <span v-html="link.label"></span>
             </a>
         </li>
-
     </ul>
 
 </template>
@@ -23,8 +22,10 @@
         },
         methods: {
             onClick(link) {
-                if(link.url) {
-                    this.$emit('paginate', link.url);
+                if (link.url) {
+                    // Extract page number from URL query parameter
+                    const page = new URL(link.url).searchParams.get('page');
+                    this.$emit('paginate', page);
                 }
             },
             isDisabled(link) {
@@ -40,7 +41,7 @@
                     classes = 'flex items-center justify-center whitespace-nowrap px-3 h-8 ms-0 leading-tight border rounded-s-lg dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white';
 
                 //  If last link
-                }else if(index == this.pagination.links.length - 1) {
+                }else if(index == this.pagination.meta.links.length - 1) {
 
                     classes = 'flex items-center justify-center whitespace-nowrap px-3 h-8 leading-tight border rounded-e-lg hover:bg-gray-100 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white';
 

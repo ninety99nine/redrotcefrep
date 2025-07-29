@@ -10,19 +10,6 @@ use App\Enums\FilterResourceType;
 class MiscellaneousService
 {
     /**
-     * Inspect shopping cart.
-     *
-     * @return array
-     */
-    public function inspectShoppingCart(array $data): array
-    {
-        $storeId = $data['store_id'];
-        $store = Store::find($storeId);
-        $shoppingCartInstance = (new ShoppingCartService)->startInspection($store);
-        return $shoppingCartInstance->getShoppingCart();
-    }
-
-    /**
      * Show social media links.
      *
      * @return array

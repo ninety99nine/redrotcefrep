@@ -103,13 +103,13 @@ class OrderResource extends JsonResource
             'assigned_to_user' => UserResource::make($this->whenLoaded('assignedToUser')),
             'courier' => CourierResource::make($this->whenLoaded('courier')),
             'delivery_method' => DeliveryMethodResource::make($this->whenLoaded('deliveryMethod')),
+            'delivery_address' => DeliveryAddressResource::make($this->whenLoaded('deliveryAddress')),
             'collection_verified_by_user' => UserResource::make($this->whenLoaded('collectionVerifiedByUser')),
 
             'order_products' => OrderProductResource::collection($this->whenLoaded('orderProducts')),
             'order_promotions' => OrderPromotionResource::collection($this->whenLoaded('orderPromotions')),
             'order_fees' => OrderFeeResource::collection($this->whenLoaded('orderFees')),
             'order_discounts' => OrderDiscountResource::collection($this->whenLoaded('orderDiscounts')),
-            'order_history' => OrderHistoryResource::collection($this->whenLoaded('orderHistory')),
             'order_comments' => OrderCommentResource::collection($this->whenLoaded('orderComments')),
 
             '_links' => [

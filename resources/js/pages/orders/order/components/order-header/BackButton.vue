@@ -34,7 +34,7 @@
                 return this.orderState.order;
             },
             isEditing() {
-                return this.$route.name === 'edit-store-order';
+                return this.$route.name === 'edit-order';
             },
         },
         methods: {
@@ -52,7 +52,7 @@
                         'order_id': this.order.id
                     },
                     query: {
-                        'store_id': this.store.id
+                        store_id: this.store.id
                     }
                 });
             },
@@ -60,7 +60,7 @@
                 this.$router.replace({
                     name: 'show-orders',
                     query: {
-                        'store_id': this.store.id,
+                        store_id: this.store.id,
                         searchTerm: this.$route.query.searchTerm,
                         filterExpressions: this.$route.query.filterExpressions,
                         sortingExpressions: this.$route.query.sortingExpressions

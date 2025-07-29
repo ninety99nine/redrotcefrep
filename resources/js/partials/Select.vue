@@ -130,7 +130,7 @@
 
                             <li
                                 :key="index"
-                                @click="() => selectOption(option)"
+                                @click.stop="() => selectOption(option)"
                                 v-for="(option, index) in filteredOptions"
                                 :class="[
                                     'px-4 py-2 text-sm flex justify-between items-center hover:bg-gray-100',
@@ -288,6 +288,8 @@
                 },
                 set(value) {
                     this.$emit("update:modelValue", value);
+                    console.log('change')
+                    console.log(value)
                     this.$emit("change", value);
                 }
             },
@@ -318,6 +320,8 @@
                 });
             },
             selectOption(option) {
+                console.log('option');
+                console.log(option);
                 if(this.disabled || option.disabled) return;
 
                 this.isOpen = false;

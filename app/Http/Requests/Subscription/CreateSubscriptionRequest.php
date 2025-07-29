@@ -57,7 +57,7 @@ class CreateSubscriptionRequest extends FormRequest
             'owner_id.required' => 'The owner ID is required.',
             'owner_id.uuid' => 'The owner ID must be a valid UUID.',
             'owner_type.required' => 'The owner type is required.',
-            'owner_type.in' => 'The owner type must be one of: ' . Arr::join(['user', 'store'], ',', 'or'),
+            'owner_type.in' => 'The owner type must be one of: ' . Arr::join(['user', 'store'], ', ', ' or '),
         ];
     }
 }

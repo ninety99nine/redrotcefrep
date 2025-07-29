@@ -51,7 +51,7 @@ class UpdateProductArrangementRequest extends FormRequest
             'product_ids.*.uuid' => 'The product ID must be a valid UUID.',
             'product_ids.*.exists' => 'The product ID do not exist.',
             'sort_by.required_without' => 'Sort by is required when product IDs are not provided.',
-            'sort_by.enum' => 'The sort by value must be one of: ' . Arr::join(SortProductBy::values(), ',', 'or'),
+            'sort_by.enum' => 'The sort by value must be one of: ' . Arr::join(SortProductBy::values(), ', ', ' or '),
         ];
     }
 }

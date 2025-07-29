@@ -46,10 +46,10 @@ class ShowPricingPlansRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'association.enum' => 'The association must be one o: ' . Arr::join([Association::SUPER_ADMIN->value], ',', 'or'),
-            'type.enum' => 'The type must be one of: ' . Arr::join(PricingPlanType::values(), ',', 'or'),
-            'platform.enum' => 'The platform must be one of: ' . Arr::join(Platform::values(), ',', 'or'),
-            'billing_type.enum' => 'The billing type must be one of: ' . Arr::join(PricingPlanBillingType::values(), ',', 'or'),
+            'association.enum' => 'The association must be one o: ' . Arr::join([Association::SUPER_ADMIN->value], ', ', ' or '),
+            'type.enum' => 'The type must be one of: ' . Arr::join(PricingPlanType::values(), ', ', ' or '),
+            'platform.enum' => 'The platform must be one of: ' . Arr::join(Platform::values(), ', ', ' or '),
+            'billing_type.enum' => 'The billing type must be one of: ' . Arr::join(PricingPlanBillingType::values(), ', ', ' or '),
         ];
     }
 }

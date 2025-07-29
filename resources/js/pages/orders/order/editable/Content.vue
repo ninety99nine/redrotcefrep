@@ -4,35 +4,33 @@
 
         <div class="col-span-8 space-y-4">
 
-            <div class="bg-white rounded-lg p-4 shadow-sm">
+            <!-- Order Products -->
+            <OrderProducts></OrderProducts>
 
-                {{ shoppingCartState.shoppingCartForm }}
+            <!-- Order Promotions -->
+            <OrderPromotions></OrderPromotions>
 
-                <!-- Order Products -->
-                <OrderProducts></OrderProducts>
+            <!-- Order Fees -->
+            <OrderFees></OrderFees>
 
-            </div>
+            <!-- Order Delivery Methods -->
+            <OrderDeliveryMethods></OrderDeliveryMethods>
 
-            <div class="bg-white rounded-lg p-4 shadow-sm">
+            <!-- Order Miscellaneous -->
+            <OrderMiscellaneous></OrderMiscellaneous>
 
-                <!-- Order Promotions -->
-                <OrderPromotions></OrderPromotions>
+            <!-- Order Totals -->
+            <OrderTotals></OrderTotals>
 
-            </div>
+        </div>
 
-            <div class="bg-white rounded-lg p-4 shadow-sm">
+        <div class="col-span-4 space-y-4">
 
-                <!-- Order Fees -->
-                <OrderFees></OrderFees>
+            <!-- Order Customer -->
+            <OrderCustomer></OrderCustomer>
 
-            </div>
-
-            <div class="bg-white rounded-lg p-4 shadow-sm">
-
-                <!-- Order Delivery Methods -->
-                <OrderDeliveryMethods></OrderDeliveryMethods>
-
-            </div>
+            <!-- Order Basics -->
+            <OrderBasics></OrderBasics>
 
         </div>
 
@@ -44,27 +42,37 @@
 
     import { v4 as uuidv4 } from 'uuid';
     import debounce from 'lodash/debounce';
-    import OrderFees from '@Pages/orders/order/editable/components/fees/OrderFees.vue';
-    import OrderProducts from '@Pages/orders/order/editable/components/products/OrderProducts.vue';
-    import OrderPromotions from '@Pages/orders/order/editable/components/promotions/OrderPromotions.vue';
-    import OrderDeliveryMethods from '@Pages/orders/order/editable/components/delivery-methods/OrderDeliveryMethods.vue';
+    import OrderFees from '@Pages/orders/order/editable/components/order-fees/OrderFees.vue';
+    import OrderBasics from '@Pages/orders/order/editable/components/order-basics/OrderBasics.vue';
+    import OrderTotals from '@Pages/orders/order/editable/components/order-totals/OrderTotals.vue';
+    import OrderCustomer from '@Pages/orders/order/editable/components/order-customer/OrderCustomer.vue';
+    import OrderProducts from '@Pages/orders/order/editable/components/order-products/OrderProducts.vue';
+    import OrderPromotions from '@Pages/orders/order/editable/components/order-promotions/OrderPromotions.vue';
+    import OrderMiscellaneous from '@Pages/orders/order/editable/components/order-miscellaneous/OrderMiscellaneous.vue';
+    import OrderDeliveryMethods from '@Pages/orders/order/editable/components/order-delivery-methods/OrderDeliveryMethods.vue';
 
     export default {
-        inject: ['formState', 'orderState', 'storeState', 'shoppingCartState', 'notificationState'],
+        inject: ['formState', 'orderState', 'storeState', 'changeHistoryState', 'notificationState'],
         components: {
-            OrderFees, OrderProducts, OrderPromotions, OrderDeliveryMethods
+            OrderFees, OrderBasics, OrderTotals, OrderCustomer, OrderProducts, OrderPromotions,
+            OrderMiscellaneous, OrderDeliveryMethods
         },
         data() {
             return {
-                guestId: uuidv4()
+                guestId: uuidv4(),
+                shoppingCartReady: false
             }
         },
         watch: {
-            shoppingCartForm: {
-                handler(newValue, oldValue) {
-                    if(oldValue != null) {
-                        this.shoppingCartState.setIsInspectingShoppingCart(true);
-                        this.inspectShoppingCartDelayed();
+            orderForm: {
+                handler(newVal) {
+                    if(newVal) {
+                        if(this.shoppingCartReady) {
+                            this.orderState.setIsInspectingShoppingCart(true);
+                            this.inspectShoppingCartDelayed();
+                        }else{
+                            this.shoppingCartReady = true;
+                        }
                     }
                 },
                 deep: true
@@ -74,26 +82,43 @@
             store() {
                 return this.storeState.store;
             },
-            shoppingCartForm() {
-                return this.shoppingCartState.shoppingCartForm;
+            orderForm() {
+                return this.orderState.orderForm;
+            },
+            isEditing() {
+                return this.$route.name === 'edit-order';
+            },
+            isCreating() {
+                return this.$route.name === 'create-order';
             },
         },
         methods: {
             inspectShoppingCartDelayed: debounce(function () {
-                this.inspectShoppingCart();
+
+                if(this.changeHistoryState.hasChanges) {
+                    this.inspectShoppingCart();
+                }else{
+                    this.orderState.setShoppingCart(null);
+                    this.orderState.setIsInspectingShoppingCart(false);
+                }
+
             }, 1000),
             async inspectShoppingCart() {
 
                 try {
 
+                    this.orderState.setIsInspectingShoppingCart(true);
+
                     const data = {
+                        inspect: true,
+                        ...this.orderForm,
                         guest_id: this.guestId,
                         store_id: this.store.id,
-                        ...this.shoppingCartForm
+                        association: 'team member'
                     };
 
-                    const response = await axios.post(`/api/shopping-carts`, data);
-                    this.shoppingCartState.setShoppingCart(response.data);
+                    const response = await axios.post(`/api/orders`, data);
+                    this.orderState.setShoppingCart(response.data);
 
                 } catch (error) {
                     const message = error?.response?.data?.message || error?.message || 'Something went wrong while inspecting shopping cart';
@@ -101,7 +126,7 @@
                     this.formState.setServerFormErrors(error);
                     console.error('Failed to inspect shopping cart:', error);
                 } finally {
-                    this.shoppingCartState.setIsInspectingShoppingCart(false);
+                    this.orderState.setIsInspectingShoppingCart(false);
                 }
 
             }

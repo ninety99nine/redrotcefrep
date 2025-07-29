@@ -28,9 +28,14 @@ class ShowTransactionsRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'transaction_id' => ['sometimes', 'uuid', 'exists:transactions,id'],
-            'store_id' => ['sometimes', 'uuid', 'exists:stores,id'],
-            'association' => ['sometimes', Rule::enum(Association::class)->only([Association::ASSOCIATED, Association::UNASSOCIATED])],
+            'order_id' => ['sometimes', 'uuid'],
+            'store_id' => ['sometimes', 'uuid'],
+            'customer_id' => ['sometimes', 'uuid'],
+            'ai_assistant_id' => ['sometimes', 'uuid'],
+            'payment_method_id' => ['sometimes', 'uuid'],
+            'requested_by_user_id' => ['sometimes', 'uuid'],
+            'manually_verified_by_user_id' => ['sometimes', 'uuid'],
+            'association' => ['sometimes', Rule::enum(Association::class)->only([Association::SUPER_ADMIN])],
         ];
     }
 
@@ -42,11 +47,14 @@ class ShowTransactionsRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'transaction_id.uuid' => 'The transaction ID must be a valid UUID.',
-            'transaction_id.exists' => 'The specified transaction does not exist.',
+            'order_id.uuid' => 'The order ID must be a valid UUID.',
             'store_id.uuid' => 'The store ID must be a valid UUID.',
-            'store_id.exists' => 'The specified store does not exist.',
-            'association.enum' => 'The association must be one of: ' . Arr::join([Association::ASSOCIATED->value, Association::UNASSOCIATED->value], ',', 'or'),
+            'customer_id.uuid' => 'The customer ID must be a valid UUID.',
+            'ai_assistant_id.uuid' => 'The AI Assistant ID must be a valid UUID.',
+            'payment_method_id.uuid' => 'The payment method ID must be a valid UUID.',
+            'requested_by_user_id.uuid' => 'The requested by user ID must be a valid UUID.',
+            'manually_verified_by_user_id.uuid' => 'The manually verified by user ID must be a valid UUID.',
+            'association.enum' => 'The association must be one of: ' . Arr::join([Association::SUPER_ADMIN->value], ', ', ' or '),
         ];
     }
 }

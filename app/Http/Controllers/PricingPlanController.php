@@ -69,7 +69,7 @@ class PricingPlanController extends Controller
     }
 
     /**
-     * Show single pricing plan.
+     * Show pricing plan.
      *
      * @param ShowPricingPlanRequest $request
      * @param PricingPlan $pricingPlan

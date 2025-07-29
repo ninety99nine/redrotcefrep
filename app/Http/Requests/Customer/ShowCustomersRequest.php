@@ -46,7 +46,7 @@ class ShowCustomersRequest extends FormRequest
             'customer_id.exists' => 'The specified customer does not exist.',
             'store_id.uuid' => 'The store ID must be a valid UUID.',
             'store_id.exists' => 'The specified store does not exist.',
-            'association.enum' => 'The association must be one of: ' . Arr::join([Association::ASSOCIATED->value, Association::UNASSOCIATED->value], ',', 'or'),
+            'association.enum' => 'The association must be one of: ' . Arr::join([Association::ASSOCIATED->value, Association::UNASSOCIATED->value], ', ', ' or '),
         ];
     }
 }

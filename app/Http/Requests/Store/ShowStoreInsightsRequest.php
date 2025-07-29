@@ -60,9 +60,9 @@ class ShowStoreInsightsRequest extends FormRequest
     {
         return [
             'categories.array' => 'The categories must be an array.',
-            'categories.*.enum' => 'Each category must be one of: ' . Arr::join(InsightCategory::values(), ',', 'or'),
-            'platform.enum' => 'The platform must be one of: ' . Arr::join(Platform::values(), ',', 'or'),
-            'period.enum' => 'The period must be one of: ' . Arr::join(InsightPeriod::values(), ',', 'or'),
+            'categories.*.enum' => 'Each category must be one of: ' . Arr::join(InsightCategory::values(), ', ', ' or '),
+            'platform.enum' => 'The platform must be one of: ' . Arr::join(Platform::values(), ', ', ' or '),
+            'period.enum' => 'The period must be one of: ' . Arr::join(InsightPeriod::values(), ', ', ' or '),
         ];
     }
 }

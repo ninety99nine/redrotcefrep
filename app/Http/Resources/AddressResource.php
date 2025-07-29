@@ -16,7 +16,7 @@ class AddressResource extends JsonResource
     public function toArray($request): array
     {
         return [
-            'id' => $this->id,
+            'id' => $this->id,     //  not available when validating address
             'city' => $this->city,
             'state' => $this->state,
             'country' => $this->country,
@@ -27,19 +27,20 @@ class AddressResource extends JsonResource
             'description' => $this->description,
             'postal_code' => $this->postal_code,
             'address_line' => $this->address_line,
-            'latitude' => $this->latitude,
-            'longitude' => $this->longitude,
+            'complete_address' => $this->complete_address,
+            'latitude' => (float) $this->latitude,
+            'longitude' => (float) $this->longitude,
             'address_line2' => $this->address_line2,
-            'created_at' => $this->created_at->toDateTimeString(),
-            'updated_at' => $this->updated_at->toDateTimeString(),
+            'created_at' => $this->created_at?->toDateTimeString(),     //  not available when validating address
+            'updated_at' => $this->updated_at?->toDateTimeString(),     //  not available when validating address
 
             'owner' => $this->whenLoaded('owner', fn() => $this->getOwnerResource()),
 
-            '_links' => [
+            '_links' => $this->id ? [
                 'show' => route('show.address', ['address' => $this->id]),
                 'update' => route('update.address', ['address' => $this->id]),
                 'delete' => route('delete.address', ['address' => $this->id]),
-            ],
+            ] : []
         ];
     }
 

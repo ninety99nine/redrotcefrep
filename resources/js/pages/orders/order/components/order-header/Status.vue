@@ -1,6 +1,6 @@
 <template>
 
-    <div class="flex items-center space-x-2">
+    <div class="flex items-center space-x-1">
         <Pill :type="type" size="xs">
             <span class="whitespace-nowrap">{{ _order.status }}</span>
         </Pill>

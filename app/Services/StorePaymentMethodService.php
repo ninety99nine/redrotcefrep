@@ -67,8 +67,9 @@ class StorePaymentMethodService extends BaseService
         if (isset($data['logo']) && !empty($data['logo'])) {
             (new MediaFileService)->createMediaFile([
                 'file' => $data['logo'],
-                'store_payment_method_id' => $storePaymentMethod->id,
-                'type' => UploadFolderName::STORE_PAYMENT_METHOD_LOGO->value
+                'mediable_id' => $storePaymentMethod->id,
+                'mediable_type' => 'store_payment_method',
+                'upload_folder_name' => UploadFolderName::STORE_PAYMENT_METHOD_LOGO->value
             ]);
         }
 
@@ -76,8 +77,9 @@ class StorePaymentMethodService extends BaseService
         if (isset($data['photo']) && !empty($data['photo'])) {
             (new MediaFileService)->createMediaFile([
                 'file' => $data['photo'],
-                'store_payment_method_id' => $storePaymentMethod->id,
-                'type' => UploadFolderName::STORE_PAYMENT_METHOD_PHOTO->value
+                'mediable_id' => $storePaymentMethod->id,
+                'mediable_type' => 'store_payment_method',
+                'upload_folder_name' => UploadFolderName::STORE_PAYMENT_METHOD_PHOTO->value
             ]);
         }
 
@@ -99,11 +101,21 @@ class StorePaymentMethodService extends BaseService
             ->get();
 
         if ($totalStorePaymentMethods = $storePaymentMethods->count()) {
+
+            $mediaFileService = new MediaFileService;
+
             foreach ($storePaymentMethods as $storePaymentMethod) {
+
+                foreach ($storePaymentMethod->mediaFiles as $mediaFile) {
+                    $mediaFileService->deleteMediaFile($mediaFile);
+                }
+
                 $storePaymentMethod->delete();
+
             }
 
             return ['message' => $totalStorePaymentMethods . ($totalStorePaymentMethods == 1 ? ' Store Payment Method' : ' Store Payment Methods') . ' deleted'];
+
         } else {
             throw new Exception('No Store Payment Methods deleted');
         }
@@ -183,8 +195,9 @@ class StorePaymentMethodService extends BaseService
         if (isset($data['logo']) && !empty($data['logo'])) {
             (new MediaFileService)->createMediaFile([
                 'file' => $data['logo'],
-                'store_payment_method_id' => $storePaymentMethod->id,
-                'type' => UploadFolderName::STORE_PAYMENT_METHOD_LOGO->value
+                'mediable_id' => $storePaymentMethod->id,
+                'mediable_type' => 'store_payment_method',
+                'upload_folder_name' => UploadFolderName::STORE_PAYMENT_METHOD_LOGO->value
             ]);
         }
 
@@ -192,8 +205,9 @@ class StorePaymentMethodService extends BaseService
         if (isset($data['photo']) && !empty($data['photo'])) {
             (new MediaFileService)->createMediaFile([
                 'file' => $data['photo'],
-                'store_payment_method_id' => $storePaymentMethod->id,
-                'type' => UploadFolderName::STORE_PAYMENT_METHOD_PHOTO->value
+                'mediable_id' => $storePaymentMethod->id,
+                'mediable_type' => 'store_payment_method',
+                'upload_folder_name' => UploadFolderName::STORE_PAYMENT_METHOD_PHOTO->value
             ]);
         }
 
@@ -209,6 +223,12 @@ class StorePaymentMethodService extends BaseService
      */
     public function deleteStorePaymentMethod(StorePaymentMethod $storePaymentMethod): array
     {
+        $mediaFileService = new MediaFileService;
+
+        foreach ($storePaymentMethod->mediaFiles as $mediaFile) {
+            $mediaFileService->deleteMediaFile($mediaFile);
+        }
+
         $deleted = $storePaymentMethod->delete();
 
         if ($deleted) {

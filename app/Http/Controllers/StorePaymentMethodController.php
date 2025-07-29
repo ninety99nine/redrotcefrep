@@ -78,7 +78,7 @@ class StorePaymentMethodController extends Controller
     }
 
     /**
-     * Show single store payment method.
+     * Show store payment method.
      *
      * @param ShowStorePaymentMethodRequest $request
      * @param StorePaymentMethod $storePaymentMethod

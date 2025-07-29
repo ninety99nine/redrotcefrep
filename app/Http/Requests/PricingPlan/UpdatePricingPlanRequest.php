@@ -60,7 +60,7 @@ class UpdatePricingPlanRequest extends FormRequest
             'type.string' => 'The type must be a string.',
             'type.max' => 'The type may not be greater than 255 characters.',
             'description.string' => 'The description must be a string.',
-            'billing_type.in' => 'The billing type must be one of: ' . Arr::join(PricingPlanBillingType::values(), ',', 'or'),
+            'billing_type.in' => 'The billing type must be one of: ' . Arr::join(PricingPlanBillingType::values(), ', ', ' or '),
             'currency.size' => 'The currency must be exactly 3 characters.',
             'price.numeric' => 'The price must be a number.',
             'price.min' => 'The price must be at least 0.',

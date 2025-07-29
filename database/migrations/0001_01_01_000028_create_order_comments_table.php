@@ -16,12 +16,12 @@ return new class extends Migration
         Schema::create('order_comments', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->string('comment');
-            $table->foreignUuid('user_id');
+            $table->foreignUuid('user_id')->nullable();
             $table->foreignUuid('order_id');
             $table->foreignUuid('store_id');
             $table->timestamps();
 
-            $table->foreign('user_id')->references('id')->on('users')->cascadeOnDelete();
+            $table->foreign('user_id')->references('id')->on('users')->nullOnDelete();
             $table->foreign('order_id')->references('id')->on('orders')->cascadeOnDelete();
             $table->foreign('store_id')->references('id')->on('stores')->cascadeOnDelete();
         });

@@ -72,8 +72,9 @@ class ProductService extends BaseService
 
             (new MediaFileService)->createMediaFile([
                 'file' => $data['photo'],
-                'product_id' => $product->id,
-                'type' => UploadFolderName::PRODUCT_PHOTO->value
+                'mediable_type' => 'product',
+                'mediable_id' => $product->id,
+                'upload_folder_name' => UploadFolderName::PRODUCT_PHOTO->value
             ]);
 
         }
@@ -94,8 +95,16 @@ class ProductService extends BaseService
 
         if ($totalProducts = $products->count()) {
 
+            $mediaFileService = new MediaFileService;
+
             foreach ($products as $product) {
+
+                foreach ($product->mediaFiles as $mediaFile) {
+                    $mediaFileService->deleteMediaFile($mediaFile);
+                }
+
                 $product->delete();
+
             }
 
             return ['message' => $totalProducts . ($totalProducts == 1 ? ' Product' : ' Products') . ' deleted'];
@@ -299,6 +308,12 @@ class ProductService extends BaseService
      */
     public function deleteProduct(Product $product): array
     {
+        $mediaFileService = new MediaFileService;
+
+        foreach ($product->mediaFiles as $mediaFile) {
+            $mediaFileService->deleteMediaFile($mediaFile);
+        }
+
         $deleted = $product->delete();
 
         if ($deleted) {

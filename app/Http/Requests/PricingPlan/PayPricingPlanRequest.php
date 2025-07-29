@@ -55,7 +55,7 @@ class PayPricingPlanRequest extends FormRequest
             'payment_method_id.uuid' => 'The payment method ID must be a valid UUID.',
             'payment_method_id.exists' => 'The specified payment method does not exist.',
             'payment_method_type.required_without' => 'The payment method type is required when payment method ID is not provided.',
-            'payment_method_type.in' => 'The payment method type must be one of: ' . Arr::join(PaymentMethodType::values(), ',', 'or'),
+            'payment_method_type.in' => 'The payment method type must be one of: ' . Arr::join(PaymentMethodType::values(), ', ', ' or '),
         ];
     }
 }

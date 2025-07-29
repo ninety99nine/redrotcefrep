@@ -89,7 +89,7 @@ class DeliveryMethodController extends Controller
     }
 
     /**
-     * Show single delivery method.
+     * Show delivery method.
      *
      * @param ShowDeliveryMethodRequest $request
      * @param DeliveryMethod $deliveryMethod

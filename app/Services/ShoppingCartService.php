@@ -66,12 +66,19 @@ class ShoppingCartService
     public $specifiedOrderPromotions = [];
     public $canApplyPromotionCode = false;
     public $scheduleIncompleteReasons = [];
+    public $totalSpecifiedOrderProducts = 0;
     public $availableDeliveryTimeSlots = [];
     public $detectedOrderProductChanges = [];
     public $deliveryAddressIsComplete = false;
+    public $totalSpecifiedOrderPromotions = 0;
     public $detectedOrderPromotionChanges = [];
     public $selectedDeliveryMethodOption = null;
+    public $totalSpecifiedCancelledOrderProducts = 0;
+    public $totalSpecifiedOrderProductQuantities = 0;
+    public $totalSpecifiedCancelledOrderPromotions = 0;
     public $totalSpecifiedUnCancelledOrderProducts = 0;
+    public $totalSpecifiedUnCancelledOrderPromotions = 0;
+    public $totalSpecifiedCancelledOrderProductQuantities = 0;
     public $totalSpecifiedUncancelledOrderProductQuantities = 0;
 
     /**
@@ -103,18 +110,18 @@ class ShoppingCartService
 
         $this->setSpecifiedOrderProducts();
         $this->calculateOrderProductTotals();
-        $totalSpecifiedOrderProducts = $this->countSpecifiedOrderProducts();
-        $totalSpecifiedCancelledOrderProducts = $this->countSpecifiedCancelledOrderProducts();
+        $this->totalSpecifiedOrderProducts = $this->countSpecifiedOrderProducts();
+        $this->totalSpecifiedCancelledOrderProducts = $this->countSpecifiedCancelledOrderProducts();
         $this->totalSpecifiedUnCancelledOrderProducts = $this->countSpecifiedUnCancelledOrderProducts();
-        $totalSpecifiedOrderProductQuantities = $this->countSpecifiedOrderProductQuantities();
-        $totalSpecifiedCancelledOrderProductQuantities = $this->countSpecifiedCancelledOrderProductQuantities();
+        $this->totalSpecifiedOrderProductQuantities = $this->countSpecifiedOrderProductQuantities();
+        $this->totalSpecifiedCancelledOrderProductQuantities = $this->countSpecifiedCancelledOrderProductQuantities();
         $this->totalSpecifiedUncancelledOrderProductQuantities = $this->countSpecifiedUncancelledOrderProductQuantities();
 
         $this->setSpecifiedOrderPromotions();
 
-        $totalSpecifiedOrderPromotions = $this->countSpecifiedOrderPromotions();
-        $totalSpecifiedCancelledOrderPromotions = $this->countSpecifiedCancelledOrderPromotions();
-        $totalSpecifiedUnCancelledOrderPromotions = $this->countSpecifiedUnCancelledOrderPromotions();
+        $this->totalSpecifiedOrderPromotions = $this->countSpecifiedOrderPromotions();
+        $this->totalSpecifiedCancelledOrderPromotions = $this->countSpecifiedCancelledOrderPromotions();
+        $this->totalSpecifiedUnCancelledOrderPromotions = $this->countSpecifiedUnCancelledOrderPromotions();
 
         $this->setDeliveryDate();
         $this->setDeliveryMethod();
@@ -129,15 +136,6 @@ class ShoppingCartService
         $this->calculateFeeTotals();
         $this->calculateGrandTotal();
 
-        $vatRate = PercentageService::convertToPercentageFormat($this->vatRate);
-        $vat = MoneyService::convertToMoneyFormat($this->vat, $this->currency);
-        $subtotal = MoneyService::convertToMoneyFormat($this->subtotal, $this->currency);
-        $feeTotal = MoneyService::convertToMoneyFormat($this->feeTotal, $this->currency);
-        $grandTotal = MoneyService::convertToMoneyFormat($this->grandTotal, $this->currency);
-        $discountTotal = MoneyService::convertToMoneyFormat($this->discountTotal, $this->currency);
-        $adjustmentTotal = MoneyService::convertToMoneyFormat($this->adjustmentTotal, $this->currency);
-        $subtotalAfterDiscount = MoneyService::convertToMoneyFormat($this->subtotalAfterDiscount, $this->currency);
-
         $miniCart = [
             'orderProducts' => $this->specifiedOrderProducts,
             'orderPromotions' => $this->specifiedOrderPromotions
@@ -145,56 +143,6 @@ class ShoppingCartService
 
         //  Cache the shopping cart for exactly 10 minutes
         $this->getShoppingCartCacheService()->put($miniCart, now()->addMinutes(10));
-
-        $this->shoppingCart = [
-            'totals' => [
-                'subtotal' => $subtotal,
-                'discounts' => $this->discounts,
-                'discount_total' => $discountTotal,
-                'subtotal_after_discount' => $subtotalAfterDiscount,
-                'vat' => [
-                    'method' => $this->store->tax_method,
-                    'rate' => $vatRate,
-                    'amount' => $vat,
-                ],
-                'fees' => $this->fees,
-                'fee_total' => $feeTotal,
-                'adjustment_total' => $adjustmentTotal,
-                'grand_total' => $grandTotal,
-            ],
-            'totals_summary' => [
-                'order_products' => [
-                    'total_products' => $totalSpecifiedOrderProducts,
-                    'total_cancelled_products' => $totalSpecifiedCancelledOrderProducts,
-                    'total_uncancelled_products' => $this->totalSpecifiedUnCancelledOrderProducts,
-                    'total_product_quantities' => $totalSpecifiedOrderProductQuantities,
-                    'total_cancelled_product_quantities' => $totalSpecifiedCancelledOrderProductQuantities,
-                    'total_uncancelled_product_quantities' => $this->totalSpecifiedUncancelledOrderProductQuantities,
-                ],
-                'order_promotions' => [
-                    'total_promotions' => $totalSpecifiedOrderPromotions,
-                    'total_cancelled_promotions' => $totalSpecifiedCancelledOrderPromotions,
-                    'total_uncancelled_promotions' => $totalSpecifiedUnCancelledOrderPromotions,
-                ],
-            ],
-            'can_apply_promotion_code' => $this->canApplyPromotionCode,
-            'promotion_code' => [
-                'code' => $this->promotionCode,
-                'name' => $this->promotionName,
-                'applied' => $this->promotionApplied,
-                'message' => $this->promotionMessage,
-            ],
-            'delivery_method_options' => $this->deliveryMethodOptions,
-            'changes' => [
-                'detected_order_product_changes' => $this->detectedOrderProductChanges,
-                'detected_order_promotion_changes' => $this->detectedOrderPromotionChanges
-            ],
-            'checkout' => [
-                'can_checkout' => $this->canCheckout(),
-            ],
-            'order_products' => $this->getTransformedOrderProducts(),
-            'order_promotions' => $this->getTransformedOrderPromotions()
-        ];
 
         return $this;
     }
@@ -380,8 +328,68 @@ class ShoppingCartService
      *
      *  @return array
      */
-    public function getShoppingCart(): array
+    public function getShoppingCart($transform = true): array
     {
+        $vatRate = PercentageService::convertToPercentageFormat($this->vatRate);
+        $vat = MoneyService::convertToMoneyFormat($this->vat, $this->currency);
+        $subtotal = MoneyService::convertToMoneyFormat($this->subtotal, $this->currency);
+        $feeTotal = MoneyService::convertToMoneyFormat($this->feeTotal, $this->currency);
+        $grandTotal = MoneyService::convertToMoneyFormat($this->grandTotal, $this->currency);
+        $discountTotal = MoneyService::convertToMoneyFormat($this->discountTotal, $this->currency);
+        $adjustmentTotal = MoneyService::convertToMoneyFormat($this->adjustmentTotal, $this->currency);
+        $subtotalAfterDiscount = MoneyService::convertToMoneyFormat($this->subtotalAfterDiscount, $this->currency);
+
+        $this->shoppingCart = [
+            'totals' => [
+                'subtotal' => $subtotal,
+                'discounts' => $this->discounts,
+                'discount_total' => $discountTotal,
+                'subtotal_after_discount' => $subtotalAfterDiscount,
+                'vat' => [
+                    'method' => $this->store->tax_method,
+                    'rate' => $vatRate,
+                    'amount' => $vat
+                ],
+                'fees' => $this->fees,
+                'fee_total' => $feeTotal,
+                'adjustment_total' => $adjustmentTotal,
+                'grand_total' => $grandTotal,
+            ],
+            'totals_summary' => [
+                'order_products' => [
+                    'total_products' => $this->totalSpecifiedOrderProducts,
+                    'total_cancelled_products' => $this->totalSpecifiedCancelledOrderProducts,
+                    'total_uncancelled_products' => $this->totalSpecifiedUnCancelledOrderProducts,
+                    'total_product_quantities' => $this->totalSpecifiedOrderProductQuantities,
+                    'total_cancelled_product_quantities' => $this->totalSpecifiedCancelledOrderProductQuantities,
+                    'total_uncancelled_product_quantities' => $this->totalSpecifiedUncancelledOrderProductQuantities,
+                ],
+                'order_promotions' => [
+                    'total_promotions' => $this->totalSpecifiedOrderPromotions,
+                    'total_cancelled_promotions' => $this->totalSpecifiedCancelledOrderPromotions,
+                    'total_uncancelled_promotions' => $this->totalSpecifiedUnCancelledOrderPromotions,
+                ],
+            ],
+            'can_apply_promotion_code' => $this->canApplyPromotionCode,
+            'promotion_code' => [
+                'code' => $this->promotionCode,
+                'name' => $this->promotionName,
+                'applied' => $this->promotionApplied,
+                'message' => $this->promotionMessage,
+            ],
+            'delivery_method_options' => $this->deliveryMethodOptions,
+            'free_delivery' => $this->freeDelivery,
+            'changes' => [
+                'detected_order_product_changes' => $this->detectedOrderProductChanges,
+                'detected_order_promotion_changes' => $this->detectedOrderPromotionChanges
+            ],
+            'checkout' => [
+                'can_checkout' => $this->canCheckout(),
+            ],
+            'order_products' => $transform ? $this->getTransformedOrderProducts() : collect($this->specifiedOrderProducts)->toArray(),
+            'order_promotions' => $transform ? $this->getTransformedOrderPromotions() : collect($this->specifiedOrderPromotions)->toArray()
+        ];
+
         return $this->shoppingCart;
     }
 
@@ -536,6 +544,10 @@ class ShoppingCartService
     protected function mapCartProductToOrderProduct(array $cartProduct, $relatedProducts): ?OrderProduct
     {
         $productId = $cartProduct['id'] ?? null;
+        $productName = $cartProduct['name'] ?? null;
+
+        // If no ID or Name, ignore the product
+        if(!$productId && !$productName) return null;
 
         // If no ID and not a team member, ignore the product
         if(!$productId && !$this->isTeamMember) return null;
@@ -543,7 +555,7 @@ class ShoppingCartService
         // Retrieve the related product from the pre-fetched collection
         $relatedProduct = $productId ? $relatedProducts->get($productId) : null;
 
-        // If product ID is provided but not found, create a mock OrderProduct if the user is a team member
+        // If product ID is provided but not found, ignore the product
         if($productId && !$relatedProduct && !$this->isTeamMember) return null;
 
         $existingOrderProduct = $relatedProduct ? collect($this->existingOrderProducts)->firstWhere('product_id', $relatedProduct->id) : null;
@@ -1346,15 +1358,10 @@ class ShoppingCartService
      */
     public function setSpecifiedOrderPromotions(): void
     {
-        if(count($this->storePromotions) === 0){
-            $this->specifiedOrderPromotions = [];
-            return;
-        }
-
         if($this->isTeamMember) {
             $this->specifiedOrderPromotions = $this->mapTeamMemberProvidedPromotions();
         } else {
-            $this->specifiedOrderPromotions = $this->mapRelatedPromotionsToOrderPromotions();
+            $this->specifiedOrderPromotions = $this->mapRelatedStorePromotionsToOrderPromotions();
         }
     }
 
@@ -1374,11 +1381,15 @@ class ShoppingCartService
      * Map a team member's provided promotion to an OrderPromotion.
      *
      * @param array $cartPromotion
-     * @return OrderPromotion
+     * @return OrderPromotion|null
      */
-    private function mapToOrderPromotionFromTeamMember(array $cartPromotion): OrderPromotion
+    private function mapToOrderPromotionFromTeamMember(array $cartPromotion): OrderPromotion|null
     {
         $promotionId = $cartPromotion['id'] ?? null;
+        $promotionName = $cartPromotion['name'] ?? null;
+
+        // If no ID or Name, ignore the promotion
+        if(!$promotionId && !$promotionName) return null;
 
         // Find existing promotion if an ID is provided
         $relatedPromotion = $promotionId ? $this->store->promotions()->find($promotionId) : null;
@@ -1406,7 +1417,7 @@ class ShoppingCartService
                 'cancellation_reasons' => [],
                 'store_id' => $this->store->id,
                 'currency' => $this->store->currency,
-                'promotion_id' => $relatedPromotion?->id,
+                'promotion_id' => $relatedPromotion?->id
             ]
         );
 
@@ -1418,7 +1429,7 @@ class ShoppingCartService
      *
      *  @return array
      */
-    protected function mapRelatedPromotionsToOrderPromotions(): array
+    protected function mapRelatedStorePromotionsToOrderPromotions(): array
     {
         return collect($this->storePromotions)
             ->map(fn($storePromotion) => $this->mapToOrderPromotion($storePromotion))
@@ -1918,7 +1929,9 @@ class ShoppingCartService
         collect($this->getSpecifiedUnCancelledOrderProducts())->each(function($orderProduct){
             $this->subtotal += $orderProduct->subtotal->amount;
             $this->subtotalAfterDiscount += $orderProduct->subtotal->amount;
-            $this->addDiscount('sale discount', $orderProduct->sale_discount_total->amount);
+            if($orderProduct->sale_discount_total->amount > 0) {
+                $this->addDiscount('sale discount', $orderProduct->sale_discount_total->amount);
+            }
         });
     }
 
@@ -2020,8 +2033,9 @@ class ShoppingCartService
     {
         if($this->isTeamMember) {
             $this->calculateCartFeeTotals();
+            $this->calculateDeliveryFeeTotals();
         }else{
-            $this->calculateCustomFeeTotals();
+            $this->calculateStoreCheckoutFeeTotals();
             $this->calculateDeliveryFeeTotals();
             $this->calculateTipFeeTotals();
         }
@@ -2035,8 +2049,10 @@ class ShoppingCartService
     private function calculateCartFeeTotals(): void
     {
         collect($this->cartFees)->each(function($cartFee) {
-            $this->handleCartFlatFee($cartFee);
-            $this->handleCartPercentageFee($cartFee);
+            if(!empty($cartFee['name'])) {
+                $this->handleCartFlatFee($cartFee);
+                $this->handleCartPercentageFee($cartFee);
+            }
         });
     }
 
@@ -2045,7 +2061,7 @@ class ShoppingCartService
      *
      * @return void
      */
-    private function calculateCustomFeeTotals(): void
+    private function calculateStoreCheckoutFeeTotals(): void
     {
         collect($this->store->checkout_fees)->each(function($checkoutFee) {
             $this->handleCustomFlatFee($checkoutFee);
@@ -2201,7 +2217,7 @@ class ShoppingCartService
         $rateType = RateType::FLAT->value;
         $amount = $this->freeDelivery ? 0 : $deliveryMethod->flat_fee_rate->amount;
 
-        $deliveryMethodOption['amount'] = $amount;
+        $deliveryMethodOption['amount'] = MoneyService::convertToMoneyFormat($amount, $this->currency);
 
         if($deliveryMethodOption['is_selected']) {
 
@@ -2232,7 +2248,7 @@ class ShoppingCartService
         $percentageRate = $deliveryMethod->percentage_fee_rate;
         $amount = $this->freeDelivery ? 0 : $this->subtotalAfterDiscount * ($percentageRate / 100);
 
-        $deliveryMethodOption['amount'] = $amount;
+        $deliveryMethodOption['amount'] = MoneyService::convertToMoneyFormat($amount, $this->currency);
 
         if($deliveryMethodOption['is_selected']) {
 
@@ -2284,7 +2300,7 @@ class ShoppingCartService
                     $amount = $this->freeDelivery ? 0 : $zone['fee'];
                     $name = 'Delivery fee ('.$deliveryMethodOption['distance']['text'].')';
 
-                    $deliveryMethodOption['amount'] = $amount;
+                    $deliveryMethodOption['amount'] = MoneyService::convertToMoneyFormat($amount, $this->currency);
 
                     if($deliveryMethodOption['is_selected']) {
 
@@ -2340,7 +2356,7 @@ class ShoppingCartService
                         $amount = $this->freeDelivery ? 0 : $zone['fee'];
                         $name = 'Delivery fee (Zone ' . $postalCode . ')';
 
-                        $deliveryMethodOption['amount'] = $amount;
+                        $deliveryMethodOption['amount'] = MoneyService::convertToMoneyFormat($amount, $this->currency);
 
                         if($deliveryMethodOption['is_selected']) {
 
@@ -2392,7 +2408,7 @@ class ShoppingCartService
                     $name = 'Delivery fee ('.$weight . $weightUnit.')';
                     $amount = $this->freeDelivery ? 0 : $category['fee'];
 
-                    $deliveryMethodOption['amount'] = $amount;
+                    $deliveryMethodOption['amount'] = MoneyService::convertToMoneyFormat($amount, $this->currency);
 
                     if($deliveryMethodOption['is_selected']) {
 
@@ -2609,7 +2625,7 @@ class ShoppingCartService
             case DeliveryMethodFeeType::FLAT_FEE->value:
                 $amount = $this->freeDelivery ? 0 : $this->deliveryMethod->fallback_flat_fee_rate->amount;
 
-                $deliveryMethodOption['amount'] = $amount;
+                $deliveryMethodOption['amount'] = MoneyService::convertToMoneyFormat($amount, $this->currency);
 
                 if($deliveryMethodOption['is_selected']) {
 
@@ -2632,7 +2648,7 @@ class ShoppingCartService
                 $percentageRate = $this->deliveryMethod->fallback_percentage_fee_rate;
                 $amount = $this->freeDelivery ? 0 : $this->subtotalAfterDiscount * ($percentageRate / 100);
 
-                $deliveryMethodOption['amount'] = $amount;
+                $deliveryMethodOption['amount'] = MoneyService::convertToMoneyFormat($amount, $this->currency);
 
                 if($deliveryMethodOption['is_selected']) {
 
@@ -2721,16 +2737,16 @@ class ShoppingCartService
     private function calculateGrandTotal(): void
     {
         if ($this->store->tax_method == TaxMethod::EXCLUSIVE->value) {
-            $this->grandTotal = $this->subtotalAfterDiscount + $this->vat + $this->feeTotal + $this->adjustmentTotal;
+            $this->grandTotal = $this->subtotalAfterDiscount + $this->vat + $this->feeTotal;
         } else {
-            $this->grandTotal = $this->subtotalAfterDiscount + $this->feeTotal + $this->adjustmentTotal;
+            $this->grandTotal = $this->subtotalAfterDiscount + $this->feeTotal;
         }
 
-        if ($this->adjustmentTotal < 0) {
-            if ($this->grandTotal + $this->adjustmentTotal < 0) {
-                $this->adjustmentTotal = -$this->grandTotal;
-                $this->grandTotal = 0;
-            }
+        if(($this->grandTotal + $this->adjustmentTotal) >= 0) {
+            $this->grandTotal = $this->grandTotal + $this->adjustmentTotal;
+        }else{
+            $this->adjustmentTotal = $this->grandTotal;
+            $this->grandTotal = 0;
         }
     }
 

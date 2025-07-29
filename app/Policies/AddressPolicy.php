@@ -28,7 +28,7 @@ class AddressPolicy extends BasePolicy
      */
     public function viewAny(User $user): bool
     {
-        return $this->isStoreUserWithPermission($user, 'view addresses');
+        return true;
     }
 
     /**
@@ -40,7 +40,7 @@ class AddressPolicy extends BasePolicy
      */
     public function view(User $user, Address $address): bool
     {
-        return $this->isStoreUserWithPermission($user, 'view addresses');
+        return true;
     }
 
     /**
@@ -51,7 +51,18 @@ class AddressPolicy extends BasePolicy
      */
     public function create(User $user): bool
     {
-        return $this->isStoreUserWithPermission($user, 'manage addresses');
+        return true;
+    }
+
+    /**
+     * Determine whether the user can create addresses.
+     *
+     * @param User $user
+     * @return bool
+     */
+    public function validate(User $user): bool
+    {
+        return true;
     }
 
     /**
@@ -63,7 +74,7 @@ class AddressPolicy extends BasePolicy
      */
     public function update(User $user, Address $address): bool
     {
-        return $this->isStoreUserWithPermission($user, 'manage addresses');
+        return true;
     }
 
     /**
@@ -75,7 +86,7 @@ class AddressPolicy extends BasePolicy
      */
     public function delete(User $user, Address $address): bool
     {
-        return $this->isStoreUserWithPermission($user, 'manage addresses');
+        return true;
     }
 
     /**
@@ -86,6 +97,6 @@ class AddressPolicy extends BasePolicy
      */
     public function deleteAny(User $user): bool
     {
-        return $this->isStoreUserWithPermission($user, 'manage addresses');
+        return true;
     }
 }

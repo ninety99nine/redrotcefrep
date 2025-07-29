@@ -9,7 +9,7 @@
 
             <div class="grid grid-cols-2 gap-2">
 
-                <h1 class="font-lg font-bold my-2">{{ completeAddress ? 'Edit Address' : 'Add Address' }}</h1>
+                <h1 class="font-lg font-bold my-2">{{ localAddress ? 'Edit Address' : 'Add Address' }}</h1>
 
                 <template v-if="isLoadingCountryAddressOptions">
 
@@ -30,8 +30,8 @@
                         <!-- Address Line 2 Input -->
                         <Input
                             type="text"
-                            v-model="form.address_line_2"
-                            :errorText="formState.getFormError('address_line_2')"
+                            v-model="form.address_line2"
+                            :errorText="formState.getFormError('address_line2')"
                             placeholder="Apartment, unit number, suite, etc. (optional)">
                         </Input>
 
@@ -103,7 +103,7 @@
                         type="danger"
                         :action="deleteAddress"
                         :disabled="isSubmitting"
-                        v-if="step == 1 && completeAddress">
+                        v-if="step == 1 && localAddress">
                         <span>Delete</span>
                     </Button>
 
@@ -139,7 +139,7 @@
         <template #trigger>
 
             <!-- Edit Address / Add Address Button - Triggers Modal -->
-            <div class="space-y-4 p-4 border rounded-lg shadow-lg bg-white">
+            <div class="space-y-4 p-4 border border-gray-300 rounded-lg shadow-lg bg-white">
 
                 <h1 class="flex items-center font-lg font-bold">
                     <svg class="w-6 h-6 mr-2 flex-shrink-0" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
@@ -149,10 +149,10 @@
                     <span>{{ title }}</span>
                 </h1>
 
-                <p class="text-sm text-gray-500 mb-2 pb-4 border-b border-dashed">{{ subtitle }}</p>
+                <p class="text-sm text-gray-500 mb-2 pb-4 border-b border-dashed border-gray-300">{{ subtitle }}</p>
 
-                <div v-if="completeAddress" class="flex justify-between items-center space-x-20">
-                    <span class="text-sm">{{ completeAddress }}</span>
+                <div v-if="localAddress" class="flex justify-between items-center space-x-20">
+                    <span class="text-sm">{{ localAddress.complete_address }}</span>
 
                     <Button
                         size="xs"
@@ -166,7 +166,9 @@
                     v-else
                     size="xs"
                     type="light"
-                    :action="showModal">
+                    :leftIcon="Plus"
+                    :action="showModal"
+                    buttonClass="w-full">
                     <span>Add Address</span>
                 </Button>
 
@@ -195,7 +197,7 @@
     import Modal from '@Partials/Modal.vue';
     import cloneDeep from 'lodash/cloneDeep';
     import Button from '@Partials/Button.vue';
-    import { MoveLeft } from 'lucide-vue-next';
+    import { Plus, MoveLeft } from 'lucide-vue-next';
     import GoogleMaps from '@Partials/GoogleMaps.vue';
     import SelectCountry from '@Partials/SelectCountry.vue';
 
@@ -209,19 +211,11 @@
                 type: [Object, null],
                 default: null
             },
-            userId: {
+            ownerId: {
                 type: [String, null],
                 default: null
             },
-            storeId: {
-                type: [String, null],
-                default: null
-            },
-            customerId: {
-                type: [String, null],
-                default: null
-            },
-            deliveryMethodId: {
+            ownerType: {
                 type: [String, null],
                 default: null
             },
@@ -237,10 +231,15 @@
                 type: Boolean,
                 default: true
             },
+            onlyValidate: {
+                type: Boolean,
+                default: false
+            },
         },
         emits: ['onValidated', 'onCreated', 'onUpdated', 'onDeleted'],
         data() {
             return {
+                Plus,
                 step: 1,
                 MoveLeft,
                 form: {
@@ -252,11 +251,13 @@
                     longitude: null,
                     postal_code: null,
                     address_line: null,
-                    address_line_2: null,
+                    address_line2: null,
+                    owner_id: this.ownerId,
+                    owner_type: this.ownerType
                 },
                 originalForm: null,
+                localAddress: null,
                 isSubmitting: false,
-                completeAddress: null,
                 previewLatitude: null,
                 previewLongitude: null,
                 countryAddressOptions: [],
@@ -266,14 +267,14 @@
         watch: {
             'address'(newValue) {
                 this.setFields(newValue);
-                this.completeAddress = newValue ? newValue._attributes.completeAddress : null;
+                this.localAddress = newValue;
             }
         },
         computed: {
             submitText() {
                 if(this.pinLocationOnMap && this.step == 1) {
                     return 'Next';
-                }else if(this.completeAddress) {
+                }else if(this.localAddress) {
                     return 'Save Address';
                 }else{
                     return 'Add Address';
@@ -301,7 +302,7 @@
             googleMapsAddress() {
                 var googleMapsAddress = this.form.address_line;
 
-                if(this.form.address_line_2 && this.form.address_line_2.trim() !== '') googleMapsAddress += (', '+this.form.address_line_2);
+                if(this.form.address_line2 && this.form.address_line2.trim() !== '') googleMapsAddress += (', '+this.form.address_line2);
                 if(this.form.city && this.form.city.trim() !== '') googleMapsAddress += (', '+this.form.city);
                 if(this.form.state && this.form.state.trim() !== '') googleMapsAddress += (', '+this.form.state);
                 if(this.form.postal_code && this.form.postal_code.trim() !== '') googleMapsAddress += (', '+this.form.postal_code);
@@ -310,14 +311,7 @@
                 return googleMapsAddress;
             },
             hasAddress() {
-                return this.address != null;
-            },
-            validate() {
-                return this.address === null &&
-                       this.userId === null &&
-                       this.storeId === null &&
-                       this.customerId === null &&
-                       this.deliveryMethodId === null;
+                return this.address?.id != null;
             },
             formHasChanged() {
                 // Clone the objects to avoid modifying the original data
@@ -354,11 +348,13 @@
                 if(address) {
                     this.form.city = address.city;
                     this.form.state = address.state;
-                    this.form.place_id = address.place_id;
                     this.form.country = address.country;
+                    this.form.place_id = address.place_id;
+                    this.form.owner_id = address.owner_id;
+                    this.form.owner_type = address.owner_type;
                     this.form.postal_code = address.postal_code;
                     this.form.address_line = address.address_line;
-                    this.form.address_line_2 = address.address_line_2;
+                    this.form.address_line2 = address.address_line2;
                     this.form.latitude = address.latitude ? parseFloat(address.latitude) : null;
                     this.form.longitude = address.longitude ? parseFloat(address.longitude) : null;
 
@@ -373,7 +369,7 @@
                     this.form.longitude = null;
                     this.form.postal_code = null;
                     this.form.address_line = null;
-                    this.form.address_line_2 = null;
+                    this.form.address_line2 = null;
 
                     this.previewLatitude = null;
                     this.previewLongitude = null;
@@ -389,7 +385,7 @@
             submit() {
                 if(this.pinLocationOnMap && this.step == 1) {
                     this.step = 2;
-                }else if(this.validate) {
+                }else if(this.onlyValidate) {
                     this.validateAddress();
                 }else if(this.hasAddress) {
                     this.updateAddress();
@@ -414,160 +410,128 @@
                     this.isLoadingCountryAddressOptions = false;
                 }
             },
-            validateAddress() {
+            async validateAddress() {
 
-                //  Start loader
-                this.isSubmitting = true;
+                try {
 
-                postApi(this.apiState.apiHome['_links']['validateAddAddress'], this.form).then(response => {
+                    this.isSubmitting = true;
 
-                    if(response.status == 200) {
+                    const data = {
+                        ...this.form
+                    };
 
-                        this.completeAddress = response.data.completeAddress;
-                        this.$emit('onValidated', cloneDeep(this.form));
-                        this.previewLongitude = this.form.longitude;
-                        this.previewLatitude = this.form.latitude;
-                        this.originalForm = cloneDeep(this.form);
-                        this.hideModal();
+                    const response = await axios.post(`/api/addresses/validate`, data);
 
-                    }
-
-                    //  Stop loader
-                    this.isSubmitting = false;
-
-                }).catch(errorException => {
-
-                    //  Stop loader
-                    this.isSubmitting = false;
-
-                    this.formState.setServerFormErrors(errorException);
-
-                });
-
-            },
-            createAddress() {
-
-                //  Start loader
-                this.isSubmitting = true;
-
-                let data = {...this.form, return: '1'};
-
-                if(this.userId) {
-                    data['userId'] = this.userId;
-                }else if(this.storeId) {
-                    data['storeId'] = this.storeId;
-                }else if(this.customerId) {
-                    data['customerId'] = this.customerId;
-                }else if(this.deliveryMethodId) {
-                    data['deliveryMethodId'] = this.deliveryMethodId;
-                }
-
-                postApi(this.apiState.apiHome['_links']['createAddress'], data).then(response => {
-
-                    if(response.status == 200) {
-
-                        this.notificationState.showSuccessNotification('Address created');
-                        this.$emit('onCreated', response.data.address);
-                        this.setFields(response.data.address);
-                        this.hideModal();
-
-                    }
-
-                    //  Stop loader
-                    this.isSubmitting = false;
-
-                }).catch(errorException => {
-
-                    //  Stop loader
-                    this.isSubmitting = false;
-
-                    this.formState.setServerFormErrors(errorException);
-
-                });
-
-            },
-            updateAddress() {
-
-                //  Start loader
-                this.isSubmitting = true;
-
-                let data = {...this.form, return: '1'};
-
-                putApi(this.address._links.updateAddress, data).then(response => {
-
-                    if(response.status == 200) {
-
-                        this.notificationState.showSuccessNotification('Address updated');
-                        this.$emit('onUpdated', response.data.address);
-                        this.setFields(response.data.address);
-                        this.hideModal();
-
-                    }
-
-                    //  Stop loader
-                    this.isSubmitting = false;
-
-                }).catch(errorException => {
-
-                    //  Stop loader
-                    this.isSubmitting = false;
-
-                    this.formState.setServerFormErrors(errorException);
-
-                });
-
-            },
-            deleteAddress() {
-
-                if(!this.hasAddress) {
-                    this.$emit('onDeleted', this.form);
-                    this.completeAddress = null;
-                    this.setFields(null);
+                    this.localAddress = response.data;
+                    this.setFields(this.localAddress);
+                    this.$emit('onValidated', cloneDeep(this.localAddress));
                     this.hideModal();
-                    return;
+
+                } catch (error) {
+                    const message = error?.response?.data?.message || error?.message || 'Something went wrong while validating address';
+                    this.notificationState.showWarningNotification(message);
+                    this.formState.setServerFormErrors(error);
+                    console.error('Failed to validate address:', error);
+                } finally {
+                    this.isSubmitting = false;
                 }
 
-                //  Start loader
-                this.isSubmitting = true;
+            },
+            async createAddress() {
 
-                deleteApi(this.address._links.deleteAddress).then(response => {
+                try {
 
-                    if(response.status == 200) {
+                    this.isSubmitting = true;
 
-                        if(response.data.deleted) {
+                    const data = {
+                        return: '1',
+                        ...this.form
+                    };
 
-                            this.notificationState.showSuccessNotification('Address deleted');
-                            this.$emit('onDeleted', response.data.address);
-                            this.setFields(null);
-                            this.hideModal();
+                    const response = await axios.post(`/api/addresses`, data);
 
-                        }else{
+                    this.localAddress = response.data;
+                    this.setFields(this.localAddress);
+                    this.$emit('onCreated', cloneDeep(this.localAddress));
+                    this.notificationState.showSuccessNotification('Address created');
+                    this.hideModal();
 
-                            this.formState.setFormError('general', response.data.message);
-                            this.notificationState.showWarningNotification(response.data.message);
+                } catch (error) {
+                    const message = error?.response?.data?.message || error?.message || 'Something went wrong while creating address';
+                    this.notificationState.showWarningNotification(message);
+                    this.formState.setServerFormErrors(error);
+                    console.error('Failed to create address:', error);
+                } finally {
+                    this.isSubmitting = false;
+                }
 
-                        }
+            },
+            async updateAddress() {
 
+                try {
+
+                    this.isSubmitting = true;
+
+                    const data = {
+                        return: '1',
+                        ...this.form
+                    };
+
+                    const response = await axios.put(`/api/addresses/${this.localAddress.id}`, data);
+
+                    this.localAddress = response.data;
+                    this.setFields(this.localAddress);
+                    this.$emit('onUpdated', cloneDeep(this.localAddress));
+                    this.notificationState.showSuccessNotification('Address updated');
+                    this.hideModal();
+
+                } catch (error) {
+                    const message = error?.response?.data?.message || error?.message || 'Something went wrong while updating address';
+                    this.notificationState.showWarningNotification(message);
+                    this.formState.setServerFormErrors(error);
+                    console.error('Failed to update address:', error);
+                } finally {
+                    this.isSubmitting = false;
+                }
+
+            },
+            async deleteAddress() {
+
+                try {
+
+                    if(!this.hasAddress) {
+                        this.$emit('onDeleted', this.localAddress);
+                        this.localAddress = null;
+                        this.setFields(null);
+                        this.hideModal();
+                        return;
                     }
 
-                    //  Stop loader
+                    this.isSubmitting = true;
+
+                    const response = await axios.delete(`/api/addresses/${this.localAddress.id}`);
+
+                    this.setFields(null);
+                    this.localAddress = null;
+                    this.$emit('onDeleted', null);
+                    this.notificationState.showSuccessNotification('Address deleted');
+                    this.hideModal();
+
+                } catch (error) {
+                    const message = error?.response?.data?.message || error?.message || 'Something went wrong while deleting address';
+                    this.notificationState.showWarningNotification(message);
+                    this.formState.setServerFormErrors(error);
+                    console.error('Failed to delete address:', error);
+                } finally {
                     this.isSubmitting = false;
-
-                }).catch(errorException => {
-
-                    //  Stop loader
-                    this.isSubmitting = false;
-
-                    this.formState.setServerFormErrors(errorException);
-
-                });
+                }
 
             },
         },
         created() {
             this.setFields(this.address);
             this.showCountryAddressOptions();
-            this.completeAddress = this.address ? this.address._attributes.completeAddress : null;
+            this.localAddress = this.address;
         }
     };
 </script>

@@ -3,13 +3,11 @@
 namespace App\Services;
 
 use Exception;
-use App\Models\User;
-use App\Models\Store;
-use App\Models\Product;
 use App\Models\MediaFile;
+use Illuminate\Http\Response;
 use App\Enums\UploadFolderName;
-use App\Models\StorePaymentMethod;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Http;
 use App\Http\Resources\MediaFileResource;
 use App\Http\Resources\MediaFileResources;
 
@@ -38,22 +36,22 @@ class MediaFileService extends BaseService
     {
         return DB::transaction(function () use ($data) {
             $file = $data['file'];
-            $type = $data['type'];
-            $mediableData = $this->getMediableData($data);
-            $uploadFolderName = UploadFolderName::from($type);
+            $mediableId = $data['mediable_id'];
+            $mediableType = $data['mediable_type'];
+            $uploadFolderName = UploadFolderName::from($data['upload_folder_name']);
 
-            $this->handleSingleFileTypes($type, $mediableData);
-            $this->checkMediaFileLimits($type, $mediableData);
+            $this->handleSingleFileTypes($mediableId, $mediableType, $uploadFolderName);
+            $this->checkMediaFileLimits($mediableId, $mediableType, $uploadFolderName);
 
             $filePath = AWSService::store($uploadFolderName, $file);
 
             $mediaFile = MediaFile::create([
-                'type' => $type,
                 'file_path' => $filePath,
+                'mediable_id' => $mediableId,
                 'file_size' => $file->getSize(),
+                'mediable_type' => $mediableType,
+                'type' => $uploadFolderName->value,
                 'mime_type' => $file->getMimeType(),
-                'mediable_id' => $mediableData['id'],
-                'mediable_type' => $mediableData['type'],
                 'width' => getimagesize($file)[0] ?? null,
                 'height' => getimagesize($file)[1] ?? null,
                 'file_name' => $file->getClientOriginalName(),
@@ -160,50 +158,43 @@ class MediaFileService extends BaseService
     }
 
     /**
-     * Get mediable data based on input.
+     * Download media file.
      *
-     * @param array $data
-     * @return array
-     * @throws Exception
+     * @param MediaFile $mediaFile
+     * @return Response
      */
-    private function getMediableData(array $data): array
+    public function downloadMediaFile(MediaFile $mediaFile): Response
     {
-        $uploadFolderName = UploadFolderName::tryFrom($data['type']);
+        $response = Http::get($mediaFile->file_path);
 
-        switch ($uploadFolderName) {
-            case UploadFolderName::PROFILE_PHOTO:
-                return ['id' => $data['user_id'], 'type' => User::class];
-            case UploadFolderName::STORE_LOGO:
-                return ['id' => $data['store_id'], 'type' => Store::class];
-            case UploadFolderName::STORE_PAYMENT_METHOD_LOGO:
-                return ['id' => $data['store_payment_method_id'], 'type' => StorePaymentMethod::class];
-            case UploadFolderName::STORE_PAYMENT_METHOD_PHOTO:
-                return ['id' => $data['store_payment_method_id'], 'type' => StorePaymentMethod::class];
-            case UploadFolderName::PRODUCT_PHOTO:
-                return ['id' => $data['product_id'], 'type' => Product::class];
-            default:
-                throw new Exception('Invalid media file type.');
-        }
+        return response($response->body(), 200)
+            ->header('Content-Type', 'image/png')
+            ->header('Content-Disposition', 'inline; filename="' . $mediaFile->file_name . '"');
     }
 
     /**
      * Handle single file types by deleting existing files for STORE_LOGO and PROFILE_PHOTO.
      *
-     * @param string $type
-     * @param array $mediableData
+     * @param string $mediableId
+     * @param string $mediableType
+     * @param UploadFolderName $uploadFolderName
      * @return void
      * @throws Exception
+     * $mediableId, $mediableType
      */
-    private function handleSingleFileTypes(string $type, array $mediableData): void
+    private function handleSingleFileTypes(string $mediableId, string $mediableType, UploadFolderName $uploadFolderName): void
     {
-        if (in_array($type, [
-            UploadFolderName::STORE_LOGO->value, UploadFolderName::PROFILE_PHOTO->value,
-            UploadFolderName::STORE_PAYMENT_METHOD_LOGO->value, UploadFolderName::STORE_PAYMENT_METHOD_PHOTO->value,
+        if (in_array($uploadFolderName->value, [
+            UploadFolderName::STORE_LOGO->value,
+            UploadFolderName::PROFILE_PHOTO->value,
+            UploadFolderName::TRANSACTION_PHOTO->value,
+            UploadFolderName::STORE_PAYMENT_METHOD_LOGO->value,
+            UploadFolderName::STORE_PAYMENT_METHOD_PHOTO->value,
         ])) {
             $existingFile = MediaFile::where([
-                'mediable_id' => $mediableData['id'],
-                'mediable_type' => $mediableData['type'],
-                'type' => $type,
+                'mediable_id' => $mediableId,
+                'mediable_type' => $mediableType,
+                'type' => $uploadFolderName->value,
             ])->first();
 
             if ($existingFile) {
@@ -215,27 +206,29 @@ class MediaFileService extends BaseService
     /**
      * Check media file limits for types with maximum file counts.
      *
-     * @param string $type
-     * @param array $mediableData
+     * @param string $mediableId
+     * @param string $mediableType
+     * @param UploadFolderName $uploadFolderName
      * @return void
      * @throws Exception
      */
-    private function checkMediaFileLimits(string $type, array $mediableData): void
+    private function checkMediaFileLimits(string $mediableId, string $mediableType, UploadFolderName $uploadFolderName): void
     {
         $limits = [
             UploadFolderName::PRODUCT_PHOTO->value => [5, 'this product'],
+            UploadFolderName::ORDER_COMMENT_PHOTO->value => [6, 'this order comment'],
             // Add future types and their limits here, e.g. UploadFolderName::EXAMPLE->value => [10, 'example']
         ];
 
-        if (isset($limits[$type])) {
+        if (isset($limits[$uploadFolderName->value])) {
             $currentCount = MediaFile::where([
-                'mediable_id' => $mediableData['id'],
-                'mediable_type' => $mediableData['type'],
-                'type' => $type,
+                'mediable_id' => $mediableId,
+                'mediable_type' => $mediableType,
+                'type' => $uploadFolderName->value,
             ])->count();
 
-            if ($currentCount >= $limits[$type][0]) {
-                throw new Exception("You have reached your upload limit for {$limits[$type][1]}.");
+            if ($currentCount >= $limits[$uploadFolderName->value][0]) {
+                throw new Exception("You have reached your upload limit for {$limits[$uploadFolderName->value][1]}.");
             }
         }
     }

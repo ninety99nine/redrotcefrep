@@ -56,13 +56,13 @@ class ProductResource extends JsonResource
             'maximum_allowed_quantity_per_order' => $this->maximum_allowed_quantity_per_order,
             'visibility_expires_at' => $this->visibility_expires_at ? $this->visibility_expires_at->toDateTimeString() : null,
 
+            'user' => new UserResource($this->whenLoaded('user')),
+            'store' => new StoreResource($this->whenLoaded('store')),
             'photo' => new MediaFileResource($this->whenLoaded('photo')),
-            'user' => UserResource::collection($this->whenLoaded('user')),
-            'store' => UserResource::collection($this->whenLoaded('store')),
             'photos' => MediaFileResource::collection($this->whenLoaded('photos')),
             'variations' => UserResource::collection($this->whenLoaded('variations')),
+            'parent_product' => new ProductResource($this->whenLoaded('parentProduct')),
             'media_files' => MediaFileResource::collection($this->whenLoaded('mediaFiles')),
-            'parent_product' => UserResource::collection($this->whenLoaded('parentProduct')),
 
             '_links' => [
                 'show' => route('show.product', ['product' => $this->id]),

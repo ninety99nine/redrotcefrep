@@ -107,14 +107,14 @@
             navigateToPricingPlans() {
                 this.$router.push({
                     name: 'show-pricing-plans',
-                    query: { 'store_id': this.store.id }
+                    query: { store_id: this.store.id }
                 })
             },
             navigateToSubscription() {
                 this.$router.push({
                     name: 'show-store-subscription',
                     params: {
-                        'store_id': this.store.id,
+                        store_id: this.store.id,
                         'subscription_href': this.activeSubscription._links.show
                      }
                 })

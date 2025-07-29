@@ -91,7 +91,7 @@ class ProductController extends Controller
     }
 
     /**
-     * Show single product.
+     * Show product.
      *
      * @param ShowProductRequest $request
      * @param Product $product

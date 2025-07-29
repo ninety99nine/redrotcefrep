@@ -52,7 +52,7 @@
                 this.$router.push({
                     name: 'create-store-coupon',
                     params: {
-                        'store_id': this.store.id
+                        store_id: this.store.id
                     }
                 });
             }

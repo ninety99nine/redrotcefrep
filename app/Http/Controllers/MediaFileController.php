@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\MediaFile;
+use Illuminate\Http\Response;
 use App\Services\MediaFileService;
 use App\Http\Resources\MediaFileResource;
 use App\Http\Resources\MediaFileResources;
@@ -12,6 +13,7 @@ use App\Http\Requests\MediaFile\CreateMediaFileRequest;
 use App\Http\Requests\MediaFile\UpdateMediaFileRequest;
 use App\Http\Requests\MediaFile\DeleteMediaFileRequest;
 use App\Http\Requests\MediaFile\DeleteMediaFilesRequest;
+use App\Http\Requests\MediaFile\DownloadMediaFileRequest;
 
 class MediaFileController extends Controller
 {
@@ -65,7 +67,7 @@ class MediaFileController extends Controller
     }
 
     /**
-     * Show single media file.
+     * Show media file.
      *
      * @param ShowMediaFileRequest $request
      * @param MediaFile $mediaFile
@@ -98,5 +100,17 @@ class MediaFileController extends Controller
     public function deleteMediaFile(DeleteMediaFileRequest $request, MediaFile $mediaFile): array
     {
         return $this->service->deleteMediaFile($mediaFile);
+    }
+
+    /**
+     * Download media file.
+     *
+     * @param DownloadMediaFileRequest $request
+     * @param MediaFile $mediaFile
+     * @return Response
+     */
+    public function downloadMediaFile(MediaFile $mediaFile): Response
+    {
+        return $this->service->downloadMediaFile($mediaFile);
     }
 }

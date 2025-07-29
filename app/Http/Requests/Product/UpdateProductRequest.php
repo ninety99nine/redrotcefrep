@@ -130,8 +130,8 @@ class UpdateProductRequest extends FormRequest
             'store_id.uuid' => 'The store ID must be a valid UUID.',
             'store_id.exists' => 'The specified store does not exist.',
             'variant_attributes.array' => 'The variant attributes must be an array.',
-            'allowed_quantity_per_order.enum' => 'The allowed quantity per order must be one of: ' . Arr::join(AllowedQuantityPerOrder::values(), ',', 'or'),
-            'stock_quantity_type.enum' => 'The stock quantity type must be one of: ' . Arr::join(StockQuantityType::values(), ',', 'or'),
+            'allowed_quantity_per_order.enum' => 'The allowed quantity per order must be one of: ' . Arr::join(AllowedQuantityPerOrder::values(), ', ', ' or '),
+            'stock_quantity_type.enum' => 'The stock quantity type must be one of: ' . Arr::join(StockQuantityType::values(), ', ', ' or '),
         ];
     }
 }

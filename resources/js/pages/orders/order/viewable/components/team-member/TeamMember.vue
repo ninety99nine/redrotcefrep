@@ -2,34 +2,37 @@
 
     <div class="bg-white rounded-lg p-4 mb-4">
 
-        <div class="flex items-center space-x-2 mb-4">
-
-            <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
-            </svg>
-
-            <span class="text-gray-700 font-semibold">Team Member</span>
-
-        </div>
-
         <!-- Order Team Member (Loading Placeholder) -->
         <Skeleton
             v-if="isLoadingStore || isLoadingOrder || !hasOrder"
             width="w-full" height="h-8" rounded="rounded-md" :shine="true">
         </Skeleton>
 
-        <template v-else>
+        <div v-else class="space-y-4">
 
             <!-- Team Members Select Input -->
             <Select
                 :search="true"
+                label="Assigned To"
                 :options="teamMemberOptions"
                 v-model="orderForm.assigned_to_user_id"
                 :skeleton="isLoadingOrder || !hasOrder || isLoadingTeamMembers"
-                @change="(assignedToUserId) => updateOrder({ assigned_to_user_id: assignedToUserId })">
+                @change="(assignedToUserId) => updateOrder({ assigned_to_user_id: assignedToUserId }, 'team member')">
             </Select>
 
-        </template>
+            <!-- Internal Note Textarea -->
+            <Input
+                rows="2"
+                type="textarea"
+                label="Internal Note"
+                v-model="orderForm.internal_note"
+                description="Visible to team members"
+                :errorText="formState.getFormError('internal_note')"
+                @blur="(internalNote) => updateOrder({ internal_note: internalNote }, 'internal note')"
+                tooltipContent="Internal information about this order only visible to you and other team members">
+            </Input>
+
+        </div>
 
     </div>
 
@@ -38,12 +41,13 @@
 <script>
 
     import axios from 'axios';
+    import Input from '@Partials/Input.vue';
     import Select from '@Partials/Select.vue';
     import Skeleton from '@Partials/Skeleton.vue';
 
     export default {
         inject: ['formState', 'orderState', 'storeState', 'notificationState'],
-        components: { Select, Skeleton },
+        components: { Input, Select, Skeleton },
         data() {
             return {
                 teamMembers: [],
@@ -120,7 +124,7 @@
                     this.isLoadingTeamMembers = false;
                 }
             },
-            async updateOrder(data) {
+            async updateOrder(data, type) {
 
                 try {
 
@@ -131,11 +135,20 @@
 
                     await axios.put(`/api/orders/${this.order.id}`, data);
 
-                    if(this.orderForm.assigned_to_user_id) {
-                        const teamMember = this.teamMembers.find(teamMember => teamMember.id === this.orderForm.assigned_to_user_id);
-                        this.notificationState.showSuccessNotification(`Order assigned to ${teamMember.first_name}`);
-                    }else{
-                        this.notificationState.showSuccessNotification(`No team member unassigned`);
+                    if(type == 'team member') {
+                        if(this.orderForm.assigned_to_user_id) {
+                            const teamMember = this.teamMembers.find(teamMember => teamMember.id === this.orderForm.assigned_to_user_id);
+                            this.notificationState.showSuccessNotification(`Order assigned to ${teamMember.first_name}`);
+                        }else{
+                            this.notificationState.showSuccessNotification(`No team member unassigned`);
+                        }
+                    }else if(type == 'internal note') {
+                        if(this.orderForm.internal_note) {
+                            this.notificationState.showSuccessNotification(`Internal note updated`);
+                        }else{
+                            this.notificationState.showSuccessNotification(`Internal note removed`);
+                        }
+                        this.orderState.order.internal_note = this.orderForm.internal_note;
                     }
 
                 } catch (error) {

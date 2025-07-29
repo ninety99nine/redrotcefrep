@@ -51,7 +51,7 @@
 
                     </div>
 
-                    <template v-if="changeHistoryState.hasHistoryItems">
+                    <template v-if="changeHistoryState.hasChangeHistory">
 
                         <ChangeHistoryNavigation></ChangeHistoryNavigation>
 
@@ -335,7 +335,7 @@
     import ChangeHistoryNavigation from '@Layouts/dashboard/components/ChangeHistoryNavigation.vue';
 
     export default {
-        inject: ['uiState', 'authState', 'storeState', 'notificationState', 'changeHistoryState'],
+        inject: ['uiState', 'formState', 'authState', 'storeState', 'notificationState', 'changeHistoryState'],
         components: {
             Logo, Loader, Button, Dropdown, Skeleton, StoreLogo, Footer,
             Notifications, ChangeHistoryNavigation, UserRound
@@ -493,25 +493,25 @@
             navigateToPricingPlans() {
                 this.$router.push({
                     name: 'show-pricing-plans',
-                    query: { 'store_id': this.store.id }
+                    query: { store_id: this.store.id }
                 })
             },
             navigateToHome() {
                 this.$router.push({
                     name: 'show-store-home',
-                    params: { 'store_id': this.store.id }
+                    params: { store_id: this.store.id }
                 })
             },
             navigateToNavRoute(navMenu) {
                 if(['show-store-home'].includes(navMenu.routeName)) {
                     this.$router.push({
                         name: navMenu.routeName,
-                        params: { 'store_id': this.store.id }
+                        params: { store_id: this.store.id }
                     })
                 }else{
                     this.$router.push({
                         name: navMenu.routeName,
-                        query: { 'store_id': this.store.id }
+                        query: { store_id: this.store.id }
                     })
                 }
             },
@@ -527,7 +527,7 @@
 
                     let config = {
                         params: {
-                            '_relationships': ['logo', 'activeSubscription.pricingPlan', /*  'storeRollingNumbers', 'userStoreAssociation'  */].join(',')
+                            _relationships: ['logo', 'activeSubscription.pricingPlan', /*  'storeRollingNumbers', 'userStoreAssociation'  */].join(',')
                         }
                     };
 
@@ -539,6 +539,11 @@
                     this.notificationState.showWarningNotification(message);
                     this.formState.setServerFormErrors(error);
                     console.error('Failed to fetch store:', error);
+
+                    if(error.status == 404) {
+                        await this.$router.replace({ name: 'show-stores' });
+                    }
+
                 } finally {
                     this.storeState.isLoadingStore = false;
                 }

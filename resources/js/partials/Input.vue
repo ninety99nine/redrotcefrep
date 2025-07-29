@@ -77,7 +77,7 @@
                     @drop="handleDrop"
                     @click="handleClick"
                     @dragover.prevent
-                    :class="[
+                    :class="wrapperClass ? wrapperClass : [
                         'flex',
                         wrapperAlignItems,
                         {
@@ -98,8 +98,7 @@
                         {
                             [height]: type == 'file',
                             'cursor-pointer': type == 'file' && !(disabled || !filesLeftToUpload),
-                            'select-none border-2 border-dashed border-gray-300 rounded-lg flex flex-col items-center justify-center text-gray-500 text-sm hover:bg-blue-50 transition':
-                            type == 'file'
+                            'select-none border-2 border-dashed border-gray-300 rounded-lg flex flex-col items-center justify-center text-gray-500 text-sm hover:bg-blue-50 transition': type == 'file'
                         },
                         {
                             'opacity-50 cursor-not-allowed': disabled || hasFilesLeftToUpload === false
@@ -131,11 +130,14 @@
                         :maxLength="maxLength"
                         v-if="type == 'textarea'"
                         :placeholder="inputPlaceholder"
+                        @keydown.enter="(event) => $emit('onEnter', event)"
                         :class="[
-                            'w-full h-full text-sm leading-6 font-medium text-gray-700 placeholder:text-gray-400 placeholder:font-normal invalid:text-red-400 focus-within:outline-none bg-transparent appearance-none [&::-webkit-search-cancel-button]:cursor-pointer',
-                            {
-                                'cursor-not-allowed': disabled
-                            }
+                            inputClass ? inputClass : [
+                                'w-full h-full text-sm leading-6 font-medium text-gray-700 placeholder:text-gray-400 placeholder:font-normal invalid:text-red-400 focus-within:outline-none bg-transparent appearance-none [&::-webkit-search-cancel-button]:cursor-pointer resize-none',
+                                {
+                                    'cursor-not-allowed': disabled
+                                }
+                            ]
                         ]">
                     </textarea>
 
@@ -180,7 +182,7 @@
                         :maxLength="maxLength"
                         :checked="inputChecked"
                         :placeholder="inputPlaceholder"
-                        :class="[
+                        :class="inputClass ? inputClass : [
                             {
                                 'w-full h-full text-sm leading-6 font-medium text-gray-700 placeholder:text-gray-400 placeholder:font-normal invalid:text-red-400 focus-within:outline-none bg-transparent appearance-none [&::-webkit-search-cancel-button]:cursor-pointer':
                                 [
@@ -233,13 +235,27 @@
                     </template>
 
                     <template v-if="type == 'file'">
-                        <svg :class="['w-6 h-6 mb-2', { 'text-gray-400' : !filesLeftToUpload }]" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 9.75v6.75m0 0-3-3m3 3 3-3m-8.25 6a4.5 4.5 0 0 1-1.41-8.775 5.25 5.25 0 0 1 10.233-2.33 3 3 0 0 1 3.758 3.848A3.752 3.752 0 0 1 18 19.5H6.75Z" />
-                        </svg>
-                        <p v-if="disabled" class="text-gray-400 cursor-not-allowed">File upload is disabled</p>
-                        <p v-else-if="!filesLeftToUpload" class="text-gray-400 cursor-not-allowed">Upload limit reached ({{ filesLeftToUpload }} | {{ currentFileCount }})</p>
-                        <p v-else-if="!currentFileCount">Click or Drag & Drop Images</p>
-                        <p v-else>Upload More Images</p>
+
+                        <slot
+                            name="fileTrigger"
+                            :maxFiles="maxFiles"
+                            :disabled="disabled"
+                            :handleClick="handleClick"
+                            :currentFileCount="currentFileCount"
+                            :filesLeftToUpload="filesLeftToUpload"
+                            :singleFileUploadMessage="singleFileUploadMessage">
+
+                            <svg :class="['w-6 h-6 mb-2', { 'text-gray-400' : !filesLeftToUpload }]" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 9.75v6.75m0 0-3-3m3 3 3-3m-8.25 6a4.5 4.5 0 0 1-1.41-8.775 5.25 5.25 0 0 1 10.233-2.33 3 3 0 0 1 3.758 3.848A3.752 3.752 0 0 1 18 19.5H6.75Z" />
+                            </svg>
+                            <p v-if="disabled" class="text-gray-400 cursor-not-allowed">File upload is disabled</p>
+                            <p v-else-if="maxFiles == 1 && !filesLeftToUpload" class="text-gray-400 cursor-not-allowed">{{ singleFileUploadMessage || 'File attached' }}</p>
+                            <p v-else-if="!filesLeftToUpload" class="text-gray-400 cursor-not-allowed">Upload limit reached</p>
+                            <p v-else-if="!currentFileCount">{{ maxFiles == 1 ? 'Click or Drag & Drop Image' : 'Click or Drag & Drop Images' }}</p>
+                            <p v-else>Upload More Images</p>
+
+                        </slot>
+
                     </template>
 
                     <!-- Suffix Icon Slot -->
@@ -286,69 +302,75 @@
                             <template v-if="!file.uploading">
 
                                 <!-- Success Tick -->
-                                <div v-if="file.uploaded === true" class="absolute z-10 top-1 right-1 bg-green-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs">
-                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5" />
-                                    </svg>
+                                <div v-if="file.uploaded === true" class="w-5 h-5 absolute z-10 top-1 right-1 rounded-full">
+                                    <CircleCheck size="20" class="text-green-500"></CircleCheck>
                                 </div>
 
                                 <!-- Failure Exclamation -->
-                                <div v-if="file.uploaded === false" class="w-5 h-5 sm:hidden lg:block group-hover:hidden absolute z-10 top-1 right-1 bg-red-500 text-white rounded-full">
-                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
-                                        <path fill-rule="evenodd" d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12ZM12 8.25a.75.75 0 0 1 .75.75v3.75a.75.75 0 0 1-1.5 0V9a.75.75 0 0 1 .75-.75Zm0 8.25a.75.75 0 1 0 0-1.5.75.75 0 0 0 0 1.5Z" clip-rule="evenodd" />
-                                    </svg>
+                                <div v-if="file.uploaded === false" class="w-5 h-5 absolute z-10 top-4 right-4 rounded-full">
+                                    <CircleAlert size="20" class="text-red-500"></CircleAlert>
                                 </div>
 
                                 <!-- Retry Button -->
                                 <div
                                     v-if="file.uploaded === false"
-                                    @click.stop="() => onUpload(modelValue, fileIndex)"
+                                    @click.stop="() => $emit('retryUpload', modelValue[fileIndex], fileIndex)"
                                     class="flex items-center justify-center w-8 h-8 rounded-full cursor-pointer bg-yellow-500 text-white hover:bg-yellow-600 active:scale-95 absolute z-10 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
-                                    <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
-                                        <path fill-rule="evenodd" d="M4.755 10.059a7.5 7.5 0 0 1 12.548-3.364l1.903 1.903h-3.183a.75.75 0 1 0 0 1.5h4.992a.75.75 0 0 0 .75-.75V4.356a.75.75 0 0 0-1.5 0v3.18l-1.9-1.9A9 9 0 0 0 3.306 9.67a.75.75 0 1 0 1.45.388Zm15.408 3.352a.75.75 0 0 0-.919.53 7.5 7.5 0 0 1-12.548 3.364l-1.902-1.903h3.183a.75.75 0 0 0 0-1.5H2.984a.75.75 0 0 0-.75.75v4.992a.75.75 0 0 0 1.5 0v-3.18l1.9 1.9a9 9 0 0 0 15.059-4.035.75.75 0 0 0-.53-.918Z" clip-rule="evenodd" />
-                                    </svg>
+                                    <RefreshCcw size="16"></RefreshCcw>
                                 </div>
 
                                 <!-- Remove Image Button -->
                                 <div
                                     v-if="(!file.uploaded && !file.uploading)"
                                     @click.stop="(event) => removeFile(event, fileIndex)"
-                                    class="w-5 h-5 lg:opacity-0 group-hover:opacity-100 active:scale-90 transition cursor-pointer flex items-center justify-center absolute z-10 top-1 right-1 bg-red-500 text-white rounded-full">
-                                    <div v-if="isTemporaryFile(fileIndex)" class="-mt-0.5">x</div>
+                                    class="w-6 h-6 active:scale-90 transition cursor-pointer flex items-center justify-center absolute z-10 -top-1 -right-1 border border-gray-300 bg-white text-black hover:bg-gray-100 rounded-full">
+                                    <X v-if="isTemporaryFile(fileIndex)" size="14"></X>
                                     <svg v-else class="w-3 h-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
                                         <path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
                                     </svg>
                                 </div>
 
-                                <!-- Remove Image Button -->
+                                <!-- Invalid QR code Disclaimer -->
                                 <div
-                                    v-if="(file.hasOwnProperty('qrCode') && !file.qrCode.valid)"
                                     @click.stop="(event) => removeFile(event, fileIndex)"
+                                    v-if="(file.hasOwnProperty('qrCode') && !file.qrCode.valid)"
                                     class="w-full flex items-center justify-center absolute z-10 bottom-2">
                                     <div class="bg-yellow-500 text-xs text-white rounded-full px-2">Invalid QR code</div>
                                 </div>
 
                                 <!-- Failed Indicator -->
-                                <div v-if="file.uploaded === false" class="absolute inset-0 bg-white bg-opacity-80 border border-red-500 rounded-lg flex items-center justify-center"></div>
+                                <div v-if="file.uploaded === false" class="absolute inset-0 bg-white/80 bg-opac outline outline-red-500 rounded-lg flex items-center justify-center"></div>
 
                             </template>
 
                             <!-- Uploading Indicator -->
-                            <div v-if="file.uploading" class="absolute inset-0 bg-gray-900 bg-opacity-50 rounded-lg flex items-center justify-center">
+                            <div v-if="file.uploading" class="absolute inset-0 bg-gray-900/50 rounded-lg flex items-center justify-center">
                                 <span class="text-white text-xs font-bold">Uploading...</span>
                             </div>
 
                             <!-- File Preview -->
-                            <div class="w-full h-24 p-4 rounded-lg border border-gray-300 dark:border-gray-700 flex items-center justify-center">
+                            <slot name="filePreview" :file="file" :fileIndex="fileIndex">
 
-                                <img v-if="file.type == 'image'" :src="file.file_path" class="w-full h-full object-contain" />
+                                <div class="w-full h-24 p-4 rounded-lg border border-gray-300 dark:border-gray-700 flex items-center justify-center">
 
-                                <div v-else class="space-y-2">
-                                    <svg v-if="file.type == 'csv'" class="w-10 h-10 mx-auto" viewBox="0 0 56 64" xmlns="http://www.w3.org/2000/svg"><path clip-rule="evenodd" d="m5.106 0c-2.802 0-5.073 2.272-5.073 5.074v53.841c0 2.803 2.271 5.074 5.073 5.074h45.774c2.801 0 5.074-2.271 5.074-5.074v-38.605l-18.903-20.31h-31.945z" fill="#45b058" fill-rule="evenodd"/><path d="m20.306 43.197c.126.144.198.324.198.522 0 .378-.306.72-.703.72-.18 0-.378-.072-.504-.234-.702-.846-1.891-1.387-3.007-1.387-2.629 0-4.627 2.017-4.627 4.88 0 2.845 1.999 4.879 4.627 4.879 1.134 0 2.25-.486 3.007-1.369.125-.144.324-.233.504-.233.415 0 .703.359.703.738 0 .18-.072.36-.198.504-.937.972-2.215 1.693-4.015 1.693-3.457 0-6.176-2.521-6.176-6.212s2.719-6.212 6.176-6.212c1.8.001 3.096.721 4.015 1.711zm6.802 10.714c-1.782 0-3.187-.594-4.213-1.495-.162-.144-.234-.342-.234-.54 0-.361.27-.757.702-.757.144 0 .306.036.432.144.828.739 1.98 1.314 3.367 1.314 2.143 0 2.827-1.152 2.827-2.071 0-3.097-7.112-1.386-7.112-5.672 0-1.98 1.764-3.331 4.123-3.331 1.548 0 2.881.467 3.853 1.278.162.144.252.342.252.54 0 .36-.306.72-.703.72-.144 0-.306-.054-.432-.162-.882-.72-1.98-1.044-3.079-1.044-1.44 0-2.467.774-2.467 1.909 0 2.701 7.112 1.152 7.112 5.636.001 1.748-1.187 3.531-4.428 3.531zm16.994-11.254-4.159 10.335c-.198.486-.685.81-1.188.81h-.036c-.522 0-1.008-.324-1.207-.81l-4.142-10.335c-.036-.09-.054-.18-.054-.288 0-.36.323-.793.81-.793.306 0 .594.18.72.486l3.889 9.992 3.889-9.992c.108-.288.396-.486.72-.486.468 0 .81.378.81.793.001.09-.017.198-.052.288z" fill="#fff"/><g clip-rule="evenodd" fill-rule="evenodd"><path d="m56.001 20.357v1h-12.8s-6.312-1.26-6.128-6.707c0 0 .208 5.707 6.003 5.707z" fill="#349c42"/><path d="m37.098.006v14.561c0 1.656 1.104 5.791 6.104 5.791h12.8l-18.904-20.352z" fill="#fff" opacity=".5"/></g></svg>
-                                    <svg v-else-if="file.type == 'excel'" class="w-10 h-10 mx-auto" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><linearGradient id="a" gradientUnits="userSpaceOnUse" x1="4.494" x2="13.832" y1="7.914" y2="24.086"><stop offset="0" stop-color="#18884f"/><stop offset=".5" stop-color="#117e43"/><stop offset="1" stop-color="#0b6631"/></linearGradient><path d="m19.581 15.35-11.069-1.95v14.409a1.192 1.192 0 0 0 1.193 1.191h19.1a1.192 1.192 0 0 0 1.195-1.191v-5.309z" fill="#185c37"/><path d="m19.581 3h-9.876a1.192 1.192 0 0 0 -1.193 1.191v5.309l11.069 6.5 5.861 1.95 4.558-1.95v-6.5z" fill="#21a366"/><path d="m8.512 9.5h11.069v6.5h-11.069z" fill="#107c41"/><path d="m16.434 8.2h-7.922v16.25h7.922a1.2 1.2 0 0 0 1.194-1.191v-13.868a1.2 1.2 0 0 0 -1.194-1.191z" opacity=".1"/><path d="m15.783 8.85h-7.271v16.25h7.271a1.2 1.2 0 0 0 1.194-1.191v-13.868a1.2 1.2 0 0 0 -1.194-1.191z" opacity=".2"/><path d="m15.783 8.85h-7.271v14.95h7.271a1.2 1.2 0 0 0 1.194-1.191v-12.568a1.2 1.2 0 0 0 -1.194-1.191z" opacity=".2"/><path d="m15.132 8.85h-6.62v14.95h6.62a1.2 1.2 0 0 0 1.194-1.191v-12.568a1.2 1.2 0 0 0 -1.194-1.191z" opacity=".2"/><path d="m3.194 8.85h11.938a1.193 1.193 0 0 1 1.194 1.191v11.918a1.193 1.193 0 0 1 -1.194 1.191h-11.938a1.192 1.192 0 0 1 -1.194-1.191v-11.918a1.192 1.192 0 0 1 1.194-1.191z" fill="url(#a)"/><path d="m5.7 19.873 2.511-3.884-2.3-3.862h1.847l1.255 2.473c.116.234.2.408.238.524h.017c.082-.188.169-.369.26-.546l1.342-2.447h1.7l-2.359 3.84 2.419 3.905h-1.809l-1.45-2.711a2.355 2.355 0 0 1 -.171-.365h-.024a1.688 1.688 0 0 1 -.168.351l-1.493 2.722z" fill="#fff"/><path d="m28.806 3h-9.225v6.5h10.419v-5.309a1.192 1.192 0 0 0 -1.194-1.191z" fill="#33c481"/><path d="m19.581 16h10.419v6.5h-10.419z" fill="#107c41"/></svg>
-                                    <p class="text-sm text-gray-700 truncate">{{ file.name }}</p>
+                                    <img v-if="file.type == 'image'" :src="file.file_path" class="w-full h-full object-contain" />
+
+                                    <div v-else class="space-y-2">
+                                        <svg v-if="file.type == 'csv'" class="w-10 h-10 mx-auto" viewBox="0 0 56 64" xmlns="http://www.w3.org/2000/svg"><path clip-rule="evenodd" d="m5.106 0c-2.802 0-5.073 2.272-5.073 5.074v53.841c0 2.803 2.271 5.074 5.073 5.074h45.774c2.801 0 5.074-2.271 5.074-5.074v-38.605l-18.903-20.31h-31.945z" fill="#45b058" fill-rule="evenodd"/><path d="m20.306 43.197c.126.144.198.324.198.522 0 .378-.306.72-.703.72-.18 0-.378-.072-.504-.234-.702-.846-1.891-1.387-3.007-1.387-2.629 0-4.627 2.017-4.627 4.88 0 2.845 1.999 4.879 4.627 4.879 1.134 0 2.25-.486 3.007-1.369.125-.144.324-.233.504-.233.415 0 .703.359.703.738 0 .18-.072.36-.198.504-.937.972-2.215 1.693-4.015 1.693-3.457 0-6.176-2.521-6.176-6.212s2.719-6.212 6.176-6.212c1.8.001 3.096.721 4.015 1.711zm6.802 10.714c-1.782 0-3.187-.594-4.213-1.495-.162-.144-.234-.342-.234-.54 0-.361.27-.757.702-.757.144 0 .306.036.432.144.828.739 1.98 1.314 3.367 1.314 2.143 0 2.827-1.152 2.827-2.071 0-3.097-7.112-1.386-7.112-5.672 0-1.98 1.764-3.331 4.123-3.331 1.548 0 2.881.467 3.853 1.278.162.144.252.342.252.54 0 .36-.306.72-.703.72-.144 0-.306-.054-.432-.162-.882-.72-1.98-1.044-3.079-1.044-1.44 0-2.467.774-2.467 1.909 0 2.701 7.112 1.152 7.112 5.636.001 1.748-1.187 3.531-4.428 3.531zm16.994-11.254-4.159 10.335c-.198.486-.685.81-1.188.81h-.036c-.522 0-1.008-.324-1.207-.81l-4.142-10.335c-.036-.09-.054-.18-.054-.288 0-.36.323-.793.81-.793.306 0 .594.18.72.486l3.889 9.992 3.889-9.992c.108-.288.396-.486.72-.486.468 0 .81.378.81.793.001.09-.017.198-.052.288z" fill="#fff"/><g clip-rule="evenodd" fill-rule="evenodd"><path d="m56.001 20.357v1h-12.8s-6.312-1.26-6.128-6.707c0 0 .208 5.707 6.003 5.707z" fill="#349c42"/><path d="m37.098.006v14.561c0 1.656 1.104 5.791 6.104 5.791h12.8l-18.904-20.352z" fill="#fff" opacity=".5"/></g></svg>
+                                        <svg v-else-if="file.type == 'excel'" class="w-10 h-10 mx-auto" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><linearGradient id="a" gradientUnits="userSpaceOnUse" x1="4.494" x2="13.832" y1="7.914" y2="24.086"><stop offset="0" stop-color="#18884f"/><stop offset=".5" stop-color="#117e43"/><stop offset="1" stop-color="#0b6631"/></linearGradient><path d="m19.581 15.35-11.069-1.95v14.409a1.192 1.192 0 0 0 1.193 1.191h19.1a1.192 1.192 0 0 0 1.195-1.191v-5.309z" fill="#185c37"/><path d="m19.581 3h-9.876a1.192 1.192 0 0 0 -1.193 1.191v5.309l11.069 6.5 5.861 1.95 4.558-1.95v-6.5z" fill="#21a366"/><path d="m8.512 9.5h11.069v6.5h-11.069z" fill="#107c41"/><path d="m16.434 8.2h-7.922v16.25h7.922a1.2 1.2 0 0 0 1.194-1.191v-13.868a1.2 1.2 0 0 0 -1.194-1.191z" opacity=".1"/><path d="m15.783 8.85h-7.271v16.25h7.271a1.2 1.2 0 0 0 1.194-1.191v-13.868a1.2 1.2 0 0 0 -1.194-1.191z" opacity=".2"/><path d="m15.783 8.85h-7.271v14.95h7.271a1.2 1.2 0 0 0 1.194-1.191v-12.568a1.2 1.2 0 0 0 -1.194-1.191z" opacity=".2"/><path d="m15.132 8.85h-6.62v14.95h6.62a1.2 1.2 0 0 0 1.194-1.191v-12.568a1.2 1.2 0 0 0 -1.194-1.191z" opacity=".2"/><path d="m3.194 8.85h11.938a1.193 1.193 0 0 1 1.194 1.191v11.918a1.193 1.193 0 0 1 -1.194 1.191h-11.938a1.192 1.192 0 0 1 -1.194-1.191v-11.918a1.192 1.192 0 0 1 1.194-1.191z" fill="url(#a)"/><path d="m5.7 19.873 2.511-3.884-2.3-3.862h1.847l1.255 2.473c.116.234.2.408.238.524h.017c.082-.188.169-.369.26-.546l1.342-2.447h1.7l-2.359 3.84 2.419 3.905h-1.809l-1.45-2.711a2.355 2.355 0 0 1 -.171-.365h-.024a1.688 1.688 0 0 1 -.168.351l-1.493 2.722z" fill="#fff"/><path d="m28.806 3h-9.225v6.5h10.419v-5.309a1.192 1.192 0 0 0 -1.194-1.191z" fill="#33c481"/><path d="m19.581 16h10.419v6.5h-10.419z" fill="#107c41"/></svg>
+                                        <p class="text-sm text-gray-700 truncate">{{ file.name }}</p>
+                                    </div>
+
                                 </div>
 
+                            </slot>
+
+                            <!-- Upload Error Message -->
+                            <div
+                                v-if="!file.uploading && file.error_message"
+                                @click.stop="(event) => removeFile(event, fileIndex)"
+                                class="w-full flex items-center justify-center relative z-50">
+                                <div class="bg-yellow-500 text-xs text-white rounded-b-lg py-1 px-2">{{ file.error_message }}</div>
                             </div>
 
                         </div>
@@ -362,7 +384,7 @@
                             type="warning"
                             :iconLeft="RefreshCcw"
                             :disabled="isUploading"
-                            :action="() => onUpload(modelValue)">
+                            :action="() => $emit('retryUploads', modelValue)">
                             <span>Retry Uplaods</span>
                         </Button>
 
@@ -400,12 +422,12 @@
     import { generateUniqueId } from '@Utils/generalUtils.js';
     import { convertToValidMoney } from '@Utils/numberUtils.js';
     import { parsePhoneNumberFromString } from 'libphonenumber-js';
-    import { Eye, Mail, Lock, Search, EyeOff, RefreshCcw } from 'lucide-vue-next';
+    import { X, Eye, Mail, Lock, Search, EyeOff, CircleAlert, CircleCheck, RefreshCcw } from 'lucide-vue-next';
 
     export default {
         inject: ['notificationState'],
         directives: { capitalize },
-        components: { Eye, Copy, Mail, Lock, Search, EyeOff, Button, Popover, Tooltip, Skeleton, IntlTelInput },
+        components: { X, Eye, Copy, Mail, Lock, Search, EyeOff, CircleAlert, CircleCheck, RefreshCcw, Button, Popover, Tooltip, Skeleton, IntlTelInput },
         props: {
             modelValue: {
                 type: [String, Boolean, Array, null]
@@ -466,6 +488,14 @@
             },
             alignItems: {
                 type: [String, null]
+            },
+            wrapperClass: {
+                type: [String, Object, Array, null],
+                default: null
+            },
+            inputClass: {
+                type: [String, Object, Array, null],
+                default: null
             },
             errorText: {
                 type: [String, null],
@@ -549,6 +579,10 @@
                 type: [Number, null],
                 default: 5,
             },
+            singleFileUploadMessage: {
+                type: [String, null],
+                default: null
+            },
             mimeTypes: {
                 type: [Array, null],
                 default: () => ["image/*"],
@@ -566,10 +600,6 @@
                 type: Boolean,
                 default: false
             },
-            onUpload: {
-                type: Function,
-                default: () => {},
-            },
             onDelete: {
                 type: Function,
                 default: () => {},
@@ -585,10 +615,11 @@
                 default: false
             },
 
-            emits: ['update:modelValue', 'focus', 'blur'],
+            emits: ['update:modelValue', 'focus', 'blur', 'onEnter', 'retryUpload', 'retryUploads'],
         },
         data() {
             return {
+                X,
                 iti: null,
                 RefreshCcw,
                 mobileError: null,
@@ -749,8 +780,12 @@
             },
             handleClick(event) {
                 if(this.disabled) return;
+
                 if(this.type == 'file') {
-                    if(!this.filesLeftToUpload) return;
+                    if(!this.filesLeftToUpload) {
+                        this.notificationState.showWarningNotification(`You can only upload ${this.maxFiles} at a time`);
+                        return;
+                    }
                     this.triggerFileInput(event);
                 }else{
                     this.focusInput();
@@ -775,7 +810,6 @@
                 }
             },
             handleFileUpload(event) {
-                console.log('handleFileUpload');
                 const files = event.target.files;
 
                 if (!files.length) return;
@@ -788,7 +822,6 @@
             },
             processFiles(files) {
 
-                console.log('processFiles');
                 if (!files.length) return;
 
                 if (this.filesLeftToUpload <= 0) {
@@ -852,12 +885,13 @@
                             }
 
                             let newFile = {
-                                file_path: type == 'image' ? null : URL.createObjectURL(file),
+                                file_path: type == 'image' ? URL.createObjectURL(file) : null,
+                                error_message: null,
                                 uploading: false,
                                 deleting: false,
                                 name: file.name,
                                 uploaded: null,
-                                fileRef: file,
+                                file_ref: file,
                                 type: type
                             }
 
@@ -874,13 +908,8 @@
 
                 Promise.all(filePromises).then(() => {
 
-                    console.log('emit files');
-
                     this.updateModalValue([...this.modelValue, ...newFiles]);
 
-                    if (this.onUpload) {
-                        this.onUpload(this.modelValue);
-                    }
                 });
             },
             isTemporaryFile(fileIndex) {

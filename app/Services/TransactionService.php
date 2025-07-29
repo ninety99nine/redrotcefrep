@@ -2,13 +2,16 @@
 
 namespace App\Services;
 
-use App\Enums\PaymentMethodType;
 use Exception;
+use Carbon\Carbon;
+use App\Enums\Association;
 use App\Models\Transaction;
+use App\Enums\UploadFolderName;
+use App\Enums\PaymentMethodType;
+use Illuminate\Support\Facades\Auth;
 use App\Http\Resources\TransactionResource;
 use App\Http\Resources\TransactionResources;
-use Carbon\Carbon;
-use Illuminate\Support\Facades\Auth;
+use App\Models\Order;
 
 class TransactionService extends BaseService
 {
@@ -20,7 +23,32 @@ class TransactionService extends BaseService
      */
     public function showTransactions(array $data): TransactionResources|array
     {
-        $query = Transaction::query()->when(!request()->has('_sort'), fn($query) => $query->latest());
+        $orderId = $data['order_id'] ?? null;
+        $storeId = $data['store_id'] ?? null;
+        $customerId = $data['customer_id'] ?? null;
+        $paymentMethodId = $data['payment_method_id'] ?? null;
+        $requestedByUserId = $data['requested_by_user_id'] ?? null;
+        $manuallyVerifiedByUserId = $data['manually_verified_by_user_id'] ?? null;
+        $association = isset($data['association']) ? Association::tryFrom($data['association']) : null;
+
+        if($association == Association::SUPER_ADMIN) {
+            $query = Transaction::query();
+        }else if($orderId) {
+            $query = Transaction::where('owner_id', $orderId)->where('owner_type', 'order');
+        }else if($customerId) {
+            $query = Transaction::where('customer_id', $customerId);
+        }else if($paymentMethodId) {
+            $query = Transaction::where('payment_method_id', $paymentMethodId);
+        }else if($requestedByUserId) {
+            $query = Transaction::where('requested_by_user_id', $requestedByUserId);
+        }else if($manuallyVerifiedByUserId) {
+            $query = Transaction::where('manually_verified_by_user_id', $manuallyVerifiedByUserId);
+        }else {
+            $query = Transaction::where('store_id', $storeId);
+        }
+
+        $query = $query->when(!request()->has('_sort'), fn($query) => $query->latest());
+
         return $this->setQuery($query)->getOutput();
     }
 
@@ -34,6 +62,27 @@ class TransactionService extends BaseService
     public function createTransaction(array $data): array
     {
         $transaction = Transaction::create($data);
+
+        if($data['owner_type'] == 'order') {
+
+            $orderService = new OrderService;
+            $order = Order::find($data['owner_id']);
+            $orderService->updateOrderAmountBalance($order);
+
+        }
+
+        // Create transaction photo if provided
+        if (isset($data['photo']) && !empty($data['photo'])) {
+
+            (new MediaFileService)->createMediaFile([
+                'file' => $data['photo'],
+                'mediable_type' => 'transaction',
+                'mediable_id' => $transaction->id,
+                'upload_folder_name' => UploadFolderName::TRANSACTION_PHOTO->value
+            ]);
+
+        }
+
         return $this->showCreatedResource($transaction);
     }
 
@@ -46,12 +95,28 @@ class TransactionService extends BaseService
      */
     public function deleteTransactions(array $transactionIds): array
     {
-        $transactions = Transaction::whereIn('id', $transactionIds)->get();
+        $transactions = Transaction::whereIn('id', $transactionIds)->with(['mediaFiles'])->get();
 
         if ($totalTransactions = $transactions->count()) {
 
+            $mediaFileService = new MediaFileService;
+
             foreach ($transactions as $transaction) {
+
+                foreach ($transaction->mediaFiles as $mediaFile) {
+                    $mediaFileService->deleteMediaFile($mediaFile);
+                }
+
                 $transaction->delete();
+
+                if($transaction->owner_type == 'order') {
+
+                    $orderService = new OrderService;
+                    $order = Order::find($transaction->owner_id);
+                    $orderService->updateOrderAmountBalance($order);
+
+                }
+
             }
 
             return ['message' => $totalTransactions . ($totalTransactions == 1 ? ' Transaction' : ' Transactions') . ' deleted'];
@@ -94,7 +159,21 @@ class TransactionService extends BaseService
      */
     public function deleteTransaction(Transaction $transaction): array
     {
+        $mediaFileService = new MediaFileService;
+
+        foreach ($transaction->mediaFiles as $mediaFile) {
+            $mediaFileService->deleteMediaFile($mediaFile);
+        }
+
         $deleted = $transaction->delete();
+
+        if($transaction->owner_type == 'order') {
+
+            $orderService = new OrderService;
+            $order = Order::find($transaction->owner_id);
+            $orderService->updateOrderAmountBalance($order);
+
+        }
 
         if ($deleted) {
             return ['message' => 'Transaction deleted'];

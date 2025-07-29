@@ -53,8 +53,8 @@ class UpdateOrdersRequest extends FormRequest
             'order_ids.*.exists' => 'One or more order IDs do not exist.',
             'store_id.uuid' => 'The store ID must be a valid UUID.',
             'store_id.exists' => 'The specified store does not exist.',
-            'status.enum' => 'The status must be one of: ' . Arr::join(OrderStatus::values(), ',', 'or'),
-            'payment_status.enum' => 'The payment status must be one of: ' . Arr::join(OrderPaymentStatus::values(), ',', 'or'),
+            'status.enum' => 'The status must be one of: ' . Arr::join(OrderStatus::values(), ', ', ' or '),
+            'payment_status.enum' => 'The payment status must be one of: ' . Arr::join(OrderPaymentStatus::values(), ', ', ' or '),
             'assigned_to_user_id.uuid' => 'The assigned to user ID must be a valid UUID.',
             'assigned_to_user_id.exists' => 'The specified assigned to user does not exist.',
         ];

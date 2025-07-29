@@ -58,6 +58,7 @@ class StoreService extends BaseService
             'manage store',
             'view orders', 'manage orders',
             'view products', 'manage products',
+            'view customers', 'manage customers',
             'view promotions', 'manage promotions',
             'view team members', 'manage team members'
         ];
@@ -85,8 +86,9 @@ class StoreService extends BaseService
 
             (new MediaFileService)->createMediaFile([
                 'file' => $data['logo'],
-                'store_id' => $store->id,
-                'type' => UploadFolderName::STORE_LOGO->value
+                'mediable_type' => 'store',
+                'mediable_id' => $store->id,
+                'upload_folder_name' => UploadFolderName::STORE_LOGO->value
             ]);
 
         }
@@ -119,12 +121,20 @@ class StoreService extends BaseService
      */
     public function deleteStores(array $storeIds): array
     {
-        $stores = Store::whereIn('id', $storeIds)->get();
+        $stores = Store::whereIn('id', $storeIds)->with(['mediaFiles'])->get();
 
         if($totalStores = $stores->count()) {
 
+            $mediaFileService = new MediaFileService;
+
             foreach($stores as $store) {
+
+                foreach ($store->mediaFiles as $mediaFile) {
+                    $mediaFileService->deleteMediaFile($mediaFile);
+                }
+
                 $store->delete();
+
             }
 
             return ['message' => $totalStores  . ($totalStores  == 1 ? ' Store': ' Stores') . ' deleted'];
@@ -169,6 +179,12 @@ class StoreService extends BaseService
      */
     public function deleteStore(Store $store): array
     {
+        $mediaFileService = new MediaFileService;
+
+        foreach ($store->mediaFiles as $mediaFile) {
+            $mediaFileService->deleteMediaFile($mediaFile);
+        }
+
         $deleted = $store->delete();
 
         if ($deleted) {

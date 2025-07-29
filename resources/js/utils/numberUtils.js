@@ -4,6 +4,11 @@ export function generateRandomNumber(length) {
     return Array.from({ length }, () => Math.floor(Math.random() * 10)).join('');
 }
 
+export function removeDecimalTrailingZeros(value) {
+    const number = parseFloat(value);
+    return number.toFixed(2).replace(/\.?0+$/, '');
+}
+
 /**
  * Convert a value to a valid monetary format based on the currency's decimal digits.
  *

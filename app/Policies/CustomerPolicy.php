@@ -28,7 +28,7 @@ class CustomerPolicy extends BasePolicy
      */
     public function viewAny(User $user): bool
     {
-        return $this->isStoreUserWithPermission($user, 'view customers');
+        return true;
     }
 
     /**
@@ -40,7 +40,7 @@ class CustomerPolicy extends BasePolicy
      */
     public function view(User $user, Customer $customer): bool
     {
-        return $this->isStoreUserWithPermission($user, 'view customers');
+        return true;
     }
 
     /**
@@ -51,7 +51,7 @@ class CustomerPolicy extends BasePolicy
      */
     public function create(User $user): bool
     {
-        return $this->isStoreUserWithPermission($user, 'manage customers');
+        return true;
     }
 
     /**
@@ -63,7 +63,7 @@ class CustomerPolicy extends BasePolicy
      */
     public function update(User $user, Customer $customer): bool
     {
-        return $this->isStoreUserWithPermission($user, 'manage customers');
+        return true;
     }
 
     /**
@@ -75,7 +75,7 @@ class CustomerPolicy extends BasePolicy
      */
     public function delete(User $user, Customer $customer): bool
     {
-        return $this->isStoreUserWithPermission($user, 'manage customers');
+        return true;
     }
 
     /**
@@ -86,6 +86,6 @@ class CustomerPolicy extends BasePolicy
      */
     public function deleteAny(User $user): bool
     {
-        return $this->isStoreUserWithPermission($user, 'manage customers');
+        return true;
     }
 }

@@ -2,9 +2,7 @@
 
     <div
         ref="dropdown"
-        :data-hs-dropdown="trigger"
-        class="hs-dropdown relative"
-        :data-hs-dropdown-placement="position">
+        class="relative">
 
         <!-- Trigger Slot -->
         <slot name="trigger" :isOpen="isOpen" :toggleDropdown="toggleDropdown">
@@ -42,8 +40,13 @@
             :id="uniqueId"
             :class="[
                 dropdownClasses,
+                {
+                    'left-0': position === 'right',
+                    'right-0': position === 'left',
+                    'left-1/2 -translate-x-1/2': position === 'center'
+                },
                 { 'hidden opacity-0 invisible': !isOpen, 'opacity-100 visible': isOpen },
-                'hs-dropdown-menu absolute z-50 bg-white border border-gray-100 mt-1 text-start rounded-lg overflow-hidden shadow-md dark:bg-neutral-800 dark:border-neutral-700 transition-opacity duration-200 ease-in-out'
+                'absolute z-50 bg-white border border-gray-100 mt-1 text-start rounded-lg overflow-hidden shadow-md dark:bg-neutral-800 dark:border-neutral-700 transition-opacity duration-200 ease-in-out'
             ]">
 
             <slot name="header"></slot>
@@ -122,8 +125,8 @@
             },
             position: {
                 type: String,
-                default: "bottom",
-                validator: (value) => ["top", "bottom", "left", "right"].includes(value),
+                default: "center",
+                validator: (value) => ["left", "right", "center"].includes(value),
             },
             dropdownClasses: {
                 type: String,

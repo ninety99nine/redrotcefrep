@@ -58,6 +58,18 @@ class AddressService extends BaseService
     }
 
     /**
+     * Validate address.
+     *
+     * @param array $data
+     * @return AddressResource
+     */
+    public function validateAddress(array $data): AddressResource
+    {
+        $address = new Address($data);
+        return $this->showResource($address);
+    }
+
+    /**
      * Delete Addresses.
      *
      * @return array

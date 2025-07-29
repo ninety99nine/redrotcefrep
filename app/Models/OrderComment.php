@@ -2,10 +2,13 @@
 
 namespace App\Models;
 
+use App\Enums\UploadFolderName;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Attributes\Scope;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
+use Illuminate\Database\Eloquent\Relations\MorphOne;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
@@ -63,5 +66,35 @@ class OrderComment extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    /**
+     * Get the photo.
+     *
+     * @return MorphOne
+     */
+    public function photo(): MorphOne
+    {
+        return $this->morphOne(MediaFile::class, 'mediable')->where('type', UploadFolderName::ORDER_COMMENT_PHOTO->value);
+    }
+
+    /**
+     * Get the photos.
+     *
+     * @return MorphMany
+     */
+    public function photos(): MorphMany
+    {
+        return $this->morphMany(MediaFile::class, 'mediable')->where('type', UploadFolderName::ORDER_COMMENT_PHOTO->value);
+    }
+
+    /**
+     * Get the media files (photos and other media file types).
+     *
+     * @return MorphMany
+     */
+    public function mediaFiles(): MorphMany
+    {
+        return $this->morphMany(MediaFile::class, 'mediable');
     }
 }

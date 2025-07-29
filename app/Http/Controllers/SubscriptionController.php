@@ -65,7 +65,7 @@ class SubscriptionController extends Controller
     }
 
     /**
-     * Show single subscription.
+     * Show subscription.
      *
      * @param ShowSubscriptionRequest $request
      * @param Subscription $subscription

@@ -8,9 +8,12 @@
                 v-if="triggerText"
                 :size="triggerSize"
                 :type="triggerType"
-                :icon="triggerIcon"
                 :action="showModal"
-                :skeleton="triggerLoading">
+                :skeleton="triggerLoading"
+                :leftIcon="leftTriggerIcon"
+                :rightIcon="rightTriggerIcon"
+                :leftIconSize="leftTriggerIconSize"
+                :rightIconSize="rightTriggerIconSize">
                 <span>{{ triggerText }}</span>
             </Button>
 
@@ -78,10 +81,11 @@
 
                             <Button
                                 :size="declineSize"
-                                :icon="declineIcon"
                                 :type="declineType"
                                 v-if="showDelineButton"
                                 :loading="declineLoading"
+                                :leftIcon="leftDeclineIcon"
+                                :rightIcon="rightDeclineIcon"
                                 :action="declineAction ? () => declineAction(hideModal) : hideModal">
                                 <slot name="declineIcon"></slot>
                                 <span>{{ declineText }}</span>
@@ -89,10 +93,11 @@
 
                             <Button
                                 :size="approveSize"
-                                :icon="approveIcon"
                                 :type="approveType"
                                 v-if="showApproveButton"
                                 :loading="approveLoading"
+                                :leftIcon="leftApproveIcon"
+                                :rightIcon="rightApproveIcon"
                                 :action="approveAction ? () => approveAction(hideModal) : hideModal">
                                 <slot name="approveIcon"></slot>
                                 <span>{{ approveText }}</span>
@@ -137,9 +142,21 @@
                 type: String,
                 default: 'light'
             },
-            triggerIcon: {
+            leftTriggerIcon: {
                 type: [Object, Function, null],
                 default: null
+            },
+            rightTriggerIcon: {
+                type: [Object, Function, null],
+                default: null
+            },
+            leftTriggerIconSize: {
+                type: String,
+                default: '16',
+            },
+            rightTriggerIconSize: {
+                type: String,
+                default: '16',
             },
             size: {
                 type: String,
@@ -182,7 +199,11 @@
                 type: String,
                 default: 'sm'
             },
-            declineIcon: {
+            leftDeclineIcon: {
+                type: [Object, Function, null],
+                default: null
+            },
+            rightDeclineIcon: {
                 type: [Object, Function, null],
                 default: null
             },
@@ -210,7 +231,11 @@
                 type: String,
                 default: 'primary'
             },
-            approveIcon: {
+            leftApproveIcon: {
+                type: [Object, Function, null],
+                default: null
+            },
+            rightApproveIcon: {
                 type: [Object, Function, null],
                 default: null
             },

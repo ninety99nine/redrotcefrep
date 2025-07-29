@@ -52,7 +52,7 @@ class CreateAddressRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'type.enum' => 'The address type must be one of: ' . Arr::join(AddressType::values(), ',', 'or'),
+            'type.enum' => 'The address type must be one of: ' . Arr::join(AddressType::values(), ', ', ' or '),
             'address_line.required' => 'The address line is required.',
             'address_line.string' => 'The address line must be a string.',
             'address_line.max' => 'The address line must not exceed 255 characters.',
@@ -77,7 +77,7 @@ class CreateAddressRequest extends FormRequest
             'owner_id.required' => 'The owner ID is required.',
             'owner_id.uuid' => 'The owner ID must be a valid UUID.',
             'owner_type.required' => 'The owner type is required.',
-            'owner_type.in' => 'The owner type must be one of: ' . Arr::join(['store', 'customer'], ',', 'or'),
+            'owner_type.in' => 'The owner type must be one of: ' . Arr::join(['store', 'customer'], ', ', ' or '),
         ];
     }
 }

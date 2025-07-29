@@ -269,9 +269,12 @@
             async downloadQR() {
                 try {
                     this.downloadingQr = true;
-                    const response = await axios.get(`/api/stores/${this.store.id}/qr-code`, {
-                        responseType: 'blob',
-                    });
+
+                    let config = {
+                        responseType: 'blob'
+                    };
+
+                    const response = await axios.get(`/api/stores/${this.store.id}/qr-code`, config);
                     const blob = response.data;
                     const url = URL.createObjectURL(blob);
                     const link = document.createElement('a');
@@ -295,7 +298,7 @@
             navigateToStoreHome() {
                 this.$router.push({
                     name: 'show-store-home',
-                    params: { 'store_id': this.store.id }
+                    params: { store_id: this.store.id }
                 });
             }
         }

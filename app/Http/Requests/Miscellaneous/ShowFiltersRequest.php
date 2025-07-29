@@ -42,7 +42,7 @@ class ShowFiltersRequest extends FormRequest
         return [
             'store_id.uuid' => 'The store ID must be a valid UUID.',
             'store_id.exists' => 'The specified store does not exist.',
-            'type.enum' => 'The type must be one of: ' . Arr::join(FilterResourceType::values(), ',', 'or'),
+            'type.enum' => 'The type must be one of: ' . Arr::join(FilterResourceType::values(), ', ', ' or '),
         ];
     }
 }

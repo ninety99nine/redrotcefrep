@@ -67,7 +67,7 @@
             navigateToStoreHome() {
                 this.$router.push({
                     name: 'show-store-home',
-                    params: { 'store_id': this.store.id }
+                    params: { store_id: this.store.id }
                 });
             }
         }

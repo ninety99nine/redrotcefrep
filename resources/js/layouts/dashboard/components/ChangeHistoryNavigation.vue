@@ -13,15 +13,17 @@
             </svg>
 
             <!-- History Dropdown -->
-            <Dropdown ref="dropdown">
-                <template #trigger>
-                    <button
-                        @click.prevent.stop
+            <Dropdown
+                ref="dropdown"
+                dropdownClasses="w-96">
+                <template #trigger="props">
+                    <div
+                        @click="props.toggleDropdown"
                         :class="buttonClasses(canUndo || canRedo)">
                         <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
                         </svg>
-                    </button>
+                    </div>
                 </template>
                 <template #content>
                     <div class="z-20 w-96 bg-white divide-y divide-gray-100 rounded-lg shadow-md">
@@ -47,7 +49,11 @@
                             No history to undo or redo
                         </p>
                         <div v-else class="p-2">
-                            <Button :action="resetHistoryToOriginal" type="light" size="sm" buttonClass="w-full">
+                            <Button
+                                size="sm"
+                                type="light"
+                                buttonClass="w-full"
+                                :action="resetHistoryToOriginal">
                                 <span>Reset to Original</span>
                             </Button>
                         </div>
@@ -68,10 +74,10 @@
         <div class="flex items-center space-x-2">
 
             <Button
-                size="xs"
+                size="sm"
                 :key="index"
                 :type="actionButton.type"
-                :icon="actionButton.icon"
+                :leftIcon="actionButton.icon"
                 :action="actionButton.action"
                 :loading="actionButton.loading"
                 v-for="(actionButton, index) in changeHistoryState.actionButtons">
@@ -111,17 +117,17 @@
                 this.$refs.dropdown.hideDropdown();
             },
             undo() {
-                this.orderState.orderForm = this.changeHistoryState.undo();
+                this.changeHistoryState.undo();
             },
             redo() {
-                this.orderState.orderForm = this.changeHistoryState.redo();
+                this.changeHistoryState.redo();
             },
             jumpToHistory(index) {
-                this.orderState.orderForm = this.changeHistoryState.jumpToHistory(index);
+                this.changeHistoryState.jumpToHistory(index);
             },
             resetHistoryToOriginal() {
                 this.hideDropdown();
-                this.orderState.orderForm = this.changeHistoryState.resetHistoryToOriginal();
+                this.changeHistoryState.resetHistoryToOriginal();
             },
             buttonClasses(enabled) {
                 return [

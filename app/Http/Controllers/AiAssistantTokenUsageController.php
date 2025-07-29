@@ -65,7 +65,7 @@ class AiAssistantTokenUsageController extends Controller
     }
 
     /**
-     * Show single AI assistant token usage.
+     * Show AI assistant token usage.
      *
      * @param ShowAiAssistantTokenUsageRequest $request
      * @param AiAssistantTokenUsage $aiAssistantTokenUsage

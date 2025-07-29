@@ -46,7 +46,7 @@ class ShowDeliveryAddressesRequest extends FormRequest
             'delivery_address_id.exists' => 'The specified delivery address does not exist.',
             'order_id.uuid' => 'The order ID must be a valid UUID.',
             'order_id.exists' => 'The specified order does not exist.',
-            'association.enum' => 'The association must be one of: ' . Arr::join([Association::ASSOCIATED->value, Association::UNASSOCIATED->value], ',', 'or'),
+            'association.enum' => 'The association must be one of: ' . Arr::join([Association::ASSOCIATED->value, Association::UNASSOCIATED->value], ', ', ' or '),
         ];
     }
 }

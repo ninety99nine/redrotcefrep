@@ -73,7 +73,7 @@
             navigateToPricingPlans() {
                 this.$router.push({
                     name: 'show-pricing-plans',
-                    query: { 'store_id': this.store.id }
+                    query: { store_id: this.store.id }
                 })
             },
             manageUpgradeButtonAnimation() {

@@ -106,7 +106,7 @@ class CreateDeliveryMethodRequest extends FormRequest
             'fallback_flat_fee_rate.min' => 'The fallback flat fee rate must be at least 0.',
             'operational_hours.array' => 'The operational hours must be an array.',
             'operational_hours.*.day.required_with' => 'The day is required for each operational hour entry.',
-            'operational_hours.*.day.in' => 'The day must be one of: ' . Arr::join(DaysOfTheWeek::values(), ',', 'or'),
+            'operational_hours.*.day.in' => 'The day must be one of: ' . Arr::join(DaysOfTheWeek::values(), ', ', ' or '),
             'operational_hours.*.open.required_with' => 'The opening time is required for each operational hour entry.',
             'operational_hours.*.open.regex' => 'The opening time must be in HH:MM format (e.g., 09:00).',
             'operational_hours.*.close.required_with' => 'The closing time is required for each operational hour entry.',
@@ -133,11 +133,11 @@ class CreateDeliveryMethodRequest extends FormRequest
             'store_id.required' => 'The store ID is required.',
             'store_id.uuid' => 'The store ID must be a valid UUID.',
             'store_id.exists' => 'The specified store does not exist.',
-            'fee_type.enum' => 'The fee type must be one of: ' . Arr::join(DeliveryMethodFeeType::values(), ',', 'or'),
-            'fallback_fee_type.enum' => 'The fallback fee type must be one of: ' . Arr::join(DeliveryMethodFeeType::values(), ',', 'or'),
-            'schedule_type.enum' => 'The schedule type must be one of: ' . Arr::join(DeliveryMethodScheduleType::values(), ',', 'or'),
-            'time_slot_interval_unit.enum' => 'The time slot interval unit must be one of: ' . Arr::join(AutoGenerateTimeSlotsUnit::values(), ',', 'or'),
-            'earliest_delivery_time_unit.enum' => 'The earliest delivery time unit must be one of: ' . Arr::join(['hour', 'day', 'week', 'month'], ',', 'or'),
+            'fee_type.enum' => 'The fee type must be one of: ' . Arr::join(DeliveryMethodFeeType::values(), ', ', ' or '),
+            'fallback_fee_type.enum' => 'The fallback fee type must be one of: ' . Arr::join(DeliveryMethodFeeType::values(), ', ', ' or '),
+            'schedule_type.enum' => 'The schedule type must be one of: ' . Arr::join(DeliveryMethodScheduleType::values(), ', ', ' or '),
+            'time_slot_interval_unit.enum' => 'The time slot interval unit must be one of: ' . Arr::join(AutoGenerateTimeSlotsUnit::values(), ', ', ' or '),
+            'earliest_delivery_time_unit.enum' => 'The earliest delivery time unit must be one of: ' . Arr::join(['hour', 'day', 'week', 'month'], ', ', ' or '),
         ];
     }
 }

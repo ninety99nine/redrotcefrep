@@ -67,6 +67,18 @@ class MediaFilePolicy extends BasePolicy
     }
 
     /**
+     * Determine whether the user can download the media file.
+     *
+     * @param User $user
+     * @param MediaFile $mediaFile
+     * @return bool
+     */
+    public function download(User $user, MediaFile $mediaFile): bool
+    {
+        return $this->isAllowed($user, $mediaFile);
+    }
+
+    /**
      * Determine whether the user can delete any media files.
      *
      * @param User $user
@@ -86,11 +98,13 @@ class MediaFilePolicy extends BasePolicy
      */
     private function isAllowed(User $user, ?MediaFile $mediaFile = null): bool
     {
-        $uploadFolderName = UploadFolderName::tryFrom($mediaFile?->type ?? request()->input('type'));
+        $uploadFolderName = UploadFolderName::tryFrom($mediaFile?->type ?? request()->input('upload_folder_name'));
 
         if($uploadFolderName == UploadFolderName::PROFILE_PHOTO) {
             $userId = request()->input('user_id');
             return $user->id == $userId;
+        }else if($uploadFolderName == UploadFolderName::ORDER_COMMENT_PHOTO) {
+            return $this->isStoreUserWithPermission($user, 'manage orders');
         }else if($uploadFolderName == UploadFolderName::PRODUCT_PHOTO) {
             return $this->isStoreUserWithPermission($user, 'manage products');
         }else if(in_array(

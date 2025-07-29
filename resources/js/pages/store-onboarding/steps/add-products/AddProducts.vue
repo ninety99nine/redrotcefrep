@@ -339,14 +339,14 @@
                 }
 
                 if (typeof index !== "number") {
-                    console.warn(`⚠️ Invalid index: ${index}`, index);
+                    console.log(`⚠️ Invalid index: ${index}`, index);
                     return;
                 }
 
                 if (this.fileInputs[index]) {
                     this.fileInputs[index].click();
                 } else {
-                    console.warn(`⚠️ File input not found for index: ${index}`);
+                    console.log(`⚠️ File input not found for index: ${index}`);
                 }
             },
             handleFileUpload(event, index) {
@@ -548,7 +548,7 @@
                 try{
 
                     if (retryCount > 2) {
-                        console.warn(`❌ Image ${index + 1} permanently failed after 3 attempts.`);
+                        console.log(`❌ Image ${index + 1} permanently failed after 3 attempts.`);
                         photo.uploaded = false;
                         photo.uploading = false;
                         photo.error_message = error?.response?.data?.message || error?.message || `Something went wrong while uploading photo`;
@@ -583,13 +583,14 @@
 
                 } catch (error) {
                     console.error(`⚠️ Image ${index + 1} upload attempt ${retryCount + 1} failed.`, error);
+                    this.form.photos[index].upload_error_message = error?.response?.data?.message || error?.message || 'Upload failed';
                     return this.uploadSingleImage(localProduct, photo, index, retryCount + 1, error);
                 }
             },
             navigateToAddPayments() {
                 this.$router.push({
                     name: 'add-payments',
-                    params: { 'store_id': this.store.id }
+                    params: { store_id: this.store.id }
                 });
             }
         },

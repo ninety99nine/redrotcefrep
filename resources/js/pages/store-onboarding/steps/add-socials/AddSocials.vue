@@ -316,7 +316,7 @@
             navigateToAddAdvancedFeatures() {
                 this.$router.push({
                     name: 'advanced-features',
-                    params: { 'store_id': this.store.id }
+                    params: { store_id: this.store.id }
                 });
             }
         },

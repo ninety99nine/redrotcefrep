@@ -1,6 +1,6 @@
 <template>
 
-    <div class="flex items-center space-x-2">
+    <div class="flex items-center space-x-1">
         <Pill :type="_order.collection_verified ? 'success' : 'warning'" size="xs">
             <span class="whitespace-nowrap">{{ _order.collection_verified ? 'Verfiied' : 'Not Verified' }}</span>
         </Pill>

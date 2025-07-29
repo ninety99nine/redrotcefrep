@@ -13,7 +13,7 @@
                 class="w-full"
                 :debounced="true"
                 v-model="localSearchTerm"
-                :isSearching="isSearching"
+                @input="onInputSearchTerm"
                 :placeholder="searchPlaceholder">
             </Input>
 
@@ -74,22 +74,22 @@
         <div class="relative w-full overflow-x-auto border border-blue-200 rounded-lg">
 
             <!-- Table Loader -->
-            <div v-if="pagination && isLoading && !isSearching" class="absolute top-0 bottom-0 left-0 right-0 bg-white/50 flex justify-center items-center">
-                <Loader v-if="!isSearching"></Loader>
+            <div v-if="pagination && pagination.meta.total > 0 && (localIsLoading || isSearching)" class="absolute top-0 bottom-0 left-0 right-0 bg-white/50 flex justify-center items-center">
+                <Loader></Loader>
             </div>
 
             <table class="w-full text-left rtl:text-right">
 
                 <!-- Table Head -->
-                <thead class="text-sm bg-blue-50">
+                <thead class="text-sm bg-blue-50" ref="tablehead">
                     <slot name="head"></slot>
                 </thead>
 
                 <!-- Pulsing Placeholder Rows -->
-                <tbody v-if="!pagination && !isLoading && totalActiveColumns > 0">
+                <tbody v-if="!pagination && localIsLoading && totalTableHeaders > 0">
 
                     <tr v-for="(row, index) in [1,2,3]" :key="index" class="animate-pulse">
-                        <td v-for="(column, index) in totalActiveColumns" :key="index">
+                        <td v-for="(column, index) in totalTableHeaders" :key="index">
                             <div class="h-2 bg-blue-200 rounded-full mx-4 my-4"></div>
                         </td>
                     </tr>
@@ -149,22 +149,31 @@
                 </tbody>
 
             </table>
+
+            <!-- No Results Desclaimer -->
+            <slot v-if="$slots.noResults && !localIsLoading && pagination && pagination.meta.total == 0 && !hasSearchTerm" name="noResults"></slot>
+
+            <div v-else-if="pagination && pagination.meta.total == 0" class="text-sm text-gray-700 text-center py-16 bg-blue-50 border-t border-blue-200">
+                <div
+                    v-if="localIsLoading || isSearching"
+                    class="flex items-center justify-center space-x-2">
+                    <Loader></Loader>
+                    <span class="text-sm text-gray-500">{{ isSearching ? 'Searching' : 'Loading' }}</span>
+                </div>
+                <span v-else>No results found</span>
+            </div>
+
         </div>
 
-        <!-- No Results Desclaimer -->
-        <div v-if="pagination && pagination.total == 0" class="text-xs text-gray-700 text-center py-16 bg-gray-50 border-t">
-            No results found
-        </div>
-
-        <div v-if="pagination && pagination.total > 0" class="flex justify-between items-center mt-4">
+        <div v-if="pagination && pagination.meta.total > 0" class="flex justify-between items-center mt-4">
 
             <!-- Results -->
-            <span class="text-sm font-normal text-gray-500 dark:text-gray-400">Showing <span class="font-semibold text-gray-900 dark:text-white">{{ pagination.from }}-{{ pagination.to }}</span> of <span class="font-semibold text-gray-900 dark:text-white">{{ pagination.total }}</span></span>
+            <span class="text-sm font-normal text-gray-500 dark:text-gray-400">Showing <span class="font-semibold text-gray-900 dark:text-white">{{ pagination.meta.from }}-{{ pagination.meta.to }}</span> of <span class="font-semibold text-gray-900 dark:text-white">{{ pagination.meta.total }}</span></span>
 
             <div class="flex items-center space-x-4">
 
                 <Select
-                    width="w-fit"
+                    class="w-40"
                     :search="false"
                     v-model="localPerPage"
                     :options="perPageOptions">
@@ -241,13 +250,20 @@
                 filters: [],
                 sorting: [],
                 filterDrawer: null,
+                isSearching: false,
                 sortingDrawer: null,
+                totalTableHeaders: 0,
                 localPerPage: this.perPage,
+                localIsLoading: this.isLoading,
                 localSearchTerm: this.searchTerm,
                 uniqueModalId: generateUniqueId('modal')
             }
         },
         watch: {
+            isLoading(newValue) {
+                this.localIsLoading = newValue;
+                this.isSearching = newValue && this.hasSearchTerm;
+            },
             localSearchTerm(newValue) {
                 this.$emit('search', newValue);
             },
@@ -261,12 +277,17 @@
                         this.sortingDrawer = this.$refs.sortingDrawer;
                     });
                 }
-            }
+            },
+            columns: {
+                handler() {
+                    this.$nextTick(() => {
+                        this.totalTableHeaders = this.$refs.tablehead.querySelectorAll('th').length;
+                    });
+                },
+                deep: true
+            },
         },
         computed: {
-            isSearching() {
-                return this.hasSearchTerm && this.isLoading;
-            },
             hasSearchTerm() {
                 return this.localSearchTerm != null && this.localSearchTerm.trim() != '';
             },
@@ -282,19 +303,16 @@
             hasSortingExpressions() {
                 return this.sortingExpressions.length > 0;
             },
-            totalActiveColumns() {
-                return this.columns.filter((tableHeader) => tableHeader.active).length;
-            },
             perPageOptions() {
                 return ['15', '50', '100', '200'].map(value => ({
                     label: `${value} per page`,
-                    value: parseInt(value),
+                    value: value
                 }));
             }
         },
         methods: {
             refresh() {
-                if(!this.isLoading) this.$emit('refresh');
+                if(!this.localIsLoading) this.$emit('refresh');
             },
             paginate(url) {
                 this.$emit('paginate', url);
@@ -315,7 +333,19 @@
             },
             removeAppliedSort(sort) {
                 this.sortingDrawer.removeAppliedSort(sort);
+            },
+            onInputSearchTerm(event) {
+                const searchTerm = event.target.value;
+                if(searchTerm.length) {
+                    this.isSearching = true;
+                }else{
+                    this.isSearching = false;
+                }
+                this.localIsLoading = true;
             }
+        },
+        mounted() {
+            this.totalTableHeaders = this.$refs.tablehead.querySelectorAll('th').length;
         }
     };
 </script>

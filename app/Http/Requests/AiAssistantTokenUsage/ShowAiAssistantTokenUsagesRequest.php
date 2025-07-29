@@ -46,7 +46,7 @@ class ShowAiAssistantTokenUsagesRequest extends FormRequest
             'ai_assistant_token_usage_id.exists' => 'The specified AI assistant token usage does not exist.',
             'ai_assistant_id.uuid' => 'The AI assistant ID must be a valid UUID.',
             'ai_assistant_id.exists' => 'The specified AI assistant does not exist.',
-            'association.enum' => 'The association must be one of: ' . Arr::join([Association::ASSOCIATED->value, Association::UNASSOCIATED->value], ',', 'or'),
+            'association.enum' => 'The association must be one of: ' . Arr::join([Association::ASSOCIATED->value, Association::UNASSOCIATED->value], ', ', ' or '),
         ];
     }
 }
