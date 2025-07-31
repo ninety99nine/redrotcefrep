@@ -240,10 +240,10 @@
                                 type="file"
                                 :maxFiles="5"
                                 v-model="productForm.photos"
+                                @retryUploads="(files) => uploadImages()"
+                                @retryUpload="(file, fileIndex) => uploadImages(fileIndex)"
                                 @change="productState.saveStateDebounced('Photos changed')">
                             </Input>
-
-                            {{ productForm.photos }}
 
                         </template>
 
@@ -886,12 +886,15 @@
         watch: {
             store(newValue) {
                 if(newValue && this.isEditing) {
+                    console.log('STAGE 1 !!!!!!!!!!');
                     this.setup();
                 }
             },
             '$route.params.product_id'(newValue) {
                 if(newValue) {
+                    console.log('STAGE 2 !!!!!!!!!!');
                     this.setup();
+                    this.setActionButtons();
                 }
             },
         },
@@ -948,10 +951,17 @@
                 this.navigateToProducts();
             },
             async setup() {
+                console.log('PART 1');
                 if(this.isEditing) {
+                console.log('PART 2.1');
+                console.log('this.productForm');
+                console.log(this.productForm);
+                console.log('this.store');
+                console.log(this.store);
                     if(this.productForm == null) this.productState.setProductForm(null, false);
                     if(this.store) await this.showProduct();
                 }else{
+                console.log('PART 2.2');
                     this.productState.setProductForm(null);
                 }
             },
@@ -1076,8 +1086,10 @@
                     }
 
                     this.notificationState.showSuccessNotification(`Product created`);
-                    this.changeHistoryState.resetHistoryToCurrent();
-                    //await this.onView(this.createdProduct);
+                    this.productState.saveOriginalState('Original product');
+                    //this.productState.reset();
+                    //this.changeHistoryState.reset();
+                    await this.onView(this.createdProduct);
 
                 } catch (error) {
                     const message = error?.response?.data?.message || error?.message || 'Something went wrong while creating product';
@@ -1126,7 +1138,7 @@
                     }
 
                     this.notificationState.showSuccessNotification(`Product updated`);
-                    this.changeHistoryState.resetHistoryToCurrent();
+                    this.productState.saveOriginalState('Original product');
 
                 } catch (error) {
                     const message = error?.response?.data?.message || error?.message || 'Something went wrong while updating product';
@@ -1230,7 +1242,7 @@
                         if(photoIndex == null || photoIndex == index) {
 
                             imageUploadPromises.push(
-                                this.uploadSingleImage(photo, index)
+                                this.uploadSingleImage(this.productForm.photos[index], index)
                             );
                         }
                     }
@@ -1254,20 +1266,56 @@
 
                 try{
 
-                    console.log('uploadSingleImage');
-                    console.log('index');
-                    console.log(index);
-                    console.log('this.productState.productForm.photos[index] 1');
-                    console.log(this.productState.productForm.photos[index]);
+                    if (retryCount > 2) {
+                        console.log(`❌ Image ${index + 1} permanently failed after 3 attempts.`);
+                        photo.uploaded = false;
+                        photo.uploading = false;
+                        photo.error_message = error?.response?.data?.message || error?.message || `Upload failed`;
 
-                    this.productState.productForm.name = 'HELLO 123';
-                    this.productState.productForm.photos[index].uploading = true;
-                    console.log('this.productState.productForm.photos[index] 2');
-                    console.log(this.productState.productForm.photos[index]);
+                        return Promise.reject(`Failed after 3 attempts`);
+                    }
+
+                    let formData = new FormData();
+                    formData.append('file', photo.file_ref);
+                    formData.append('store_id', this.store.id);
+                    formData.append('mediable_type', 'product');
+                    formData.append('upload_folder_name', 'product_photo');
+                    formData.append('mediable_id', this.createdProduct ? this.createdProduct.id : this.product.id);
+
+                    photo.uploading = true;
+                    photo.error_message = null;
+
+                    const config = {
+                        headers: { 'Content-Type': 'multipart/form-data' }
+                    };
+
+                    const response = await axios.post('/api/media-files', formData, config);
+                    const mediaFile = response.data.media_file;
+
+                    photo.uploaded = true;
+                    photo.uploading = false;
+                    photo.id = mediaFile.id;
+                    photo.path = mediaFile.path;
+
+                    console.log(`✅ Image ${index + 1} uploaded successfully.`);
+
+                    return response;
 
                 } catch (error) {
                     console.error(`⚠️ Image ${index + 1} upload attempt ${retryCount + 1} failed.`, error);
                     return this.uploadSingleImage(photo, index, retryCount + 1, error);
+                }
+            },
+            setActionButtons() {
+                if(this.isCreating || this.isEditing) {
+                    this.changeHistoryState.removeButtons();
+                    this.changeHistoryState.addDiscardButton(this.onDiscard);
+                    this.changeHistoryState.addActionButton(
+                        this.isEditing ? 'Save Changes' : 'Create Product',
+                        this.isEditing ? this.updateProduct : this.createProduct,
+                        'primary',
+                        null,
+                    );
                 }
             },
             setProductForm(productForm) {
@@ -1291,23 +1339,13 @@
         created() {
 
             this.setup();
+            this.setActionButtons();
 
             const listeners = ['undo', 'redo', 'jumpToHistory', 'resetHistoryToCurrent', 'resetHistoryToOriginal'];
 
             for (let i = 0; i < listeners.length; i++) {
                 let listener = listeners[i];
                 this.changeHistoryState.listeners[listener] = this.setProductForm;
-            }
-
-            if(this.isCreating || this.isEditing) {
-                this.changeHistoryState.removeButtons();
-                this.changeHistoryState.addDiscardButton(this.onDiscard);
-                this.changeHistoryState.addActionButton(
-                    this.isEditing ? 'Save Changes' : 'Create Product',
-                    this.isEditing ? this.updateProduct : this.createProduct,
-                    'primary',
-                    null,
-                );
             }
 
         }

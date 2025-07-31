@@ -298,14 +298,14 @@
                         ]">
 
                         <div
+                            :key="fileIndex"
                             class="relative group"
-                            :key="file.id ?? fileIndex"
                             v-for="(file, fileIndex) in modelValue">
 
                             <template v-if="!file.uploading && !file.deleting">
 
                                 <!-- Success Tick -->
-                                <div v-if="file.uploaded === true" class="w-5 h-5 absolute z-10 top-1 right-1 rounded-full">
+                                <div v-if="file.uploaded === true" class="w-5 h-5 absolute z-10 top-4 right-4 rounded-full">
                                     <CircleCheck size="20" class="text-green-500"></CircleCheck>
                                 </div>
 
@@ -324,8 +324,6 @@
 
                                 <!-- Remove Image Button -->
                                 <div
-                                    v-if="!file.uploaded"
-                                    :key="modelValue[fileIndex].path"
                                     @click.stop="(event) => removeFile(event, fileIndex)"
                                     class="w-6 h-6 active:scale-90 transition cursor-pointer flex items-center justify-center absolute z-10 -top-1 -right-1 border border-gray-300 bg-white text-black hover:bg-gray-100 rounded-full">
                                     <X v-if="isTemporaryFile(modelValue[fileIndex])" size="14"></X>
@@ -379,10 +377,8 @@
                                 v-if="!file.uploading && file.error_message"
                                 @click.stop="(event) => removeFile(event, fileIndex)"
                                 class="w-full flex items-center justify-center relative z-50">
-                                <div class="bg-yellow-500 text-xs text-white rounded-b-lg py-1 px-2">{{ file.error_message }}</div>
+                                <div class="w-full bg-yellow-500 text-xs text-white rounded-b-lg py-1 px-2">{{ file.error_message }}</div>
                             </div>
-
-                            {{ modelValue[fileIndex] }}
 
                         </div>
 
