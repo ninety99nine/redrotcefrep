@@ -155,7 +155,7 @@
 
                     this.formState.hideFormErrors();
 
-                    if(this.form.name?.trim() === '') {
+                    if(this.form.name == null || this.form.name?.trim() === '') {
                         this.formState.setFormError('name', 'Enter store name');
                     }
 

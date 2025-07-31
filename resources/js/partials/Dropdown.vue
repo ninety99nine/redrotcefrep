@@ -51,7 +51,7 @@
 
             <slot name="header"></slot>
 
-            <slot name="content" :toggleDropdown="toggleDropdown" :handleItemClick="handleItemClick">
+            <slot name="content" :toggleDropdown="toggleDropdown" :handleItemClick="handleItemClick" :options="options">
 
                 <ul class="max-h-60 overflow-auto">
 

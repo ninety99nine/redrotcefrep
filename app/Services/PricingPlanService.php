@@ -100,7 +100,9 @@ class PricingPlanService extends BaseService
         if ($totalPricingPlans = $pricingPlans->count()) {
 
             foreach ($pricingPlans as $pricingPlan) {
-                $pricingPlan->delete();
+
+                $this->deletePricingPlan($pricingPlan);
+
             }
 
             return ['message' => $totalPricingPlans . ($totalPricingPlans == 1 ? ' Pricing plan' : ' Pricing plans') . ' deleted'];

@@ -18,7 +18,6 @@
                             type="file"
                             :maxFiles="6"
                             class="w-full"
-                            :onUpload="null"
                             :wrapperClass="{}"
                             v-model="form.photos"
                             @retryUploads="(photos) => uploadImages()"
@@ -147,7 +146,7 @@
             <p class="text-lg font-bold border-b border-dashed border-gray-200 pb-4 mb-4">Image Preview</p>
 
             <div class="flex justify-center">
-                <img :src="orderCommentPhoto.file_path" />
+                <img :src="orderCommentPhoto.path" />
             </div>
 
             <div v-if="!orderCommentPhoto.hasOwnProperty('temporary')" class="flex justify-end space-x-2 mt-4">
@@ -289,7 +288,7 @@
 
                     this.formState.hideFormErrors();
 
-                    if(this.form.comment?.trim() === '') {
+                    if(this.form.comment == null || this.form.comment.trim() === '') {
                         this.formState.setFormError('comment', 'The comment is required');
                     }
 
@@ -326,7 +325,7 @@
                 this.orderComments.push({
                     user: this.authState.user,
                     ...this.createdOrderComment,
-                    photos: this.form.photos.map(function(photo) { return { id: uuidv4(), temporary: true, file_path: photo.file_path } }),
+                    photos: this.form.photos.map(function(photo) { return { id: uuidv4(), temporary: true, path: photo.path } }),
                 });
                 this.notificationState.showSuccessNotification('Comment created!');
                 this.isCreatingOrderComment = false;
@@ -429,7 +428,7 @@
                     const url = URL.createObjectURL(blob);
                     const link = document.createElement('a');
                     link.href = url;
-                    link.download = this.orderCommentPhoto.file_name;
+                    link.download = this.orderCommentPhoto.name;
                     link.click();
                     URL.revokeObjectURL(url);
                 } catch (error) {

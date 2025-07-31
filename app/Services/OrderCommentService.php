@@ -80,15 +80,9 @@ class OrderCommentService extends BaseService
 
         if ($totalOrderComments = $orderComments->count()) {
 
-            $mediaFileService = new MediaFileService;
-
             foreach ($orderComments as $orderComment) {
 
-                foreach ($orderComment->mediaFiles as $mediaFile) {
-                    $mediaFileService->deleteMediaFile($mediaFile);
-                }
-
-                $orderComment->delete();
+                $this->deleteOrderComment($orderComment);
 
             }
 

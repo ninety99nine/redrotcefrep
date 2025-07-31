@@ -50,8 +50,11 @@ class DeliveryAddressService extends BaseService
         $deliveryAddresses = DeliveryAddress::whereIn('id', $deliveryAddressIds)->get();
 
         if ($totalAddresses = $deliveryAddresses->count()) {
+
             foreach ($deliveryAddresses as $deliveryAddress) {
-                $deliveryAddress->delete();
+
+                $this->deleteDeliveryAddress($deliveryAddress);
+
             }
 
             return ['message' => $totalAddresses . ($totalAddresses == 1 ? ' Delivery Address' : ' Delivery Addresses') . ' deleted'];

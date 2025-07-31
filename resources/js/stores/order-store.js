@@ -108,7 +108,7 @@ export const useOrderStore = defineStore('order', {
             this.isInspectingShoppingCart = isInspectingShoppingCart;
         },
         addCartFeeUsingOrderFee(orderFee) {
-            this.orderForm.cartFees.push({
+            this.orderForm.cart_fees.push({
                 'active': true,
                 'removable': false,
                 'name': orderFee.name,
@@ -146,7 +146,7 @@ export const useOrderStore = defineStore('order', {
                     'id': orderProduct.product_id,
                     'is_free': orderProduct.is_free,
                     'quantity': orderProduct.quantity.toString(),
-                    'photo_file_path': photo ? photo.file_path : null,
+                    'photo_path': photo ? photo.path : null,
                     'unit_weight': orderProduct.unit_weight.toString(),
                     'unit_sale_price': orderProduct.unit_sale_price.amount,
                     'unit_regular_price': orderProduct.unit_regular_price.amount
@@ -181,8 +181,8 @@ export const useOrderStore = defineStore('order', {
                     'id': product.id,
                     'name': product.name,
                     'is_free': product.is_free,
+                    'photo_path': photo ? photo.path : null,
                     'unit_weight': product.unit_weight.toString(),
-                    'photo_file_path': photo ? photo.file_path : null,
                     'unit_sale_price': product.unit_sale_price.amount,
                     'unit_regular_price': product.unit_regular_price.amount
                 });
@@ -198,7 +198,7 @@ export const useOrderStore = defineStore('order', {
                 'quantity': '1',
                 'is_free': false,
                 'unit_weight': '0',
-                'photo_file_path': null,
+                'photo_path': null,
                 'unit_sale_price': '0.00',
                 'unit_regular_price': '0.00'
             });

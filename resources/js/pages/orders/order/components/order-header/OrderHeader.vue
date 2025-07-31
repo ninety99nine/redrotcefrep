@@ -25,12 +25,12 @@
                     </div>
                 </div>
 
-                <!-- Heading -->
-                <h1 v-else class="text-xl text-gray-700 font-semibold">
-                    {{ isCreating ? 'Add Order' : `#${order.number}` }}
-                </h1>
+                <template v-else>
 
-                <template v-if="hasOrder">
+                    <!-- Heading -->
+                    <h1 class="text-lg text-gray-700 font-semibold">
+                        {{ isCreating ? 'Add Order' : `#${order.number} ${order.customer_first_name}` }}
+                    </h1>
 
                     <!-- Status -->
                     <Status></Status>
@@ -58,6 +58,9 @@
                     <!-- Download Button -->
                     <DownloadButton></DownloadButton>
 
+                    <!-- More Dropdown -->
+                    <MoreDropdown></MoreDropdown>
+
                     <!-- Navigation Arrows -->
                     <NavigationArrows></NavigationArrows>
 
@@ -79,6 +82,7 @@
     import BackButton from '@Pages/orders/order/components/order-header/BackButton.vue';
     import EditButton from '@Pages/orders/order/components/order-header/EditButton.vue';
     import PrintButton from '@Pages/orders/order/components/order-header/PrintButton.vue';
+    import MoreDropdown from '@Pages/orders/order/components/order-header/MoreDropdown.vue';
     import PaymentStatus from '@Pages/orders/order/components/order-header/PaymentStatus.vue';
     import DownloadButton from '@Pages/orders/order/components/order-header/DownloadButton.vue';
     import WhatsappButton from '@Pages/orders/order/components/order-header/WhatsappButton.vue';
@@ -87,8 +91,8 @@
     export default {
         inject: ['storeState', 'orderState'],
         components: {
-            Button, Skeleton, Status, BackButton, EditButton, PrintButton, PaymentStatus,
-            DownloadButton, WhatsappButton, NavigationArrows
+            Button, Skeleton, Status, BackButton, EditButton, PrintButton, MoreDropdown,
+            PaymentStatus, DownloadButton, WhatsappButton, NavigationArrows
         },
         computed: {
             order() {

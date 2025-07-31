@@ -19,7 +19,7 @@ class MediaFile extends Model
      * @var array
      */
     protected $fillable = [
-        'type','file_name','file_path','file_size','width','height','mime_type','mediable_id','mediable_type'
+        'type','name','path','size','width','height','mime_type','mediable_id','mediable_type'
     ];
 
     /**
@@ -32,7 +32,7 @@ class MediaFile extends Model
     #[Scope]
     protected function search(Builder $query, string $searchTerm): void
     {
-        $query->where('file_name', 'like', '%' . $searchTerm . '%');
+        $query->where('name', 'like', '%' . $searchTerm . '%');
     }
 
     /**

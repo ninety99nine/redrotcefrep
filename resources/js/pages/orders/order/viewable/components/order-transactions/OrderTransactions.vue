@@ -71,7 +71,6 @@
                                 <Input
                                     type="file"
                                     :maxFiles="1"
-                                    :onUpload="null"
                                     v-model="form.photo"
                                     label="Proof Of Payment"
                                     singleFileUploadMessage="proof of payment attached">
@@ -88,14 +87,12 @@
 
                 <Skeleton v-if="isLoadingStore || isLoadingOrder || !hasOrder" width="w-full" height="h-8" rounded="rounded-md" :shine="true"></Skeleton>
 
-                <Select
+                <OrderPaymentStatusSelect
                     v-else
-                    class="w-40"
-                    :search="false"
-                    :options="paymentStatuses"
-                    v-model="orderForm.payment_status"
+                    class="w-48"
+                    :showLabel="false"
                     @change="(paymentStatus) => updateOrder({ payment_status: paymentStatus })">
-                </Select>
+                </OrderPaymentStatusSelect>
 
             </div>
 
@@ -229,15 +226,14 @@
     import Input from '@Partials/Input.vue';
     import Modal from '@Partials/Modal.vue';
     import Button from '@Partials/Button.vue';
-    import Select from '@Partials/Select.vue';
     import Skeleton from '@Partials/Skeleton.vue';
-    import { capitalize } from '@Utils/stringUtils.js';
     import { Plus, Link2, Trash2, ExternalLink, CircleDollarSign } from 'lucide-vue-next';
     import OrderTransaction from '@Pages/orders/order/viewable/components/order-transactions/OrderTransaction.vue';
+    import OrderPaymentStatusSelect from '@Pages/orders/order/editable/components/order-basics/components/OrderPaymentStatusSelect.vue';
 
     export default {
         inject: ['formState', 'storeState', 'orderState', 'notificationState'],
-        components: { Image, Alert, Input, Modal, Button, Select, Skeleton, OrderTransaction },
+        components: { Image, Alert, Input, Modal, Button, Skeleton, OrderTransaction, OrderPaymentStatusSelect },
         data() {
             return {
                 Plus,
@@ -289,16 +285,6 @@
             },
             hasTransactions() {
                 return this.transactions.length > 0;
-            },
-            paymentStatuses() {
-                const options = ['paid','unpaid','pending payment','partially paid'];
-
-                return options.map((option) => {
-                    return {
-                        'label': capitalize(option),
-                        'value': option
-                    }
-                });
             }
         },
         methods: {
@@ -352,7 +338,7 @@
 
                     this.formState.hideFormErrors();
 
-                    if(this.form.description?.trim() === '') {
+                    if(this.form.description == null || this.form.description.trim() === '') {
                         this.formState.setFormError('description', 'Enter payment name');
                     }
 

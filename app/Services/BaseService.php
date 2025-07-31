@@ -700,7 +700,7 @@ abstract class BaseService
     }
 
     /**
-     * Check if should count resources.
+     * Check if should export resources.
      *
      * @param Model $model
      * @return Model
@@ -708,6 +708,17 @@ abstract class BaseService
     protected function checkIfShouldExportResources()
     {
         return request()->boolean('_export');
+    }
+
+    /**
+     * Check if should return pagination information.
+     *
+     * @param Model $model
+     * @return Model
+     */
+    protected function checkIfShouldReturnPaginationInformation()
+    {
+        return request()->boolean('_pagination');
     }
 
     /**
@@ -744,6 +755,8 @@ abstract class BaseService
 
         if($this->checkIfShouldCountResources()) {
             return $this->countResources();
+        }else if($this->checkIfShouldReturnPaginationInformation()) {
+            return $this->getPaginationInformation();
         }else {
             $this->applySortingOnQuery();
             if($this->checkIfShouldExportResources()) {
@@ -763,6 +776,18 @@ abstract class BaseService
     protected function countResources(): array
     {
         return ['total' => $this->query->count()];
+    }
+
+    /**
+     * Get pagination information.
+     *
+     * @return array
+     */
+    protected function getPaginationInformation(): array
+    {
+        $paginated = $this->query->paginate()->toArray();
+        $paginated['data'] = collect($paginated['data'])->map(fn($record) => $record['id']);
+        return $paginated;
     }
 
     /**

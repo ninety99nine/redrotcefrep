@@ -63,7 +63,9 @@ class CourierService extends BaseService
         if ($totalCouriers = $couriers->count()) {
 
             foreach ($couriers as $courier) {
-                $courier->delete();
+
+                $this->deleteCourier($courier);
+
             }
 
             return ['message' => $totalCouriers . ($totalCouriers == 1 ? ' Courier' : ' Couriers') . ' deleted'];

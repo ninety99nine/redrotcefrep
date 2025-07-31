@@ -47,8 +47,11 @@ class AiAssistantService extends BaseService
         $aiAssistants = AiAssistant::whereIn('id', $aiAssistantIds)->get();
 
         if ($totalAiAssistants = $aiAssistants->count()) {
+
             foreach ($aiAssistants as $aiAssistant) {
-                $aiAssistant->delete();
+
+                $this->deleteAiAssistant($aiAssistant);
+
             }
 
             return ['message' => $totalAiAssistants . ($totalAiAssistants == 1 ? ' AI Assistant' : ' AI Assistants') . ' deleted'];

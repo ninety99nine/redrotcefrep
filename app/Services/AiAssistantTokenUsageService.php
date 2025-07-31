@@ -50,8 +50,11 @@ class AiAssistantTokenUsageService extends BaseService
         $aiAssistantTokenUsages = AiAssistantTokenUsage::whereIn('id', $aiAssistantTokenUsageIds)->get();
 
         if ($totalAiAssistantTokenUsages = $aiAssistantTokenUsages->count()) {
+
             foreach ($aiAssistantTokenUsages as $aiAssistantTokenUsage) {
-                $aiAssistantTokenUsage->delete();
+
+                $this->deleteAiAssistantTokenUsage($aiAssistantTokenUsage);
+
             }
 
             return ['message' => $totalAiAssistantTokenUsages . ($totalAiAssistantTokenUsages == 1 ? ' AI Assistant Token Usage' : ' AI Assistant Token Usages') . ' deleted'];

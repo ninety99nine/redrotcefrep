@@ -102,15 +102,9 @@ class StorePaymentMethodService extends BaseService
 
         if ($totalStorePaymentMethods = $storePaymentMethods->count()) {
 
-            $mediaFileService = new MediaFileService;
-
             foreach ($storePaymentMethods as $storePaymentMethod) {
 
-                foreach ($storePaymentMethod->mediaFiles as $mediaFile) {
-                    $mediaFileService->deleteMediaFile($mediaFile);
-                }
-
-                $storePaymentMethod->delete();
+                $this->deleteStorePaymentMethod($storePaymentMethod);
 
             }
 

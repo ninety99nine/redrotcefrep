@@ -16,12 +16,12 @@ class MediaFileResource extends JsonResource
     {
         return [
             'id' => $this->id,
+            'name' => $this->name,
+            'path' => $this->path,
+            'size' => $this->size,
             'type' => $this->type,
             'width' => $this->width,
             'height' => $this->height,
-            'file_name' => $this->file_name,
-            'file_path' => $this->file_path,
-            'file_size' => $this->file_size,
             'mime_type' => $this->mime_type,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,

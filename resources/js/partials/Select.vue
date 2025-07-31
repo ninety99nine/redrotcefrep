@@ -85,7 +85,7 @@
                     <!-- Select Input -->
                     <div
                         @click="toggleDropdown"
-                        :class="[
+                        :class="selectClasses ? selectClasses : [
                             'w-full select-none bg-white border border-gray-300 rounded-md',
                             disabled ? 'cursor-not-allowed' : 'cursor-pointer'
                         ]">
@@ -194,7 +194,7 @@
         components: { Input, Popover, Tooltip, Skeleton },
         props: {
             modelValue: {
-                type: [String, null]
+                type: [String, Number, Boolean, null]
             },
             label: {
                 type: [String, null],
@@ -271,8 +271,12 @@
                     'label', 'value'
                 ]
             },
+            selectClasses: {
+                type: [Array, Object, null],
+                default: null
+            },
 
-            emits: ['update:modelValue'],
+            emits: ['update:modelValue', 'change'],
         },
         data() {
             return {
@@ -320,8 +324,6 @@
                 });
             },
             selectOption(option) {
-                console.log('option');
-                console.log(option);
                 if(this.disabled || option.disabled) return;
 
                 this.isOpen = false;

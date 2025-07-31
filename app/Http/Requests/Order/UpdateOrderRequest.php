@@ -73,7 +73,7 @@ class UpdateOrderRequest extends FormRequest
             'delivery_address.longitude' => ['nullable', 'numeric', 'min:-180', 'max:180'],
             'delivery_address.description' => ['nullable', 'string'],
             'delivery_date' => $requiresDate ? ['nullable', 'date'] : ['exclude'],
-            'delivery_timeslot' => $requiresTimeslot ? ['nullable', 'string', 'regex:/^(?:[01]\d|2[0-3]):[0-5]\d - (?:[01]\d|2[0-3]):[0-5]\d$/'] : ['exclude'],
+            'delivery_timeslot' => $requiresTimeslot ? ['nullable', 'string', 'regex:/^(?:[01]\d|2[0-3]):[0-5]\d-(?:[01]\d|2[0-3]):[0-5]\d$/'] : ['exclude'],
             'delivery_method_id' => ['nullable', 'uuid', Rule::exists('delivery_methods', 'id')->where(function (Builder $query) {
                 $query->where('store_id', $this->input('store_id'))->where('active', 1);
             })],

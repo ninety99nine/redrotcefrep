@@ -68,7 +68,9 @@ class SubscriptionService extends BaseService
         if ($totalSubscriptions = $subscriptions->count()) {
 
             foreach ($subscriptions as $subscription) {
-                $subscription->delete();
+
+                $this->deleteSubscription($subscription);
+
             }
 
             return ['message' => $totalSubscriptions . ($totalSubscriptions == 1 ? ' Subscription' : ' Subscriptions') . ' deleted'];

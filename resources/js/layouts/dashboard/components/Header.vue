@@ -131,7 +131,7 @@
 
                                     <div @click="navMenu.name == 'Sign Out' ? attemptLogout() : navigateToNavRoute(navMenu)" class="cursor-pointer flex space-x-2 items-center py-3 px-4 text-gray-900 hover:bg-gray-100 group">
 
-                                        <SpinningLoader v-if="navMenu.name == 'Sign Out' && isLoggingOut"></SpinningLoader>
+                                        <Loader v-if="navMenu.name == 'Sign Out' && isLoggingOut"></Loader>
 
                                         <span class="text-sm text-gray-500 group-hover:text-gray-900">
                                             {{ navMenu.name }}
@@ -159,6 +159,7 @@
 
 <script>
 
+    import Loader from '@Partials/Loader.vue';
     import Skeleton from '@Partials/Skeleton.vue';
     import StoreLogo from '@Components/StoreLogo.vue';
 

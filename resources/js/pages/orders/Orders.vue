@@ -7,6 +7,8 @@
 
         <div class="relative bg-white/80 p-4 rounded-md">
 
+            <h1 class="text-lg text-gray-700 font-semibold mb-4">Orders</h1>
+
             <Tabs
                 class="mb-4"
                 :tabs="filterTabs"
@@ -624,7 +626,7 @@
         <Modal
             approveType="danger"
             ref="deleteOrdersModal"
-            :leftApproveIcon="Trash"
+            :leftApproveIcon="Trash2"
             :approveAction="deleteOrders"
             :approveLoading="isDeletingOrders"
             :approveText="totalCheckedRows == 1 ? 'Delete Order' : 'Delete Orders'">
@@ -649,7 +651,9 @@
 
         <!-- Confirm Delete Order -->
         <Modal
+            approveType="danger"
             ref="deleteOrderModal"
+            :leftApproveIcon="Trash2"
             approveText="Delete Order"
             :approveAction="deleteOrder"
             :approveLoading="isDeletingOrder(deletableOrder)">
@@ -683,7 +687,7 @@
     import Status from '@Pages/orders/order/components/order-header/Status.vue';
     import { formattedDatetime, formattedRelativeDate } from '@Utils/dateUtils.js';
     import NoDataPlaceholder from '@Partials/table/components/NoDataPlaceholder.vue';
-    import { Info, Plus, Trash, Printer, RefreshCcw, ArrowDownToLine } from 'lucide-vue-next';
+    import { Info, Plus, Trash2, Printer, RefreshCcw, ArrowDownToLine } from 'lucide-vue-next';
     import PaymentStatus from '@Pages/orders/order/components/order-header/PaymentStatus.vue';
     import CollectionStatus from '@Pages/orders/order/components/order-header/CollectionStatus.vue';
 
@@ -696,7 +700,7 @@
         data() {
             return {
                 Plus,
-                Trash,
+                Trash2,
                 Printer,
                 RefreshCcw,
                 ArrowDownToLine,
@@ -975,9 +979,9 @@
 
                     const config = {
                         params: {
-                            'page': page,
-                            store_id: this.store.id,
-                            'per_page': this.perPage
+                            page: page,
+                            per_page: this.perPage,
+                            store_id: this.store.id
                         },
                         cancelToken: this.cancelTokenSource.token // Attach cancel token
                     }
@@ -1031,11 +1035,11 @@
 
                     let config = {
                         params: {
-                            '_export': '1',
+                            _export: '1',
                             store_id: this.store.id,
-                            'export_mode': this.exportMode,
-                            'export_limit': this.exportLimit,
-                            'export_format': this.exportFormat
+                            export_mode: this.exportMode,
+                            export_limit: this.exportLimit,
+                            export_format: this.exportFormat
                         }
                     }
 
@@ -1412,7 +1416,7 @@
                                     orderMessage += `${checkedOrders[i].created_at}\n`;
                                     break;
                                 case "Order Link":
-                                    orderMessage += `${window.location.origin + this.$router.resolve({ name: 'show-order', params: { store_id: this.store.id, 'order_id': checkedOrders[i].id } }).href}\n`;
+                                    orderMessage += `${window.location.origin + this.$router.resolve({ name: 'show-order', params: { store_id: this.store.id, order_id: checkedOrders[i].id } }).href}\n`;
                                     break;
                             }
 
@@ -1447,6 +1451,7 @@
             this.searchTerm = this.$route.query.searchTerm;
             if(this.$route.query.filterExpressions) this.filterExpressions = this.$route.query.filterExpressions.split('|');
             if(this.$route.query.sortingExpressions) this.sortingExpressions = this.$route.query.sortingExpressions.split('|');
+            if(this.store) this.getOrders();
         }
     };
 

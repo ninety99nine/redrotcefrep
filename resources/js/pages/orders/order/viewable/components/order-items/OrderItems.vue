@@ -16,14 +16,12 @@
 
                 <Skeleton v-if="isLoadingStore || isLoadingOrder || !hasOrder" width="w-full" height="h-8" rounded="rounded-md" :shine="true"></Skeleton>
 
-                <Select
+                <OrderStatusSelect
                     v-else
-                    class="w-40"
-                    :search="false"
-                    :options="statuses"
-                    v-model="orderForm.status"
+                    class="w-48"
+                    :showLabel="false"
                     @change="(status) => updateOrder({ status: status })">
-                </Select>
+                </OrderStatusSelect>
 
             </div>
 
@@ -41,18 +39,17 @@
 
 <script>
 
-    import Select from '@Partials/Select.vue';
     import Popover from '@Partials/Popover.vue';
     import Skeleton from '@Partials/Skeleton.vue';
-    import { capitalize } from '@Utils/stringUtils.js';
     import { formattedDatetime, formattedRelativeDate } from '@Utils/dateUtils.js';
     import OrderTotals from '@Pages/orders/order/viewable/components/order-items/order-totals/OrderTotals.vue';
     import OrderProducts from '@Pages/orders/order/viewable/components/order-items/order-products/OrderProducts.vue';
+    import OrderStatusSelect from '@Pages/orders/order/editable/components/order-basics/components/OrderStatusSelect.vue';
 
     export default {
         inject: ['formState', 'orderState', 'storeState', 'notificationState'],
         components: {
-            Select, Popover, Skeleton, OrderTotals, OrderProducts
+            Popover, Skeleton, OrderTotals, OrderProducts, OrderStatusSelect
         },
         computed: {
             store() {
@@ -75,17 +72,7 @@
             },
             isLoadingOrder() {
                 return this.orderState.isLoadingOrder;
-            },
-            statuses() {
-                const options = ['waiting','cancelled','completed','on its way','ready for pickup'];
-
-                return options.map((option) => {
-                    return {
-                        'label': capitalize(option),
-                        'value': option
-                    }
-                });
-            },
+            }
         },
         methods: {
             formattedDatetime,

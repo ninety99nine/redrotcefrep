@@ -11,7 +11,7 @@
 
                 <div :class="['flex items-center justify-center w-10 h-10 rounded-lg', { 'border border-dashed border-gray-200' : !hasPhoto }]">
 
-                    <img v-if="hasPhoto" class="w-full max-h-full object-contain rounded-lg flex-shrink-0" :src="photo.file_path">
+                    <img v-if="hasPhoto" class="w-full max-h-full object-contain rounded-lg flex-shrink-0" :src="photo.path">
 
                     <Image v-else size="20" class="text-gray-400 flex-shrink-0"></Image>
 

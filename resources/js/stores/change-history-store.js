@@ -22,6 +22,21 @@ export const useChangeHistoryStore = defineStore('change-history', {
         }
     },
     actions: {
+        reset() {
+            this.data = null;
+            this.history = {
+                timeline: [],
+                currentIndex: null
+            };
+            this.actionButtons = [];
+            this.listeners = {
+                undo: null,
+                redo: null,
+                jumpToHistory: null,
+                resetHistoryToCurrent: null,
+                resetHistoryToOriginal: null
+            };
+        },
         removeButtons() {
             this.actionButtons = [];
         },

@@ -190,7 +190,9 @@ class OrderService extends BaseService
         if ($totalOrders = $orders->count()) {
 
             foreach ($orders as $order) {
-                $order->delete();
+
+                $this->deleteOrder($order);
+
             }
 
             return ['message' => $totalOrders . ($totalOrders == 1 ? ' Order' : ' Orders') . ' deleted'];
@@ -221,7 +223,7 @@ class OrderService extends BaseService
         })->toArray();
 
         // Generate the PDF
-        $pdf = Pdf::loadView('pdfs.order.invoice', compact('store', 'orders'));
+        $pdf = Pdf::loadView('pdfs.order.show.invoice', compact('store', 'orders'));
 
         return response()->streamDownload(function () use ($pdf) {
             echo $pdf->stream();

@@ -22,7 +22,7 @@
         watch: {
             store(newValue) {
                 if(newValue) {
-                    if(this.orderId) {
+                    if(this.orderId || this.duplicateOrderId) {
                         this.showOrder();
                     }else{
                         this.orderState.setOrderForm(null);
@@ -30,9 +30,9 @@
 
                     if(this.isCreating || this.isEditing) {
                         this.changeHistoryState.removeButtons();
-                        this.changeHistoryState.addDiscardButton(this.onDiscard);
+                        this.changeHistoryState.addDiscardButton();
                         this.changeHistoryState.addActionButton(
-                            this.isEditing ? 'Save Changes'  : 'Create Order',
+                            this.isEditing ? 'Save Changes' : 'Create Order',
                             this.isEditing ? this.updateOrder : this.createOrder,
                             'primary',
                             null,
@@ -50,6 +50,9 @@
             },
             orderId() {
                 return this.$route.params.order_id;
+            },
+            duplicateOrderId() {
+                return this.$route.query.duplicate_order_id;
             },
             isEditing() {
                 return this.$route.name === 'edit-order';
@@ -74,7 +77,7 @@
                         }
                     };
 
-                    const response = await axios.get(`/api/orders/${this.orderId}`, config);
+                    const response = await axios.get(`/api/orders/${this.orderId || this.duplicateOrderId}`, config);
 
                     const order = response.data;
                     this.orderState.setOrder(order);
@@ -202,6 +205,7 @@
         },
         unmounted() {
             this.orderState.reset();
+            this.changeHistoryState.reset();
         },
         created() {
             const listeners = ['undo', 'redo', 'jumpToHistory', 'resetHistoryToCurrent', 'resetHistoryToOriginal'];

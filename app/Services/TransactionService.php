@@ -99,23 +99,9 @@ class TransactionService extends BaseService
 
         if ($totalTransactions = $transactions->count()) {
 
-            $mediaFileService = new MediaFileService;
-
             foreach ($transactions as $transaction) {
 
-                foreach ($transaction->mediaFiles as $mediaFile) {
-                    $mediaFileService->deleteMediaFile($mediaFile);
-                }
-
-                $transaction->delete();
-
-                if($transaction->owner_type == 'order') {
-
-                    $orderService = new OrderService;
-                    $order = Order::find($transaction->owner_id);
-                    $orderService->updateOrderAmountBalance($order);
-
-                }
+                $this->deleteTransaction($transaction);
 
             }
 

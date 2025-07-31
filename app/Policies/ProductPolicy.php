@@ -78,12 +78,34 @@ class ProductPolicy extends BasePolicy
     }
 
     /**
+     * Determine whether the user can update any products.
+     *
+     * @param User $user
+     * @return bool
+     */
+    public function updateAny(User $user): bool
+    {
+        return $this->isStoreUserWithPermission($user, 'manage products');
+    }
+
+    /**
      * Determine whether the user can delete any products.
      *
      * @param User $user
      * @return bool
      */
     public function deleteAny(User $user): bool
+    {
+        return $this->isStoreUserWithPermission($user, 'manage products');
+    }
+
+    /**
+     * Determine whether the user can download any products.
+     *
+     * @param User $user
+     * @return bool
+     */
+    public function downloadAny(User $user): bool
     {
         return $this->isStoreUserWithPermission($user, 'manage products');
     }

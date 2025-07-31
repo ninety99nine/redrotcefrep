@@ -48,7 +48,9 @@ class StoreQuotaService extends BaseService
         if ($totalStoreQuotas = $storeQuotas->count()) {
 
             foreach ($storeQuotas as $storeQuota) {
-                $storeQuota->delete();
+
+                $this->deleteStoreQuota($storeQuota);
+
             }
 
             return ['message' => $totalStoreQuotas . ($totalStoreQuotas == 1 ? ' Store quota' : ' Store quotas') . ' deleted'];

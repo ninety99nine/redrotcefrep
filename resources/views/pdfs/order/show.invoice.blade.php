@@ -32,8 +32,8 @@
                                     <!-- Logo -->
                                     @if (!empty($store['logo']))
                                         @php
-                                            $imageData = file_get_contents($store['logo']['file_path']);
-                                            $imageType = pathinfo($store['logo']['file_path'], PATHINFO_EXTENSION);
+                                            $imageData = file_get_contents($store['logo']['path']);
+                                            $imageType = pathinfo($store['logo']['path'], PATHINFO_EXTENSION);
                                             $base64Image = 'data:image/' . $imageType . ';base64,' . base64_encode($imageData);
                                         @endphp
                                         <td style="padding-right: 12px;">

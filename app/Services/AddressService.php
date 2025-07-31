@@ -47,7 +47,9 @@ class AddressService extends BaseService
         if ($totalAddresses = $addresses->count()) {
 
             foreach ($addresses as $address) {
-                $address->delete();
+
+                $this->deleteAddress($address);
+
             }
 
             return ['message' => $totalAddresses . ($totalAddresses == 1 ? ' Address' : ' Addresses') . ' deleted'];

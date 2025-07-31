@@ -123,7 +123,7 @@
 
                     if(this.storeState.store && this.localStore.id == this.storeState.store.id) {
                         this.storeState.store.logo = response.data.media_file;
-                        this.filePath = response.data.media_file.file_path;
+                        this.filePath = response.data.media_file.path;
                         this.filePathBefore = this.filePath;
                     }
 
@@ -143,7 +143,7 @@
             this.localStore = this.store ? this.store : this.storeState.store;
 
             if(this.localStore?.logo) {
-                this.filePath = this.localStore.logo.file_path;
+                this.filePath = this.localStore.logo.path;
                 this.filePathBefore = this.filePath;
             }
         }

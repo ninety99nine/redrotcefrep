@@ -6,17 +6,19 @@
             alertClass,
         ]">
 
-        <component v-if="showIcon" :is="iconName" :size="iconSize" :class="['shrink-0', iconMarginTop]" />
+        <component v-if="showIcon" :is="iconName" :size="iconSize" :class="['shrink-0 mr-4', iconMarginTop]" />
 
         <!-- Content -->
-        <div class="ms-4">
-            <h3 v-if="$slots.title || title" class="text-sm font-semibold">
-                <slot name="title">{{ title }}</slot>
-            </h3>
-            <div v-if="$slots.description || description" class="mt-1 text-sm">
-                <slot name="description">{{ description }}</slot>
+         <slot name="content">
+            <div>
+                <h3 v-if="$slots.title || title" class="text-sm font-semibold">
+                    <slot name="title">{{ title }}</slot>
+                </h3>
+                <div v-if="$slots.description || description" :class="['text-sm', { 'mt-1' : $slots.title || title }]">
+                    <slot name="description">{{ description }}</slot>
+                </div>
             </div>
-        </div>
+         </slot>
 
         <!-- Close Button -->
         <button

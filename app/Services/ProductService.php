@@ -10,12 +10,15 @@ use App\Models\Variable;
 use Illuminate\Support\Str;
 use Illuminate\Support\Arr;
 use App\Enums\SortProductBy;
+use Barryvdh\DomPDF\Facade\Pdf;
 use App\Enums\UploadFolderName;
 use App\Enums\StockQuantityType;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Collection;
 use App\Http\Resources\ProductResource;
 use App\Http\Resources\ProductResources;
+use Symfony\Component\HttpFoundation\StreamedResponse;
+use \Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class ProductService extends BaseService
 {
@@ -25,17 +28,17 @@ class ProductService extends BaseService
      * Show products.
      *
      * @param array $data
-     * @return ProductResources|array
+     * @return ProductResources|BinaryFileResponse|array
      */
-    public function showProducts(array $data): ProductResources|array
+    public function showProducts(array $data): ProductResources|BinaryFileResponse|array
     {
         $storeId = $data['store_id'] ?? null;
         $association = isset($data['association']) ? Association::tryFrom($data['association']) : null;
 
         if($association == Association::SUPER_ADMIN) {
-            $query = Product::query();
+            $query = Product::query()->doesNotSupportVariations();
         }else if($association == Association::TEAM_MEMBER) {
-            $query = Product::where('store_id', $storeId);
+            $query = Product::where('store_id', $storeId)->doesNotSupportVariations();
         }else {
             $query = Product::where('store_id', $storeId)->doesNotSupportVariations()->visible();
         }
@@ -57,7 +60,7 @@ class ProductService extends BaseService
         $store = Store::find($storeId);
 
         $data = array_merge($data, [
-            'currency' => $store->currency['code']
+            'currency' => $store->currency
         ]);
 
         $product = Product::create($data);
@@ -83,6 +86,25 @@ class ProductService extends BaseService
     }
 
     /**
+     * Update products.
+     *
+     * @param array $data
+     * @return array
+     */
+    public function updateProducts(array $data): array
+    {
+        $storeId = $data['store_id'];
+        $productIds = $data['product_ids'];
+        $totalProducts = count($productIds);
+        $fillableData = array_intersect_key($data, array_flip([
+            'visible'
+        ]));
+
+        Product::whereIn('id', $productIds)->where('store_id', $storeId)->update($fillableData);
+        return ['updated' => true, 'message' => $totalProducts . ($totalProducts == 1 ? ' product': ' products') . ' updated'];
+    }
+
+    /**
      * Delete Products.
      *
      * @param array $productIds
@@ -95,15 +117,9 @@ class ProductService extends BaseService
 
         if ($totalProducts = $products->count()) {
 
-            $mediaFileService = new MediaFileService;
-
             foreach ($products as $product) {
 
-                foreach ($product->mediaFiles as $mediaFile) {
-                    $mediaFileService->deleteMediaFile($mediaFile);
-                }
-
-                $product->delete();
+                $this->deleteProduct($product);
 
             }
 
@@ -112,6 +128,33 @@ class ProductService extends BaseService
         } else {
             throw new Exception('No Products deleted');
         }
+    }
+
+    /**
+     * Download products.
+     *
+     * @param array $data
+     * @return StreamedResponse
+     */
+    public function downloadProducts(array $data): StreamedResponse
+    {
+        $storeId = $data['store_id'];
+        $productIds = $data['product_ids'];
+
+        $store = Store::with(['logo'])->find($storeId);
+        $products = Product::whereIn('id', $productIds)->where('store_id', $storeId)->with(['photos'])->get();
+
+        // Convert objects to arrays
+        $products = $products->map(function ($product) {
+            return json_decode(json_encode($product), true);
+        })->toArray();
+
+        // Generate the PDF
+        $pdf = Pdf::loadView('pdfs.product.show', compact('store', 'products'));
+
+        return response()->streamDownload(function () use ($pdf) {
+            echo $pdf->stream();
+        }, 'name.pdf');
     }
 
     /**
@@ -314,6 +357,10 @@ class ProductService extends BaseService
             $mediaFileService->deleteMediaFile($mediaFile);
         }
 
+        foreach ($product->variations as $variation) {
+            $this->deleteProduct($variation);
+        }
+
         $deleted = $product->delete();
 
         if ($deleted) {
@@ -420,9 +467,9 @@ class ProductService extends BaseService
                 'name' => $name,
                 'created_at' => now(),
                 'updated_at' => now(),
+                'user_id' => auth()->user()->id,
                 'store_id' => $product->store_id,
                 'parent_product_id' => $product->id,
-                'user_id' => request()->current_user->id,
                 'variable_templates' => collect($options)->map(function ($option, $key) use ($variantAttributes) {
                     $variantAttributeNames = $variantAttributes->keys();
                     return [

@@ -36,10 +36,13 @@
             isEditing() {
                 return this.$route.name === 'edit-order';
             },
+            duplicateOrderId() {
+                return this.$route.query.duplicate_order_id;
+            },
         },
         methods: {
             goBack() {
-                if(this.isEditing) {
+                if(this.isEditing || this.duplicateOrderId) {
                     this.navigateToOrder();
                 }else{
                     this.navigateToOrders();
@@ -49,7 +52,7 @@
                 this.$router.push({
                     name: 'show-order',
                     params: {
-                        'order_id': this.order.id
+                        order_id: this.order.id || this.duplicateOrderId
                     },
                     query: {
                         store_id: this.store.id

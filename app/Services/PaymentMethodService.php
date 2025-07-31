@@ -78,8 +78,11 @@ class PaymentMethodService extends BaseService
         $paymentMethods = PaymentMethod::whereIn('id', $paymentMethodIds)->get();
 
         if ($totalPaymentMethods = $paymentMethods->count()) {
+
             foreach ($paymentMethods as $paymentMethod) {
-                $paymentMethod->delete();
+
+                $this->deletePaymentMethod($paymentMethod);
+
             }
 
             return ['message' => $totalPaymentMethods . ($totalPaymentMethods == 1 ? ' Payment Method' : ' Payment Methods') . ' deleted'];

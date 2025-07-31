@@ -13,10 +13,10 @@
 
             <div
                 role="tooltip"
-                class="hs-tooltip-content hs-tooltip-shown:opacity-100 hs-tooltip-shown:visible hidden opacity-0 transition-opacity absolute invisible z-50 w-auto max-w-xs bg-white border border-gray-100 text-start rounded-xl shadow-md after:absolute after:top-0 after:-start-4 after:w-4 after:h-full dark:bg-neutral-800 dark:border-neutral-700">
+                class="hs-tooltip-content hs-tooltip-shown:opacity-100 hs-tooltip-shown:visible hidden opacity-0 transition-opacity absolute invisible z-30 w-auto max-w-xs bg-white border border-gray-100 text-start rounded-xl shadow-md after:absolute after:top-0 after:-start-4 after:w-4 after:h-full dark:bg-neutral-800 dark:border-neutral-700">
 
                 <slot name="content">
-                    <p class="text-xs leading-5 px-4 py-2 whitespace-normal">{{ content }}</p>
+                    <p class="max-w-80 text-xs leading-5 px-4 py-2 whitespace-normal">{{ content }}</p>
                 </slot>
 
             </div>

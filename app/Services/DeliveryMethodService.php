@@ -59,7 +59,7 @@ class DeliveryMethodService extends BaseService
         $store = Store::find($storeId);
 
         $data = array_merge($data, [
-            'currency' => $store->currency['code']
+            'currency' => $store->currency
         ]);
 
         $deliveryMethod = DeliveryMethod::create($data);
@@ -84,8 +84,11 @@ class DeliveryMethodService extends BaseService
         $deliveryMethods = DeliveryMethod::whereIn('id', $deliveryMethodIds)->get();
 
         if ($totalDeliveryMethods = $deliveryMethods->count()) {
+
             foreach ($deliveryMethods as $deliveryMethod) {
-                $deliveryMethod->delete();
+
+                $this->deleteDeliveryMethod($deliveryMethod);
+
             }
 
             return ['message' => $totalDeliveryMethods . ($totalDeliveryMethods == 1 ? ' Delivery Method' : ' Delivery Methods') . ' deleted'];

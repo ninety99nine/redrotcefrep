@@ -13,21 +13,17 @@
 
         <div v-else class="space-y-2">
 
-            <Select
-                label="Status"
-                :search="false"
-                :options="statuses"
-                v-model="orderForm.status"
+            <OrderStatusSelect
+                class="w-full"
+                :showLabel="true"
                 @change="orderState.saveStateDebounced(`Status changed to ${ orderForm.status }`)">
-            </Select>
+            </OrderStatusSelect>
 
-            <Select
-                :search="false"
-                label="Payment Status"
-                :options="paymentStatuses"
-                v-model="orderForm.payment_status"
+            <OrderPaymentStatusSelect
+                class="w-full"
+                :showLabel="true"
                 @change="orderState.saveStateDebounced(`Payment status changed to ${ orderForm.payment_status }`)">
-            </Select>
+            </OrderPaymentStatusSelect>
 
             <Select
                 :search="false"
@@ -69,10 +65,12 @@
     import Select from '@Partials/Select.vue';
     import Skeleton from '@Partials/Skeleton.vue';
     import { capitalize } from '@Utils/stringUtils.js';
+    import OrderStatusSelect from '@Pages/orders/order/editable/components/order-basics/components/OrderStatusSelect.vue';
+    import OrderPaymentStatusSelect from '@Pages/orders/order/editable/components/order-basics/components/OrderPaymentStatusSelect.vue';
 
     export default {
         inject: ['formState', 'storeState', 'orderState', 'notificationState'],
-        components: { Input, Select, Skeleton },
+        components: { Input, Select, Skeleton, OrderStatusSelect, OrderPaymentStatusSelect },
         data() {
             return {
                 couriers: [],

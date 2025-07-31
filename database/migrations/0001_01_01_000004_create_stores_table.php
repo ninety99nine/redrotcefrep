@@ -65,7 +65,7 @@ return new class extends Migration
             $table->boolean('combine_fees_into_one_amount')->default(false);
             $table->boolean('combine_discounts_into_one_amount')->default(false);
             $table->json('checkout_fees')->nullable();
-            $table->unsignedInteger('order_number_padding')->default(4);
+            $table->unsignedInteger('order_number_padding')->default(2);
             $table->unsignedInteger('order_number_counter')->default(0);
             $table->string('order_number_prefix')->nullable();
             $table->string('order_number_suffix')->nullable();

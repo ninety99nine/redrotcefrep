@@ -51,7 +51,7 @@
 
                     </div>
 
-                    <template v-if="changeHistoryState.hasChangeHistory">
+                    <template v-if="changeHistoryState.hasChangeHistory || duplicateOrderId">
 
                         <ChangeHistoryNavigation></ChangeHistoryNavigation>
 
@@ -358,7 +358,10 @@
             }
         },
         watch: {
-            '$route'(newValue, oldValue) {
+            '$route.params.store_id'(newValue, oldValue) {
+                if(this.storeId) this.showStore();
+            },
+            '$route.query.store_id'(newValue, oldValue) {
                 if(this.storeId) this.showStore();
             }
         },
@@ -373,7 +376,7 @@
                 return this.storeState.isLoadingStore;
             },
             storeId() {
-                return this.$route.params.store_id || this.$route.query.store_id;;
+                return this.$route.params.store_id || this.$route.query.store_id;
             },
             storeMode() {
                 return !this.isOnboarding && this.storeId;
@@ -383,6 +386,9 @@
             },
             isShowingSettings() {
                 return this.$route.meta.settings === true;
+            },
+            duplicateOrderId() {
+                return this.$route.query.duplicate_order_id;
             },
             navMenus() {
                 if(this.isShowingSettings) {
@@ -431,8 +437,8 @@
                         },
                         {
                             name: 'Products',
-                            routeName: 'show-store-products',
-                            associatedRouteNames: ['show-store-product', 'create-store-product'],
+                            routeName: 'show-products',
+                            associatedRouteNames: ['edit-product', 'create-product'],
                         },
                         {
                             name: 'Customers',

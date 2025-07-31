@@ -62,8 +62,11 @@ class UserService extends BaseService
         $users = User::whereIn('id', $userIds)->get();
 
         if ($totalUsers = $users->count()) {
+
             foreach ($users as $user) {
-                $user->delete();
+
+                $this->deleteUser($user);
+
             }
 
             return ['message' => $totalUsers . ($totalUsers == 1 ? ' User' : ' Users') . ' deleted'];

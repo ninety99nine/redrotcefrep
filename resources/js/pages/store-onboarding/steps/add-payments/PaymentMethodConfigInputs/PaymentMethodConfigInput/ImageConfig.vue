@@ -14,7 +14,7 @@
             @dragover.prevent
             @drop="handleDrop"
             @click="triggerFileInput"
-            v-if="!localModelValue.file_path"
+            v-if="!localModelValue.path"
             class="mt-2 w-full h-40 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg flex flex-col items-center justify-center text-gray-500 dark:text-gray-400 text-sm cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 transition">
             <p>Click or Drag & Drop Image</p>
             <input
@@ -86,7 +86,7 @@
 
             <!-- Image -->
             <img
-                :src="localModelValue.file_path"
+                :src="localModelValue.path"
                 v-if="hasCloudImage || hasLocalImage"
                 class="w-full max-h-40 p-4 object-contain rounded-lg border border-gray-300 dark:border-gray-700"
             />
@@ -173,10 +173,10 @@
 
             },
             hasCloudImage() {
-                return this.localModelValue?.file_path && !this.localModelValue?.file_path.startsWith("blob:");
+                return this.localModelValue?.path && !this.localModelValue?.path.startsWith("blob:");
             },
             hasLocalImage() {
-                return this.localModelValue?.file_path && this.localModelValue?.file_path.startsWith("blob:");
+                return this.localModelValue?.path && this.localModelValue?.path.startsWith("blob:");
             }
         },
         methods: {
@@ -201,7 +201,7 @@
                 new Promise((resolve) => {
                     const reader = new FileReader();
                     reader.onload = () => {
-                        this.localModelValue.file_path = URL.createObjectURL(file);
+                        this.localModelValue.path = URL.createObjectURL(file);
                         this.localModelValue.uploading = false;
                         this.localModelValue.uploaded = null;
                         this.localModelValue.file_ref = file;
@@ -234,7 +234,7 @@
                     const QrScanner = (await import('qr-scanner')).default;
 
                     // Scan QR code
-                    const scanResult = await QrScanner.scanImage(this.localModelValue.file_path, { returnDetailedScanResult: true });
+                    const scanResult = await QrScanner.scanImage(this.localModelValue.path, { returnDetailedScanResult: true });
 
                     // Extract QR data (supporting both old & new API formats)
                     const qrData = scanResult?.data ?? scanResult;
@@ -270,9 +270,9 @@
 
                 if (this.hasLocalImage) {
 
-                    this.localModelValue.file_path = null;
+                    this.localModelValue.path = null;
 
-                }else if(this.localModelValue.file_path != null) {
+                }else if(this.localModelValue.path != null) {
 
                     await this.deletePaymentMethodImage(this.paymentMethod, this.configSchemaEntity.attribute);
 

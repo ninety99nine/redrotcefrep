@@ -93,7 +93,7 @@
 
             <div class="bg-gray-50 p-4 border border-gray-200 rounded-lg space-y-2 text-sm">
 
-                <div v-if="order.customer_name" class="grid grid-cols-3">
+                <div v-if="order.customer_name" class="grid grid-cols-3 items-center">
                     <span>Name</span>
                     <div class="col-span-2 flex items-center space-x-2">
                         <UserRoundCheck v-if="customer" size="16"></UserRoundCheck>

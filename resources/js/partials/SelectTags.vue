@@ -45,7 +45,7 @@
                     <div
                         @click="toggleDropdown"
                         :class="[
-                            'w-full select-none bg-white border border-gray-300 rounded-md p-2 flex flex-wrap gap-2 items-center overflow-hidden',
+                            'w-full select-none bg-white border border-gray-300 rounded-md py-1 px-2 flex flex-wrap gap-2 items-center overflow-hidden',
                             disabled ? 'cursor-not-allowed' : 'cursor-pointer'
                         ]">
                         <!-- Draggable Support -->
@@ -172,6 +172,7 @@
     import { generateUniqueId } from '@Utils/generalUtils.js';
 
     export default {
+        inject: ['notificationState'],
         directives: { capitalize },
         components: { draggable: VueDraggableNext },
         props: {
@@ -322,7 +323,7 @@
             },
             focusOnInput() {
                 this.$nextTick(() => {
-                    if (this.$refs.search && document.activeElement !== this.$refs.search) {
+                    if (this.$refs.search) {
                         this.$refs.search.focus();
                     }
                 });
@@ -355,6 +356,9 @@
                     )
                 );
             },
+            isOptionCaptured(query) {
+                return this.localModelValue.some(option => option.toLowerCase() === query.toLowerCase());
+            },
             handleClickOutside(event) {
                 if (!this.$refs.dropdown.contains(event.target)) {
                     this.isOpen = false;
@@ -366,7 +370,14 @@
                 }
             },
             addCustomOption() {
-                const newOptionValue = this.searchQuery.toLowerCase();
+
+                if(this.isOptionCaptured(this.searchQuery)) {
+                    this.notificationState.showWarningNotification('This option already exists');
+                    this.searchQuery = "";
+                    return;
+                }
+
+                const newOptionValue = this.searchQuery;
                 const newOption = { label: this.searchQuery, value: newOptionValue };
 
                 if (this.onAddCustomOption) {
@@ -379,6 +390,7 @@
                 }
 
                 this.searchQuery = "";
+                this.focusOnInput();
             },
         },
         mounted() {

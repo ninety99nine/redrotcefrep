@@ -36,7 +36,7 @@
                 this.$router.push({
                     name: 'edit-order',
                     params: {
-                        'order_id': this.order.id
+                        order_id: this.order.id
                     },
                     query: {
                         store_id: this.store.id

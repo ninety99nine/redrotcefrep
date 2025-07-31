@@ -12,6 +12,10 @@ use App\Http\Requests\Product\CreateProductRequest;
 use App\Http\Requests\Product\UpdateProductRequest;
 use App\Http\Requests\Product\DeleteProductRequest;
 use App\Http\Requests\Product\DeleteProductsRequest;
+use App\Http\Requests\Product\UpdateProductsRequest;
+use Symfony\Component\HttpFoundation\StreamedResponse;
+use App\Http\Requests\Product\DownloadProductsRequest;
+use \Symfony\Component\HttpFoundation\BinaryFileResponse;
 use App\Http\Requests\Product\ShowProductVariationsRequest;
 use App\Http\Requests\Product\UpdateProductVisibilityRequest;
 use App\Http\Requests\Product\CreateProductVariationsRequest;
@@ -38,9 +42,9 @@ class ProductController extends Controller
      * Show products.
      *
      * @param ShowProductsRequest $request
-     * @return ProductResources|array
+     * @return ProductResources|BinaryFileResponse|array
      */
-    public function showProducts(ShowProductsRequest $request): ProductResources|array
+    public function showProducts(ShowProductsRequest $request): ProductResources|BinaryFileResponse|array
     {
         return $this->service->showProducts($request->validated());
     }
@@ -57,6 +61,17 @@ class ProductController extends Controller
     }
 
     /**
+     * Update products.
+     *
+     * @param UpdateProductsRequest $request
+     * @return array
+     */
+    public function updateProducts(UpdateProductsRequest $request): array
+    {
+        return $this->service->updateProducts($request->validated());
+    }
+
+    /**
      * Delete multiple products.
      *
      * @param DeleteProductsRequest $request
@@ -66,6 +81,17 @@ class ProductController extends Controller
     {
         $productIds = request()->input('product_ids', []);
         return $this->service->deleteProducts($productIds);
+    }
+
+    /**
+     * Download products.
+     *
+     * @param DownloadProductsRequest $request
+     * @return StreamedResponse
+     */
+    public function downloadProducts(DownloadProductsRequest $request): StreamedResponse
+    {
+        return $this->service->downloadProducts($request->validated());
     }
 
     /**

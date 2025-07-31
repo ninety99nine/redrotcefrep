@@ -424,7 +424,7 @@
                                     orderMessage += `${window.location.origin + this.$router.resolve({
                                         name: 'show-order',
                                         params: {
-                                            'order_id': this.order.id
+                                            order_id: this.order.id
                                         },
                                         query: {
                                             store_id: this.store.id

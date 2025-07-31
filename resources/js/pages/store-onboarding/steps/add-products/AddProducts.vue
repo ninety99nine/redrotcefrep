@@ -124,7 +124,7 @@
 
                             <!-- Image -->
                             <img
-                                :src="photo.file_path"
+                                :src="photo.path"
                                 class="w-full h-24 p-4 object-contain rounded-lg border border-gray-300 dark:border-gray-700"
                             />
 
@@ -386,7 +386,7 @@
                         const reader = new FileReader();
                         reader.onload = (e) => {
                             product.photos.push({
-                                file_path: URL.createObjectURL(file),
+                                path: URL.createObjectURL(file),
                                 error_message: null,
                                 uploading: false,
                                 uploaded: null,

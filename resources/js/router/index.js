@@ -120,11 +120,11 @@ const routes = [
                     {
                         path: '',
                         name: 'show-orders',
-                        component: () => import('@Pages/orders/StoreOrders.vue')
+                        component: () => import('@Pages/orders/Orders.vue')
                     },
                     {
                         path: 'create',
-                        component: () => import('@Pages/orders/order/StoreOrder.vue'),
+                        component: () => import('@Pages/orders/order/Order.vue'),
                         children: [
                             {
                                 path: '',
@@ -135,7 +135,7 @@ const routes = [
                     },
                     {
                         path: ':order_id',
-                        component: () => import('@Pages/orders/order/StoreOrder.vue'),
+                        component: () => import('@Pages/orders/order/Order.vue'),
                         children: [
                             {
                                 path: '',
@@ -148,6 +148,26 @@ const routes = [
                                 component: () => import('@Pages/orders/order/editable/Content.vue'),
                             }
                         ]
+                    }
+                ]
+            },
+            {
+                path: 'products',
+                children: [
+                    {
+                        path: '',
+                        name: 'show-products',
+                        component: () => import('@Pages/products/Products.vue')
+                    },
+                    {
+                        path: 'create',
+                        name: 'create-product',
+                        component: () => import('@Pages/products/product/Product.vue')
+                    },
+                    {
+                        path: ':product_id',
+                        name: 'edit-product',
+                        component: () => import('@Pages/products/product/Product.vue')
                     }
                 ]
             },

@@ -46,8 +46,11 @@ class CustomerService extends BaseService
         $customers = Customer::whereIn('id', $customerIds)->get();
 
         if ($totalCustomers = $customers->count()) {
+
             foreach ($customers as $customer) {
-                $customer->delete();
+
+                $this->deleteCustomer($customer);
+
             }
 
             return ['message' => $totalCustomers . ($totalCustomers == 1 ? ' Customer' : ' Customers') . ' deleted'];

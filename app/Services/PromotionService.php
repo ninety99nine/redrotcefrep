@@ -63,7 +63,9 @@ class PromotionService extends BaseService
         if ($totalPromotions = $promotions->count()) {
 
             foreach ($promotions as $promotion) {
-                $promotion->delete();
+
+                $this->deletePromotion($promotion);
+
             }
 
             return ['message' => $totalPromotions . ($totalPromotions == 1 ? ' Promotion' : ' Promotions') . ' deleted'];

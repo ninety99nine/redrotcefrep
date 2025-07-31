@@ -9,7 +9,7 @@
             :leftIcon="ChevronLeft"
             :disabled="!hasPreviousOrder"
             :action="() => onView('prev')"
-            :skeleton="isLoadingStore || isLoadingOrder">
+            :skeleton="isLoadingStore || isLoadingOrder || !hasOrder">
         </Button>
 
         <!-- Next Order -->
@@ -19,7 +19,7 @@
             :leftIcon="ChevronRight"
             :disabled="!hasNextOrder"
             :action="() => onView('next')"
-            :skeleton="isLoadingStore || isLoadingOrder">
+            :skeleton="isLoadingStore || isLoadingOrder || !hasOrder">
         </Button>
 
     </div>
@@ -41,9 +41,11 @@
                 ChevronRight,
                 pagination: null,
                 searchTerm: null,
+                latestRequestId: 0,
                 filterExpressions: [],
                 sortingExpressions: [],
-                isLoadingOrders: false
+                isLoadingOrders: false,
+                cancelTokenSource: null
             }
         },
         watch: {
@@ -59,6 +61,9 @@
             },
             store() {
                 return this.storeState.store;
+            },
+            hasOrder() {
+                return this.orderState.hasOrder;
             },
             isLoadingOrder() {
                 return this.orderState.isLoadingOrder;
@@ -76,31 +81,32 @@
                 return this.sortingExpressions.length > 0;
             },
             hasNextOrder() {
-                if(this.isLoadingOrder || this.isLoadingOrders || !this.pagination || !this.pagination.data.length) return false;
+                if(this.isLoadingStore || this.isLoadingOrder || this.isLoadingOrders || !this.pagination || !this.pagination.data.length) return false;
 
-                let currentIndex = this.pagination.data.findIndex(order => order.id === this.order.id);
+                let currentIndex = this.pagination.data.findIndex(orderId => orderId === this.order.id);
 
                 // Check if there's another order in the same page OR another page exists
-                return currentIndex < this.pagination.data.length - 1 || this.pagination.nextPageUrl !== null;
+                return currentIndex < this.pagination.data.length - 1 || this.pagination.next_page_url !== null;
             },
             hasPreviousOrder() {
-                if(this.isLoadingOrder || this.isLoadingOrders || !this.pagination || !this.pagination.data.length) return false;
+                if(this.isLoadingStore || this.isLoadingOrder || this.isLoadingOrders || !this.pagination || !this.pagination.data.length) return false;
 
-                let currentIndex = this.pagination.data.findIndex(order => order.id === this.order.id);
+                let currentIndex = this.pagination.data.findIndex(orderId => orderId === this.order.id);
 
                 // Check if there's a previous order in the same page OR another page exists
-                return currentIndex > 0 || this.pagination.prevPageUrl !== null;
+                return currentIndex > 0 || this.pagination.prev_page_url !== null;
             }
         },
         methods: {
             onView(direction) {
 
-                let currentIndex = this.pagination.data.findIndex(order => order.id === this.order.id);
+                let currentIndex = this.pagination.data.findIndex(orderId => orderId === this.order.id);
 
                 const query = {
+                    store_id: this.store.id,
                     searchTerm: this.searchTerm,
                     filterExpressions: this.filterExpressions.join('|'),
-                    sortingExpressions: this.sortingExpressions.join('|'),
+                    sortingExpressions: this.sortingExpressions.join('|')
                 }
 
                 if(direction === 'next') {
@@ -110,17 +116,17 @@
                         // Go to next order in the same page
                         this.$router.push({
                             name: 'show-order',
-                            query: query,
                             params: {
-                                store_id: this.store.id,
-                                'order_id': this.pagination.data[currentIndex + 1].id
-                            }
+                                order_id: this.pagination.data[currentIndex + 1]
+                            },
+                            query: query
                         });
 
-                    }else if(this.pagination.nextPageUrl) {
+                    }else if(this.pagination.next_page_url) {
 
                         // Load the next page of orders
-                        this.getOrders(this.pagination.nextPageUrl);
+                        const page = new URL(this.pagination.next_page_url).searchParams.get('page');
+                        this.getOrders(page);
 
                     }
 
@@ -131,65 +137,77 @@
                         // Go to previous order in the same page
                         this.$router.push({
                             name: 'show-order',
-                            query: query,
                             params: {
-                                store_id: this.store.id,
-                                'order_id': this.pagination.data[currentIndex - 1].id
-                            }
+                                order_id: this.pagination.data[currentIndex - 1]
+                            },
+                            query: query
                         });
 
-                    }else if(this.pagination.prevPageUrl) {
+                    }else if(this.pagination.prev_page_url) {
 
                         // Load the previous page of orders
-                        this.getOrders(this.pagination.prevPageUrl);
+                        const page = new URL(this.pagination.prev_page_url).searchParams.get('page');
+                        this.getOrders(page);
 
                     }
 
                 }
 
             },
-            async getOrders(url = null) {
+            async getOrders(page = 1) {
+
+                const currentRequestId = ++this.latestRequestId;
 
                 try {
 
                     this.isLoadingOrders = true;
 
-                    let config = {};
-
-                    if(url == null) {
-
-                        url = `/api/orders`;
-
-                        config = {
-                            params: {
-                                'per_page': this.perPage,
-                                store_id: this.store.id
-                            }
-                        }
-
-                        if(this.hasSearchTerm) config.params['search'] = this.searchTerm;
-
-                        if(this.hasFilterExpressions) {
-                            config.params['_filters'] = this.filterExpressions.join('|');
-                        }
-
-                        if(this.hasSortingExpressions) {
-                            config.params['_sort'] = this.sortingExpressions.join('|');
-                        }
-
+                    if (this.cancelTokenSource) {
+                        this.cancelTokenSource.cancel('Request superseded by a newer one'); // Cancel previous request if it exists
                     }
 
-                    const response = await axios.get(url, config);
+                    this.cancelTokenSource = axios.CancelToken.source(); // Create a new cancel token source
+
+                    const config = {
+                        params: {
+                            page: page,
+                            _pagination: '1',
+                            store_id: this.store.id
+                        },
+                        cancelToken: this.cancelTokenSource.token // Attach cancel token
+                    }
+
+                    if(this.hasSearchTerm) config.params['search'] = this.searchTerm;
+
+                    if(this.hasFilterExpressions) {
+                        config.params['_filters'] = this.filterExpressions.join('|');
+                    }
+
+                    if(this.hasSortingExpressions) {
+                        config.params['_sort'] = this.sortingExpressions.join('|');
+                    }
+
+                    const response = await axios.get(`/api/orders`, config);
+
+                    // Only process response if it matches the latest request
+                    if (currentRequestId !== this.latestRequestId) return;
 
                     this.pagination = response.data;
 
                 } catch (error) {
-                    const message = error?.response?.data?.message || error?.message || 'Something went wrong while fetching orders';
+
+                    if (axios.isCancel(error)) return; // Ignore canceled requests
+
+                    if (currentRequestId !== this.latestRequestId) return;
+
+                    const message = error?.response?.data?.message || error?.message || 'Something went wrong while fetching order navigation';
                     this.notificationState.showWarningNotification(message);
                     this.formState.setServerFormErrors(error);
-                    console.error('Failed to fetch orders:', error);
+                    console.error('Failed to fetch order navigation:', error);
                 } finally {
+                    if (currentRequestId !== this.latestRequestId) return;
                     this.isLoadingOrders = false;
+                    this.cancelTokenSource = null;
                 }
 
             }

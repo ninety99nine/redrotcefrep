@@ -125,15 +125,9 @@ class StoreService extends BaseService
 
         if($totalStores = $stores->count()) {
 
-            $mediaFileService = new MediaFileService;
+            foreach ($stores as $store) {
 
-            foreach($stores as $store) {
-
-                foreach ($store->mediaFiles as $mediaFile) {
-                    $mediaFileService->deleteMediaFile($mediaFile);
-                }
-
-                $store->delete();
+                $this->deleteStore($store);
 
             }
 

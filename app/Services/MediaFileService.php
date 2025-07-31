@@ -46,15 +46,15 @@ class MediaFileService extends BaseService
             $filePath = AWSService::store($uploadFolderName, $file);
 
             $mediaFile = MediaFile::create([
-                'file_path' => $filePath,
+                'path' => $filePath,
                 'mediable_id' => $mediableId,
-                'file_size' => $file->getSize(),
+                'size' => $file->getSize(),
                 'mediable_type' => $mediableType,
                 'type' => $uploadFolderName->value,
                 'mime_type' => $file->getMimeType(),
+                'name' => $file->getClientOriginalName(),
                 'width' => getimagesize($file)[0] ?? null,
                 'height' => getimagesize($file)[1] ?? null,
-                'file_name' => $file->getClientOriginalName(),
             ]);
 
             return $this->showCreatedResource($mediaFile);
@@ -75,7 +75,9 @@ class MediaFileService extends BaseService
         if ($totalMediaFiles = $mediaFiles->count()) {
 
             foreach ($mediaFiles as $mediaFile) {
+
                 $this->deleteMediaFile($mediaFile);
+
             }
 
             return ['message' => $totalMediaFiles . ($totalMediaFiles == 1 ? ' Media File' : ' Media Files') . ' deleted'];
@@ -99,7 +101,7 @@ class MediaFileService extends BaseService
             if (isset($data['file'])) {
 
                 // Delete old file from S3
-                AWSService::delete($mediaFile->file_path);
+                AWSService::delete($mediaFile->path);
 
                 // Upload new file
                 $file = $data['file'];
@@ -107,12 +109,12 @@ class MediaFileService extends BaseService
                 $filePath = AWSService::store($uploadFolderName, $file);
 
                 $updateData = [
-                    'file_path' => $filePath,
-                    'file_size' => $file->getSize(),
+                    'path' => $filePath,
+                    'size' => $file->getSize(),
                     'mime_type' => $file->getMimeType(),
+                    'name' => $file->getClientOriginalName(),
                     'width' => getimagesize($file)[0] ?? null,
                     'height' => getimagesize($file)[1] ?? null,
-                    'file_name' => $file->getClientOriginalName(),
                 ];
 
                 $mediaFile->update($updateData);
@@ -145,7 +147,7 @@ class MediaFileService extends BaseService
     {
         return DB::transaction(function () use ($mediaFile) {
 
-            AWSService::delete($mediaFile->file_path);
+            AWSService::delete($mediaFile->path);
             $deleted = $mediaFile->delete();
 
             if ($deleted) {
@@ -165,11 +167,11 @@ class MediaFileService extends BaseService
      */
     public function downloadMediaFile(MediaFile $mediaFile): Response
     {
-        $response = Http::get($mediaFile->file_path);
+        $response = Http::get($mediaFile->path);
 
         return response($response->body(), 200)
             ->header('Content-Type', 'image/png')
-            ->header('Content-Disposition', 'inline; filename="' . $mediaFile->file_name . '"');
+            ->header('Content-Disposition', 'inline; filename="' . $mediaFile->name . '"');
     }
 
     /**

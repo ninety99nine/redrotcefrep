@@ -34,7 +34,7 @@
                                 <img
                                     alt="Payment Method Logo"
                                     class="h-full object-contain"
-                                    :src="paymentMethod.configs.logo && paymentMethod.configs.logo.file_path ? paymentMethod.configs.logo.file_path : paymentMethod.logo"
+                                    :src="paymentMethod.configs.logo && paymentMethod.configs.logo.path ? paymentMethod.configs.logo.path : paymentMethod.logo"
                                 />
                             </div>
 
@@ -224,7 +224,7 @@
 
                     return sum + paymentMethod.config_schema.filter(configSchemaEntity => {
                         return paymentMethod.configs[configSchemaEntity.attribute] &&
-                            paymentMethod.configs[configSchemaEntity.attribute].file_path &&
+                            paymentMethod.configs[configSchemaEntity.attribute].path &&
                             paymentMethod.configs[configSchemaEntity.attribute].hasOwnProperty('uploaded');
                     }).length;
 
@@ -236,8 +236,8 @@
                     return sum + paymentMethod.config_schema.filter(config_schema_entity => {
                         const config = paymentMethod.configs[config_schema_entity.attribute];
 
-                        // Ensure config exists, has a file_path, and was NOT uploaded successfully
-                        return config?.file_path?.startsWith("blob:") && config.uploaded === false;
+                        // Ensure config exists, has a path, and was NOT uploaded successfully
+                        return config?.path?.startsWith("blob:") && config.uploaded === false;
                     }).length;
                 }, 0);
             },
@@ -365,7 +365,7 @@
                                 result.configs[config_schema_entity.attribute] = {
                                     id: logo?.id,  //  Not available when the logo has been deleted
                                     deleting: false,
-                                    file_path: logo?.file_path  //  Not available when the logo has been deleted
+                                    path: logo?.path  //  Not available when the logo has been deleted
                                 };
 
                             }else if (config_schema_entity.type === 'image' && config_schema_entity.attribute == 'photo') {
@@ -373,7 +373,7 @@
                                 result.configs[config_schema_entity.attribute] = {
                                     id: photo?.id,  //  Not available when the photo has been deleted
                                     deleting: false,
-                                    file_path: photo?.file_path  //  Not available when the photo has been deleted
+                                    path: photo?.path  //  Not available when the photo has been deleted
                                 };
 
                             }
@@ -438,7 +438,7 @@
                             if (config_schema_entity.type === 'image') {
 
                                 result.configs[config_schema_entity.attribute] = {
-                                    file_path:  null
+                                    path:  null
                                 };
 
                             }
@@ -516,7 +516,7 @@
 
                     const [message] = configSchemaEntity.validation_rules.qr_code;
 
-                    if (value?.file_path?.startsWith('blob:') && value?.valid_qr === false) {
+                    if (value?.path?.startsWith('blob:') && value?.valid_qr === false) {
                         errors.push(message);
                     }
                 }
@@ -762,7 +762,7 @@
                         uploaded: true,
                         deleting: false,
                         id: createdMediaFile.id,
-                        file_path: createdMediaFile.file_path
+                        path: createdMediaFile.path
                     };
 
                     console.log(`✅ Image for '${paymentMethod.name}' uploaded successfully.`);
@@ -793,7 +793,7 @@
 
                     await axios.delete(`/api/media-files/${paymentMethod.configs[attribute].id}`, config);
 
-                    paymentMethod.configs[attribute].file_path = null;
+                    paymentMethod.configs[attribute].path = null;
                     paymentMethod.configs[attribute].uploaded = false;
 
                     console.log(`✅ Successfully deleted ${attribute} for '${paymentMethod.name}'`);
