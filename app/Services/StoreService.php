@@ -4,10 +4,12 @@ namespace App\Services;
 
 use Exception;
 use Carbon\Carbon;
+use App\Models\Tag;
 use App\Models\User;
 use App\Models\Role;
 use App\Models\Store;
 use App\Enums\Platform;
+use App\Models\Category;
 use App\Models\Permission;
 use App\Enums\InsightPeriod;
 use Illuminate\Http\Response;
@@ -49,6 +51,21 @@ class StoreService extends BaseService
         $user = Auth::user();
 
         $store = $user->stores()->create($data);
+
+        // Create default tags
+        $defaultTags = ['popular', 'new'];
+        foreach ($defaultTags as $tagName) {
+            Tag::firstOrCreate([
+                'name' => $tagName,
+                'store_id' => $store->id,
+            ]);
+        }
+
+        // Create default category
+        Category::firstOrCreate([
+            'name' => 'General',
+            'store_id' => $store->id
+        ]);
 
         // Create roles
         $adminRole = Role::create(['name' => 'admin', 'store_id' => $store->id, 'guard_name' => 'sanctum']);

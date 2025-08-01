@@ -2,92 +2,50 @@
 
     <div class="pt-24 px-4">
 
-        <div class="select-none bg-white rounded-lg p-4 mb-4">
+        <div class="grid grid-cols-12 gap-4 mb-4">
 
-            <div class="flex justify-between items-center">
+            <div class="col-span-8 z-10">
 
-                <div class="flex items-center space-x-4">
+                <div class="select-none bg-white rounded-lg p-4 mb-4">
 
-                    <!-- Back Button -->
-                    <Button
-                        size="xs"
-                        type="light"
-                        :action="goBack"
-                        :leftIcon="MoveLeft">
-                        <span>Back</span>
-                    </Button>
+                    <div class="flex justify-between items-center">
 
-                    <div v-if="isLoadingStore || isLoadingProduct || (isEditing && !hasProduct)" class="flex items-center space-x-2">
-                        <Skeleton width="w-40"></Skeleton>
-                        <Skeleton width="w-4"></Skeleton>
-                    </div>
+                        <div class="flex items-center space-x-4">
 
-                    <template v-else>
+                            <!-- Back Button -->
+                            <Button
+                                size="xs"
+                                type="light"
+                                :action="goBack"
+                                :leftIcon="MoveLeft">
+                                <span>Back</span>
+                            </Button>
 
-                        <!-- Heading -->
-                        <div class="flex items-center space-x-1">
+                            <div v-if="isLoadingStore || isLoadingProduct || (isEditing && !hasProduct)" class="flex items-center space-x-2">
+                                <Skeleton width="w-40"></Skeleton>
+                                <Skeleton width="w-4"></Skeleton>
+                            </div>
 
-                            <h1 class="text-lg text-gray-700 font-semibold">
-                                {{ isCreating ? 'Add Product' : productForm.name || '...' }}
-                            </h1>
+                            <template v-else>
 
-                            <Popover title="What Is This?" content="Products are physical or non physical items that customers can place orders and pay for using your preferred payment methods" placement="top"></Popover>
+                                <!-- Heading -->
+                                <div class="flex items-center space-x-1">
+
+                                    <h1 class="text-lg text-gray-700 font-semibold">
+                                        {{ isCreating ? 'Add Product' : productForm.name || '...' }}
+                                    </h1>
+
+                                    <Popover title="What Is This?" content="Products are physical or non physical items that customers can place orders and pay for using your preferred payment methods" placement="top"></Popover>
+
+                                </div>
+
+                            </template>
 
                         </div>
 
-                    </template>
+                    </div>
 
                 </div>
-
-            </div>
-
-        </div>
-
-
-
-
-
-        <!-- General Error Info Alert -->
-        <Alert v-if="!(productForm.allow_variations && !hasVariantAttributes)" type="warning" class="flex justify-between items-center mb-2">
-
-            <div class="flex items-center space-x-2">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 3.75h.008v.008H12v-.008Z" />
-                </svg>
-                <span>
-                    <template v-if="!product && variantAttributesHaveChanged && hasVariantAttributes">Create your product and variations</template>
-                    <template v-else-if="variantAttributesHaveChanged && hasVariantAttributes">Create your product variations</template>
-                    <template v-else>{{ isCreating ? 'Create your product' : 'Please save your changes'}}</template>
-                </span>
-            </div>
-
-            <!-- Create Variations Button -->
-            <Button v-if="variantAttributesHaveChanged && hasVariantAttributes" type="primary" size="xs" :action="() => product ? createProductVariations() : createProduct()" :loading="isCreatingVariations" class="w-48">
-                <svg class="w-3 h-3 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904 9 18.75l-.813-2.846a4.5 4.5 0 0 0-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 0 0 3.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 0 0 3.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 0 0-3.09 3.09ZM18.259 8.715 18 9.75l-.259-1.035a3.375 3.375 0 0 0-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 0 0 2.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 0 0 2.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 0 0-2.456 2.456ZM16.894 20.567 16.5 21.75l-.394-1.183a2.25 2.25 0 0 0-1.423-1.423L13.5 18.75l1.183-.394a2.25 2.25 0 0 0 1.423-1.423l.394-1.183.394 1.183a2.25 2.25 0 0 0 1.423 1.423l1.183.394-1.183.394a2.25 2.25 0 0 0-1.423 1.423Z" />
-                </svg>
-                Create Variations
-            </Button>
-
-            <!-- Create Product / Save Changes Button -->
-            <Button v-else type="primary" size="xs" :action="isCreating ? createProduct : updateProduct" :loading="isSubmitting" class="w-40">
-                {{ isCreating ? 'Create Product' : 'Save Changes' }}
-            </Button>
-
-        </Alert>
-
-
-
-
-
-
-
-
-
-
-        <div class="grid grid-cols-12 gap-8 mb-8">
-
-            <div class="col-span-8 z-10">
 
                 <div class="relative mb-4">
 
@@ -119,7 +77,7 @@
                                     :options="visibilityTypes"
                                     v-model="productForm.visible"
                                     :errorText="formState.getFormError('visible')"
-                                    @change="productState.saveStateDebounced('Visible status changed')"
+                                    @change="productState.saveStateDebounced('Visibility status changed')"
                                     tooltipContent="Turn on if you want your product to be visible (Made available to customers)">
                                 </Select>
 
@@ -203,7 +161,7 @@
                                     v-model="productForm.sku"
                                     :errorText="formState.getFormError('sku')"
                                     @input="productState.saveStateDebounced('SKU changed')"
-                                    tooltipContent="The stock keeping unit of this product. Useful for stock management">
+                                    tooltipContent="The stock keeping unit for this product. Useful for stock management">
                                 </Input>
 
                                 <!-- Barcode Input -->
@@ -214,7 +172,7 @@
                                     v-model="productForm.barcode"
                                     :errorText="formState.getFormError('barcode')"
                                     @input="productState.saveStateDebounced('Barcode changed')"
-                                    tooltipContent="The barcode of this product. Useful for stock management">
+                                    tooltipContent="The barcode for this product. Useful for stock management">
                                 </Input>
 
                             </div>
@@ -225,264 +183,133 @@
 
                 </div>
 
-                <div class="relative mb-4">
+                <div
+                    class="relative mb-4"
+                    v-if="productForm.allow_variations == false">
 
                     <BackdropLoader v-if="isLoadingProduct || isSubmitting" :showSpinningLoader="false" class="rounded-lg"></BackdropLoader>
 
                     <div class="bg-white rounded-lg space-y-4 p-4">
 
-                        <!-- Non Variation Settings -->
-                        <template v-if="productForm.allow_variations == false">
+                        <p class="text-lg text-gray-700 font-semibold">Pricing</p>
 
-                            <p class="text-lg text-gray-700 font-semibold">Images</p>
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
 
-                            <Input
-                                type="file"
-                                :maxFiles="5"
-                                v-model="productForm.photos"
-                                @retryUploads="(files) => uploadImages()"
-                                @retryUpload="(file, fileIndex) => uploadImages(fileIndex)"
-                                @change="productState.saveStateDebounced('Photos changed')">
-                            </Input>
+                            <!-- If Free Switch -->
+                            <Switch
+                                size="xs"
+                                suffixText="Is Free"
+                                v-model="productForm.is_free"
+                                :errorText="formState.getFormError('is_free')"
+                                @change="productState.saveStateDebounced('Free status changed')"
+                                tooltipContent="Turn on if you want your product to be made Free for customers">
+                            </Switch>
 
-                        </template>
+                            <!-- If Free Switch -->
+                            <Switch
+                                size="xs"
+                                v-if="!productForm.is_free"
+                                suffixText="Display as estimated price"
+                                v-model="productForm.is_estimated_price"
+                                :errorText="formState.getFormError('is_estimated_price')"
+                                @change="productState.saveStateDebounced('Estimated price status changed')"
+                                tooltipContent="The checkout page will display the price as an estimated price. Customers will confirm with you before payment">
+                            </Switch>
 
-                    </div>
+                        </div>
 
-                </div>
+                        <!-- Info Alert -->
+                        <Alert v-if="productForm.is_free" type="success">
+                            <template #description>
+                                This product is <span class="font-bold">Free</span>
+                            </template>
+                        </Alert>
 
-                <div class="relative mb-4">
-
-                    <BackdropLoader v-if="isLoadingProduct || isSubmitting" :showSpinningLoader="false" class="rounded-lg"></BackdropLoader>
-
-                    <div class="bg-white rounded-lg space-y-4 p-4">
-
-                        <!-- Non Variation Settings -->
-                        <template v-if="productForm.allow_variations == false">
-
-                            <p class="text-lg text-gray-700 font-semibold">Pricing</p>
+                        <template v-else>
 
                             <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
 
-                                <!-- If Free Toggle Switch -->
-                                <Switch
-                                    size="xs"
-                                    suffixText="Is Free"
-                                    v-model="productForm.is_free"
-                                    :errorText="formState.getFormError('is_free')"
-                                    @change="productState.saveStateDebounced('Free status changed')"
-                                    tooltipContent="Turn on if you want your product to be made Free for customers">
-                                </Switch>
-
-                                <!-- If Free Toggle Switch -->
-                                <Switch
-                                    size="xs"
-                                    v-if="!productForm.is_free"
-                                    suffixText="Display as estimated price"
-                                    v-model="productForm.is_estimated_price"
-                                    :errorText="formState.getFormError('is_estimated_price')"
-                                    @change="productState.saveStateDebounced('Estimated price status changed')"
-                                    tooltipContent="The checkout page will display the price as an estimated price. Customers will confirm with you before payment">
-                                </Switch>
-
-                            </div>
-
-                            <!-- Info Alert -->
-                            <Alert v-if="productForm.is_free" type="success">
-                                <template #description>
-                                    This product is <span class="font-bold">Free</span>
-                                </template>
-                            </Alert>
-
-                            <template v-else>
-
-                                <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
-
-                                    <!-- Unit Regular Price Input -->
-                                    <Input
-                                        type="money"
-                                        label="Regular Price"
-                                        v-model="productForm.unit_regular_price"
-                                        :errorText="formState.getFormError('unit_regular_price')"
-                                        @input="productState.saveStateDebounced('Regular price changed')"
-                                        tooltipContent="Set the regular price of this product (How much the product is sold when its not on sale)">
-                                    </Input>
-
-                                    <!-- Unit Sale Price Input -->
-                                    <Input
-                                        type="money"
-                                        label="Sale Price"
-                                        v-model="productForm.unit_sale_price"
-                                        :errorText="formState.getFormError('unit_sale_price')"
-                                        @input="productState.saveStateDebounced('Sale price changed')"
-                                        tooltipContent="Set the sale price of this product (if the product is on sale)">
-                                    </Input>
-
-                                </div>
-
-                                <!-- Unit Cost Price Input -->
+                                <!-- Unit Regular Price Input -->
                                 <Input
                                     type="money"
-                                    label="Cost Price"
-                                    description="Invisible to customers"
-                                    v-model="productForm.unit_cost_price"
-                                    :errorText="formState.getFormError('unit_cost_price')"
-                                    @input="productState.saveStateDebounced('Cost price changed')"
-                                    tooltipContent="Set the cost price of this product (if the product is on sale)">
+                                    label="Regular Price"
+                                    v-model="productForm.unit_regular_price"
+                                    :errorText="formState.getFormError('unit_regular_price')"
+                                    @input="productState.saveStateDebounced('Regular price changed')"
+                                    tooltipContent="Set the regular price for this product (How much the product is sold when its not on sale)">
                                 </Input>
 
-                                <!-- Price Per Unit Checkbox -->
+                                <!-- Unit Sale Price Input -->
                                 <Input
-                                    type="checkbox"
-                                    inputLabel="Price per unit"
-                                    v-model="productForm.show_price_per_unit"
-                                    @change="productState.saveStateDebounced('Price per unit status changed')">
-                                </Input>
-
-                                <div v-if="productForm.show_price_per_unit" class="grid grid-cols-1 lg:grid-cols-2 gap-4">
-
-                                    <!-- Unit Value -->
-                                    <Input
-                                        type="number"
-                                        label="Unit Value"
-                                        v-model="productForm.unit_value"
-                                        :errorText="formState.getFormError('unit_value')"
-                                        @input="productState.saveStateDebounced('Unit value changed')">
-                                    </Input>
-
-                                    <!-- Unit Type -->
-                                    <Select
-                                        class="w-full"
-                                        :search="false"
-                                        label="Unit Type"
-                                        :options="pricePerUnitTypes"
-                                        v-model="productForm.unit_type"
-                                        :errorText="formState.getFormError('unit_type')"
-                                        @change="productState.saveStateDebounced('Unit type changed')">
-                                    </Select>
-
-                                </div>
-
-                                <!-- Tax Overide Checkbox -->
-                                <Input
-                                    type="checkbox"
-                                    inputLabel="Tax Overide"
-                                    v-model="productForm.tax_overide"
-                                    @change="productState.saveStateDebounced('Tax overide status changed')">
-                                </Input>
-
-                                <!-- Tax Overide Input -->
-                                <Input
-                                    type="number"
-                                    v-if="productForm.tax_overide"
-                                    v-model="productForm.tax_overide_amount"
-                                    :errorText="formState.getFormError('tax_overide_amount')"
-                                    @input="productState.saveStateDebounced('Tax overide changed')">
-                                </Input>
-
-                            </template>
-
-                            <div class="flex space-x-4">
-
-                                <!-- Stock Quantity Type Select -->
-                                <Select
-                                    class="w-40"
-                                    :search="false"
-                                    label="Available Stock"
-                                    :options="stockQuantityTypes"
-                                    v-model="productForm.stock_quantity_type"
-                                    :errorText="formState.getFormError('stock_quantity_type')"
-                                    @change="productState.saveStateDebounced('Stock quantity type changed')"
-                                    tooltipContent="Select the available stock e.g Unlimited means that stock is always available while limited means that stock is limited to the quatities specified">
-                                </Select>
-
-                                <!-- Stock Quantity Input -->
-                                <Input
-                                    min="1"
-                                    type="number"
-                                    v-model="productForm.stock_quantity"
-                                    label="Stock Quantity" placeholder="100"
-                                    v-if="productForm.stock_quantity_type == 'limited'"
-                                    :errorText="formState.getFormError('stock_quantity')"
-                                    @input="productState.saveStateDebounced('Stock quantity changed')"
-                                    tooltipContent="Set the stock quantity e.g 100 means that you only have 100 items of this product">
+                                    type="money"
+                                    label="Sale Price"
+                                    v-model="productForm.unit_sale_price"
+                                    :errorText="formState.getFormError('unit_sale_price')"
+                                    @input="productState.saveStateDebounced('Sale price changed')"
+                                    tooltipContent="Set the sale price for this product (if the product is on sale)">
                                 </Input>
 
                             </div>
 
-                        </template>
+                            <!-- Unit Cost Price Input -->
+                            <Input
+                                type="money"
+                                label="Cost Price"
+                                description="Invisible to customers"
+                                v-model="productForm.unit_cost_price"
+                                :errorText="formState.getFormError('unit_cost_price')"
+                                @input="productState.saveStateDebounced('Cost price changed')"
+                                tooltipContent="Set the cost price for this product (if the product is on sale)">
+                            </Input>
 
-                    </div>
+                            <!-- Price Per Unit Checkbox -->
+                            <Input
+                                type="checkbox"
+                                inputLabel="Price per unit"
+                                v-model="productForm.show_price_per_unit"
+                                @change="productState.saveStateDebounced('Price per unit status changed')">
+                            </Input>
 
-                </div>
+                            <div v-if="productForm.show_price_per_unit" class="grid grid-cols-1 lg:grid-cols-2 gap-4">
 
-                <div class="relative mb-4">
-
-                    <BackdropLoader v-if="isLoadingProduct || isSubmitting" :showSpinningLoader="false" class="rounded-lg"></BackdropLoader>
-
-                    <div class="bg-white rounded-lg space-y-4 p-4">
-
-                        <!-- Non Variation Settings -->
-                        <template v-if="productForm.allow_variations == false">
-
-                            <p class="text-lg text-gray-700 font-semibold">Pricing</p>
-
-                            <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
-
-                                <!-- Stock Quantity Type Select -->
-                                <Select
-                                    class="w-40"
-                                    :search="false"
-                                    label="Available Stock"
-                                    :options="stockQuantityTypes"
-                                    v-model="productForm.stock_quantity_type"
-                                    :errorText="formState.getFormError('stock_quantity_type')"
-                                    @change="productState.saveStateDebounced('Stock quantity type changed')"
-                                    tooltipContent="Select the available stock e.g Unlimited means that stock is always available while limited means that stock is limited to the quatities specified">
-                                </Select>
-
-                                <!-- Stock Quantity Input -->
+                                <!-- Unit Value -->
                                 <Input
-                                    min="1"
                                     type="number"
-                                    v-model="productForm.stock_quantity"
-                                    label="Stock Quantity" placeholder="100"
-                                    v-if="productForm.stock_quantity_type == 'limited'"
-                                    :errorText="formState.getFormError('stock_quantity')"
-                                    @input="productState.saveStateDebounced('Stock quantity changed')"
-                                    tooltipContent="Set the stock quantity e.g 100 means that you only have 100 items of this product">
+                                    label="Unit Value"
+                                    v-model="productForm.unit_value"
+                                    :errorText="formState.getFormError('unit_value')"
+                                    @input="productState.saveStateDebounced('Unit value changed')">
                                 </Input>
+
+                                <!-- Unit Type -->
+                                <Select
+                                    class="w-full"
+                                    :search="false"
+                                    label="Unit Type"
+                                    :options="pricePerUnitTypes"
+                                    v-model="productForm.unit_type"
+                                    :errorText="formState.getFormError('unit_type')"
+                                    @change="productState.saveStateDebounced('Unit type changed')">
+                                </Select>
 
                             </div>
 
-                            <div class="flex space-x-4">
+                            <!-- Tax Overide Checkbox -->
+                            <Input
+                                type="checkbox"
+                                inputLabel="Tax Overide"
+                                v-model="productForm.tax_overide"
+                                @change="productState.saveStateDebounced('Tax overide status changed')">
+                            </Input>
 
-                                <!-- Quantities Per Order Select -->
-                                <Select
-                                    class="w-40"
-                                    :search="false"
-                                    label="Quantities Per Order"
-                                    :options="allowedQuantityPerOrder"
-                                    v-model="productForm.allowed_quantity_per_order"
-                                    :errorText="formState.getFormError('allowed_auantity_per_order')"
-                                    @change="productState.saveStateDebounced('Allowed quantity per order changed')"
-                                    tooltipContent="Select the maximum quantity per order of this product (Used to manage supply and demand) e.g Unlimited means that a customer can specify any quantity while limited means that a customer can only specify up to the maximum quantity that you support">
-                                </Select>
-
-                                <!-- Maximum Allowed Quantity Per Order Input -->
-                                <Input
-                                    min="1"
-                                    type="number"
-                                    placeholder="10"
-                                    label="Maximum Quantities Per Order"
-                                    v-model="productForm.maximum_allowed_quantity_per_order"
-                                    v-if="productForm.allowed_quantity_per_order == 'limited'"
-                                    :errorText="formState.getFormError('maximum_allowed_auantity_per_order')"
-                                    @input="productState.saveStateDebounced('Maximum allowed quantity per order changed')"
-                                    tooltipContent="Set the maximum quantity per order of this product (Used to manage supply and demand) e.g 10 means that a customer can only specify a quantity of 1 up to 10 when placing an order. They will not be permitted to order anymore than this quantity">
-                                </Input>
-
-                            </div>
+                            <!-- Tax Overide Input -->
+                            <Input
+                                type="number"
+                                v-if="productForm.tax_overide"
+                                v-model="productForm.tax_overide_amount"
+                                :errorText="formState.getFormError('tax_overide_amount')"
+                                @input="productState.saveStateDebounced('Tax overide changed')">
+                            </Input>
 
                         </template>
 
@@ -496,7 +323,7 @@
 
                     <div class="bg-white rounded-lg space-y-4 p-4">
 
-                        <!-- Allow Variations Toggle Switch -->
+                        <!-- Allow Variations Switch -->
                         <Switch
                             size="xs"
                             suffixText="Allow variations"
@@ -521,7 +348,7 @@
                                     <p v-else-if="productForm.allow_variations">Click the <Pill type="primary" size="xs">+ Add Option</Pill> button to add different variations of your product e.g different sizes, materials, colors, etc</p>
                                     <p v-else>Turn on <Pill type="primary" size="xs">Allow variations</Pill> if you want your product to support variations (different versions of itself e.g different sizes, materials, colors, etc)</p>
 
-                                    <!-- Allow Variations Toggle Switch -->
+                                    <!-- Allow Variations Switch -->
                                     <Switch
                                         size="md"
                                         suffixText="Allow variations"
@@ -689,44 +516,146 @@
 
             <div class="col-span-4">
 
-                <div class="bg-white rounded-lg p-4 mb-4 relative">
+                <div
+                    class="relative mb-4"
+                    v-if="productForm.allow_variations == false">
 
-                    <!-- Loading Backdrop -->
                     <BackdropLoader v-if="isLoadingProduct || isSubmitting" :showSpinningLoader="false" class="rounded-lg"></BackdropLoader>
 
-                    <div class="space-y-4">
+                    <div class="bg-white rounded-lg space-y-4 p-4">
 
-                        <div class="flex items-center space-x-4">
+                        <p class="text-lg text-gray-700 font-semibold">Images</p>
 
-                            <!-- Open Eye Icon -->
-                            <svg v-if="productForm.visible" @click="productForm.visible = !productForm.visible" class="w-6 h-6 cursor-pointer" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" />
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
-                            </svg>
+                        <Input
+                            type="file"
+                            :maxFiles="5"
+                            v-model="productForm.photos"
+                            @retryUploads="(files) => uploadImages()"
+                            @retryUpload="(file, fileIndex) => uploadImages(fileIndex)"
+                            @change="productState.saveStateDebounced('Photos changed')">
+                        </Input>
 
-                            <!-- Closed Eye Icon -->
-                            <svg v-else @click="productForm.visible = !productForm.visible" class="w-6 h-6 cursor-pointer" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M3.98 8.223A10.477 10.477 0 0 0 1.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.451 10.451 0 0 1 12 4.5c4.756 0 8.773 3.162 10.065 7.498a10.522 10.522 0 0 1-4.293 5.774M6.228 6.228 3 3m3.228 3.228 3.65 3.65m7.894 7.894L21 21m-3.228-3.228-3.65-3.65m0 0a3 3 0 1 0-4.243-4.243m4.242 4.242L9.88 9.88" />
-                            </svg>
+                    </div>
 
-                            <!-- Visible Toggle Switch -->
-                            <Switch
-                                size="xs"
-                                suffixText="Show Product"
-                                v-model="productForm.visible"
-                                :errorText="formState.getFormError('visible')"
-                                @change="productState.saveStateDebounced('Visible status changed')"
-                                tooltipContent="Turn on if you want your product to be visible (Made available to customers)">
-                            </Switch>
+                </div>
 
-                        </div>
+                <div
+                    class="relative mb-4"
+                    v-if="productForm.allow_variations == false">
 
-                        <!-- Info Alert -->
-                        <Alert
-                            type="warning"
-                            v-if="!productForm.visible">
-                            This product has been <span class="font-bold">hidden</span> from customers visiting your store
-                        </Alert>
+                    <BackdropLoader v-if="isLoadingProduct || isSubmitting" :showSpinningLoader="false" class="rounded-lg"></BackdropLoader>
+
+                    <div class="bg-white rounded-lg space-y-4 p-4">
+
+                        <p class="text-lg text-gray-700 font-semibold">Inventory</p>
+
+                        <!-- Stock Quantity Type Select -->
+                        <Select
+                            label="Stock"
+                            class="w-full"
+                            :search="false"
+                            :options="stockQuantityTypes"
+                            v-model="productForm.stock_quantity_type"
+                            :errorText="formState.getFormError('stock_quantity_type')"
+                            @change="productState.saveStateDebounced('Stock quantity type changed')"
+                            tooltipContent="Select the available stock e.g Unlimited means that stock is always available while limited means that stock is limited to the quatities specified">
+                        </Select>
+
+                        <!-- Stock Quantity Input -->
+                        <Input
+                            min="1"
+                            type="number"
+                            v-model="productForm.stock_quantity"
+                            label="Stock Quantity" placeholder="100"
+                            v-if="productForm.stock_quantity_type == 'limited'"
+                            :errorText="formState.getFormError('stock_quantity')"
+                            @input="productState.saveStateDebounced('Stock quantity changed')"
+                            tooltipContent="Set the stock quantity e.g 100 means that you only have 100 items for this product">
+                        </Input>
+
+                        <!-- Daily Capacity Switch -->
+                        <Switch
+                            size="xs"
+                            suffixText="Daily Capacity"
+                            v-model="productForm.set_daily_capacity"
+                            :errorText="formState.getFormError('set_daily_capacity')"
+                            tooltipContent="The maximum number number of items you can sell per day"
+                            @change="productState.saveStateDebounced('Daily capacity status changed')">
+                        </Switch>
+
+                        <!-- Daily Capacity Input -->
+                        <Input
+                            min="1"
+                            type="number"
+                            placeholder="10"
+                            v-model="productForm.daily_capacity"
+                            v-if="productForm.set_daily_capacity"
+                            :errorText="formState.getFormError('daily_capacity')"
+                            @input="productState.saveStateDebounced('Daily capacity changed')">
+                        </Input>
+
+                        <!-- Minimum Quantities Per Order Switch -->
+                        <Switch
+                            size="xs"
+                            suffixText="Minimum Order Quantity"
+                            v-model="productForm.set_min_order_quantity"
+                            :errorText="formState.getFormError('set_min_order_quantity')"
+                            @change="productState.saveStateDebounced('Minimum order quantity status changed')"
+                            tooltipContent="Set the minimum order quantity for this product (Used to manage supply and demand)">
+                        </Switch>
+
+                        <!-- Minimum Allowed Quantity Per Order Input -->
+                        <Input
+                            min="1"
+                            type="number"
+                            placeholder="10"
+                            v-model="productForm.min_order_quantity"
+                            v-if="productForm.set_min_order_quantity"
+                            :errorText="formState.getFormError('min_order_quantity')"
+                            @input="productState.saveStateDebounced('Minimum order quantity changed')">
+                        </Input>
+
+                        <!-- Maximum Quantities Per Order Switch -->
+                        <Switch
+                            size="xs"
+                            suffixText="Maximum Order Quantity"
+                            v-model="productForm.set_max_order_quantity"
+                            :errorText="formState.getFormError('set_max_order_quantity')"
+                            @change="productState.saveStateDebounced('Maximum order quantity status changed')"
+                            tooltipContent="Set the maximum order quantity for this product (Used to manage supply and demand)">
+                        </Switch>
+
+                        <!-- Maximum Allowed Quantity Per Order Input -->
+                        <Input
+                            min="1"
+                            type="number"
+                            placeholder="10"
+                            v-model="productForm.max_order_quantity"
+                            v-if="productForm.set_max_order_quantity"
+                            :errorText="formState.getFormError('max_order_quantity')"
+                            @input="productState.saveStateDebounced('Maximum order quantity changed')">
+                        </Input>
+
+                    </div>
+
+                </div>
+
+                <div
+                    class="relative mb-4"
+                    v-if="productForm.allow_variations == false">
+
+                    <BackdropLoader v-if="isLoadingProduct || isSubmitting" :showSpinningLoader="false" class="rounded-lg"></BackdropLoader>
+
+                    <div class="bg-white rounded-lg space-y-4 p-4">
+
+                        <p class="text-lg text-gray-700 font-semibold">Tags</p>
+
+                        <!-- Tags -->
+                        <SelectTags
+                            :options="tags"
+                            v-model="productForm.tags"
+                            :errorText="formState.getFormError('tags')"
+                            @change="productState.saveStateDebounced('Tags changed')" />
 
                     </div>
 
@@ -734,50 +663,55 @@
 
             </div>
 
+        </div>
 
-            <div v-if="productForm.allow_variations && hasOriginalVariantAttributes" class="col-span-12">
+        <template v-if="productForm.allow_variations && hasOriginalVariantAttributes">
 
-                <!-- Variation List -->
-                <div class="space-y-4 bg-white shadow-lg rounded-lg border p-4">
+            <!-- Variation List -->
+            <div class="space-y-4 bg-white shadow-lg rounded-lg border border-gray-300 p-4 mb-4">
 
-                    <template v-if="variantAttributesHaveChanged">
+                <template v-if="variantAttributesHaveChanged">
 
-                        <!-- Info Alert -->
-                        <Alert class="flex items-start space-x-2">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 3.75h.008v.008H12v-.008Z" />
-                            </svg>
-                            <div>
-                                The variation options have been changed. You can
-                                <template v-if="hasVariantAttributes">
-                                    either
-                                    <span @click="() => createProductVariations()" class="font-bold underline cursor-pointer">
-                                    Create New Variations
+                    <!-- Info Alert -->
+                    <Alert type="light" class="flex items-start space-x-2">
+
+                        <template #description>
+                            <div class="flex space-x-2">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 3.75h.008v.008H12v-.008Z" />
+                                </svg>
+                                <div>
+                                    The variation options have been changed. You can
+                                    <template v-if="hasVariantAttributes">
+                                        either
+                                        <span @click="() => createProductVariations()" class="font-bold underline cursor-pointer">
+                                        Create New Variations
+                                        </span>
+                                        or
+                                    </template>
+                                    <span @click="onResetVariantAttributes" class="font-bold underline cursor-pointer">
+                                        Undo Changes
                                     </span>
-                                    or
-                                </template>
-                                <span @click="onResetVariantAttributes" class="font-bold underline cursor-pointer">
-                                    Undo Changes
-                                </span>
-                                to revert back to the original variations you had before.
+                                    to revert back to the original variations you had before.
+                                </div>
                             </div>
-                        </Alert>
+                        </template>
 
-                    </template>
+                    </Alert>
 
-                    <ProductVariations
-                        :product="product"
-                        v-else-if="product"
-                        :isLoadingProduct="isLoadingProduct"
-                        :isCreatingVariations="isCreatingVariations"
-                        @totalProductVariations="(total) => totalProductVariations = total">
-                    </ProductVariations>
+                </template>
 
-                </div>
+                <ProductVariations
+                    :product="product"
+                    v-else-if="product"
+                    :isLoadingProduct="isLoadingProduct"
+                    :isCreatingVariations="isCreatingVariations"
+                    @totalProductVariations="(total) => totalProductVariations = total">
+                </ProductVariations>
 
             </div>
 
-        </div>
+        </template>
 
         <div
             v-if="product"
@@ -839,14 +773,12 @@
                 Plus,
                 Trash2,
                 MoveLeft,
+                tags: [],
+                categories: [],
                 isUploading: false,
                 createdProduct: null,
                 setupCompleted: false,
                 totalProductVariations: null,
-                categories: [
-                    { label: 'Hot today 🔥', value: 'Hot today 🔥'},
-                    { label: 'Drinks 🥤', value: 'Drinks 🥤'}
-                ],
                 pricePerUnitTypes: [
                     { label: 'G', value: 'g'},
                     { label: 'KG', value: 'kg'},
@@ -885,14 +817,12 @@
         },
         watch: {
             store(newValue) {
-                if(newValue && this.isEditing) {
-                    console.log('STAGE 1 !!!!!!!!!!');
+                if(newValue) {
                     this.setup();
                 }
             },
             '$route.params.product_id'(newValue) {
                 if(newValue) {
-                    console.log('STAGE 2 !!!!!!!!!!');
                     this.setup();
                     this.setActionButtons();
                 }
@@ -951,18 +881,25 @@
                 this.navigateToProducts();
             },
             async setup() {
-                console.log('PART 1');
-                if(this.isEditing) {
-                console.log('PART 2.1');
-                console.log('this.productForm');
-                console.log(this.productForm);
-                console.log('this.store');
-                console.log(this.store);
-                    if(this.productForm == null) this.productState.setProductForm(null, false);
-                    if(this.store) await this.showProduct();
-                }else{
-                console.log('PART 2.2');
-                    this.productState.setProductForm(null);
+                if(this.productForm == null) this.productState.setProductForm(null, this.isCreating);
+                if(this.isEditing && this.store) await this.showProduct();
+
+                if(this.store) {
+
+                    this.tags = this.store.tags.map((tag) => {
+                        return {
+                            label: tag.name,
+                            value: tag.id
+                        }
+                    });
+
+                    this.categories = this.store.categories.map((category) => {
+                        return {
+                            label: category.name,
+                            value: category.id
+                        }
+                    });
+
                 }
             },
             async navigateToProducts() {
@@ -1007,7 +944,7 @@
                     let config = {
                         params: {
                             store_id: this.store.id,
-                            _relationships: ['photos'].join(',')
+                            _relationships: ['photos', 'tags', 'categories'].join(',')
                         }
                     };
 
@@ -1190,7 +1127,10 @@
 
                 try {
 
-                    if(!(this.variantAttributesHaveChanged && this.hasVariantAttributes) || !(this.totalProductVariations == 0 && this.hasVariantAttributes)) return;
+                    const condition1 = this.variantAttributesHaveChanged && this.hasVariantAttributes;
+                    const condition2 = this.totalProductVariations == 0 && this.hasVariantAttributes;
+
+                    if(!condition1 && !condition2) return;
                     if(this.productState.isCreatingVariations) return;
 
                     this.productState.isCreatingVariations = true;

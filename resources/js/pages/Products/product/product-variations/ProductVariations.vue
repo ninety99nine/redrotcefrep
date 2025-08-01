@@ -268,10 +268,10 @@
                                     </div>
                                 </td>
 
-                                <!-- Quantity Per Order -->
-                                <td v-else-if="column.name == 'Quantity Per Order'" class="align-top pr-4 py-4 text-sm">
+                                <!-- Minimum Order Quantity -->
+                                <td v-else-if="column.name == 'Minimum Order Quantity'" class="align-top pr-4 py-4 text-sm">
                                     <div class="flex space-x-1 items-center">
-                                        <Pill type="light" size="xs">{{ product.allowed_quantity_per_order == 'unlimited' ? 'Unlimited' : product.maximum_allowed_quantity_per_order }}</Pill>
+                                        <Pill type="light" size="xs">{{ product.set_min_order_quantity ? product.min_order_quantity : 'none' }}</Pill>
                                         <Popover
                                             placement="top"
                                             wrapperClasses="opacity-0 group-hover:opacity-100">
@@ -280,8 +280,31 @@
 
                                                 <div class="min-w-40 p-4">
 
-                                                <p class="border-b border-gray-300 pb-2 mb-2">Quantity Per Order</p>
-                                                <p>{{ product.allowed_quantity_per_order == 'unlimited' ? 'Allows unlimited quantity per order' : `Allows maximum of ${product.maximum_allowed_quantity_per_order} ${product.maximum_allowed_quantity_per_order == 1 ? 'quantity' : 'quantities' } per order` }}</p>
+                                                <p class="border-b border-gray-300 pb-2 mb-2">Minimum Order Quantity</p>
+                                                <p>{{ product.set_min_order_quantity ? `Allows minimum of ${product.min_order_quantity} ${product.min_order_quantity == 1 ? 'quantity' : 'quantities' } per order` : 'Does not have any limits' }}</p>
+
+                                                </div>
+
+                                            </template>
+
+                                        </Popover>
+                                    </div>
+                                </td>
+
+                                <!-- Maximum Order Quantity -->
+                                <td v-else-if="column.name == 'Maximum Order Quantity'" class="align-top pr-4 py-4 text-sm">
+                                    <div class="flex space-x-1 items-center">
+                                        <Pill type="light" size="xs">{{ product.set_max_order_quantity ? product.max_order_quantity : 'none' }}</Pill>
+                                        <Popover
+                                            placement="top"
+                                            wrapperClasses="opacity-0 group-hover:opacity-100">
+
+                                            <template #content>
+
+                                                <div class="min-w-40 p-4">
+
+                                                <p class="border-b border-gray-300 pb-2 mb-2">Maximum Order Quantity</p>
+                                                <p>{{ product.set_max_order_quantity ? `Allows maximum of ${product.max_order_quantity} ${product.max_order_quantity == 1 ? 'quantity' : 'quantities' } per order` : 'Does not have any limits' }}</p>
 
                                                 </div>
 
@@ -800,7 +823,7 @@
             formattedDatetime: formattedDatetime,
             formattedRelativeDate: formattedRelativeDate,
             prepareColumns() {
-                const columnNames = ['Name', 'Description', 'Visible', 'Price', 'Stock', 'Variations', 'Quantity Per Order', 'Position', 'Created Date'];
+                const columnNames = ['Name', 'Description', 'Visible', 'Price', 'Stock', 'Variations', 'Minimum Order Quantity', 'Maximum Order Quantity', 'Position', 'Created Date'];
                 const defaultColumnNames  = ['Name', 'Description', 'Visible', 'Price', 'Stock', 'Variations', 'Position', 'Created Date'];
 
                 return columnNames.map(name => ({
@@ -810,7 +833,7 @@
                 }));
             },
             prepareWhatsappFields() {
-                const whatsappFieldNames = ['Name', 'Description', 'Visible', 'Unit Regular Price', 'Unit Sale Price', 'Unit Price', 'Stock', 'Variations', 'Quantity Per Order', 'Position', 'Created Date', 'Product Link'];
+                const whatsappFieldNames = ['Name', 'Description', 'Visible', 'Unit Regular Price', 'Unit Sale Price', 'Unit Price', 'Stock', 'Variations', 'Minimum Order Quantity', 'Maximum Order Quantity', 'Position', 'Created Date', 'Product Link'];
                 const defaultWhatsappFieldNames  = ['Name', 'Description', 'Visible', 'Unit Price', 'Stock', 'Variations', 'Position', 'Created Date'];
 
                 return whatsappFieldNames.map(name => ({
@@ -1287,8 +1310,11 @@
                                 case "Variations":
                                     productMessage += `${checkedProducts[i].allow_variations ? checkedProducts[i].total_visible_variations : 'none'}\n`;
                                     break;
-                                case "Quantity Per Order":
-                                    productMessage += `${checkedProducts[i].allowed_quantity_per_order == 'unlimited' ? 'unlimited' : checkedProducts[i].maximum_allowed_quantity_per_order}\n`;
+                                case "Minimum Order Quantity":
+                                    productMessage += `${checkedProducts[i].set_min_order_quantity ? checkedProducts[i].min_order_quantity : 'none'}\n`;
+                                    break;
+                                case "Maximum Order Quantity":
+                                    productMessage += `${checkedProducts[i].set_max_order_quantity ? checkedProducts[i].max_order_quantity : 'none'}\n`;
                                     break;
                                 case "Position":
                                     productMessage += `${checkedProducts[i].position}\n`;

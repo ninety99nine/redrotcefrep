@@ -53,7 +53,8 @@ class ProductExport implements FromCollection, WithHeadings, ShouldAutoSize, Wit
                 'Unit Sale Price' => $product->unit_sale_price->amount_without_currency,
                 'Unit Price' => $product->unit_price->amount_without_currency,
                 'Stock' => $product->has_stock ? ($product->stock_quantity_type == 'unlimited' ? 'unlimited' : $product->stock_quantity) : 'no stock',
-                'Quantity Per Order' => $product->allowed_quantity_per_order == 'unlimited' ? 'unlimited' : $product->maximum_allowed_quantity_per_order,
+                'Min Order Quantity' => $product->set_min_order_quantity ? $product->min_order_quantity : 'none',
+                'Max Order Quantity' => $product->set_max_order_quantity ? $product->max_order_quantity : 'none',
                 'Position' => $product->position,
                 'Variations' => $product->allow_variations ? $product->total_visible_variations : 'none',
                 'Created Date' => $product->created_at->format('Y-m-d')

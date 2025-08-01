@@ -2,10 +2,11 @@
 
 namespace App\Http\Requests\Product;
 
+use App\Enums\ProductType;
 use Illuminate\Support\Arr;
+use App\Enums\ProductUnitType;
 use Illuminate\Validation\Rule;
 use App\Enums\StockQuantityType;
-use App\Enums\AllowedQuantityPerOrder;
 use Illuminate\Foundation\Http\FormRequest;
 
 class UpdateProductRequest extends FormRequest
@@ -31,6 +32,7 @@ class UpdateProductRequest extends FormRequest
 
         return [
             'name' => ['sometimes', 'string', 'max:60'],
+            'type' => ['sometimes', Rule::enum(ProductType::class)],
             'visible' => ['nullable', 'boolean'],
             'visibility_expires_at' => ['nullable', 'date'],
             'show_description' => ['nullable', 'boolean'],
@@ -44,6 +46,13 @@ class UpdateProductRequest extends FormRequest
             'total_visible_variations' => ['nullable', 'integer', 'min:0', 'max:255'],
             'unit_weight' => ['nullable', 'numeric', 'min:0'],
             'is_free' => ['nullable', 'boolean'],
+            'is_estimated_price' => ['nullable', 'boolean'],
+            'show_price_per_unit' => ['nullable', 'boolean'],
+            'tax_overide' => ['nullable', 'boolean'],
+            'tax_overide_amount' => ['nullable', 'numeric', 'min:0'],
+            'download_link' => ['nullable', 'url'],
+            'unit_type' => ['nullable', Rule::enum(ProductUnitType::class)],
+            'unit_value' => ['nullable', 'numeric', 'min:0'],
             'currency' => ['nullable', 'string', 'size:3'],
             'unit_regular_price' => ['nullable', 'numeric', 'min:0'],
             'on_sale' => ['nullable', 'boolean'],
@@ -57,8 +66,12 @@ class UpdateProductRequest extends FormRequest
             'unit_profit_percentage' => ['nullable', 'integer', 'min:0', 'max:65535'],
             'unit_loss' => ['nullable', 'numeric', 'min:0'],
             'unit_loss_percentage' => ['nullable', 'integer', 'min:0', 'max:65535'],
-            'allowed_quantity_per_order' => ['nullable', Rule::enum(AllowedQuantityPerOrder::class)],
-            'maximum_allowed_quantity_per_order' => ['nullable', 'integer', 'min:1', 'max:65535'],
+            'set_min_order_quantity' => ['sometimes', 'boolean'],
+            'set_max_order_quantity' => ['sometimes', 'boolean'],
+            'min_order_quantity' => ['nullable', 'integer', 'min:1', 'max:65535'],
+            'max_order_quantity' => ['nullable', 'integer', 'min:1', 'max:65535'],
+            'set_daily_capacity' => ['sometimes', 'boolean'],
+            'daily_capacity' => ['nullable', 'integer', 'min:1', 'max:16777215'],
             'has_stock' => ['nullable', 'boolean'],
             'stock_quantity_type' => ['nullable', Rule::enum(StockQuantityType::class)],
             'stock_quantity' => ['nullable', 'integer', 'min:0', 'max:16777215'],
@@ -66,6 +79,10 @@ class UpdateProductRequest extends FormRequest
             'parent_product_id' => ['nullable', 'uuid', 'exists:products,id'],
             'user_id' => ['nullable', 'uuid', 'exists:users,id'],
             'store_id' => ['sometimes', 'uuid', 'exists:stores,id'],
+            'tags' => ['nullable', 'array'],
+            'tags.*' => ['string'],
+            'categories' => ['nullable', 'array'],
+            'categories.*' => ['string'],
         ];
     }
 
@@ -79,6 +96,7 @@ class UpdateProductRequest extends FormRequest
         return [
             'name.string' => 'The product name must be a string.',
             'name.max' => 'The product name must not exceed 60 characters.',
+            'type.enum' => 'The product type must be one of: ' . Arr::join(ProductType::values(), ', ', ' or '),
             'sku.unique' => 'This SKU is already in use.',
             'sku.max' => 'The SKU must not exceed 50 characters.',
             'barcode.max' => 'The barcode must not exceed 50 characters.',
@@ -114,9 +132,16 @@ class UpdateProductRequest extends FormRequest
             'total_visible_variations.integer' => 'The total visible variations must be an integer.',
             'total_visible_variations.min' => 'The total visible variations must be at least 0.',
             'total_visible_variations.max' => 'The total visible variations must not exceed 255.',
-            'maximum_allowed_quantity_per_order.integer' => 'The maximum allowed quantity per order must be an integer.',
-            'maximum_allowed_quantity_per_order.min' => 'The maximum allowed quantity per order must be at least 1.',
-            'maximum_allowed_quantity_per_order.max' => 'The maximum allowed quantity per order must not exceed 65535.',
+            'min_order_quantity.integer' => 'The minimum order quantity must be an integer.',
+            'min_order_quantity.min' => 'The minimum order quantity must be at least 1.',
+            'min_order_quantity.max' => 'The minimum order quantity must not exceed 65535.',
+            'max_order_quantity.integer' => 'The maximum order quantity must be an integer.',
+            'max_order_quantity.min' => 'The maximum order quantity must be at least 1.',
+            'max_order_quantity.max' => 'The maximum order quantity must not exceed 65535.',
+            'set_daily_capacity.boolean' => 'The set daily capacity must be a boolean.',
+            'daily_capacity.integer' => 'The daily capacity must be an integer.',
+            'daily_capacity.min' => 'The daily capacity must be at least 1.',
+            'daily_capacity.max' => 'The daily capacity must not exceed 16777215.',
             'stock_quantity.integer' => 'The stock quantity must be an integer.',
             'stock_quantity.min' => 'The stock quantity must be at least 0.',
             'stock_quantity.max' => 'The stock quantity must not exceed 16777215.',
@@ -130,8 +155,19 @@ class UpdateProductRequest extends FormRequest
             'store_id.uuid' => 'The store ID must be a valid UUID.',
             'store_id.exists' => 'The specified store does not exist.',
             'variant_attributes.array' => 'The variant attributes must be an array.',
-            'allowed_quantity_per_order.enum' => 'The allowed quantity per order must be one of: ' . Arr::join(AllowedQuantityPerOrder::values(), ', ', ' or '),
+            'set_min_order_quantity.boolean' => 'The minimum order quantity must be a boolean.',
+            'set_max_order_quantity.boolean' => 'The maximum order quantity must be a boolean.',
             'stock_quantity_type.enum' => 'The stock quantity type must be one of: ' . Arr::join(StockQuantityType::values(), ', ', ' or '),
+            'tags.array' => 'The tags must be an array.',
+            'tags.string' => 'The product tags must be a string.',
+            'categories.array' => 'The categories must be an array.',
+            'categories.string' => 'The product categories must be a string.',
+            'download_link.url' => 'The download link must be a valid URL.',
+            'unit_type.enum' => 'The unit type must be one of: ' . Arr::join(ProductUnitType::values(), ', ', ' or '),
+            'unit_value.numeric' => 'The unit value must be a number.',
+            'unit_value.min' => 'The unit value must be at least 0.',
+            'tax_overide_amount.numeric' => 'The tax override amount must be a number.',
+            'tax_overide_amount.min' => 'The tax override amount must be at least 0.',
         ];
     }
 }

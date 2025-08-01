@@ -17,6 +17,8 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Collection;
 use App\Http\Resources\ProductResource;
 use App\Http\Resources\ProductResources;
+use App\Models\Category;
+use App\Models\Tag;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use \Symfony\Component\HttpFoundation\BinaryFileResponse;
 
@@ -57,13 +59,58 @@ class ProductService extends BaseService
     public function createProduct(array $data): array
     {
         $storeId = $data['store_id'];
-        $store = Store::find($storeId);
+        $store = Store::findOrFail($storeId);
+
+        $tags = $data['tags'] ?? null;
+        $categories = $data['categories'] ?? null;
+        unset($data['tags'], $data['categories']);
 
         $data = array_merge($data, [
             'currency' => $store->currency
         ]);
 
         $product = Product::create($data);
+
+        // Process tags
+        $tagIds = [];
+
+        if (!empty($tags)) {
+
+            $existingTags = $store->tags;
+
+            // Match tags by UUID or name
+            $matchingUuidTags = $existingTags->filter(fn($existingTag) => collect($tags)->contains($existingTag->id));
+            $matchingNameTags = $existingTags->filter(fn($existingTag) => collect($tags)->contains($existingTag->name));
+
+            // Non-matching tags (new tags to create)
+            $nonMatchingNameTags = collect($tags)->filter(function ($tag) use ($existingTags) {
+                return !Str::isUuid($tag) && !$existingTags->contains('name', $tag);
+            })->unique()->values();
+
+            // Create new tags
+            foreach ($nonMatchingNameTags as $tagName) {
+                $newTag = Tag::create([
+                    'name' => $tagName,
+                    'store_id' => $storeId
+                ]);
+                $tagIds[] = $newTag->id;
+            }
+
+            // Combine all tag IDs (UUIDs, matching names, new tags)
+            $tagIds = array_merge(
+                $tagIds,
+                $matchingUuidTags->pluck('id')->toArray(),
+                $matchingNameTags->pluck('id')->toArray()
+            );
+        }
+
+        if(!is_null($tags)) {
+            $this->createProductTags($product, $tags);
+        }
+
+        if(!is_null($categories)) {
+            $this->createProductCategories($product, $categories);
+        }
 
         $this->updateProductArrangement([
             'store_id' => $storeId,
@@ -95,12 +142,45 @@ class ProductService extends BaseService
     {
         $storeId = $data['store_id'];
         $productIds = $data['product_ids'];
-        $totalProducts = count($productIds);
         $fillableData = array_intersect_key($data, array_flip([
             'visible'
         ]));
 
-        Product::whereIn('id', $productIds)->where('store_id', $storeId)->update($fillableData);
+        $query = Product::whereIn('id', $productIds)->where('store_id', $storeId);
+
+        $products = $query->get();
+        $query->update($fillableData);
+        $totalProducts = count($products);
+
+        if($totalProducts) {
+
+            if (!empty($data['tags_to_add'])) {
+                foreach ($products as $product) {
+                    $product->tags()->syncWithoutDetaching($data['tags_to_add']);
+                }
+            }
+
+            if (!empty($data['tags_to_remove'])) {
+                foreach ($products as $product) {
+                    $product->tags()->detach($data['tags_to_remove']);
+                }
+            }
+
+            if (!empty($data['categories_to_add'])) {
+                foreach ($products as $product) {
+                    $product->categories()->syncWithoutDetaching($data['categories_to_add']);
+                }
+            }
+
+            // Handle categories to remove
+            if (!empty($data['categories_to_remove'])) {
+                foreach ($products as $product) {
+                    $product->categories()->detach($data['categories_to_remove']);
+                }
+            }
+
+        }
+
         return ['updated' => true, 'message' => $totalProducts . ($totalProducts == 1 ? ' product': ' products') . ' updated'];
     }
 
@@ -338,7 +418,20 @@ class ProductService extends BaseService
      */
     public function updateProduct(Product $product, array $data): array
     {
+        $tags = $data['tags'] ?? null;
+        $categories = $data['categories'] ?? null;
+        unset($data['tags'], $data['categories']);
+
         $product->update($data);
+
+        if(!is_null($tags)) {
+            $this->createProductTags($product, $tags);
+        }
+
+        if(!is_null($categories)) {
+            $this->createProductCategories($product, $categories);
+        }
+
         return $this->showUpdatedResource($product);
     }
 
@@ -580,5 +673,95 @@ class ProductService extends BaseService
 
             return [];
         });
+    }
+
+
+
+    /**
+     * Create product tags.
+     *
+     * @param Product $product
+     * @param array<string> $tags - UUIDs or name as string
+     */
+    private function createProductTags(Product $product, array $tags) {
+
+        // Process tags
+        $tagIds = [];
+
+        if (!empty($tags)) {
+
+            $existingTags = Tag::where('store_id', $product->store_id)->get();
+
+            // Match tags by UUID or name
+            $matchingUuidTags = $existingTags->filter(fn($existingTag) => collect($tags)->contains($existingTag->id));
+            $matchingNameTags = $existingTags->filter(fn($existingTag) => collect($tags)->contains($existingTag->name));
+
+            // Non-matching tags (new tags to create)
+            $nonMatchingNameTags = collect($tags)->filter(function ($tag) use ($existingTags) {
+                return !Str::isUuid($tag) && !$existingTags->contains('name', $tag);
+            })->unique()->values();
+
+            // Create new tags
+            foreach ($nonMatchingNameTags as $tagName) {
+                $newTag = Tag::create([
+                    'name' => $tagName,
+                    'store_id' => $product->store_id
+                ]);
+                $tagIds[] = $newTag->id;
+            }
+
+            // Combine all tag IDs (UUIDs, matching names, new tags)
+            $tagIds = array_merge(
+                $tagIds,
+                $matchingUuidTags->pluck('id')->toArray(),
+                $matchingNameTags->pluck('id')->toArray()
+            );
+        }
+
+        $product->tags()->sync($tagIds);
+    }
+
+    /**
+     * Create product categories.
+     *
+     * @param Product $product
+     * @param array<string> $categories - UUIDs or name as string
+     */
+    private function createProductCategories(Product $product, array $categories) {
+
+        // Process categories
+        $categoryIds = [];
+
+        if (!empty($categories)) {
+
+            $existingCategories = Category::where('store_id', $product->store_id)->get();
+
+            // Match categories by UUID or name
+            $matchingUuidCategories = $existingCategories->filter(fn($existingCategory) => collect($categories)->contains($existingCategory->id));
+            $matchingNameCategories = $existingCategories->filter(fn($existingCategory) => collect($categories)->contains($existingCategory->name));
+
+            // Non-matching categories (new categories to create)
+            $nonMatchingNameCategories = collect($categories)->filter(function ($category) use ($existingCategories) {
+                return !Str::isUuid($category) && !$existingCategories->contains('name', $category);
+            })->unique()->values();
+
+            // Create new categories
+            foreach ($nonMatchingNameCategories as $categoryName) {
+                $newCategory = Category::create([
+                    'name' => $categoryName,
+                    'store_id' => $product->store_id
+                ]);
+                $categoryIds[] = $newCategory->id;
+            }
+
+            // Combine all category IDs (UUIDs, matching names, new categories)
+            $categoryIds = array_merge(
+                $categoryIds,
+                $matchingUuidCategories->pluck('id')->toArray(),
+                $matchingNameCategories->pluck('id')->toArray()
+            );
+        }
+
+        $product->categories()->sync($categoryIds);
     }
 }

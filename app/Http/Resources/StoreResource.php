@@ -74,7 +74,9 @@ class StoreResource extends JsonResource
             'whatsapp_mobile_number' => $this->whatsapp_mobile_number ? PhoneNumberService::formatPhoneNumber($this->whatsapp_mobile_number) : null,
 
             'logo' => new MediaFileResource($this->whenLoaded('logo')),
+            'tags' => TagResource::collection($this->whenLoaded('tags')),
             'users' => UserResource::collection($this->whenLoaded('users')),
+            'categories' => CategoryResource::collection($this->whenLoaded('categories')),
             'media_files' => MediaFileResource::collection($this->whenLoaded('mediaFiles')),
             'active_subscription' => new SubscriptionResource($this->whenLoaded('activeSubscription')),
 

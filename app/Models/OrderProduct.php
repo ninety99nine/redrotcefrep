@@ -38,7 +38,8 @@ class OrderProduct extends Model
             'has_price' => 'boolean',
             'is_cancelled' => 'boolean',
             'has_limited_stock' => 'boolean',
-            'has_exceeded_maximum_allowed_quantity_per_order' => 'boolean',
+            'has_met_minimum_order_quantity' => 'boolean',
+            'has_met_maximum_order_quantity' => 'boolean',
 
             'subtotal' => Money::class,
             'unit_loss' => Money::class,
@@ -65,8 +66,8 @@ class OrderProduct extends Model
         'name','description','sku','barcode','unit_weight','is_free','currency','unit_regular_price','on_sale',
         'unit_sale_price','unit_sale_discount','unit_sale_discount_percentage','unit_cost_price','has_price',
         'unit_price','unit_profit','unit_profit_percentage','unit_loss','unit_loss_percentage','sale_discount_total',
-        'grand_total','subtotal','original_quantity','quantity','has_limited_stock','has_exceeded_maximum_allowed_quantity_per_order',
-        'is_cancelled','cancellation_reasons','detected_changes','order_id','store_id','product_id'
+        'grand_total','subtotal','original_quantity','quantity','has_limited_stock','has_met_minimum_order_quantity',
+        'has_met_maximum_order_quantity','is_cancelled','cancellation_reasons','detected_changes','order_id','store_id','product_id'
     ];
 
     /**

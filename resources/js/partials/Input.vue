@@ -377,7 +377,7 @@
                                 v-if="!file.uploading && file.error_message"
                                 @click.stop="(event) => removeFile(event, fileIndex)"
                                 class="w-full flex items-center justify-center relative z-50">
-                                <div class="w-full bg-yellow-500 text-xs text-white rounded-b-lg py-1 px-2">{{ file.error_message }}</div>
+                                <div class="w-full bg-yellow-500 text-xs text-white rounded-b-lg p-1">{{ file.error_message }}</div>
                             </div>
 
                         </div>

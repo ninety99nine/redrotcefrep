@@ -40,6 +40,7 @@ export const useProductStore = defineStore('product', {
 
             this.productForm = {
 
+                tags: [],
                 categories: [],
                 variant_attributes: [],
 
@@ -59,39 +60,44 @@ export const useProductStore = defineStore('product', {
                 allow_variations: product?.allow_variations ?? false,
                 unit_weight: product?.unit_weight?.toString() ?? '0.00',
                 is_estimated_price: product?.is_estimated_price ?? false,
+                set_daily_capacity: product?.set_daily_capacity ?? false,
                 show_price_per_unit: product?.show_price_per_unit ?? false,
+                daily_capacity: product?.daily_capacity?.toString() ?? '1',
                 stock_quantity: product?.stock_quantity?.toString() ?? '100',
                 stock_quantity_type: product?.stock_quantity_type ?? 'unlimited',
+                set_min_order_quantity: product?.set_min_order_quantity ?? false,
+                set_max_order_quantity: product?.set_max_order_quantity ?? false,
+                min_order_quantity: product?.min_order_quantity?.toString() ?? '1',
+                max_order_quantity: product?.max_order_quantity?.toString() ?? '1',
                 unit_cost_price: product?.unit_cost_price.amount_without_currency ?? '0.00',
                 unit_sale_price: product?.unit_sale_price.amount_without_currency ?? '0.00',
-                allowed_quantity_per_order: product?.allowed_quantity_per_order ?? 'unlimited',
                 unit_regular_price: product?.unit_regular_price.amount_without_currency ?? '0.00',
                 tax_overide_amount: product?.tax_overide_amount?.amount_without_currency ?? '0.00',
-                maximum_allowed_quantity_per_order: product?.maximum_allowed_quantity_per_order?.toString() ?? '1'
 
             };
 
             if(product) {
 
+                product.tags.forEach((tag) => {
+                    this.productForm.tags.push(tag.id);
+                });
+
+                product.categories.forEach((category) => {
+                    this.productForm.categories.push(category.id);
+                });
 
                 product.variant_attributes.forEach((variantAttribute) => {
                     this.addVariantAttributeUsingVariantAttribute(variantAttribute);
                 });
 
-                this.originalVariantAttributes = cloneDeep(this.productForm.variant_attributes);
-
             }
+
+            this.originalVariantAttributes = cloneDeep(this.productForm.variant_attributes);
 
             if(saveState) {
                 this.saveOriginalState('Original product');
             }
 
-        },
-        addCategoryUsingCategory(category) {
-            this.productForm.categories.push({
-                label: category.name,
-                value: category.name
-            });
         },
         addVariantAttributeUsingVariantAttribute(variantAttribute) {
             this.productForm.variant_attributes.push({
@@ -137,12 +143,15 @@ export const useProductStore = defineStore('product', {
                     'values': [],
                 });
             }
+            this.saveStateDebounced('Added variant attribute');
         },
         onRemoveVariantAttribute(index) {
             this.productForm.variant_attributes.splice(index, 1);
+            this.saveStateDebounced('Removed variant attribute');
         },
         onResetVariantAttributes() {
             this.productForm.variant_attributes = cloneDeep(this.originalVariantAttributes);
+            this.saveStateDebounced('Reset variant attributes');
         },
     },
     getters: {

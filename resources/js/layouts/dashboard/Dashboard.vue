@@ -533,7 +533,7 @@
 
                     let config = {
                         params: {
-                            _relationships: ['logo', 'activeSubscription.pricingPlan', /*  'storeRollingNumbers', 'userStoreAssociation'  */].join(',')
+                            _relationships: ['logo', 'tags', 'categories', 'activeSubscription.pricingPlan', /*  'storeRollingNumbers', 'userStoreAssociation'  */].join(',')
                         }
                     };
 

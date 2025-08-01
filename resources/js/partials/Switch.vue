@@ -2,7 +2,7 @@
 
     <div
         :class="[
-            'w-fit flex items-center',
+            'w-fit flex', alignItems,
             this.size == 'xs' ? 'gap-x-1' : 'gap-x-2'
         ]">
         <slot name="prefix">
@@ -115,6 +115,10 @@
             tooltipContent: {
                 type: [String, null],
                 default: null
+            },
+            alignItems: {
+                type: String,
+                default: 'items-center'
             },
         },
         emits: ["update:modelValue", "change"],

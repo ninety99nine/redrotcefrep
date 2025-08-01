@@ -178,6 +178,26 @@ class Store extends Model
     }
 
     /**
+     * Get the tags.
+     *
+     * @return HasMany
+     */
+    public function tags(): HasMany
+    {
+        return $this->hasMany(Tag::class);
+    }
+
+    /**
+     * Get the categories.
+     *
+     * @return HasMany
+     */
+    public function categories(): HasMany
+    {
+        return $this->hasMany(Category::class);
+    }
+
+    /**
      * Get the media files.
      *
      * @return MorphMany

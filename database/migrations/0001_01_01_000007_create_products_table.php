@@ -1,7 +1,8 @@
 <?php
 
+use App\Enums\ProductType;
+use App\Enums\ProductUnitType;
 use App\Enums\StockQuantityType;
-use App\Enums\AllowedQuantityPerOrder;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
@@ -15,7 +16,8 @@ return new class extends Migration
     {
         Schema::create('products', function (Blueprint $table) {
             $table->uuid('id')->primary();
-            $table->string('name', 60)->nullable()->comment('Product name, up to 60 characters to accommodate variation names (e.g., "Nike Winter Jacket (Red, Large, Cotton)")');
+            $table->string('name', 60)->nullable()->comment('Product name, up to 60 characters to accommodate variation names');
+            $table->enum('type', ProductType::values())->default(ProductType::PHYSICAL->value);
             $table->boolean('visible')->default(true);
             $table->timestamp('visibility_expires_at')->nullable();
             $table->boolean('show_description')->default(false);
@@ -28,6 +30,13 @@ return new class extends Migration
             $table->unsignedTinyInteger('total_visible_variations')->nullable();
             $table->decimal('unit_weight', 12, 3)->default(0);
             $table->boolean('is_free')->default(false);
+            $table->boolean('is_estimated_price')->default(false);
+            $table->boolean('show_price_per_unit')->default(false);
+            $table->boolean('tax_overide')->default(false);
+            $table->decimal('tax_overide_amount', 12, 3)->default(0);
+            $table->string('download_link')->nullable();
+            $table->enum('unit_type', ProductUnitType::values())->default(ProductUnitType::QUANTITY->value);
+            $table->decimal('unit_value', 12, 3)->default(1);
             $table->char('currency', 3)->default(config('app.currency'));
             $table->decimal('unit_regular_price', 12, 3)->default(0);
             $table->boolean('on_sale')->default(false);
@@ -41,8 +50,12 @@ return new class extends Migration
             $table->unsignedSmallInteger('unit_profit_percentage')->default(0);
             $table->decimal('unit_loss', 12, 3)->default(0);
             $table->unsignedSmallInteger('unit_loss_percentage')->default(0);
-            $table->enum('allowed_quantity_per_order', AllowedQuantityPerOrder::values())->default(AllowedQuantityPerOrder::UNLIMITED->value);
-            $table->unsignedSmallInteger('maximum_allowed_quantity_per_order')->default(1);
+            $table->boolean('set_min_order_quantity')->default(false);
+            $table->boolean('set_max_order_quantity')->default(false);
+            $table->unsignedSmallInteger('min_order_quantity')->default(1);
+            $table->unsignedSmallInteger('max_order_quantity')->default(1);
+            $table->boolean('set_daily_capacity')->default(false);
+            $table->unsignedMediumInteger('daily_capacity')->default(1);
             $table->boolean('has_stock')->default(true);
             $table->enum('stock_quantity_type', StockQuantityType::values())->default(StockQuantityType::UNLIMITED->value);
             $table->unsignedMediumInteger('stock_quantity')->default(100);

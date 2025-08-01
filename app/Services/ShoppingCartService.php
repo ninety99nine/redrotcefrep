@@ -19,7 +19,6 @@ use Illuminate\Support\Collection;
 use App\Services\PercentageService;
 use App\Enums\DeliveryMethodFeeType;
 use Illuminate\Support\Facades\Http;
-use App\Enums\AllowedQuantityPerOrder;
 use App\Enums\DeliveryMethodScheduleType;
 use Illuminate\Support\Facades\Auth;
 
@@ -577,7 +576,7 @@ class ShoppingCartService
     private function prepareOrderProduct($relatedProduct, array $cartProduct): OrderProduct
     {
         $originalQuantity = $cartProduct['quantity'];
-        [$quantity, $hasStock, $hasLimitedStock, $hasExceededMaximumAllowedQuantityPerOrder] = $this->calculateOrderProductQuantity($relatedProduct, $originalQuantity);
+        [$quantity, $hasStock, $hasLimitedStock, $hasMetMinimumOrderQuantity, $hasMetMaximumOrderQuantity] = $this->calculateOrderProductQuantity($relatedProduct, $originalQuantity);
 
         $baseAttributes = [
             'unit_regular_price' => 0,
@@ -609,7 +608,8 @@ class ShoppingCartService
                 'product_id' => $relatedProduct?->id,
                 'has_limited_stock' => $hasLimitedStock,
                 'original_quantity' => $originalQuantity,
-                'has_exceeded_maximum_allowed_quantity_per_order' => $hasExceededMaximumAllowedQuantityPerOrder,
+                'has_met_minimum_order_quantity' => $hasMetMinimumOrderQuantity,
+                'has_met_maximum_order_quantity' => $hasMetMaximumOrderQuantity,
             ],
             $cartProductAttributes
         );
@@ -778,7 +778,8 @@ class ShoppingCartService
         $hasStock = true;
         $hasLimitedStock = false;
         $quantity = $originalQuantity;
-        $hasExceededMaximumAllowedQuantityPerOrder = false;
+        $hasMetMinimumOrderQuantity = true;
+        $hasMetMaximumOrderQuantity = true;
 
         if($relatedProduct) {
 
@@ -795,15 +796,21 @@ class ShoppingCartService
 
             }
 
-            if($relatedProduct->allowed_quantity_per_order == AllowedQuantityPerOrder::LIMITED->value){
-                $maximumAllowedQuantityPerOrder = $relatedProduct->maximum_allowed_quantity_per_order;
-                if($hasStock) $quantity = min($quantity, $maximumAllowedQuantityPerOrder);
-                $hasExceededMaximumAllowedQuantityPerOrder = true;
+            // Handle minimum order quantity
+            if ($relatedProduct->set_min_order_quantity) {
+                $minOrderQuantity = $relatedProduct->min_order_quantity;
+                $hasMetMinimumOrderQuantity = $quantity >= $minOrderQuantity;
+            }
+
+            if($relatedProduct->set_max_order_quantity){
+                $maxOrderQuantity = $relatedProduct->max_order_quantity;
+                $hasMetMaximumOrderQuantity = $quantity <= $maxOrderQuantity;
+                $quantity = min($quantity, $maxOrderQuantity);
             }
 
         }
 
-        return [$quantity, $hasStock, $hasLimitedStock, $hasExceededMaximumAllowedQuantityPerOrder];
+        return [$quantity, $hasStock, $hasLimitedStock, $hasMetMinimumOrderQuantity, $hasMetMaximumOrderQuantity];
     }
 
     /**
@@ -902,7 +909,7 @@ class ShoppingCartService
     protected function handleExceededMaximumAllowedQuantityPerOrder(OrderProduct $orderProduct, OrderProduct|null $existingOrderProduct): void
     {
         $message = $orderProduct->original_quantity . 'x(' . $orderProduct->name . ') reduced to (' . $orderProduct->quantity . ') because of maximum allowed quantity exceeded';
-        $this->recordOrderProductDetectedChange('has_exceeded_maximum_allowed_quantity_per_order', $message, $orderProduct, $existingOrderProduct);
+        $this->recordOrderProductDetectedChange('has_exceeded_maximum_order_quantity', $message, $orderProduct, $existingOrderProduct);
     }
 
     /**
@@ -926,8 +933,8 @@ class ShoppingCartService
     protected function hasLimitedStockAtLowest(OrderProduct $orderProduct, Product $relatedProduct): bool
     {
         $stockQuantity = $relatedProduct->stock_quantity;
-        $maximumAllowedQuantityPerOrder = $relatedProduct->maximum_allowed_quantity_per_order;
-        return $orderProduct->has_limited_stock && $stockQuantity < $maximumAllowedQuantityPerOrder;
+        $maxOrderQuantity = $relatedProduct->max_order_quantity;
+        return $orderProduct->has_limited_stock && $stockQuantity < $maxOrderQuantity;
     }
 
     /**
@@ -940,8 +947,8 @@ class ShoppingCartService
     protected function hasExceededMaximumAllowedQuantityAtLowest(OrderProduct $orderProduct, Product $relatedProduct): bool
     {
         $stockQuantity = $relatedProduct->stock_quantity;
-        $maximumAllowedQuantityPerOrder = $relatedProduct->maximum_allowed_quantity_per_order;
-        return $orderProduct->has_exceeded_maximum_allowed_quantity_per_order && $maximumAllowedQuantityPerOrder < $stockQuantity;
+        $maxOrderQuantity = $relatedProduct->max_order_quantity;
+        return !$orderProduct->has_met_maximum_order_quantity && $maxOrderQuantity < $stockQuantity;
     }
 
     /**
@@ -1164,8 +1171,8 @@ class ShoppingCartService
      */
     protected function hasChangedFromExceededToNotExceededMaximumQuantity(OrderProduct $orderProduct, OrderProduct $existingOrderProduct): bool
     {
-        return $existingOrderProduct->hasDetectedChange('has_exceeded_maximum_allowed_quantity_per_order')
-                   && !$orderProduct->hasDetectedChange('has_exceeded_maximum_allowed_quantity_per_order');
+        return $existingOrderProduct->hasDetectedChange('has_exceeded_maximum_order_quantity')
+                   && !$orderProduct->hasDetectedChange('has_exceeded_maximum_order_quantity');
     }
 
     /**
@@ -2788,7 +2795,8 @@ class ShoppingCartService
                 'sale_discount_total' => $orderProduct->sale_discount_total,
                 'cancellation_reasons' => $orderProduct->cancellation_reasons,
                 'unit_sale_discount_percentage' => $orderProduct->unit_sale_discount_percentage,
-                'has_exceeded_maximum_allowed_quantity_per_order' => $orderProduct->has_exceeded_maximum_allowed_quantity_per_order,
+                'has_met_maximum_order_quantity' => $orderProduct->has_met_maximum_order_quantity,
+                'has_met_minimum_order_quantity' => $orderProduct->has_met_minimum_order_quantity,
             ];
         })->all();
 

@@ -40,7 +40,8 @@ return new class extends Migration
             $table->unsignedSmallInteger('original_quantity')->default(1);
             $table->unsignedSmallInteger('quantity')->default(1);
             $table->boolean('has_limited_stock')->default(false);
-            $table->boolean('has_exceeded_maximum_allowed_quantity_per_order')->default(false);
+            $table->boolean('has_met_minimum_order_quantity')->default(false);
+            $table->boolean('has_met_maximum_order_quantity')->default(false);
             $table->boolean('is_cancelled')->default(false);
             $table->json('cancellation_reasons')->nullable();
             $table->json('detected_changes')->nullable();

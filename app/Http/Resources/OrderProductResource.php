@@ -50,7 +50,8 @@ class OrderProductResource extends JsonResource
             'unit_loss_percentage' => $this->unit_loss_percentage,
             'unit_profit_percentage' => $this->unit_profit_percentage,
             'unit_sale_discount_percentage' => $this->unit_sale_discount_percentage,
-            'has_exceeded_maximum_allowed_quantity_per_order' => $this->has_exceeded_maximum_allowed_quantity_per_order,
+            'has_met_minimum_order_quantity' => $this->has_met_minimum_order_quantity,
+            'has_met_maximum_order_quantity' => $this->has_met_maximum_order_quantity,
             'created_at' => $this->created_at->toDateTimeString(),
             'updated_at' => $this->updated_at->toDateTimeString(),
 
