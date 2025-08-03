@@ -403,6 +403,10 @@
 
                 } catch (error) {
                     console.error(`⚠️ Image ${index + 1} upload attempt ${retryCount + 1} failed.`, error);
+
+                    // Don't retry on 504 or timeout error
+                    if (error.code === 'ECONNABORTED' || error.response?.status === 504) return;
+
                     return this.uploadSingleImage(photo, index, retryCount + 1, error);
                 }
             },

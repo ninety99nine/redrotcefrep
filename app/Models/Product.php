@@ -3,11 +3,11 @@
 namespace App\Models;
 
 use App\Casts\Money;
-use App\Casts\JsonArray;
 use App\Enums\UploadFolderName;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Attributes\Scope;
+use Illuminate\Database\Eloquent\Relations\hasOne;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Relations\hasMany;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
@@ -35,7 +35,6 @@ class Product extends Model
             'has_stock' => 'boolean',
             'tax_overide' => 'boolean',
             'show_description' => 'boolean',
-            'allow_variations' => 'boolean',
             'is_estimated_price' => 'boolean',
             'set_daily_capacity' => 'boolean',
             'show_price_per_unit' => 'boolean',
@@ -54,8 +53,6 @@ class Product extends Model
 
             'unit_value' => 'decimal:3',
             'unit_weight' => 'decimal:3',
-
-            'variant_attributes' => JsonArray::class,
         ];
     }
 
@@ -66,11 +63,10 @@ class Product extends Model
      */
     protected $fillable = [
         'name', 'type', 'visible', 'visibility_expires_at', 'show_description', 'description', 'sku', 'barcode',
-        'allow_variations', 'variant_attributes', 'total_variations', 'total_visible_variations', 'unit_weight',
-        'is_free', 'is_estimated_price', 'show_price_per_unit', 'tax_overide', 'tax_overide_amount', 'download_link',
-        'unit_type', 'unit_value', 'currency', 'unit_regular_price', 'on_sale', 'unit_sale_price', 'unit_sale_discount',
-        'unit_sale_discount_percentage', 'unit_cost_price', 'has_price', 'unit_price', 'unit_profit',
-        'unit_profit_percentage', 'unit_loss', 'unit_loss_percentage', 'set_min_order_quantity',
+        'unit_weight', 'is_free', 'is_estimated_price', 'show_price_per_unit', 'tax_overide',
+        'tax_overide_amount', 'download_link', 'unit_type', 'unit_value', 'currency', 'unit_regular_price', 'on_sale',
+        'unit_sale_price', 'unit_sale_discount', 'unit_sale_discount_percentage', 'unit_cost_price', 'has_price',
+        'unit_price', 'unit_profit', 'unit_profit_percentage', 'unit_loss', 'unit_loss_percentage', 'set_min_order_quantity',
         'set_max_order_quantity', 'min_order_quantity', 'max_order_quantity', 'set_daily_capacity', 'daily_capacity',
         'has_stock', 'stock_quantity_type', 'stock_quantity', 'position', 'parent_product_id', 'user_id', 'store_id',
     ];
@@ -91,19 +87,14 @@ class Product extends Model
               ->orWhere('description', 'like', '%' . $searchTerm . '%');
     }
 
-    public function scopeSupportsVariations($query)
-    {
-        return $query->where('allow_variations', '1');
-    }
-
-    public function scopeDoesNotSupportVariations($query)
-    {
-        return $query->where('allow_variations', '0');
-    }
-
     public function scopeVisible($query)
     {
         return $query->where('visible', '1');
+    }
+
+    public function scopeIsNotVariant($query)
+    {
+        return $query->whereNull('parent_product_id');
     }
 
     /**
@@ -127,13 +118,23 @@ class Product extends Model
     }
 
     /**
-     * Get the product variations.
+     * Get the product variant.
+     *
+     * @return hasOne
+     */
+    public function variant(): hasOne
+    {
+        return $this->hasOne(Product::class, 'parent_product_id')->orderBy('position');
+    }
+
+    /**
+     * Get the product variants.
      *
      * @return hasMany
      */
-    public function variations(): hasMany
+    public function variants(): hasMany
     {
-        return $this->hasMany(Product::class, 'parent_product_id');
+        return $this->hasMany(Product::class, 'parent_product_id')->orderBy('position');
     }
 
     /**

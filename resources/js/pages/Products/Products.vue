@@ -198,14 +198,13 @@
 
                                 <!-- Price -->
                                 <td v-else-if="column.name == 'Price'" class="align-top pr-4 py-4 text-sm">
-                                    <NoDataPlaceholder v-if="product.allow_variations"></NoDataPlaceholder>
-                                    <div v-else class="flex space-x-1 items-center">
+                                    <div class="flex space-x-1 items-center">
 
-                                        <Pill v-if="product.is_free" type="success" size="xs">free</Pill>
+                                        <Pill v-if="(product.variant ?? product).is_free" type="success" size="xs">free</Pill>
 
                                         <template v-else>
-                                            <span>{{ product.unit_price.amount_with_currency }}</span>
-                                            <Pill v-if="product.on_sale" type="success" size="xs">on sale</Pill>
+                                            <span>{{ (product.variant ?? product).unit_price.amount_with_currency }}</span>
+                                            <Pill v-if="(product.variant ?? product).on_sale" type="success" size="xs">on sale</Pill>
                                         </template>
 
                                         <Popover
@@ -220,17 +219,17 @@
 
                                                     <div class="space-y-2">
 
-                                                        <div v-if="product.on_sale" class="border-b border-gray-300 pb-2 mb-2">
-                                                            <p>Regular Price: <span :class="['text-black', { 'line-through' : product.on_sale || product.is_free }]">{{ product.unit_regular_price.amount_with_currency }}</span></p>
-                                                            <p v-if="product.on_sale">Sale Price: <span :class="['text-black', { 'line-through' : product.is_free }]">{{ product.unit_sale_price.amount_with_currency }}</span></p>
+                                                        <div v-if="(product.variant ?? product).on_sale" class="border-b border-gray-300 pb-2 mb-2">
+                                                            <p>Regular Price: <span :class="['text-black', { 'line-through' : (product.variant ?? product).on_sale || (product.variant ?? product).is_free }]">{{ (product.variant ?? product).unit_regular_price.amount_with_currency }}</span></p>
+                                                            <p v-if="(product.variant ?? product).on_sale">Sale Price: <span :class="['text-black', { 'line-through' : (product.variant ?? product).is_free }]">{{ (product.variant ?? product).unit_sale_price.amount_with_currency }}</span></p>
                                                         </div>
 
-                                                        <template v-if="product.is_free">
+                                                        <template v-if="(product.variant ?? product).is_free">
                                                             <p>This product is free</p>
                                                             <p class="font-bold text-black">Price: <span class="text-green-500">Free</span></p>
                                                         </template>
 
-                                                        <p v-else class=" text-black">Price: <span class="font-bold">{{ product.unit_price.amount_with_currency }}</span></p>
+                                                        <p v-else class=" text-black">Price: <span class="font-bold">{{ (product.variant ?? product).unit_price.amount_with_currency }}</span></p>
 
                                                     </div>
 
@@ -244,37 +243,12 @@
 
                                 <!-- Stock -->
                                 <td v-else-if="column.name == 'Stock'" class="align-top pr-4 py-4 text-sm">
-                                    <NoDataPlaceholder v-if="product.allow_variations"></NoDataPlaceholder>
-                                    <Pill v-else :type="product.has_stock ? 'success' : 'warning'" size="xs">{{ product.has_stock ? (product.stock_quantity_type == 'unlimited' ? 'unlimited' : `${product.stock_quantity} left`) : 'no stock' }}</Pill>
+                                    <Pill :type="(product.variant ?? product).has_stock ? 'success' : 'warning'" size="xs">{{ (product.variant ?? product).has_stock ? ((product.variant ?? product).stock_quantity_type == 'unlimited' ? 'unlimited' : `${(product.variant ?? product).stock_quantity} left`) : 'no stock' }}</Pill>
                                 </td>
 
-                                <!-- Variations -->
-                                <td v-else-if="column.name == 'Variations'" class="align-top pr-4 py-4 text-sm">
-                                    <div class="flex space-x-1 items-center">
-                                        <Pill type="light" size="xs">{{ product.allow_variations ? product.total_visible_variations : 'none' }}</Pill>
-                                        <Popover
-                                            placement="top"
-                                            wrapperClasses="opacity-0 group-hover:opacity-100">
-
-                                            <template #content>
-
-                                                <div class="min-w-40 p-4">
-
-                                                    <p class="border-b border-gray-300 pb-2 mb-2">Variations</p>
-
-                                                    <p>{{ product.allow_variations ? 'support variations' : 'Does not support variations' }} (Different versions of itself)</p>
-
-                                                    <template v-if="product.allow_variations">
-                                                        <p class="border-t border-gray-300 pt-2 mt-2">Total Variations: <span>{{ product.total_variations ?? '...' }}</span></p>
-                                                        <p>Total Visible Variations: <span>{{ product.total_visible_variations ?? '...' }}</span></p>
-                                                    </template>
-
-                                                </div>
-
-                                            </template>
-
-                                        </Popover>
-                                    </div>
+                                <!-- Variants -->
+                                <td v-else-if="column.name == 'Variants'" class="align-top pr-4 py-4 text-sm">
+                                    <Pill type="light" size="xs">{{ product.variants_count ? product.variants_count : 'none' }}</Pill>
                                 </td>
 
                                 <!-- Minimum Order Quantity -->
@@ -821,8 +795,8 @@
             formattedDatetime: formattedDatetime,
             formattedRelativeDate: formattedRelativeDate,
             prepareColumns() {
-                const columnNames = ['Name', 'Description', 'Visible', 'Price', 'Stock', 'Variations', 'Minimum Order Quantity', 'Maximum Order Quantity', 'Position', 'Created Date'];
-                const defaultColumnNames  = ['Name', 'Description', 'Visible', 'Price', 'Stock', 'Variations', 'Position', 'Created Date'];
+                const columnNames = ['Name', 'Description', 'Visible', 'Price', 'Stock', 'Variants', 'Minimum Order Quantity', 'Maximum Order Quantity', 'Position', 'Created Date'];
+                const defaultColumnNames  = ['Name', 'Description', 'Visible', 'Price', 'Stock', 'Variants', 'Position', 'Created Date'];
 
                 return columnNames.map(name => ({
                     name,
@@ -831,8 +805,8 @@
                 }));
             },
             prepareWhatsappFields() {
-                const whatsappFieldNames = ['Name', 'Description', 'Visible', 'Unit Regular Price', 'Unit Sale Price', 'Unit Price', 'Stock', 'Variations', 'Minimum Order Quantity', 'Maximum Order Quantity', 'Position', 'Created Date', 'Product Link'];
-                const defaultWhatsappFieldNames  = ['Name', 'Description', 'Visible', 'Unit Price', 'Stock', 'Variations', 'Position', 'Created Date'];
+                const whatsappFieldNames = ['Name', 'Description', 'Visible', 'Unit Regular Price', 'Unit Sale Price', 'Unit Price', 'Stock', 'Variants', 'Minimum Order Quantity', 'Maximum Order Quantity', 'Position', 'Created Date', 'Product Link'];
+                const defaultWhatsappFieldNames  = ['Name', 'Description', 'Visible', 'Unit Price', 'Stock', 'Variants', 'Position', 'Created Date'];
 
                 return whatsappFieldNames.map(name => ({
                     name,
@@ -935,7 +909,9 @@
                             page: page,
                             per_page: this.perPage,
                             store_id: this.store.id,
-                            association: 'team member'
+                            association: 'team member',
+                            _relationships: ['variant'].join(','),
+                            _countable_relationships: ['variants'].join(',')
                         },
                         cancelToken: this.cancelTokenSource.token // Attach cancel token
                     }
@@ -1293,19 +1269,19 @@
                                     productMessage += `${checkedProducts[i].visible ? 'Yes' : 'No'}\n`;
                                     break;
                                 case "Unit Regular Price":
-                                    productMessage += `${checkedProducts[i].unit_regular_price.amount_with_currency}\n`;
+                                    productMessage += `${(checkedProducts[i].variant ?? checkedProducts[i]).unit_regular_price.amount_with_currency}\n`;
                                     break;
                                 case "Unit Sale Price":
-                                    productMessage += `${checkedProducts[i].unit_sale_price.amount_with_currency}\n`;
+                                    productMessage += `${(checkedProducts[i].variant ?? checkedProducts[i]).unit_sale_price.amount_with_currency}\n`;
                                     break;
                                 case "Unit Price":
-                                    productMessage += `${checkedProducts[i].unit_price.amount_with_currency}\n`;
+                                    productMessage += `${(checkedProducts[i].variant ?? checkedProducts[i]).unit_price.amount_with_currency}\n`;
                                     break;
                                 case "Stock":
-                                    productMessage += `${checkedProducts[i].has_stock ? (checkedProducts[i].stock_quantity_type == 'unlimited' ? 'unlimited' : `${checkedProducts[i].stock_quantity} left`) : 'no stock'}\n`;
+                                    productMessage += `${(checkedProducts[i].variant ?? checkedProducts[i]).has_stock ? ((checkedProducts[i].variant ?? checkedProducts[i]).stock_quantity_type == 'unlimited' ? 'unlimited' : `${(checkedProducts[i].variant ?? checkedProducts[i]).stock_quantity} left`) : 'no stock'}\n`;
                                     break;
-                                case "Variations":
-                                    productMessage += `${checkedProducts[i].allow_variations ? checkedProducts[i].total_visible_variations : 'none'}\n`;
+                                case "Variants":
+                                    productMessage += `${checkedProducts[i].variants_count ? checkedProducts[i].variants_count : 'none'}\n`;
                                     break;
                                 case "Minimum Order Quantity":
                                     productMessage += `${checkedProducts[i].set_min_order_quantity ? checkedProducts[i].min_order_quantity : 'none'}\n`;

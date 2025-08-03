@@ -107,26 +107,29 @@
                     <div v-if="isOpen" class="w-full absolute z-10 mt-1 select-none bg-white border border-gray-300 rounded-md shadow-lg overflow-hidden">
                         <!-- Scrollable Options List -->
                         <ul class="max-h-60 overflow-auto">
-                            <li
+                            <template
                                 :key="index"
-                                @click="() => toggleOption(option)"
-                                v-for="(option, index) in filteredOptions"
-                                :class="[
-                                    'px-4 py-2 text-sm flex justify-between items-center hover:bg-gray-100',
-                                    option.disabled ? 'cursor-not-allowed text-gray-400' : 'cursor-pointer text-gray-700',
-                                ]">
-                                <!-- Custom Slot Support -->
-                                <slot name="option" :option="option" :isSelected="isSelected(option)">
-                                    <!-- Default Option Layout -->
-                                    <span class="truncate">{{ option.label }}</span>
-                                </slot>
-                                <!-- Default Selected Icon -->
-                                <span v-if="isSelected(option)">
-                                    <svg class="w-4 h-4 text-blue-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-                                    </svg>
-                                </span>
-                            </li>
+                                v-for="(option, index) in filteredOptions">
+                                <li
+                                    v-if="option.label"
+                                    @click="() => toggleOption(option)"
+                                    :class="[
+                                        'px-4 py-2 text-sm flex justify-between items-center hover:bg-gray-100',
+                                        option.disabled ? 'cursor-not-allowed text-gray-400' : 'cursor-pointer text-gray-700',
+                                    ]">
+                                    <!-- Custom Slot Support -->
+                                    <slot name="option" :option="option" :isSelected="isSelected(option)">
+                                        <!-- Default Option Layout -->
+                                        <span class="truncate">{{ option.label }}</span>
+                                    </slot>
+                                    <!-- Default Selected Icon -->
+                                    <span v-if="isSelected(option)">
+                                        <svg class="w-4 h-4 text-blue-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                        </svg>
+                                    </span>
+                                </li>
+                            </template>
 
                             <li
                                 @click="addCustomOption"

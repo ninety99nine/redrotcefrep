@@ -64,128 +64,124 @@
                             tooltipContent="The name of your product e.g Standard Ticket">
                         </Input>
 
-                        <!-- Non Variation Settings -->
-                        <template v-if="productForm.allow_variations == false">
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
 
-                            <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                            <!-- Visibility Select -->
+                            <Select
+                                class="w-full"
+                                :search="false"
+                                label="Visibility"
+                                :options="visibilityTypes"
+                                v-model="productForm.visible"
+                                :errorText="formState.getFormError('visible')"
+                                @change="productState.saveStateDebounced('Visibility status changed')"
+                                tooltipContent="Turn on if you want your product to be visible (Made available to customers)">
+                            </Select>
 
-                                <!-- Visibility Select -->
-                                <Select
-                                    class="w-full"
-                                    :search="false"
-                                    label="Visibility"
-                                    :options="visibilityTypes"
-                                    v-model="productForm.visible"
-                                    :errorText="formState.getFormError('visible')"
-                                    @change="productState.saveStateDebounced('Visibility status changed')"
-                                    tooltipContent="Turn on if you want your product to be visible (Made available to customers)">
-                                </Select>
+                            <!-- Type Select -->
+                            <Select
+                                label="Type"
+                                class="w-full"
+                                :search="false"
+                                :options="productTypes"
+                                v-model="productForm.type"
+                                :errorText="formState.getFormError('type')"
+                                @change="productState.saveStateDebounced('Type changed')">
+                            </Select>
 
-                                <!-- Type Select -->
-                                <Select
-                                    label="Type"
-                                    class="w-full"
-                                    :search="false"
-                                    :options="productTypes"
-                                    v-model="productForm.type"
-                                    :errorText="formState.getFormError('type')"
-                                    @change="productState.saveStateDebounced('Type changed')">
-                                </Select>
+                        </div>
 
-                            </div>
+                        <!-- Download Link Input -->
+                        <Input
+                            type=text
+                            label="Download Link"
+                            externalLinkName="Learn more"
+                            v-model="productForm.download_link"
+                            v-if="productForm.type == 'digital'"
+                            placeholder="https://example.com/download"
+                            externalLinkUrl="https://example.com/download"
+                            :errorText="formState.getFormError('download_link')"
+                            tooltipContent="This is the link to download this resource"
+                            @input="productState.saveStateDebounced('Download link changed')"
+                            description="Confirm your order to show download link on invoice">
+                        </Input>
 
-                            <!-- Download Link Input -->
-                            <Input
-                                type=text
-                                label="Download Link"
-                                externalLinkName="Learn more"
-                                v-model="productForm.download_link"
-                                v-if="productForm.type == 'digital'"
-                                placeholder="https://example.com/download"
-                                externalLinkUrl="https://example.com/download"
-                                :errorText="formState.getFormError('download_link')"
-                                tooltipContent="This is the link to download this resource"
-                                @input="productState.saveStateDebounced('Download link changed')"
-                                description="Confirm your order to show download link on invoice">
-                            </Input>
+                        <!-- Category Tags -->
+                        <SelectTags
+                            label="Categories"
+                            :options="categories"
+                            v-model="productForm.categories"
+                            :errorText="formState.getFormError('categories')"
+                            @change="productState.saveStateDebounced('Categories changed')" />
 
-                            <!-- Category Tags -->
-                            <SelectTags
-                                label="Categories"
-                                :options="categories"
-                                v-model="productForm.categories"
-                                :errorText="formState.getFormError('categories')"
-                                @change="productState.saveStateDebounced('Categories changed')" />
+                        <!-- Show Description Checkbox -->
+                        <Input
+                            type="checkbox"
+                            inputLabel="Show Description"
+                            v-model="productForm.show_description"
+                            @change="productState.saveStateDebounced('Show description status changed')">
+                        </Input>
 
-                            <!-- Show Description Checkbox -->
-                            <Input
-                                type="checkbox"
-                                inputLabel="Show Description"
-                                v-model="productForm.show_description"
-                                @change="productState.saveStateDebounced('Show description status changed')">
-                            </Input>
+                        <!-- Description Textarea -->
+                        <Input
+                            rows="2"
+                            type="textarea"
+                            label="Description"
+                            v-model="productForm.description"
+                            v-if="productForm.show_description"
+                            placeholder="1 day show with popular artists"
+                            :errorText="formState.getFormError('description')"
+                            @input="productState.saveStateDebounced('Description changed')"
+                            tooltipContent="Sweet and short description of your product e.g 1 day show with popular artists">
+                        </Input>
 
-                            <!-- Description Textarea -->
-                            <Input
-                                rows="2"
-                                type="textarea"
-                                label="Description"
-                                v-model="productForm.description"
-                                v-if="productForm.show_description"
-                                placeholder="1 day show with popular artists"
-                                :errorText="formState.getFormError('description')"
-                                @input="productState.saveStateDebounced('Description changed')"
-                                tooltipContent="Sweet and short description of your product e.g 1 day show with popular artists">
-                            </Input>
+                        <!-- Weight Input -->
+                        <Input
+                            type="text"
+                            label="Weight"
+                            v-if="!hasVariants"
+                            v-model="productForm.unit_weight"
+                            :errorText="formState.getFormError('unit_weight')"
+                            @input="productState.saveStateDebounced('Unit weight changed')"
+                            tooltipContent="The weight of the product. Useful for delivery calculations">
+                            <template #suffix>
+                                <span class="text-sm text-gray-400">{{ store?.weight_unit }}</span>
+                            </template>
+                        </Input>
 
-                            <!-- Weight Input -->
+                        <div
+                            v-if="!hasVariants"
+                            class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+
+                            <!-- Sku Input -->
                             <Input
                                 type="text"
-                                label="Weight"
-                                v-model="productForm.unit_weight"
-                                :errorText="formState.getFormError('unit_weight')"
-                                @input="productState.saveStateDebounced('Unit weight changed')"
-                                tooltipContent="The weight of the product. Useful for delivery calculations">
-                                <template #suffix>
-                                    <span class="text-sm text-gray-400">{{ store?.weight_unit }}</span>
-                                </template>
+                                label="SKU"
+                                placeholder="std-ticket"
+                                v-model="productForm.sku"
+                                :errorText="formState.getFormError('sku')"
+                                @input="productState.saveStateDebounced('SKU changed')"
+                                tooltipContent="The stock keeping unit for this product. Useful for stock management">
                             </Input>
 
-                            <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                            <!-- Barcode Input -->
+                            <Input
+                                type="text"
+                                label="Barcode"
+                                placeholder="123456789"
+                                v-model="productForm.barcode"
+                                :errorText="formState.getFormError('barcode')"
+                                @input="productState.saveStateDebounced('Barcode changed')"
+                                tooltipContent="The barcode for this product. Useful for stock management">
+                            </Input>
 
-                                <!-- Sku Input -->
-                                <Input
-                                    type="text"
-                                    label="SKU"
-                                    placeholder="std-ticket"
-                                    v-model="productForm.sku"
-                                    :errorText="formState.getFormError('sku')"
-                                    @input="productState.saveStateDebounced('SKU changed')"
-                                    tooltipContent="The stock keeping unit for this product. Useful for stock management">
-                                </Input>
-
-                                <!-- Barcode Input -->
-                                <Input
-                                    type="text"
-                                    label="Barcode"
-                                    placeholder="123456789"
-                                    v-model="productForm.barcode"
-                                    :errorText="formState.getFormError('barcode')"
-                                    @input="productState.saveStateDebounced('Barcode changed')"
-                                    tooltipContent="The barcode for this product. Useful for stock management">
-                                </Input>
-
-                            </div>
-
-                        </template>
+                        </div>
 
                     </div>
 
                 </div>
 
-                <div
-                    class="relative mb-4"
-                    v-if="productForm.allow_variations == false">
+                <div class="relative mb-4">
 
                     <BackdropLoader v-if="isLoadingProduct || isSubmitting" :showSpinningLoader="false" class="rounded-lg"></BackdropLoader>
 
@@ -195,7 +191,7 @@
 
                         <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
 
-                            <!-- If Free Switch -->
+                            <!-- Is Free Switch -->
                             <Switch
                                 size="xs"
                                 suffixText="Is Free"
@@ -205,7 +201,7 @@
                                 tooltipContent="Turn on if you want your product to be made Free for customers">
                             </Switch>
 
-                            <!-- If Free Switch -->
+                            <!-- Estimated Price Switch -->
                             <Switch
                                 size="xs"
                                 v-if="!productForm.is_free"
@@ -219,7 +215,9 @@
                         </div>
 
                         <!-- Info Alert -->
-                        <Alert v-if="productForm.is_free" type="success">
+                        <Alert
+                            type="success"
+                            v-if="productForm.is_free">
                             <template #description>
                                 This product is <span class="font-bold">Free</span>
                             </template>
@@ -227,7 +225,9 @@
 
                         <template v-else>
 
-                            <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                            <div
+                                v-if="!hasVariants"
+                                class="grid grid-cols-1 lg:grid-cols-2 gap-4">
 
                                 <!-- Unit Regular Price Input -->
                                 <Input
@@ -317,196 +317,227 @@
 
                 </div>
 
-                <div class="relative">
+                <div :class="{ 'bg-white rounded-lg p-4 space-y-4' : !hasVariants }">
 
-                    <BackdropLoader v-if="isLoadingProduct || isSubmitting" :showSpinningLoader="false" class="rounded-lg"></BackdropLoader>
+                    <p :class="['text-lg text-gray-700 font-semibold', productForm.variants.length >= 2 ? 'mb-0' : 'mb-4', { 'pl-4' : hasVariants }]">Variants</p>
 
-                    <div class="bg-white rounded-lg space-y-4 p-4">
+                    <div v-if="productForm.variants.length >= 2" class="flex items-end space-x-4 mb-2">
 
-                        <!-- Allow Variations Switch -->
-                        <Switch
+                        <!-- Variant Options -->
+                        <SelectTags
+                            class="w-full"
+                            :allowCustom="false"
+                            :options="variantOptions"
+                            v-model="selectedVariants"
+                            placeholder="Add variant filter" />
+
+                        <!-- Add Variants -->
+                        <Button
                             size="xs"
-                            suffixText="Allow variations"
-                            v-model="productForm.allow_variations"
-                            :errorText="formState.getFormError('allow_variations')"
-                            v-if="productForm.allow_variations || hasOriginalVariantAttributes"
-                            @change="productState.saveStateDebounced('Allow variations status changed')"
-                            tooltipContent="Turn on if you want your product to support variations (different versions of itself e.g different sizes, materials, colors, etc)">
-                        </Switch>
+                            type="light"
+                            :leftIcon="X"
+                            :action="clearSelectedVariants">
+                            <span>Clear Filter</span>
+                        </Button>
 
-                        <div v-if="!hasOriginalVariantAttributes">
+                    </div>
 
-                            <div class="flex justify-between p-20 border border-gray-300 rounded-lg bg-gray-50">
+                    <template
+                        :key="variant.temporary_id"
+                        v-for="(variant, index) in productForm.variants">
 
-                                <div class="space-y-4">
-                                    <h1 class="text-2xl font-bold">
-                                        <template v-if="productForm.allow_variations && hasVariantAttributes">Create Variations</template>
-                                        <template v-else-if="productForm.allow_variations">Add Options</template>
-                                        <template v-else>Have Options?</template>
-                                    </h1>
-                                    <p v-if="hasVariantAttributes">Click the <Pill type="primary" size="xs">Create Variations</Pill> button to create different variations of your product e.g different sizes, materials, colors, etc</p>
-                                    <p v-else-if="productForm.allow_variations">Click the <Pill type="primary" size="xs">+ Add Option</Pill> button to add different variations of your product e.g different sizes, materials, colors, etc</p>
-                                    <p v-else>Turn on <Pill type="primary" size="xs">Allow variations</Pill> if you want your product to support variations (different versions of itself e.g different sizes, materials, colors, etc)</p>
+                        <div
+                            class="relative mb-4"
+                            v-if="isFilteredVariants(variant)">
 
-                                    <!-- Allow Variations Switch -->
-                                    <Switch
-                                        size="md"
-                                        suffixText="Allow variations"
-                                        v-if="!productForm.allow_variations"
-                                        v-model="productForm.allow_variations"
-                                        :errorText="formState.getFormError('allow_variations')"
-                                        @change="productState.saveStateDebounced('Allow variations status changed')"
-                                        tooltipContent="Turn on if you want your product to support variations (different versions of itself e.g different sizes, materials, colors, etc)">
-                                    </Switch>
+                            <BackdropLoader v-if="isLoadingProduct || isSubmitting" :showSpinningLoader="false" class="rounded-lg"></BackdropLoader>
+
+                            <div
+                                class="bg-white border border-gray-200 rounded-lg p-4">
+
+                                <div class="flex items-center space-x-4 justify-end">
+
+                                    <div class="flex items-center space-x-1 text-gray-400">
+                                        <Split size="16"></Split>
+                                        <span class="text-sm">variant {{ `${index + 1}` }}</span>
+                                    </div>
+
+                                    <!-- Remove Variant -->
+                                    <Button
+                                        size="xs"
+                                        type="bareDanger"
+                                        :leftIcon="Trash2"
+                                        :action="() => removeVariant(index)">
+                                    </Button>
 
                                 </div>
 
-                                <div>
-                                    <span class="text-8xl">🛍️</span>
+                                <div class="space-y-4 mb-4">
+
+                                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+
+                                        <div class="flex items-center space-x-4">
+
+                                            <!-- Image -->
+                                            <div
+                                                v-if="productForm.variants[index].photos.length"
+                                                class="flex items-center justify-center w-16 h-16">
+
+                                                <img class="w-full max-h-full object-contain rounded-lg flex-shrink-0" :src="productForm.variants[index].photos[0].path">
+
+                                            </div>
+
+                                            <!-- Name Input -->
+                                            <Input
+                                                type=text
+                                                label="Name"
+                                                class="w-full"
+                                                placeholder="Standard Ticket"
+                                                v-model="productForm.variants[index].name"
+                                                @input="productState.saveStateDebounced('Name changed')"
+                                                tooltipContent="The name of your product e.g Standard Ticket"
+                                                :errorText="formState.getFormError(`variants.${index}.name`)">
+                                            </Input>
+
+                                        </div>
+
+                                        <!-- Visibility Select -->
+                                        <Select
+                                            class="w-full"
+                                            :search="false"
+                                            label="Visibility"
+                                            :options="visibilityTypes"
+                                            v-model="productForm.variants[index].visible"
+                                            :errorText="formState.getFormError(`variants.${index}.visible`)"
+                                            @change="productState.saveStateDebounced('Visibility status changed')"
+                                            tooltipContent="Turn on if you want your product to be visible (Made available to customers)">
+                                        </Select>
+
+                                    </div>
+
+                                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+
+                                        <!-- Unit Regular Price Input -->
+                                        <Input
+                                            type="money"
+                                            label="Regular Price"
+                                            v-model="productForm.variants[index].unit_regular_price"
+                                            @input="productState.saveStateDebounced('Regular price changed')"
+                                            :errorText="formState.getFormError(`variants.${index}.unit_regular_price`)"
+                                            tooltipContent="Set the regular price for this product (How much the product is sold when its not on sale)">
+                                        </Input>
+
+                                        <!-- Unit Sale Price Input -->
+                                        <Input
+                                            type="money"
+                                            label="Sale Price"
+                                            v-model="productForm.variants[index].unit_sale_price"
+                                            @input="productState.saveStateDebounced('Sale price changed')"
+                                            :errorText="formState.getFormError(`variants.${index}.unit_sale_price`)"
+                                            tooltipContent="Set the sale price for this product (if the product is on sale)">
+                                        </Input>
+
+                                        <template v-if="productForm.variants[index].show_more">
+
+                                            <div class="col-span-2">
+
+                                                <!-- Weight Input -->
+                                                <Input
+                                                    type="text"
+                                                    label="Weight"
+                                                    class="w-full"
+                                                    v-model="productForm.variants[index].unit_weight"
+                                                    @input="productState.saveStateDebounced('Unit weight changed')"
+                                                    :errorText="formState.getFormError(`variants.${index}.unit_weight`)"
+                                                    tooltipContent="The weight of the product. Useful for delivery calculations">
+                                                    <template #suffix>
+                                                        <span class="text-sm text-gray-400">{{ store?.weight_unit }}</span>
+                                                    </template>
+                                                </Input>
+
+                                            </div>
+
+                                            <!-- Sku Input -->
+                                            <Input
+                                                type="text"
+                                                label="SKU"
+                                                placeholder="std-ticket"
+                                                v-model="productForm.variants[index].sku"
+                                                @input="productState.saveStateDebounced('SKU changed')"
+                                                :errorText="formState.getFormError(`variants.${index}.sku`)"
+                                                tooltipContent="The stock keeping unit for this product. Useful for stock management">
+                                            </Input>
+
+                                            <!-- Barcode Input -->
+                                            <Input
+                                                type="text"
+                                                label="Barcode"
+                                                placeholder="123456789"
+                                                v-model="productForm.variants[index].barcode"
+                                                @input="productState.saveStateDebounced('Barcode changed')"
+                                                :errorText="formState.getFormError(`variants.${index}.barcode`)"
+                                                tooltipContent="The barcode for this product. Useful for stock management">
+                                            </Input>
+
+                                        </template>
+
+                                    </div>
+
+                                    <!-- Images Input -->
+                                    <Input
+                                        type="file"
+                                        :maxFiles="1"
+                                        singleFileUploadMessage="Photo attached"
+                                        v-if="productForm.variants[index].show_more"
+                                        v-model="productForm.variants[index].photos"
+                                        @change="productState.saveStateDebounced('Photos changed')"
+                                        @retryUploads="(files) => uploadImages(productForm.variants[index].id, null, index)"
+                                        @retryUpload="(file, fileIndex) => uploadImages(productForm.variants[index].id, fileIndex, index)">
+                                    </Input>
+
+                                </div>
+
+                                <div class="flex justify-center">
+
+                                    <!-- Show More Or Less Button -->
+                                    <Button
+                                        size="sm"
+                                        type="bare"
+                                        :action="() => toggleAdditionalVariantOptions(index)"
+                                        :rightIcon="productForm.variants[index].show_more ? ChevronUp : ChevronDown">
+                                        <span>{{ productForm.variants[index].show_more ? 'show less' : 'show more' }}</span>
+                                    </Button>
+
                                 </div>
 
                             </div>
 
                         </div>
 
-                        <!-- Variation Settings -->
-                        <template v-if="productForm.allow_variations">
+                    </template>
 
-                            <div v-for="(variantAttribute, index) in productForm.variant_attributes" :key="index" class="relative bg-gray-50 p-4 border border-gray-300 rounded-lg">
+                    <div class="flex justify-end space-x-2">
 
-                                <div class="absolute top-2 right-2 flex items-center space-x-2">
+                        <p v-if="!hasVariants" class="text-sm text-gray-700">Add variants if your product supports different versions of itself e.g different sizes, materials, colors, etc</p>
 
-                                    <svg class="w-6 h-6 cursor-pointer hover:opacity-50" @click="productForm.variant_attributes[index].is_editable = !productForm.variant_attributes[index].is_editable" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                                        <path v-if="productForm.variant_attributes[index].is_editable" stroke-linecap="round" stroke-linejoin="round" d="M9 9V4.5M9 9H4.5M9 9 3.75 3.75M9 15v4.5M9 15H4.5M9 15l-5.25 5.25M15 9h4.5M15 9V4.5M15 9l5.25-5.25M15 15h4.5M15 15v4.5m0-4.5 5.25 5.25" />
-                                        <path v-else stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10" />
-                                    </svg>
+                        <!-- Change Arrangement -->
+                        <Button
+                            size="xs"
+                            type="light"
+                            :leftIcon="ArrowDownUp"
+                            :action="showChangeArrangementModal"
+                            v-else-if="productForm.variants.length >= 2">
+                            <span>Change Arrangement</span>
+                        </Button>
 
-                                    <!-- Remove Variation Attribute Button -->
-                                    <Button
-                                        size="xs"
-                                        type="danger"
-                                        :leftIcon="Trash2"
-                                        :action="() => onRemoveVariantAttribute(index)">
-                                    </Button>
-
-                                </div>
-
-                                <div v-if="productForm.variant_attributes[index].is_editable" class="space-y-4">
-
-                                    <!-- Variant Attribute Name Input -->
-                                    <Input
-                                        type="text"
-                                        label="Name"
-                                        placeholder="Size"
-                                        v-model="productForm.variant_attributes[index].name"
-                                        tooltipContent="The variation name e.g Size, Color, Material, etc"
-                                        :errorText="formState.getFormError('variant_attributes'+index+'name')"
-                                        @input="productState.saveStateDebounced('Variant attribute name changed')">
-                                    </Input>
-
-                                    <!-- Variant Attribute Instruction Textarea -->
-                                    <Input
-                                        type="text"
-                                        label="Instruction"
-                                        placeholder="Select your size"
-                                        v-model="productForm.variant_attributes[index].instruction"
-                                        tooltipContent="The variation instruction e.g Select your size"
-                                        :errorText="formState.getFormError('variant_attributes'+index+'instruction')"
-                                        @input="productState.saveStateDebounced('Variant attribute instruction changed')">
-                                    </Input>
-
-                                    <!-- Variant Attribute Value Tags -->
-                                    <SelectTags
-                                        label="Options"
-                                        v-model="productForm.variant_attributes[index].values"
-                                        tooltipContent="The variation options e.g Small, Medium, Large, etc"
-                                        :errorText="formState.getFormError('variant_attributes'+index+'value')"
-                                        @change="productState.saveStateDebounced('Variant attribute values changed')" />
-
-                                </div>
-
-                                <div
-                                    v-else
-                                    class="space-y-2 cursor-pointer"
-                                    @click="productForm.variant_attributes[index].is_editable = true">
-
-                                    <!-- Variant Attribute Name -->
-                                    <p class="text-black">{{ productForm.variant_attributes[index].name }}</p>
-
-                                    <!-- Error Message -->
-                                    <span class="scroll-to-error font-medium text-red-500 text-xs mt-1 ml-1" v-if="formState.getFormError('variant_attributes'+index+'name')"></span>
-
-                                    <!-- Variant Attribute Instruction -->
-                                    <p class="text-xs text-black">{{ productForm.variant_attributes[index].instruction }}</p>
-
-                                    <!-- Error Message -->
-                                    <span class="scroll-to-error font-medium text-red-500 text-xs mt-1 ml-1" v-if="formState.getFormError('variant_attributes'+index+'name')"></span>
-
-                                    <!-- Variant Attribute Value -->
-                                    <div class="flex space-x-2">
-                                        <span v-for="(value, index) in productForm.variant_attributes[index].values" :key="index" class="py-1 px-2 bg-black text-white text-xs rounded-lg">
-                                            {{ value }}
-                                        </span>
-                                    </div>
-
-                                    <!-- Error Message -->
-                                    <span class="scroll-to-error font-medium text-red-500 text-xs mt-1 ml-1" v-if="formState.getFormError('variant_attributes'+index+'name')"></span>
-
-                                </div>
-
-                            </div>
-
-                            <div class="flex justify-end space-x-2">
-
-                                <!-- Undo Button -->
-                                <Button
-                                    size="xs"
-                                    primary="light"
-                                    :action="onResetVariantAttributes"
-                                    v-if="variantAttributesHaveChanged && hasOriginalVariantAttributes">
-                                    <span>Undo</span>
-                                </Button>
-
-                                <div class="flex justify-end">
-
-                                    <!-- Add Option Button -->
-                                    <div class="relative">
-                                        <div v-if="!hasVariantAttributes" class="absolute -bottom-12 left-1/2 transform -translate-x-1/2">
-                                            <div class="animate-bounce text-4xl">👆</div>
-                                        </div>
-                                        <Button
-                                            size="xs"
-                                            type="primary"
-                                            :leftIcon="Plus"
-                                            :action="onAddVariantAttribute"
-                                            :buttonClass="hasVariantAttributes ? 'w-48' : 'w-40'">
-                                            <span>{{ hasVariantAttributes ? 'Add Another Option' : 'Add Option' }}</span>
-                                        </Button>
-                                    </div>
-
-                                </div>
-
-                                <!-- Create Variations Button -->
-                                <div v-if="(variantAttributesHaveChanged && hasVariantAttributes) || (totalProductVariations == 0 && hasVariantAttributes)" class="relative">
-
-                                    <div class="absolute -bottom-12 left-1/2 transform -translate-x-1/2">
-                                        <div v-if="!isCreatingVariations" class="animate-bounce text-4xl">👆</div>
-                                    </div>
-
-                                    <Button
-                                        size="xs"
-                                        type="primary"
-                                        buttonClass="w-40"
-                                        :loading="isCreatingVariations"
-                                        :action="() => product ? createProductVariations() : createProduct()">
-                                        Create Variations
-                                    </Button>
-
-                                </div>
-
-                            </div>
-
-                        </template>
+                        <!-- Add Variants -->
+                        <Button
+                            size="xs"
+                            type="light"
+                            :leftIcon="Plus"
+                            :action="addVariant">
+                            <span>Add Variants</span>
+                        </Button>
 
                     </div>
 
@@ -516,9 +547,7 @@
 
             <div class="col-span-4">
 
-                <div
-                    class="relative mb-4"
-                    v-if="productForm.allow_variations == false">
+                <div class="relative mb-4">
 
                     <BackdropLoader v-if="isLoadingProduct || isSubmitting" :showSpinningLoader="false" class="rounded-lg"></BackdropLoader>
 
@@ -530,18 +559,16 @@
                             type="file"
                             :maxFiles="5"
                             v-model="productForm.photos"
-                            @retryUploads="(files) => uploadImages()"
-                            @retryUpload="(file, fileIndex) => uploadImages(fileIndex)"
-                            @change="productState.saveStateDebounced('Photos changed')">
+                            @retryUploads="(files) => uploadImages(productForm.id)"
+                            @change="productState.saveStateDebounced('Photos changed')"
+                            @retryUpload="(file, fileIndex) => uploadImages(productForm.id, fileIndex)">
                         </Input>
 
                     </div>
 
                 </div>
 
-                <div
-                    class="relative mb-4"
-                    v-if="productForm.allow_variations == false">
+                <div class="relative mb-4">
 
                     <BackdropLoader v-if="isLoadingProduct || isSubmitting" :showSpinningLoader="false" class="rounded-lg"></BackdropLoader>
 
@@ -565,8 +592,9 @@
                         <Input
                             min="1"
                             type="number"
+                            placeholder="100"
+                            label="Stock Quantity"
                             v-model="productForm.stock_quantity"
-                            label="Stock Quantity" placeholder="100"
                             v-if="productForm.stock_quantity_type == 'limited'"
                             :errorText="formState.getFormError('stock_quantity')"
                             @input="productState.saveStateDebounced('Stock quantity changed')"
@@ -640,9 +668,7 @@
 
                 </div>
 
-                <div
-                    class="relative mb-4"
-                    v-if="productForm.allow_variations == false">
+                <div class="relative mb-4">
 
                     <BackdropLoader v-if="isLoadingProduct || isSubmitting" :showSpinningLoader="false" class="rounded-lg"></BackdropLoader>
 
@@ -665,53 +691,82 @@
 
         </div>
 
-        <template v-if="productForm.allow_variations && hasOriginalVariantAttributes">
+        <!-- Change Variant Arrangement Modal -->
+        <Modal
+            :scrollOnContent="false"
+            ref="changeArrangementModal"
+            approveText="Change Arrangement"
+            :approveAction="changeVariantArrangement"
+            :approveLoading="isChangingVariantArrangement">
 
-            <!-- Variation List -->
-            <div class="space-y-4 bg-white shadow-lg rounded-lg border border-gray-300 p-4 mb-4">
+            <template #content>
 
-                <template v-if="variantAttributesHaveChanged">
+                <p class="text-lg font-bold border-b border-gray-200 pb-4 mb-4">Change Arrangement</p>
 
-                    <!-- Info Alert -->
-                    <Alert type="light" class="flex items-start space-x-2">
+                <div class="overflow-y-auto rounded-lg h-60">
 
-                        <template #description>
-                            <div class="flex space-x-2">
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 3.75h.008v.008H12v-.008Z" />
-                                </svg>
-                                <div>
-                                    The variation options have been changed. You can
-                                    <template v-if="hasVariantAttributes">
-                                        either
-                                        <span @click="() => createProductVariations()" class="font-bold underline cursor-pointer">
-                                        Create New Variations
-                                        </span>
-                                        or
-                                    </template>
-                                    <span @click="onResetVariantAttributes" class="font-bold underline cursor-pointer">
-                                        Undo Changes
-                                    </span>
-                                    to revert back to the original variations you had before.
+                    <!-- Draggable Variants -->
+                    <draggable
+                        class="space-y-2"
+                        handle=".draggable-handle"
+                        ghost-class="bg-yellow-50"
+                        v-model="variantsForArrangement">
+
+                        <template
+                            :key="index"
+                            v-for="(variant, index) in variantsForArrangement">
+
+                            <div class="flex justify-between items-center p-2 space-x-4 rounded-lg bg-gray-50">
+
+                                <div :class="['flex items-center justify-center w-10 h-10 rounded-lg', { 'border border-dashed border-gray-200' : !variant.photo }]">
+
+                                    <img v-if="variant.photo" class="w-full max-h-full object-contain rounded-lg flex-shrink-0" :src="variant.photo.path">
+
+                                    <Image v-else size="20" class="text-gray-400 flex-shrink-0"></Image>
+
                                 </div>
+
+                                <div class="w-full flex items-center justify-between">
+
+                                    <!-- Name -->
+                                    <span class="text-sm">{{ variant.name ?? 'no name' }}</span>
+
+                                     <!-- Drag & Drop Handle -->
+                                    <svg class="draggable-handle w-4 h-4 cursor-grab hover:text-yellow-500 visible:cursor-grabbing" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 3.75v4.5m0-4.5h4.5m-4.5 0L9 9M3.75 20.25v-4.5m0 4.5h4.5m-4.5 0L9 15M20.25 3.75h-4.5m4.5 0v4.5m0-4.5L15 9m5.25 11.25h-4.5m4.5 0v-4.5m0 4.5L15 15" />
+                                    </svg>
+
+                                </div>
+
                             </div>
+
                         </template>
 
-                    </Alert>
+                    </draggable>
 
-                </template>
+                </div>
 
-                <ProductVariations
-                    :product="product"
-                    v-else-if="product"
-                    :isLoadingProduct="isLoadingProduct"
-                    :isCreatingVariations="isCreatingVariations"
-                    @totalProductVariations="(total) => totalProductVariations = total">
-                </ProductVariations>
+            </template>
 
-            </div>
+        </Modal>
 
-        </template>
+        <Modal
+            approveType="danger"
+            approveText="Delete Variant"
+            :approveAction="deleteVariant"
+            ref="confirmDeleteVariantModal"
+            :approveLoading="isDeletingVariantIds.some(id => id == deletableVariant.id)">
+
+            <template #content v-if="deletableVariant">
+                <p class="text-lg font-bold border-b border-gray-300 border-dashed pb-4 mb-4">Confirm Delete</p>
+                <p class="mb-4">Are you sure you want to permanently delete <span class="font-bold text-black">{{ deletableVariant.name }}</span>?</p>
+                <div
+                    v-if="deletableVariant.photos.length"
+                    class="flex justify-center space-x-2 mb-8">
+                    <img class="w-20 max-h-20 object-contain rounded-lg flex-shrink-0" :src="deletableVariant.photos[0].path">
+                </div>
+            </template>
+        </Modal>
 
         <div
             v-if="product"
@@ -727,11 +782,11 @@
                     approveType="danger"
                     triggerText="Delete Product"
                     approveText="Delete Product"
-                    :isLoading="isDeletingProduct"
-                    :approveAction="deleteProduct">
+                    :approveAction="deleteProduct"
+                    :approveLoading="isDeletingProduct">
 
                     <template #content>
-                        <p class="text-lg font-bold border-b border-dashed pb-4 mb-4">Confirm Delete</p>
+                        <p class="text-lg font-bold border-b border-gray-300 border-dashed pb-4 mb-4">Confirm Delete</p>
                         <p class="mb-8">Are you sure you want to permanently delete <span class="font-bold text-black">{{ productForm.name }}</span>?</p>
                     </template>
 
@@ -747,10 +802,12 @@
 
 <script>
 
+    import isEqual from 'lodash/isEqual';
     import Pill from '@Partials/Pill.vue';
     import Alert from '@Partials/Alert.vue';
     import Input from '@Partials/Input.vue';
     import Modal from '@Partials/Modal.vue';
+    import cloneDeep from 'lodash/cloneDeep';
     import Button from '@Partials/Button.vue';
     import Loader from '@Partials/Loader.vue';
     import Switch from '@Partials/Switch.vue';
@@ -758,27 +815,32 @@
     import Popover from '@Partials/Popover.vue';
     import Skeleton from '@Partials/Skeleton.vue';
     import SelectTags from '@Partials/SelectTags.vue';
-    import { Plus, Trash2, MoveLeft } from 'lucide-vue-next';
+    import { VueDraggableNext } from 'vue-draggable-next';
     import BackdropLoader from '@Partials/BackdropLoader.vue';
-    import ProductVariations from '@Pages/Products/product/product-variations/ProductVariations.vue';
+    import { X, Plus, Image, Split, Trash2, MoveLeft, ArrowDownUp, ChevronUp, ChevronDown } from 'lucide-vue-next';
 
     export default {
         inject: ['formState', 'storeState', 'productState', 'changeHistoryState', 'notificationState'],
         components: {
-            Pill, Alert, Input, Modal, Button, Loader, Switch, Select, Popover,
-            Skeleton, SelectTags, BackdropLoader, ProductVariations
+            Image, Split, Pill, Alert, Input, Modal, Button, Loader, Switch, Select, Popover,
+            Skeleton, SelectTags, draggable: VueDraggableNext, BackdropLoader
         },
         data() {
             return {
+                X,
                 Plus,
                 Trash2,
                 MoveLeft,
                 tags: [],
+                ChevronUp,
+                ArrowDownUp,
+                ChevronDown,
                 categories: [],
                 isUploading: false,
-                createdProduct: null,
-                setupCompleted: false,
-                totalProductVariations: null,
+                selectedVariants: [],
+                deletableVariant: null,
+                isDeletingVariantIds: [],
+                variantsForArrangement: [],
                 pricePerUnitTypes: [
                     { label: 'G', value: 'g'},
                     { label: 'KG', value: 'kg'},
@@ -860,20 +922,25 @@
                 if(this.changeHistoryState.actionButtons.length == 0) return false;
                 return this.changeHistoryState.actionButtons[1].loading;
             },
+            hasVariants() {
+                return this.productState.hasVariants;
+            },
             isDeletingProduct() {
                 return this.productState.isDeletingProduct;
             },
-            isCreatingVariations() {
-                return this.productState.isCreatingVariations;
+            isCreatingVariants() {
+                return this.productState.isCreatingVariants;
             },
-            hasVariantAttributes() {
-                return this.productState.hasVariantAttributes;
+            isChangingVariantArrangement() {
+                return this.productState.isChangingVariantArrangement;
             },
-            hasOriginalVariantAttributes() {
-                return this.productState.hasOriginalVariantAttributes;
-            },
-            variantAttributesHaveChanged() {
-                return this.productState.variantAttributesHaveChanged;
+            variantOptions() {
+                return this.productForm.variants.map((variant) => {
+                    return {
+                        label: variant.name,
+                        value: variant.temporary_id
+                    }
+                });
             }
         },
         methods: {
@@ -927,14 +994,95 @@
                     }
                 });
             },
-            onAddVariantAttribute() {
-                this.productState.onAddVariantAttribute();
+            addVariant() {
+                this.selectedVariants = [];
+                this.productState.addVariant();
             },
-            onRemoveVariantAttribute() {
-                this.productState.onRemoveVariantAttribute();
+            async removeVariant(index) {
+                this.selectedVariants = [];
+                const variant = this.productForm.variants[index];
+
+                if(variant.id) {
+                    this.deletableVariant = variant;
+                    this.$refs.confirmDeleteVariantModal.showModal();
+                }else{
+                    this.productState.removeVariant(index);
+                }
             },
-            onResetVariantAttributes() {
-                this.productState.onResetVariantAttributes();
+            clearSelectedVariants() {
+                this.selectedVariants = [];
+            },
+            isFilteredVariants(variant) {
+                return  this.selectedVariants.length == 0 || this.selectedVariants.includes(variant.temporary_id);
+            },
+            toggleAdditionalVariantOptions(index) {
+                this.productForm.variants[index].show_more = !this.productForm.variants[index].show_more;
+            },
+            showChangeArrangementModal() {
+                this.setvariantsForArrangement();
+                this.$refs.changeArrangementModal.showModal();
+            },
+            setvariantsForArrangement() {
+                this.variantsForArrangement = cloneDeep(this.productForm.variants.map((variant) => {
+                    return {
+                        name: variant.name,
+                        temporary_id: variant.temporary_id,
+                        photo: variant.photos.length ? variant.photos[0] : null
+                    }
+                }));
+                this.$refs.changeArrangementModal.showModal();
+            },
+            async changeVariantArrangement() {
+
+                try {
+
+                    if(this.isChangingVariantArrangement) return;
+
+                    // Create a map of original variants by temporary_id for quick lookup
+                    const variantMap = new Map(
+                        this.productForm.variants.map(variant => [variant.temporary_id, variant])
+                    );
+
+                    // Reorder productForm.variants based on variantsForArrangement order
+                    this.productForm.variants = this.variantsForArrangement.map(arrangedVariant =>
+                        variantMap.get(arrangedVariant.temporary_id)
+                    ).filter(variant => variant !== undefined); // Filter out any undefined entries
+
+                    const productIds = this.productForm.variants.filter((variant) => variant.id).map((variant) => variant.id);
+
+                    if(productIds.length == 0) return;
+
+                    this.productState.isChangingVariantArrangement = true;
+
+                    const data = {
+                        store_id: this.store.id,
+                        product_ids: productIds,
+                        parent_product_id: this.product.id
+                    };
+
+                    await axios.post(`/api/products/arrangement`, data);
+
+                    this.notificationState.showSuccessNotification(`Variant arrangement updated`);
+
+                } catch (error) {
+                    const message = error?.response?.data?.message || error?.message || 'Something went wrong while updating variant arrangement';
+                    this.notificationState.showWarningNotification(message);
+                    this.formState.setServerFormErrors(error);
+                    console.error('Failed to update variant arrangement:', error);
+                } finally {
+                    this.productState.isChangingVariantArrangement = false;
+                    this.$refs.changeArrangementModal.hideModal();
+                }
+
+            },
+            addVariantAttribute() {
+                this.productState.addVariantAttribute();
+            },
+            removeVariantAttribute() {
+                this.productState.removeVariantAttribute();
+            },
+            resetVariantAttributes() {
+                this.productState.resetVariantAttributes();
             },
             async showProduct() {
                 try {
@@ -944,7 +1092,7 @@
                     let config = {
                         params: {
                             store_id: this.store.id,
-                            _relationships: ['photos', 'tags', 'categories'].join(',')
+                            _relationships: ['photos', 'tags', 'categories', 'variants.photos'].join(',')
                         }
                     };
 
@@ -976,57 +1124,83 @@
                     this.productState.isLoadingProduct = false;
                 }
             },
-            productCreationCompleted() {
-                this.orderComments.push({
-                    user: this.authState.user,
-                    ...this.createdOrderComment,
-                    photos: this.form.photos.map(function(photo) { return { id: uuidv4(), temporary: true, path: photo.path } }),
-                });
-                this.notificationState.showSuccessNotification('Comment created!');
-                this.isCreatingOrderComment = false;
-                this.showOrderComments();
-                this.reset();
-            },
-            async createProduct() {
+            async createProduct(parentProduct = null, variantIndex = null) {
 
                 try {
 
-                    if(this.isCreatingProduct || this.isUploading) return;
+                    if(parentProduct == null) {
 
-                    this.formState.hideFormErrors();
+                        if(this.isCreatingProduct || this.isUploading) return;
 
-                    if(this.productForm.name == null || this.productForm.name.trim() === '') {
-                        this.formState.setFormError('name', 'The name is required');
+                        this.formState.hideFormErrors();
+
+                        if(this.productForm.name == null || this.productForm.name.trim() === '') {
+                            this.formState.setFormError('name', 'The name is required');
+                        }
+
+                        for (let index = 0; index < this.productForm.variants.length; index++) {
+                            const variant = this.productForm.variants[index];
+
+                            if(variant.name == null || variant.name.trim() === '') {
+                                this.formState.setFormError(`variants.${index}.name`, 'The name is required');
+                            }
+                        }
+
+                        if(this.formState.hasErrors) {
+                            return;
+                        }
+
+                        this.productState.isCreatingProduct = true;
+                        this.changeHistoryState.actionButtons[1].loading = true;
+
                     }
 
-                    if(this.formState.hasErrors) {
-                        return;
+                    let data;
+
+                    if(parentProduct) {
+
+                        data = {
+                            store_id: this.store.id,
+                            parent_product_id: parentProduct.id,
+                            ...this.productForm.variants[variantIndex]
+                        }
+                    }else{
+                        data = {
+                            ...this.productForm,
+                            store_id: this.store.id
+                        }
                     }
-
-                    this.productState.isCreatingProduct = true;
-                    this.changeHistoryState.actionButtons[1].loading = true;
-
-                    const data = {
-                        ...this.productForm,
-                        store_id: this.store.id
-                    };
 
                     const response = await axios.post(`/api/products`, data);
-                    this.createdProduct = response.data.product;
+                    const createdProduct = response.data.product;
 
-                    if(this.productForm.allow_variations) {
-                        await this.createProductVariations();
+                    if(parentProduct) {
+
+                        this.productForm.variants[variantIndex].id = createdProduct.id;
+
+                        if(this.productForm.variants[variantIndex].photos.length) {
+                            await this.uploadImages(this.productForm.variants[variantIndex].id, null, variantIndex);
+                        }
+
+                    }else{
+
+                        this.productForm.id = createdProduct.id;
+
+                        if(this.productForm.photos.length) {
+                            await this.uploadImages(this.productForm.id);
+                        }
+
+                        for (let index = 0; index < this.productForm.variants.length; index++) {
+                            await this.createProduct(createdProduct, index);
+                        }
+
+                        this.notificationState.showSuccessNotification(`Product created`);
+                        this.productState.saveOriginalState('Original product');
+                        //this.productState.reset();
+                        //this.changeHistoryState.reset();
+                        await this.onView(createdProduct);
+
                     }
-
-                    if(this.productForm.photos.length) {
-                        await this.uploadImages();
-                    }
-
-                    this.notificationState.showSuccessNotification(`Product created`);
-                    this.productState.saveOriginalState('Original product');
-                    //this.productState.reset();
-                    //this.changeHistoryState.reset();
-                    await this.onView(this.createdProduct);
 
                 } catch (error) {
                     const message = error?.response?.data?.message || error?.message || 'Something went wrong while creating product';
@@ -1034,48 +1208,112 @@
                     this.formState.setServerFormErrors(error);
                     console.error('Failed to create product:', error);
                 } finally {
-                    this.isUploading = false;
-                    this.productState.isCreatingProduct = false;
-                    this.changeHistoryState.actionButtons[1].loading = false;
+                    if(parentProduct == null) {
+                        this.isUploading = false;
+                        this.productState.isCreatingProduct = false;
+                        this.changeHistoryState.actionButtons[1].loading = false;
+                    }
                 }
 
             },
-            async updateProduct() {
+            async updateProduct(parentProduct = null, variantIndex = null) {
 
                 try {
 
-                    if(this.isUpdatingProduct || this.isUploading) return;
+                    if(parentProduct == null) {
 
-                    this.formState.hideFormErrors();
+                        if(this.isUpdatingProduct || this.isUploading) return;
 
-                    if(this.productForm.name == null || this.productForm.name.trim() === '') {
-                        this.formState.setFormError('name', 'The name is required');
+                        this.formState.hideFormErrors();
+
+                        if(this.productForm.name == null || this.productForm.name.trim() === '') {
+                            this.formState.setFormError('name', 'The name is required');
+                        }
+
+                        for (let index = 0; index < this.productForm.variants.length; index++) {
+                            const variant = this.productForm.variants[index];
+
+                            if(variant.name == null || variant.name.trim() === '') {
+                                this.formState.setFormError(`variants.${index}.name`, 'The name is required');
+                            }
+                        }
+
+                        if(this.formState.hasErrors) {
+                            return;
+                        }
+
+                        this.productState.isUpdatingProduct = true;
+                        this.changeHistoryState.actionButtons[1].loading = true;
+
                     }
 
-                    if(this.formState.hasErrors) {
-                        return;
+                    let id;
+                    let data;
+
+                    if(parentProduct) {
+
+                        id = this.productForm.variants[variantIndex].id;
+
+                        data = {
+                            store_id: this.store.id,
+                            ...this.productForm.variants[variantIndex]
+                        }
+
+                    }else{
+
+                        id = this.productForm.id;
+
+                        data = {
+                            ...this.productForm,
+                            store_id: this.store.id
+                        }
+
                     }
 
-                    this.productState.isUpdatingProduct = true;
-                    this.changeHistoryState.actionButtons[1].loading = true;
+                    const response = await axios.put(`/api/products/${id}`, data);
+                    const updatedProduct = response.data.product;
 
-                    const data = {
-                        ...this.productForm,
-                        store_id: this.store.id
-                    };
+                    if(parentProduct) {
 
-                    await axios.put(`/api/products/${this.product.id}`, data);
+                        if(this.productForm.variants[variantIndex].photos.length) {
+                            await this.uploadImages(this.productForm.variants[variantIndex].id, null, variantIndex);
+                        }
 
-                    if(this.productForm.allow_variations) {
-                        await this.createProductVariations();
+                    }else{
+
+                        if(this.productForm.photos.length) {
+                            await this.uploadImages(this.productForm.id);
+                        }
+
+                        if(this.productForm.variants.length) {
+                            const originalState = this.changeHistoryState.getOriginalState();
+
+                            for (let index = 0; index < this.productForm.variants.length; index++) {
+
+                                const variant = cloneDeep(this.productForm.variants[index]);
+                                const originalVariant = cloneDeep(originalState.variants.find(originalVariant => originalVariant.temporary_id == variant.temporary_id));
+
+                                if(originalVariant) {
+
+                                    delete variant.show_more;
+                                    delete originalVariant.show_more;
+
+                                    if(!isEqual(variant, originalVariant)) {
+                                        await this.updateProduct(updatedProduct, index);
+                                    }
+                                }else{
+                                    await this.createProduct(updatedProduct, index);
+                                }
+
+                            }
+
+                        }
+                            console.log('stage 7')
+
+                        this.notificationState.showSuccessNotification(`Product updated`);
+                        this.productState.saveOriginalState('Original product');
+
                     }
-
-                    if(this.productForm.photos.length) {
-                        await this.uploadImages();
-                    }
-
-                    this.notificationState.showSuccessNotification(`Product updated`);
-                    this.productState.saveOriginalState('Original product');
 
                 } catch (error) {
                     const message = error?.response?.data?.message || error?.message || 'Something went wrong while updating product';
@@ -1123,86 +1361,75 @@
                 }
 
             },
-            async createProductVariations() {
+            async deleteVariant(hideModal) {
+
+                const deletableVariant = this.deletableVariant;
 
                 try {
 
-                    const condition1 = this.variantAttributesHaveChanged && this.hasVariantAttributes;
-                    const condition2 = this.totalProductVariations == 0 && this.hasVariantAttributes;
+                    if(this.isDeletingVariantIds.includes(deletableVariant.id)) return;
 
-                    if(!condition1 && !condition2) return;
-                    if(this.productState.isCreatingVariations) return;
+                    this.isDeletingVariantIds.push(deletableVariant.id);
 
-                    this.productState.isCreatingVariations = true;
-
-                    if(this.product) {
-                        this.changeHistoryState.actionButtons[1].loading = true;
+                    const config = {
+                        data: {
+                            store_id: this.store.id
+                        }
                     }
 
-                    const data = {
-                        store_id: this.store.id,
-                        variant_attributes: this.productForm.variant_attributes
-                    };
+                    await axios.delete(`/api/products/${deletableVariant.id}`, config);
 
-                    await axios.post(`/api/products/${this.createdProduct ? this.createdProduct.id : this.product.id}/variations`, data);
+                    this.notificationState.showSuccessNotification('Variant deleted');
 
-                    this.productForm.variant_attributes = this.productForm.variant_attributes.map((variantAttribute) => {
-                        variantAttribute.is_editable = false;
-                        return variantAttribute;
-                    });
-
-                    if(this.product) {
-                        this.notificationState.showSuccessNotification(`Product variations created`);
-                        this.changeHistoryState.resetHistoryToCurrent();
-                    }
+                    const index = this.productForm.variants.findIndex(variant => variant.id == deletableVariant.id);
+                    this.productState.removeVariant(index);
 
                 } catch (error) {
-                    const message = error?.response?.data?.message || error?.message || 'Something went wrong while creating product variations';
+                    const message = error?.response?.data?.message || error?.message || 'Something went wrong while deleting variant';
                     this.notificationState.showWarningNotification(message);
                     this.formState.setServerFormErrors(error);
-                    console.error('Failed to create product variations:', error);
+                    console.error('Failed to delete variant:', error);
                 } finally {
-                    this.productState.isCreatingVariations = false;
-                    if(this.product) {
-                        this.changeHistoryState.actionButtons[1].loading = false;
-                    }
+                    hideModal();
+                    this.isDeletingVariantIds = this.isDeletingVariantIds.filter(id => id != deletableVariant.id);
                 }
-
             },
-            async uploadImages(photoIndex = null) {
+            async uploadImages(productId, photoIndex = null, variantIndex = null) {
+
+                let photos = variantIndex !== null ? this.productForm.variants[variantIndex].photos : this.productForm.photos;
 
                 let imageUploadPromises = [];
 
-                for (let index = 0; index < this.productForm.photos.length; index++) {
+                for (let index = 0; index < photos.length; index++) {
+                    let photo = photos[index];
 
-                    let photo = this.productForm.photos[index];
-
-                    if(photo.id == null && photo.uploading == false && (photo.uploaded === null || photo.uploaded === false)) {
-
-                        if(photoIndex == null || photoIndex == index) {
-
+                    if (photo.id == null && photo.uploading == false && (photo.uploaded === null || photo.uploaded === false)) {
+                        if (photoIndex == null || photoIndex == index) {
                             imageUploadPromises.push(
-                                this.uploadSingleImage(this.productForm.photos[index], index)
+                                this.uploadSingleImage(productId, photos[index], index)
                             );
                         }
                     }
                 }
 
+                if (imageUploadPromises.length === 0) {
+                    this.isUploading = false;
+                    return;
+                }
+
                 this.isUploading = true;
 
                 return Promise.allSettled(imageUploadPromises).then((results) => {
-
                     let failedUploads = results.filter(result => result.status === 'rejected').length;
 
                     if (failedUploads > 0) {
                         this.notificationState.showWarningNotification(`⚠️ ${failedUploads} image(s) failed to upload. Try again or change the image.`);
                     }
 
-                    this.isUploading = false; // ✅ All images uploaded (successful or failed)
-
+                    this.isUploading = false;
                 });
             },
-            async uploadSingleImage(photo, index, retryCount = 0, error = null) {
+            async uploadSingleImage(productId, photo, index, retryCount = 0, error = null) {
 
                 try{
 
@@ -1217,10 +1444,10 @@
 
                     let formData = new FormData();
                     formData.append('file', photo.file_ref);
+                    formData.append('mediable_id', productId);
                     formData.append('store_id', this.store.id);
                     formData.append('mediable_type', 'product');
                     formData.append('upload_folder_name', 'product_photo');
-                    formData.append('mediable_id', this.createdProduct ? this.createdProduct.id : this.product.id);
 
                     photo.uploading = true;
                     photo.error_message = null;
@@ -1243,7 +1470,11 @@
 
                 } catch (error) {
                     console.error(`⚠️ Image ${index + 1} upload attempt ${retryCount + 1} failed.`, error);
-                    return this.uploadSingleImage(photo, index, retryCount + 1, error);
+
+                    // Don't retry on 504 or timeout error
+                    if (error.code === 'ECONNABORTED' || error.response?.status === 504) return;
+
+                    return this.uploadSingleImage(productId, photo, index, retryCount + 1, error);
                 }
             },
             setActionButtons() {

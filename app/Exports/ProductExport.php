@@ -34,7 +34,7 @@ class ProductExport implements FromCollection, WithHeadings, ShouldAutoSize, Wit
     {
         $headings = [
             'product_per_line' => [
-                'ID', 'Name', 'Description', 'Visible', 'Unit Regular Price', 'Unit Sale Price', 'Unit Price', 'Stock', 'Quantity Per Order', 'Position', 'Variations', 'Created Date'
+                'ID', 'Name', 'Description', 'Visible', 'Unit Regular Price', 'Unit Sale Price', 'Unit Price', 'Stock', 'Quantity Per Order', 'Position', 'Variants', 'Created Date'
             ]
         ];
 
@@ -43,7 +43,7 @@ class ProductExport implements FromCollection, WithHeadings, ShouldAutoSize, Wit
 
     private function exportProductPerLine()
     {
-        return $this->query->doesNotSupportVariations()->get()->map(function ($product) {
+        return $this->query->doesNotSupportVariants()->withCount('variants')->get()->map(function ($product) {
             return [
                 'ID' => $product->id,
                 'Name' => '="' . $product->name . '"',
@@ -56,7 +56,7 @@ class ProductExport implements FromCollection, WithHeadings, ShouldAutoSize, Wit
                 'Min Order Quantity' => $product->set_min_order_quantity ? $product->min_order_quantity : 'none',
                 'Max Order Quantity' => $product->set_max_order_quantity ? $product->max_order_quantity : 'none',
                 'Position' => $product->position,
-                'Variations' => $product->allow_variations ? $product->total_visible_variations : 'none',
+                'Variants' => $product->variants_count ? $product->variants_count : 'none',
                 'Created Date' => $product->created_at->format('Y-m-d')
             ];
         });

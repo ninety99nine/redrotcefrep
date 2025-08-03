@@ -1,6 +1,5 @@
 import { defineStore } from 'pinia';
-import isEqual from 'lodash/isEqual';
-import cloneDeep from 'lodash/cloneDeep';
+import { v4 as uuidv4 } from 'uuid';
 import { useChangeHistoryStore as changeHistoryState } from '@Stores/change-history-store.js';
 
 export const useProductStore = defineStore('product', {
@@ -11,8 +10,8 @@ export const useProductStore = defineStore('product', {
         isCreatingProduct: false,
         isUpdatingProduct: false,
         isDeletingProduct: false,
-        isCreatingVariations: false,
-        originalVariantAttributes: [],
+        isCreatingVariants: false,
+        isChangingVariantArrangement: false,
     }),
     actions: {
         reset() {
@@ -41,9 +40,9 @@ export const useProductStore = defineStore('product', {
             this.productForm = {
 
                 tags: [],
+                variants: [],
                 categories: [],
-                variant_attributes: [],
-
+                id: product?.id ?? null,
                 sku: product?.sku ?? null,
                 name: product?.name ?? null,
                 photos: product?.photos ?? [],
@@ -57,7 +56,6 @@ export const useProductStore = defineStore('product', {
                 unit_type: product?.unit_type?.toString() ?? 'qty',
                 unit_value: product?.unit_value?.toString() ?? '1',
                 show_description: product?.show_description ?? false,
-                allow_variations: product?.allow_variations ?? false,
                 unit_weight: product?.unit_weight?.toString() ?? '0.00',
                 is_estimated_price: product?.is_estimated_price ?? false,
                 set_daily_capacity: product?.set_daily_capacity ?? false,
@@ -86,95 +84,49 @@ export const useProductStore = defineStore('product', {
                     this.productForm.categories.push(category.id);
                 });
 
-                product.variant_attributes.forEach((variantAttribute) => {
-                    this.addVariantAttributeUsingVariantAttribute(variantAttribute);
+                product.variants.forEach((variant) => {
+                    this.addVariant(variant);
                 });
 
             }
-
-            this.originalVariantAttributes = cloneDeep(this.productForm.variant_attributes);
 
             if(saveState) {
                 this.saveOriginalState('Original product');
             }
 
         },
-        addVariantAttributeUsingVariantAttribute(variantAttribute) {
-            this.productForm.variant_attributes.push({
-                is_editable: false,
-                ...variantAttribute
-            });
-        },
-        onAddVariantAttribute() {
+        addVariant(variant = null) {
 
-            // Check if 'Size' variant attribute exists
-            if(!this.productForm.variant_attributes.some(attribute => attribute.name.toLowerCase() === 'size')) {
-                this.productForm.variant_attributes.push({
-                    'name': 'Size',
-                    'is_editable': true,
-                    'instruction': 'Select your size',
-                    'values': ['Small', 'Medium', 'Large'],
-                });
-            }
-            // Check if 'Colour' variant attribute exists
-            else if(!this.productForm.variant_attributes.some(attribute => attribute.name.toLowerCase() === 'colour')) {
-                this.productForm.variant_attributes.push({
-                    'name': 'Colour',
-                    'is_editable': true,
-                    'instruction': 'Select your colour',
-                    'values': ['Red', 'Blue', 'Green'],
-                });
-            }
-            // Check if 'Material' variant attribute exists
-            else if(!this.productForm.variant_attributes.some(attribute => attribute.name.toLowerCase() === 'material')) {
-                this.productForm.variant_attributes.push({
-                    'name': 'Material',
-                    'is_editable': true,
-                    'instruction': 'Select your material',
-                    'values': ['Cotton', 'Nylon'],
-                });
-            }
-            // Add a default variant attribute if none of the above conditions are met
-            else {
-                this.productForm.variant_attributes.push({
-                    'name': '',
-                    'is_editable': true,
-                    'instruction': '',
-                    'values': [],
-                });
-            }
-            this.saveStateDebounced('Added variant attribute');
+            this.productForm.variants.push({
+
+                id: variant?.id ?? null,
+                sku: variant?.sku ?? null,
+                name: variant?.name ?? null,
+                photos: variant?.photos ?? [],
+                visible: variant?.visible ?? true,
+                barcode: variant?.barcode ?? null,
+                unit_cost_price: variant?.unit_cost_price.amount_without_currency ?? '0.00',
+                unit_sale_price: variant?.unit_sale_price.amount_without_currency ?? '0.00',
+                unit_regular_price: variant?.unit_regular_price.amount_without_currency ?? '0.00',
+
+                show_more: false,
+                temporary_id: uuidv4()
+
+            });
+
+            if(!variant) this.saveStateDebounced('Added variant');
         },
-        onRemoveVariantAttribute(index) {
-            this.productForm.variant_attributes.splice(index, 1);
-            this.saveStateDebounced('Removed variant attribute');
-        },
-        onResetVariantAttributes() {
-            this.productForm.variant_attributes = cloneDeep(this.originalVariantAttributes);
-            this.saveStateDebounced('Reset variant attributes');
+        removeVariant(index) {
+            this.productForm.variants.splice(index, 1);
+            this.saveStateDebounced('Removed variant');
         },
     },
     getters: {
         hasProduct() {
             return this.product != null;
         },
-        hasVariantAttributes() {
-            return this.productForm.variant_attributes.length > 0;
-        },
-        hasOriginalVariantAttributes() {
-            return this.originalVariantAttributes.length > 0;
-        },
-        variantAttributesHaveChanged() {
-            // Clone the arrays to avoid modifying the original data
-            var a = cloneDeep(this.productForm.variant_attributes);
-            var b = cloneDeep(this.originalVariantAttributes);
-
-            // Loop through each object in the array and delete the property
-            a.forEach(obj => delete obj.is_editable);
-            b.forEach(obj => delete obj.is_editable);
-
-            // Compare the modified arrays for equality
-            return !isEqual(a, b);
+        hasVariants() {
+            return this.productForm.variants.length > 0;
         }
     }
 });

@@ -220,7 +220,13 @@ export const useChangeHistoryStore = defineStore('change-history', {
             }
         }
         return result;
-    }
+    },
+    getOriginalState() {
+        return JSON.parse(this.history.timeline[this.history.timeline.length - 1].state);
+    },
+    getCurrentState() {
+        return JSON.parse(this.history.timeline[this.history.currentIndex].state);
+    },
   },
   getters: {
     canUndo: (state) => {
@@ -245,8 +251,8 @@ export const useChangeHistoryStore = defineStore('change-history', {
       if (state.history.timeline.length === 0 || state.history.currentIndex === null) {
         return false;
       }
-      const originalState = JSON.parse(state.history.timeline[state.history.timeline.length - 1].state);
-      const currentState = JSON.parse(state.history.timeline[state.history.currentIndex].state);
+      const currentState = state.getCurrentState();
+      const originalState = state.getOriginalState();
       const differences = diff(originalState, currentState);
       return differences && differences.length > 0;
     },

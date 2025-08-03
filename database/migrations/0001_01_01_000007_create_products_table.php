@@ -16,7 +16,7 @@ return new class extends Migration
     {
         Schema::create('products', function (Blueprint $table) {
             $table->uuid('id')->primary();
-            $table->string('name', 60)->nullable()->comment('Product name, up to 60 characters to accommodate variation names');
+            $table->string('name', 60)->nullable()->comment('Product name, up to 60 characters to accommodate variant names');
             $table->enum('type', ProductType::values())->default(ProductType::PHYSICAL->value);
             $table->boolean('visible')->default(true);
             $table->timestamp('visibility_expires_at')->nullable();
@@ -24,10 +24,6 @@ return new class extends Migration
             $table->string('description', 500)->nullable();
             $table->string('sku', 50)->nullable();
             $table->string('barcode', 50)->nullable();
-            $table->boolean('allow_variations')->default(false);
-            $table->json('variant_attributes')->nullable();
-            $table->unsignedTinyInteger('total_variations')->nullable();
-            $table->unsignedTinyInteger('total_visible_variations')->nullable();
             $table->decimal('unit_weight', 12, 3)->default(0);
             $table->boolean('is_free')->default(false);
             $table->boolean('is_estimated_price')->default(false);

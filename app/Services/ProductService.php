@@ -2,30 +2,25 @@
 
 namespace App\Services;
 
-use App\Enums\Association;
 use Exception;
+use App\Models\Tag;
 use App\Models\Store;
 use App\Models\Product;
-use App\Models\Variable;
+use App\Models\Category;
+use App\Enums\Association;
 use Illuminate\Support\Str;
-use Illuminate\Support\Arr;
 use App\Enums\SortProductBy;
 use Barryvdh\DomPDF\Facade\Pdf;
 use App\Enums\UploadFolderName;
 use App\Enums\StockQuantityType;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Collection;
 use App\Http\Resources\ProductResource;
 use App\Http\Resources\ProductResources;
-use App\Models\Category;
-use App\Models\Tag;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use \Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class ProductService extends BaseService
 {
-    const MAXIMUM_VARIATIONS_PER_PRODUCT = 100;
-
     /**
      * Show products.
      *
@@ -38,11 +33,11 @@ class ProductService extends BaseService
         $association = isset($data['association']) ? Association::tryFrom($data['association']) : null;
 
         if($association == Association::SUPER_ADMIN) {
-            $query = Product::query()->doesNotSupportVariations();
+            $query = Product::query();
         }else if($association == Association::TEAM_MEMBER) {
-            $query = Product::where('store_id', $storeId)->doesNotSupportVariations();
+            $query = Product::isNotVariant()->where('store_id', $storeId);
         }else {
-            $query = Product::where('store_id', $storeId)->doesNotSupportVariations()->visible();
+            $query = Product::isNotVariant()->where('store_id', $storeId)->visible();
         }
 
         $query = $query->when(!request()->has('_sort'), fn($query) => $query->latest());
@@ -70,39 +65,6 @@ class ProductService extends BaseService
         ]);
 
         $product = Product::create($data);
-
-        // Process tags
-        $tagIds = [];
-
-        if (!empty($tags)) {
-
-            $existingTags = $store->tags;
-
-            // Match tags by UUID or name
-            $matchingUuidTags = $existingTags->filter(fn($existingTag) => collect($tags)->contains($existingTag->id));
-            $matchingNameTags = $existingTags->filter(fn($existingTag) => collect($tags)->contains($existingTag->name));
-
-            // Non-matching tags (new tags to create)
-            $nonMatchingNameTags = collect($tags)->filter(function ($tag) use ($existingTags) {
-                return !Str::isUuid($tag) && !$existingTags->contains('name', $tag);
-            })->unique()->values();
-
-            // Create new tags
-            foreach ($nonMatchingNameTags as $tagName) {
-                $newTag = Tag::create([
-                    'name' => $tagName,
-                    'store_id' => $storeId
-                ]);
-                $tagIds[] = $newTag->id;
-            }
-
-            // Combine all tag IDs (UUIDs, matching names, new tags)
-            $tagIds = array_merge(
-                $tagIds,
-                $matchingUuidTags->pluck('id')->toArray(),
-                $matchingNameTags->pluck('id')->toArray()
-            );
-        }
 
         if(!is_null($tags)) {
             $this->createProductTags($product, $tags);
@@ -289,10 +251,11 @@ class ProductService extends BaseService
     {
         $storeId = $data['store_id'];
         $store = Store::find($storeId);
-        $products = $store->products()->orderBy('position', 'asc')->get();
+        $parentProductId = $data['parent_product_id'] ?? null;
+        $products = $store->products()->when(!empty($parentProductId), fn($query) => $query->where('parent_product_id', $parentProductId))->orderBy('position', 'asc')->get();
 
         if (isset($data['sort_by'])) {
-            $query = $store->products();
+            $query = $store->products()->when(!empty($parentProductId), fn($query) => $query->where('parent_product_id', $parentProductId));
 
             switch ($data['sort_by']) {
                 case SortProductBy::BEST_SELLING->value:
@@ -450,8 +413,8 @@ class ProductService extends BaseService
             $mediaFileService->deleteMediaFile($mediaFile);
         }
 
-        foreach ($product->variations as $variation) {
-            $this->deleteProduct($variation);
+        foreach ($product->variants as $variant) {
+            $this->deleteProduct($variant);
         }
 
         $deleted = $product->delete();
@@ -464,12 +427,12 @@ class ProductService extends BaseService
     }
 
     /**
-     * Show product variations.
+     * Show product variants.
      *
      * @param Product $product
      * @return ProductResources|array
      */
-    public function showProductVariations(Product $product): ProductResources|array
+    public function showProductVariants(Product $product): ProductResources|array
     {
         $query = Product::where('parent_product_id', $product->id)
             ->with($this->getRequestRelationships())
@@ -478,204 +441,6 @@ class ProductService extends BaseService
 
         return $this->setQuery($query)->getOutput();
     }
-
-    /**
-     *  Create product variations.
-     *
-     * @param Product $product
-     * @param array $data
-     * @return ProductResources|array
-     */
-    public function createProductVariations(Product $product, array $data): ProductResources|array
-    {
-        $variantAttributes = $data['variant_attributes'];
-        $variantAttributes = $this->normalizeVariantAttributes($variantAttributes);
-        $variantAttributeMatrix = $this->generateVariantAttributeMatrix($variantAttributes);
-        $productVariationTemplates = $this->generateProductVariationTemplates($product, $variantAttributes, $variantAttributeMatrix);
-        [$matchedProductVariations, $unMatchedProductVariations] = $this->matchProductVariations($product, $productVariationTemplates);
-        $totalProductVariations = $matchedProductVariations->count() + $unMatchedProductVariations->count();
-
-        if($totalProductVariations > self::MAXIMUM_VARIATIONS_PER_PRODUCT) {
-            return ['message' => 'This product has '.$totalProductVariations.' variations which is greater than the maximum limit of '.self::MAXIMUM_VARIATIONS_PER_PRODUCT.' variations per product'];
-        }
-
-        if ($unMatchedProductVariations->count()) {
-            $this->deleteUnmatchedProductVariations($unMatchedProductVariations);
-        }
-
-        if ($productVariationTemplates->count()) {
-            $this->createNewProductVariations($productVariationTemplates, $product, $variantAttributes);
-        }
-
-        return $this->setQuery($product->variations())->getOutput();
-    }
-
-    /**
-     * Normalize variant attributes.
-     *
-     * @param array $variantAttributes
-     * @return Collection
-     */
-    private function normalizeVariantAttributes(array $variantAttributes): Collection
-    {
-        return collect($variantAttributes)->map(function ($variantAttribute) {
-            $variantAttribute['name'] = ucfirst($variantAttribute['name']);
-            if (!isset($variantAttribute['instruction']) || empty($variantAttribute['instruction'])) {
-                $variantAttribute['instruction'] = 'Select option';
-            }
-            return $variantAttribute;
-        });
-    }
-
-    /**
-     * Generate variant attribute matrix.
-     *
-     * @param Collection $variantAttributes
-     * @return array
-     */
-    private function generateVariantAttributeMatrix(Collection $variantAttributes): array
-    {
-        $variantAttributesRestructured = $variantAttributes->mapWithKeys(function ($variantAttribute) {
-            return [$variantAttribute['name'] => $variantAttribute['values']];
-        });
-
-        return Arr::crossJoin(...$variantAttributesRestructured->values());
-    }
-
-    /**
-     * Generate product variation templates.
-     *
-     * @param Product $product
-     * @param Collection $variantAttributes
-     * @param array $variantAttributeMatrix
-     * @return Collection
-     */
-    private function generateProductVariationTemplates(Product $product, Collection $variantAttributes, array $variantAttributeMatrix): Collection
-    {
-        return collect($variantAttributeMatrix)->map(function ($options) use ($product, $variantAttributes) {
-            $name = $product->name . ' (' . trim(collect($options)->map(fn($option) => ucfirst($option))->join(', ')) . ')';
-
-            $template = [
-                'id' => Str::uuid(),
-                'name' => $name,
-                'created_at' => now(),
-                'updated_at' => now(),
-                'user_id' => auth()->user()->id,
-                'store_id' => $product->store_id,
-                'parent_product_id' => $product->id,
-                'variable_templates' => collect($options)->map(function ($option, $key) use ($variantAttributes) {
-                    $variantAttributeNames = $variantAttributes->keys();
-                    return [
-                        'id' => Str::uuid(),
-                        'value' => $option,
-                        'name' => $variantAttributeNames->get($key),
-                    ];
-                })
-            ];
-
-            return $template;
-        });
-    }
-
-    /**
-     * Match product variations.
-     *
-     * @param Product $product
-     * @param Collection $productVariationTemplates
-     * @return Collection
-     */
-    private function matchProductVariations(Product $product, Collection &$productVariationTemplates): Collection
-    {
-        $existingProductVariations = $product->variations()->with('variables')->get();
-
-        return $existingProductVariations->partition(function ($existingProductVariation) use (&$productVariationTemplates) {
-            $result1 = $existingProductVariation->variables->mapWithKeys(function ($variable) {
-                return [$variable->name => $variable->value];
-            });
-
-            return collect($productVariationTemplates)->contains(function ($productVariationTemplate, $key) use ($result1, &$productVariationTemplates) {
-                $result2 = collect($productVariationTemplate['variable_templates'])->mapWithKeys(function ($variable) {
-                    return [$variable['name'] => $variable['value']];
-                });
-
-                $exists = $result1->diffAssoc($result2)->isEmpty() && $result2->diffAssoc($result1)->isEmpty();
-
-                if ($exists) {
-                    $productVariationTemplates->forget($key);
-                }
-
-                return $exists;
-            });
-        });
-    }
-
-    /**
-     * Delete unmatched product variations.
-     *
-     * @param Collection $unMatchedProductVariations
-     */
-    private function deleteUnmatchedProductVariations(Collection $unMatchedProductVariations): void
-    {
-        $unMatchedProductVariations->each(fn($unMatchedProductVariation) => $unMatchedProductVariation->delete());
-    }
-
-    /**
-     * Create new product variations.
-     *
-     * @param Collection $productVariationTemplates
-     * @param Product $product
-     * @param Collection $variantAttributes
-     */
-    private function createNewProductVariations(Collection $productVariationTemplates, Product $product, Collection $variantAttributes): void
-    {
-        Product::insert(
-            $productVariationTemplates->map(
-                fn($productVariationTemplate) => collect($productVariationTemplate)->only(['id', 'name', 'parent_product_id', 'user_id', 'store_id', 'created_at', 'updated_at'])
-            )->toArray()
-        );
-
-        $existingProductVariations = $product->variations()->get();
-        $variableTemplates = $this->generateVariableTemplates($existingProductVariations, $productVariationTemplates);
-
-        Variable::insert($variableTemplates->toArray());
-        $totalVariations = $product->variations()->count();
-        $totalVisibleVariations = $product->variations()->visible()->count();
-
-        $product->update([
-            'allow_variations' => true,
-            'total_variations' => $totalVariations,
-            'variant_attributes' => $variantAttributes,
-            'total_visible_variations' => $totalVisibleVariations
-        ]);
-    }
-
-    /**
-     * Generate variable templates.
-     *
-     * @param Collection $existingProductVariations
-     * @param Collection $productVariationTemplates
-     * @return Collection
-     */
-    private function generateVariableTemplates(Collection $existingProductVariations, Collection $productVariationTemplates): Collection
-    {
-        return $existingProductVariations->flatMap(function ($existingProductVariation) use ($productVariationTemplates) {
-
-            $productVariationTemplate = $productVariationTemplates->first(fn($productVariationTemplate) => $existingProductVariation->name === $productVariationTemplate['name']);
-
-            if ($productVariationTemplate) {
-                $variableTemplates = $productVariationTemplate['variable_templates'];
-
-                return collect($variableTemplates)->map(function ($variableTemplate) use ($existingProductVariation) {
-                    $variableTemplate['product_id'] = $existingProductVariation->id;
-                    return $variableTemplate;
-                });
-            }
-
-            return [];
-        });
-    }
-
-
 
     /**
      * Create product tags.

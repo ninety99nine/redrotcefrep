@@ -78,8 +78,8 @@
                 :key="index"
                 :type="actionButton.type"
                 :leftIcon="actionButton.icon"
-                :action="actionButton.action"
                 :loading="actionButton.loading"
+                :action="() => actionButton.action()"
                 v-for="(actionButton, index) in changeHistoryState.actionButtons">
                 <span>{{ actionButton.label }}</span>
             </Button>

@@ -516,7 +516,6 @@ class ShoppingCartService
         return $cartProductIds
             ? Product::where('store_id', $this->store->id)
                 ->whereIn('id', $cartProductIds)
-                ->doesNotSupportVariations()
                 ->get()->keyBy('id')
             : collect();
     }

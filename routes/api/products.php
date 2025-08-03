@@ -21,7 +21,6 @@ Route::prefix('products')
             Route::get('/', 'showProduct')->name('show.product');
             Route::put('/', 'updateProduct')->name('update.product');
             Route::delete('/', 'deleteProduct')->name('delete.product');
-            Route::get('/variations', 'showProductVariations')->name('show.product.variations');
-            Route::post('/variations', 'createProductVariations')->name('create.product.variations');
+            Route::get('/variants', 'showProductVariants')->name('show.product.variants');
         });
     });

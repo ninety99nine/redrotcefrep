@@ -16,9 +16,8 @@ use App\Http\Requests\Product\UpdateProductsRequest;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use App\Http\Requests\Product\DownloadProductsRequest;
 use \Symfony\Component\HttpFoundation\BinaryFileResponse;
-use App\Http\Requests\Product\ShowProductVariationsRequest;
+use App\Http\Requests\Product\showProductVariantsRequest;
 use App\Http\Requests\Product\UpdateProductVisibilityRequest;
-use App\Http\Requests\Product\CreateProductVariationsRequest;
 use App\Http\Requests\Product\UpdateProductArrangementRequest;
 
 class ProductController extends Controller
@@ -153,26 +152,14 @@ class ProductController extends Controller
     }
 
     /**
-     * Show product variations.
+     * Show product variants.
      *
-     * @param ShowProductVariationsRequest $request
+     * @param showProductVariantsRequest $request
      * @param Product $product
      * @return ProductResources|array
      */
-    public function showProductVariations(ShowProductVariationsRequest $request, Product $product): ProductResources|array
+    public function showProductVariants(showProductVariantsRequest $request, Product $product): ProductResources|array
     {
-        return $this->service->showProductVariations($product);
-    }
-
-    /**
-     * Create product variations.
-     *
-     * @param CreateProductVariationsRequest $request
-     * @param Product $product
-     * @return ProductResources|array
-     */
-    public function createProductVariations(CreateProductVariationsRequest $request, Product $product): ProductResources|array
-    {
-        return $this->service->createProductVariations($product, $request->validated());
+        return $this->service->showProductVariants($product);
     }
 }

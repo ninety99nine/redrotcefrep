@@ -298,8 +298,8 @@
                         ]">
 
                         <div
-                            :key="fileIndex"
                             class="relative group"
+                            :key="file.temporary_id"
                             v-for="(file, fileIndex) in modelValue">
 
                             <template v-if="!file.uploading && !file.deleting">
@@ -324,7 +324,7 @@
 
                                 <!-- Remove Image Button -->
                                 <div
-                                    @click.stop="(event) => removeFile(event, fileIndex)"
+                                    @click.stop="(event) => removeFile(event, file.temporary_id)"
                                     class="w-6 h-6 active:scale-90 transition cursor-pointer flex items-center justify-center absolute z-10 -top-1 -right-1 border border-gray-300 bg-white text-black hover:bg-gray-100 rounded-full">
                                     <X v-if="isTemporaryFile(modelValue[fileIndex])" size="14"></X>
                                     <svg v-else class="w-3 h-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
@@ -334,7 +334,7 @@
 
                                 <!-- Invalid QR code Disclaimer -->
                                 <div
-                                    @click.stop="(event) => removeFile(event, fileIndex)"
+                                    @click.stop="(event) => removeFile(event, file.temporary_id)"
                                     v-if="(file.hasOwnProperty('qrCode') && !file.qrCode.valid)"
                                     class="w-full flex items-center justify-center absolute z-10 bottom-2">
                                     <div class="bg-yellow-500 text-xs text-white rounded-full px-2">Invalid QR code</div>
@@ -375,7 +375,7 @@
                             <!-- Upload Error Message -->
                             <div
                                 v-if="!file.uploading && file.error_message"
-                                @click.stop="(event) => removeFile(event, fileIndex)"
+                                @click.stop="(event) => removeFile(event, file.temporary_id)"
                                 class="w-full flex items-center justify-center relative z-50">
                                 <div class="w-full bg-yellow-500 text-xs text-white rounded-b-lg p-1">{{ file.error_message }}</div>
                             </div>
@@ -416,6 +416,7 @@
 <script>
 
     import "intl-tel-input/styles";
+    import { v4 as uuidv4 } from 'uuid';
     import Copy from '@Partials/Copy.vue';
     import debounce from 'lodash.debounce';
     import cloneDeep from 'lodash.clonedeep';
@@ -871,6 +872,7 @@
 
                             let newFile = {
                                 path: this.getFileType(file.name) == 'image' ? URL.createObjectURL(file) : null,
+                                temporary_id: uuidv4(),
                                 error_message: null,
                                 uploading: false,
                                 deleting: false,
@@ -916,12 +918,15 @@
             isTemporaryFile(file) {
                 return file.path && file.path.startsWith("blob:");
             },
-            async removeFile(event, fileIndex) {
+            async removeFile(event, temporaryId) {
 
                 event.preventDefault();
                 event.stopPropagation();
 
-                if (this.isTemporaryFile(this.modelValue[fileIndex])) {
+                let fileIndex = this.modelValue.findIndex((file) => file.temporary_id == temporaryId);
+                let file = this.modelValue[fileIndex];
+
+                if (this.isTemporaryFile(file)) {
 
                     let files = cloneDeep(this.modelValue);
                     files.splice(fileIndex, 1);
@@ -929,7 +934,7 @@
                     this.updateModalValue(files);
 
                 }else if (this.onDelete) {
-                    this.onDelete(this.modelValue, fileIndex);
+                    this.onDelete(this.modelValue, temporaryId);
                 }else {
 
                     try {
@@ -946,6 +951,8 @@
 
                         await axios.delete(`/api/media-files/${this.modelValue[fileIndex].id}`, config);
                         this.notificationState.showSuccessNotification('Media file deleted');
+
+                        fileIndex = this.modelValue.findIndex((file) => file.temporary_id == temporaryId);
                         this.modelValue.splice(fileIndex, 1);
 
                     } catch (error) {
@@ -953,6 +960,7 @@
                         this.notificationState.showWarningNotification(message);
                         this.formState.setServerFormErrors(error);
                         console.error('Failed to delete media file:', error);
+                        fileIndex = this.modelValue.findIndex((file) => file.temporary_id == temporaryId);
                         this.modelValue[fileIndex].deleting = false;
                     }
 

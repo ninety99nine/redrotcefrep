@@ -40,11 +40,8 @@ class ProductResource extends JsonResource
             'unit_cost_price' => $this->unit_cost_price,
             'unit_weight' => $this->unit_weight ? (string)$this->unit_weight : null,
             'show_description' => $this->show_description,
-            'allow_variations' => $this->allow_variations,
-            'total_variations' => $this->total_variations,
             'parent_product_id' => $this->parent_product_id,
             'unit_regular_price' => $this->unit_regular_price,
-            'variant_attributes' => $this->variant_attributes,
             'unit_sale_discount' => $this->unit_sale_discount,
             'tax_overide' => $this->tax_overide,
             'tax_overide_amount' => $this->tax_overide_amount,
@@ -64,7 +61,6 @@ class ProductResource extends JsonResource
             'updated_at' => $this->updated_at->toDateTimeString(),
             'unit_loss_percentage' => $this->unit_loss_percentage,
             'unit_profit_percentage' => $this->unit_profit_percentage,
-            'total_visible_variations' => $this->total_visible_variations,
             'unit_sale_discount_percentage' => $this->unit_sale_discount_percentage,
             'visibility_expires_at' => $this->visibility_expires_at ? $this->visibility_expires_at->toDateTimeString() : null,
 
@@ -72,11 +68,14 @@ class ProductResource extends JsonResource
             'store' => new StoreResource($this->whenLoaded('store')),
             'photo' => new MediaFileResource($this->whenLoaded('photo')),
             'tags' => TagResource::collection($this->whenLoaded('tags')),
+            'variant' => new ProductResource($this->whenLoaded('variant')),
             'photos' => MediaFileResource::collection($this->whenLoaded('photos')),
+            'variants' => ProductResource::collection($this->whenLoaded('variants')),
             'parent_product' => new ProductResource($this->whenLoaded('parentProduct')),
-            'variations' => ProductResource::collection($this->whenLoaded('variations')),
             'categories' => CategoryResource::collection($this->whenLoaded('categories')),
             'media_files' => MediaFileResource::collection($this->whenLoaded('mediaFiles')),
+
+            'variants_count' => $this->whenCounted('variants'),
 
             '_links' => [
                 'show' => route('show.product', ['product' => $this->id]),
