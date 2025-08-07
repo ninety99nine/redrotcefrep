@@ -22,22 +22,7 @@
         watch: {
             store(newValue) {
                 if(newValue) {
-                    if(this.orderId || this.duplicateOrderId) {
-                        this.showOrder();
-                    }else{
-                        this.orderState.setOrderForm(null);
-                    }
-
-                    if(this.isCreating || this.isEditing) {
-                        this.changeHistoryState.removeButtons();
-                        this.changeHistoryState.addDiscardButton();
-                        this.changeHistoryState.addActionButton(
-                            this.isEditing ? 'Save Changes' : 'Create Order',
-                            this.isEditing ? this.updateOrder : this.createOrder,
-                            'primary',
-                            null,
-                        );
-                    }
+                    this.setup();
                 }
             },
         },
@@ -65,6 +50,26 @@
             },
         },
         methods: {
+            setup() {
+                if(!this.store) return;
+
+                if(this.orderId || this.duplicateOrderId) {
+                    this.showOrder();
+                }else{
+                    this.orderState.setOrderForm(null);
+                }
+
+                if(this.isCreating || this.isEditing) {
+                    this.changeHistoryState.removeButtons();
+                    this.changeHistoryState.addDiscardButton();
+                    this.changeHistoryState.addActionButton(
+                        this.isEditing ? 'Save Changes' : 'Create Order',
+                        this.isEditing ? this.updateOrder : this.createOrder,
+                        'primary',
+                        null,
+                    );
+                }
+            },
             async showOrder() {
                 try {
 
@@ -208,6 +213,7 @@
             this.changeHistoryState.reset();
         },
         created() {
+            this.setup();
             const listeners = ['undo', 'redo', 'jumpToHistory', 'resetHistoryToCurrent', 'resetHistoryToOriginal'];
 
             for (let i = 0; i < listeners.length; i++) {

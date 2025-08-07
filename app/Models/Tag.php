@@ -37,16 +37,6 @@ class Tag extends Model
     }
 
     /**
-     * Get the products.
-     *
-     * @return BelongsToMany
-     */
-    public function products(): BelongsToMany
-    {
-        return $this->belongsToMany(Product::class, 'product_tag');
-    }
-
-    /**
      * Get the store.
      *
      * @return BelongsTo
@@ -54,5 +44,15 @@ class Tag extends Model
     public function store(): BelongsTo
     {
         return $this->belongsTo(Store::class);
+    }
+
+    /**
+     * Get the products.
+     *
+     * @return BelongsToMany
+     */
+    public function products(): BelongsToMany
+    {
+        return $this->belongsToMany(Product::class, 'product_tag');
     }
 }

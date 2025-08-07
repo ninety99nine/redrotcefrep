@@ -3,7 +3,8 @@ import { defineStore } from 'pinia';
 export const useStoreStore = defineStore('store', {
     state: () => ({
         store: null,
-        isLoadingStore: false
+        silentUpdate: null,
+        isLoadingStore: false,
     }),
     actions: {
         setStore(store) {

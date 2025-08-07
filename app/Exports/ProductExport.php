@@ -34,7 +34,7 @@ class ProductExport implements FromCollection, WithHeadings, ShouldAutoSize, Wit
     {
         $headings = [
             'product_per_line' => [
-                'ID', 'Name', 'Description', 'Visible', 'Unit Regular Price', 'Unit Sale Price', 'Unit Price', 'Stock', 'Quantity Per Order', 'Position', 'Variants', 'Created Date'
+                'ID', 'Name', 'Description', 'Visibility', 'Unit Regular Price', 'Unit Sale Price', 'Unit Price', 'Stock', 'Quantity Per Order', 'Position', 'Variants', 'Created Date'
             ]
         ];
 
@@ -48,7 +48,7 @@ class ProductExport implements FromCollection, WithHeadings, ShouldAutoSize, Wit
                 'ID' => $product->id,
                 'Name' => '="' . $product->name . '"',
                 'Description' => $product->show_description && $product->description != null ? $product->show_description : null,
-                'Visible' => $product->visible ? 'yes' : 'no',
+                'Visibility' => $product->visible ? 'visible' : 'hidden',
                 'Unit Regular Price' => $product->unit_regular_price->amount_without_currency,
                 'Unit Sale Price' => $product->unit_sale_price->amount_without_currency,
                 'Unit Price' => $product->unit_price->amount_without_currency,

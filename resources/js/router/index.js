@@ -165,9 +165,54 @@ const routes = [
                         component: () => import('@Pages/products/product/Product.vue')
                     },
                     {
+                        path: 'bulk-edit',
+                        name: 'bulk-edit-products',
+                        component: () => import('@Pages/products/bulk-edit-products/BulkEditProducts.vue')
+                    },
+                    {
                         path: ':product_id',
                         name: 'edit-product',
                         component: () => import('@Pages/products/product/Product.vue')
+                    }
+                ]
+            },
+            {
+                path: 'categories',
+                children: [
+                    {
+                        path: '',
+                        name: 'show-categories',
+                        component: () => import('@Pages/categories/Categories.vue')
+                    },
+                    {
+                        path: 'create',
+                        name: 'create-category',
+                        component: () => import('@Pages/categories/category/Category.vue')
+                    },
+                    {
+                        path: ':category_id',
+                        name: 'edit-category',
+                        component: () => import('@Pages/categories/category/Category.vue')
+                    }
+                ]
+            },
+            {
+                path: 'tags',
+                children: [
+                    {
+                        path: '',
+                        name: 'show-tags',
+                        component: () => import('@Pages/tags/Tags.vue')
+                    },
+                    {
+                        path: 'create',
+                        name: 'create-tag',
+                        component: () => import('@Pages/tags/tag/Tag.vue')
+                    },
+                    {
+                        path: ':tag_id',
+                        name: 'edit-tag',
+                        component: () => import('@Pages/tags/tag/Tag.vue')
                     }
                 ]
             },

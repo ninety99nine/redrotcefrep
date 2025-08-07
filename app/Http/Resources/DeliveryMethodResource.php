@@ -62,6 +62,7 @@ class DeliveryMethodResource extends JsonResource
 
             'store' => new StoreResource($this->whenLoaded('store')),
             //  'address' => new AddressResource($this->whenLoaded('address')),
+            'products' => ProductResource::collection($this->whenLoaded('products')),
 
             '_links' => [
                 'show' => route('show.delivery.method', ['deliveryMethod' => $this->id]),

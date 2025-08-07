@@ -6,6 +6,8 @@ export const useProductStore = defineStore('product', {
     state: () => ({
         product: null,
         productForm: null,
+        isUploading: false,
+        bulkProductForm: [],
         isLoadingProduct: false,
         isCreatingProduct: false,
         isUpdatingProduct: false,
@@ -17,8 +19,14 @@ export const useProductStore = defineStore('product', {
         reset() {
             this.product = null;
             this.productForm = null;
+            this.isUploading = false;
+            this.bulkProductForm = [];
             this.isLoadingProduct = false;
-            this.originalVariantAttributes = [];
+            this.isCreatingProduct = false;
+            this.isUpdatingProduct = false;
+            this.isDeletingProduct = false;
+            this.isCreatingVariants = false;
+            this.isChangingVariantArrangement = false;
         },
         setProduct(product) {
             this.product = product;
@@ -27,13 +35,16 @@ export const useProductStore = defineStore('product', {
             this.isLoadingProduct = isLoadingProduct;
         },
         saveState(actionName) {
-            changeHistoryState().saveState(actionName, this.productForm);
+            console.log('saveState');
+            changeHistoryState().saveState(actionName, this.productForm ?? this.bulkProductForm);
         },
         saveStateDebounced(actionName) {
-            changeHistoryState().saveStateDebounced(actionName, this.productForm);
+            console.log('saveStateDebounced');
+            changeHistoryState().saveStateDebounced(actionName, this.productForm ?? this.bulkProductForm);
         },
         saveOriginalState(actionName) {
-            changeHistoryState().saveOriginalState(actionName, this.productForm);
+            console.log('saveOriginalState');
+            changeHistoryState().saveOriginalState(actionName, this.productForm ?? this.bulkProductForm);
         },
         setProductForm(product = null, saveState = true) {
 
@@ -42,8 +53,10 @@ export const useProductStore = defineStore('product', {
                 tags: [],
                 variants: [],
                 categories: [],
+                delivery_method_ids: [],
                 id: product?.id ?? null,
                 sku: product?.sku ?? null,
+                data_collection_fields: [],
                 name: product?.name ?? null,
                 photos: product?.photos ?? [],
                 type: product?.type ?? 'physical',
@@ -84,6 +97,10 @@ export const useProductStore = defineStore('product', {
                     this.productForm.categories.push(category.id);
                 });
 
+                product.delivery_methods.forEach((deliveryMethod) => {
+                    this.productForm.delivery_method_ids.push(deliveryMethod.id);
+                });
+
                 product.variants.forEach((variant) => {
                     this.addVariant(variant);
                 });
@@ -94,6 +111,96 @@ export const useProductStore = defineStore('product', {
                 this.saveOriginalState('Original product');
             }
 
+        },
+        setBulkProductForm(products = [], saveState = true) {
+
+            this.bulkProductForm = products.flatMap((product) => {
+
+                const parent = {
+                    id: product.id,
+                    sku: product.sku,
+                    name: product.name,
+                    type: product.type,
+                    photo: product.photo,
+                    visible: product.visible,
+                    is_free: product.is_free,
+                    barcode: product.barcode,
+                    position: product.position,
+                    tax_overide: product.tax_overide,
+                    description: product.description,
+                    download_link: product.download_link,
+                    unit_type: product.unit_type?.toString(),
+                    unit_value: product.unit_value?.toString(),
+                    show_description: product.show_description,
+                    parent_product_id: product.parent_product_id,
+                    unit_weight: product.unit_weight?.toString(),
+                    is_estimated_price: product.is_estimated_price,
+                    set_daily_capacity: product.set_daily_capacity,
+                    show_price_per_unit: product.show_price_per_unit,
+                    stock_quantity_type: product.stock_quantity_type,
+                    daily_capacity: product.daily_capacity?.toString(),
+                    stock_quantity: product.stock_quantity?.toString(),
+                    set_min_order_quantity: product.set_min_order_quantity,
+                    set_max_order_quantity: product.set_max_order_quantity,
+                    min_order_quantity: product.min_order_quantity?.toString(),
+                    max_order_quantity: product.max_order_quantity?.toString(),
+                    unit_cost_price: product.unit_cost_price.amount_without_currency,
+                    unit_sale_price: product.unit_sale_price.amount_without_currency,
+                    unit_regular_price: product.unit_regular_price.amount_without_currency,
+                    tax_overide_amount: product.tax_overide_amount?.amount_without_currency,
+
+                    is_variant: false,
+                    total_variants: product.variants.length,
+                    has_variants: product.variants.length > 0,
+                };
+
+                const variants = product.variants.map((variant) => ({
+                    id: variant.id,
+                    sku: variant.sku,
+                    type: variant.type,
+                    name: variant.name,
+                    photo: variant.photo,
+                    visible: variant.visible,
+                    is_free: variant.is_free,
+                    barcode: variant.barcode,
+                    position: product.position,
+                    tax_overide: variant.tax_overide,
+                    description: variant.description,
+                    download_link: variant.download_link,
+                    unit_type: variant.unit_type?.toString(),
+                    unit_value: variant.unit_value?.toString(),
+                    show_description: variant.show_description,
+                    parent_product_id: variant.parent_product_id,
+                    unit_weight: variant.unit_weight?.toString(),
+                    is_estimated_price: variant.is_estimated_price,
+                    set_daily_capacity: variant.set_daily_capacity,
+                    show_price_per_unit: variant.show_price_per_unit,
+                    stock_quantity_type: variant.stock_quantity_type,
+                    daily_capacity: variant.daily_capacity?.toString(),
+                    stock_quantity: variant.stock_quantity?.toString(),
+                    set_min_order_quantity: variant.set_min_order_quantity,
+                    set_max_order_quantity: variant.set_max_order_quantity,
+                    min_order_quantity: variant.min_order_quantity?.toString(),
+                    max_order_quantity: variant.max_order_quantity?.toString(),
+                    unit_cost_price: variant.unit_cost_price.amount_without_currency,
+                    unit_sale_price: variant.unit_sale_price.amount_without_currency,
+                    unit_regular_price: variant.unit_regular_price.amount_without_currency,
+                    tax_overide_amount: variant.tax_overide_amount?.amount_without_currency,
+
+                    is_variant: true,
+                    total_variants: 0,
+                    has_variants: false
+                }));
+
+                // Combine parent and its variants
+                return [parent, ...variants];
+            });
+
+            console.log(this.bulkProductForm);
+
+            if (saveState) {
+                this.saveOriginalState('Original products');
+            }
         },
         addVariant(variant = null) {
 

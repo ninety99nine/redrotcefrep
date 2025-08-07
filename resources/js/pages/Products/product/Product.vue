@@ -4,44 +4,40 @@
 
         <div class="grid grid-cols-12 gap-4 mb-4">
 
-            <div class="col-span-8 z-10">
+            <div class="col-span-8">
 
                 <div class="select-none bg-white rounded-lg p-4 mb-4">
 
-                    <div class="flex justify-between items-center">
+                    <div class="flex items-center space-x-4">
 
-                        <div class="flex items-center space-x-4">
+                        <!-- Back Button -->
+                        <Button
+                            size="xs"
+                            type="light"
+                            :action="goBack"
+                            :leftIcon="MoveLeft">
+                            <span>Back</span>
+                        </Button>
 
-                            <!-- Back Button -->
-                            <Button
-                                size="xs"
-                                type="light"
-                                :action="goBack"
-                                :leftIcon="MoveLeft">
-                                <span>Back</span>
-                            </Button>
+                        <div v-if="isLoadingStore || isLoadingProduct || (isEditing && !hasProduct)" class="flex items-center space-x-2">
+                            <Skeleton width="w-40"></Skeleton>
+                            <Skeleton width="w-4"></Skeleton>
+                        </div>
 
-                            <div v-if="isLoadingStore || isLoadingProduct || (isEditing && !hasProduct)" class="flex items-center space-x-2">
-                                <Skeleton width="w-40"></Skeleton>
-                                <Skeleton width="w-4"></Skeleton>
+                        <template v-else>
+
+                            <!-- Heading -->
+                            <div class="flex items-center space-x-1">
+
+                                <h1 class="text-lg text-gray-700 font-semibold">
+                                    {{ isCreating ? 'Add Product' : productForm.name || '...' }}
+                                </h1>
+
+                                <Popover content="Products are physical or non physical items that customers can place orders and pay for using your preferred payment methods" placement="top"></Popover>
+
                             </div>
 
-                            <template v-else>
-
-                                <!-- Heading -->
-                                <div class="flex items-center space-x-1">
-
-                                    <h1 class="text-lg text-gray-700 font-semibold">
-                                        {{ isCreating ? 'Add Product' : productForm.name || '...' }}
-                                    </h1>
-
-                                    <Popover title="What Is This?" content="Products are physical or non physical items that customers can place orders and pay for using your preferred payment methods" placement="top"></Popover>
-
-                                </div>
-
-                            </template>
-
-                        </div>
+                        </template>
 
                     </div>
 
@@ -106,14 +102,6 @@
                             description="Confirm your order to show download link on invoice">
                         </Input>
 
-                        <!-- Category Tags -->
-                        <SelectTags
-                            label="Categories"
-                            :options="categories"
-                            v-model="productForm.categories"
-                            :errorText="formState.getFormError('categories')"
-                            @change="productState.saveStateDebounced('Categories changed')" />
-
                         <!-- Show Description Checkbox -->
                         <Input
                             type="checkbox"
@@ -142,7 +130,7 @@
                             v-if="!hasVariants"
                             v-model="productForm.unit_weight"
                             :errorText="formState.getFormError('unit_weight')"
-                            @input="productState.saveStateDebounced('Unit weight changed')"
+                            @input="productState.saveStateDebounced('Weight changed')"
                             tooltipContent="The weight of the product. Useful for delivery calculations">
                             <template #suffix>
                                 <span class="text-sm text-gray-400">{{ store?.weight_unit }}</span>
@@ -225,14 +213,13 @@
 
                         <template v-else>
 
-                            <div
-                                v-if="!hasVariants"
-                                class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                            <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
 
                                 <!-- Unit Regular Price Input -->
                                 <Input
                                     type="money"
                                     label="Regular Price"
+                                    :currency="store.currency"
                                     v-model="productForm.unit_regular_price"
                                     :errorText="formState.getFormError('unit_regular_price')"
                                     @input="productState.saveStateDebounced('Regular price changed')"
@@ -243,6 +230,7 @@
                                 <Input
                                     type="money"
                                     label="Sale Price"
+                                    :currency="store.currency"
                                     v-model="productForm.unit_sale_price"
                                     :errorText="formState.getFormError('unit_sale_price')"
                                     @input="productState.saveStateDebounced('Sale price changed')"
@@ -255,6 +243,7 @@
                             <Input
                                 type="money"
                                 label="Cost Price"
+                                :currency="store.currency"
                                 description="Invisible to customers"
                                 v-model="productForm.unit_cost_price"
                                 :errorText="formState.getFormError('unit_cost_price')"
@@ -304,11 +293,12 @@
 
                             <!-- Tax Overide Input -->
                             <Input
-                                type="number"
+                                type="money"
+                                :currency="store.currency"
                                 v-if="productForm.tax_overide"
                                 v-model="productForm.tax_overide_amount"
                                 :errorText="formState.getFormError('tax_overide_amount')"
-                                @input="productState.saveStateDebounced('Tax overide changed')">
+                                @input="productState.saveStateDebounced('Tax overide amount changed')">
                             </Input>
 
                         </template>
@@ -317,11 +307,11 @@
 
                 </div>
 
-                <div :class="{ 'bg-white rounded-lg p-4 space-y-4' : !hasVariants }">
+                <div :class="[{ 'bg-white rounded-lg p-4 space-y-4' : !hasVariants }, 'mb-4']">
 
                     <p :class="['text-lg text-gray-700 font-semibold', productForm.variants.length >= 2 ? 'mb-0' : 'mb-4', { 'pl-4' : hasVariants }]">Variants</p>
 
-                    <div v-if="productForm.variants.length >= 2" class="flex items-end space-x-4 mb-2">
+                    <div v-if="productForm.variants.length >= 2 && variantOptions.length" class="flex items-end space-x-4 mb-2">
 
                         <!-- Variant Options -->
                         <SelectTags
@@ -331,7 +321,7 @@
                             v-model="selectedVariants"
                             placeholder="Add variant filter" />
 
-                        <!-- Add Variants -->
+                        <!-- Clear Filter -->
                         <Button
                             size="xs"
                             type="light"
@@ -421,6 +411,7 @@
                                         <Input
                                             type="money"
                                             label="Regular Price"
+                                            :currency="store.currency"
                                             v-model="productForm.variants[index].unit_regular_price"
                                             @input="productState.saveStateDebounced('Regular price changed')"
                                             :errorText="formState.getFormError(`variants.${index}.unit_regular_price`)"
@@ -431,6 +422,7 @@
                                         <Input
                                             type="money"
                                             label="Sale Price"
+                                            :currency="store.currency"
                                             v-model="productForm.variants[index].unit_sale_price"
                                             @input="productState.saveStateDebounced('Sale price changed')"
                                             :errorText="formState.getFormError(`variants.${index}.unit_sale_price`)"
@@ -447,7 +439,7 @@
                                                     label="Weight"
                                                     class="w-full"
                                                     v-model="productForm.variants[index].unit_weight"
-                                                    @input="productState.saveStateDebounced('Unit weight changed')"
+                                                    @input="productState.saveStateDebounced('Weight changed')"
                                                     :errorText="formState.getFormError(`variants.${index}.unit_weight`)"
                                                     tooltipContent="The weight of the product. Useful for delivery calculations">
                                                     <template #suffix>
@@ -516,28 +508,46 @@
 
                     </template>
 
-                    <div class="flex justify-end space-x-2">
+                    <div :class="[{'flex space-x-2 justify-between' : !hasVariants}]">
 
                         <p v-if="!hasVariants" class="text-sm text-gray-700">Add variants if your product supports different versions of itself e.g different sizes, materials, colors, etc</p>
 
-                        <!-- Change Arrangement -->
-                        <Button
-                            size="xs"
-                            type="light"
-                            :leftIcon="ArrowDownUp"
-                            :action="showChangeArrangementModal"
-                            v-else-if="productForm.variants.length >= 2">
-                            <span>Change Arrangement</span>
-                        </Button>
+                        <div class="flex justify-end space-x-2">
 
-                        <!-- Add Variants -->
-                        <Button
-                            size="xs"
-                            type="light"
-                            :leftIcon="Plus"
-                            :action="addVariant">
-                            <span>Add Variants</span>
-                        </Button>
+                            <!-- Change Arrangement -->
+                            <Button
+                                size="xs"
+                                type="light"
+                                :leftIcon="ArrowDownUp"
+                                :action="showChangeArrangementModal"
+                                v-if="productForm.variants.length >= 2">
+                                <span>Change Arrangement</span>
+                            </Button>
+
+                            <!-- Add Variants -->
+                            <Button
+                                size="xs"
+                                type="light"
+                                :leftIcon="Plus"
+                                :action="addVariant">
+                                <span>Add Variants</span>
+                            </Button>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <div class="relative mb-4">
+
+                    <BackdropLoader v-if="isLoadingProduct || isSubmitting" :showSpinningLoader="false" class="rounded-lg"></BackdropLoader>
+
+                    <div class="bg-white rounded-lg p-4">
+
+                        <p class="text-lg text-gray-700 font-semibold">Options</p>
+
+                        <DataCollectionFields></DataCollectionFields>
 
                     </div>
 
@@ -674,14 +684,55 @@
 
                     <div class="bg-white rounded-lg space-y-4 p-4">
 
+                        <p class="text-lg text-gray-700 font-semibold">Categories</p>
+
+                        <!-- Category Tags -->
+                        <SelectTags
+                            :options="categories"
+                            placeholder="Add category"
+                            v-model="productForm.categories"
+                            :errorText="formState.getFormError('categories')"
+                            @change="productState.saveStateDebounced('Categories changed')" />
+
+                    </div>
+
+                </div>
+
+                <div class="relative mb-4">
+
+                    <BackdropLoader v-if="isLoadingProduct || isSubmitting" :showSpinningLoader="false" class="rounded-lg"></BackdropLoader>
+
+                    <div class="bg-white rounded-lg space-y-4 p-4">
+
                         <p class="text-lg text-gray-700 font-semibold">Tags</p>
 
                         <!-- Tags -->
                         <SelectTags
                             :options="tags"
+                            placeholder="Add Tag"
                             v-model="productForm.tags"
                             :errorText="formState.getFormError('tags')"
                             @change="productState.saveStateDebounced('Tags changed')" />
+
+                    </div>
+
+                </div>
+
+                <div class="relative mb-4">
+
+                    <BackdropLoader v-if="isLoadingProduct || isSubmitting" :showSpinningLoader="false" class="rounded-lg"></BackdropLoader>
+
+                    <div class="bg-white rounded-lg space-y-4 p-4">
+
+                        <p class="text-lg text-gray-700 font-semibold">Delivery Methods</p>
+
+                        <!-- Delivery Methods -->
+                        <SelectTags
+                            :options="deliveryMethodOptions"
+                            placeholder="Add delivery method"
+                            v-model="productForm.delivery_method_ids"
+                            :errorText="formState.getFormError('delivery_method_ids')"
+                            @change="productState.saveStateDebounced('Delivery methods changed')" />
 
                     </div>
 
@@ -780,6 +831,7 @@
                 <Modal
                     triggerType="danger"
                     approveType="danger"
+                    :approveLeftIcon="Trash2"
                     triggerText="Delete Product"
                     approveText="Delete Product"
                     :approveAction="deleteProduct"
@@ -817,13 +869,14 @@
     import SelectTags from '@Partials/SelectTags.vue';
     import { VueDraggableNext } from 'vue-draggable-next';
     import BackdropLoader from '@Partials/BackdropLoader.vue';
+    import DataCollectionFields from '@Pages/Products/product/data-collection-fields/DataCollectionFields.vue';
     import { X, Plus, Image, Split, Trash2, MoveLeft, ArrowDownUp, ChevronUp, ChevronDown } from 'lucide-vue-next';
 
     export default {
         inject: ['formState', 'storeState', 'productState', 'changeHistoryState', 'notificationState'],
         components: {
             Image, Split, Pill, Alert, Input, Modal, Button, Loader, Switch, Select, Popover,
-            Skeleton, SelectTags, draggable: VueDraggableNext, BackdropLoader
+            Skeleton, SelectTags, draggable: VueDraggableNext, BackdropLoader, DataCollectionFields
         },
         data() {
             return {
@@ -836,11 +889,13 @@
                 ArrowDownUp,
                 ChevronDown,
                 categories: [],
-                isUploading: false,
+                deliveryMethods: [],
                 selectedVariants: [],
                 deletableVariant: null,
                 isDeletingVariantIds: [],
                 variantsForArrangement: [],
+                isLoadingDeliveryMethods: false,
+                hasLoadedInitialDeliveryMethods: false,
                 pricePerUnitTypes: [
                     { label: 'G', value: 'g'},
                     { label: 'KG', value: 'kg'},
@@ -935,10 +990,18 @@
                 return this.productState.isChangingVariantArrangement;
             },
             variantOptions() {
-                return this.productForm.variants.map((variant) => {
+                return this.productForm.variants.filter((variant) => variant.name).map((variant) => {
                     return {
                         label: variant.name,
                         value: variant.temporary_id
+                    }
+                });
+            },
+            deliveryMethodOptions() {
+                return this.deliveryMethods.map((deliveryMethod) => {
+                    return {
+                        label: deliveryMethod.name,
+                        value: deliveryMethod.id
                     }
                 });
             }
@@ -966,6 +1029,10 @@
                             value: category.id
                         }
                     });
+
+                    if(!this.hasLoadedInitialDeliveryMethods && !this.isLoadingDeliveryMethods) {
+                        this.showDeliveryMethods();
+                    }
 
                 }
             },
@@ -1013,16 +1080,16 @@
                 this.selectedVariants = [];
             },
             isFilteredVariants(variant) {
-                return  this.selectedVariants.length == 0 || this.selectedVariants.includes(variant.temporary_id);
+                return this.selectedVariants.length == 0 || this.selectedVariants.includes(variant.temporary_id);
             },
             toggleAdditionalVariantOptions(index) {
                 this.productForm.variants[index].show_more = !this.productForm.variants[index].show_more;
             },
             showChangeArrangementModal() {
-                this.setvariantsForArrangement();
+                this.setVariantsForArrangement();
                 this.$refs.changeArrangementModal.showModal();
             },
-            setvariantsForArrangement() {
+            setVariantsForArrangement() {
                 this.variantsForArrangement = cloneDeep(this.productForm.variants.map((variant) => {
                     return {
                         name: variant.name,
@@ -1075,15 +1142,6 @@
                 }
 
             },
-            addVariantAttribute() {
-                this.productState.addVariantAttribute();
-            },
-            removeVariantAttribute() {
-                this.productState.removeVariantAttribute();
-            },
-            resetVariantAttributes() {
-                this.productState.resetVariantAttributes();
-            },
             async showProduct() {
                 try {
 
@@ -1092,7 +1150,7 @@
                     let config = {
                         params: {
                             store_id: this.store.id,
-                            _relationships: ['photos', 'tags', 'categories', 'variants.photos'].join(',')
+                            _relationships: ['photos', 'tags', 'categories', 'variants.photos', 'deliveryMethods'].join(',')
                         }
                     };
 
@@ -1130,7 +1188,7 @@
 
                     if(parentProduct == null) {
 
-                        if(this.isCreatingProduct || this.isUploading) return;
+                        if(this.productState.isCreatingProduct || this.productState.isUploading) return;
 
                         this.formState.hideFormErrors();
 
@@ -1196,8 +1254,6 @@
 
                         this.notificationState.showSuccessNotification(`Product created`);
                         this.productState.saveOriginalState('Original product');
-                        //this.productState.reset();
-                        //this.changeHistoryState.reset();
                         await this.onView(createdProduct);
 
                     }
@@ -1209,7 +1265,7 @@
                     console.error('Failed to create product:', error);
                 } finally {
                     if(parentProduct == null) {
-                        this.isUploading = false;
+                        this.productState.isUploading = false;
                         this.productState.isCreatingProduct = false;
                         this.changeHistoryState.actionButtons[1].loading = false;
                     }
@@ -1222,7 +1278,7 @@
 
                     if(parentProduct == null) {
 
-                        if(this.isUpdatingProduct || this.isUploading) return;
+                        if(this.productState.isUpdatingProduct || this.productState.isUploading) return;
 
                         this.formState.hideFormErrors();
 
@@ -1308,7 +1364,6 @@
                             }
 
                         }
-                            console.log('stage 7')
 
                         this.notificationState.showSuccessNotification(`Product updated`);
                         this.productState.saveOriginalState('Original product');
@@ -1321,7 +1376,7 @@
                     this.formState.setServerFormErrors(error);
                     console.error('Failed to update product:', error);
                 } finally {
-                    this.isUploading = false;
+                    this.productState.isUploading = false;
                     this.productState.isUpdatingProduct = true;
                     this.changeHistoryState.actionButtons[1].loading = false;
                 }
@@ -1413,11 +1468,11 @@
                 }
 
                 if (imageUploadPromises.length === 0) {
-                    this.isUploading = false;
+                    this.productState.isUploading = false;
                     return;
                 }
 
-                this.isUploading = true;
+                this.productState.isUploading = true;
 
                 return Promise.allSettled(imageUploadPromises).then((results) => {
                     let failedUploads = results.filter(result => result.status === 'rejected').length;
@@ -1426,7 +1481,7 @@
                         this.notificationState.showWarningNotification(`⚠️ ${failedUploads} image(s) failed to upload. Try again or change the image.`);
                     }
 
-                    this.isUploading = false;
+                    this.productState.isUploading = false;
                 });
             },
             async uploadSingleImage(productId, photo, index, retryCount = 0, error = null) {
@@ -1475,6 +1530,31 @@
                     if (error.code === 'ECONNABORTED' || error.response?.status === 504) return;
 
                     return this.uploadSingleImage(productId, photo, index, retryCount + 1, error);
+                }
+            },
+            async showDeliveryMethods() {
+                try {
+
+                    this.isLoadingDeliveryMethods = true;
+
+                    let config = {
+                        params: {
+                            per_page: 100,
+                            store_id: this.store.id
+                        }
+                    };
+
+                    const response = await axios.get('/api/delivery-methods', config);
+                    this.deliveryMethods = response.data.data;
+
+                } catch (error) {
+                    const message = error?.response?.data?.message || error?.message || 'Something went wrong while fetching delivery methods';
+                    this.notificationState.showWarningNotification(message);
+                    this.formState.setServerFormErrors(error);
+                    console.error('Failed to fetch delivery methods:', error);
+                } finally {
+                    this.isLoadingDeliveryMethods = false;
+                    this.hasLoadedInitialDeliveryMethods = true;
                 }
             },
             setActionButtons() {

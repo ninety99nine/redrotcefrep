@@ -63,6 +63,7 @@ class ProductResource extends JsonResource
             'unit_profit_percentage' => $this->unit_profit_percentage,
             'unit_sale_discount_percentage' => $this->unit_sale_discount_percentage,
             'visibility_expires_at' => $this->visibility_expires_at ? $this->visibility_expires_at->toDateTimeString() : null,
+            'data_collection_fields' => $this->data_collection_fields,
 
             'user' => new UserResource($this->whenLoaded('user')),
             'store' => new StoreResource($this->whenLoaded('store')),
@@ -74,6 +75,7 @@ class ProductResource extends JsonResource
             'parent_product' => new ProductResource($this->whenLoaded('parentProduct')),
             'categories' => CategoryResource::collection($this->whenLoaded('categories')),
             'media_files' => MediaFileResource::collection($this->whenLoaded('mediaFiles')),
+            'delivery_methods' => DeliveryMethodResource::collection($this->whenLoaded('deliveryMethods')),
 
             'variants_count' => $this->whenCounted('variants'),
 

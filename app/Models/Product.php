@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Casts\Money;
+use App\Casts\JsonArray;
 use App\Enums\UploadFolderName;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
@@ -51,6 +52,8 @@ class Product extends Model
             'unit_regular_price' => Money::class,
             'tax_overide_amount' => Money::class,
 
+            'data_collection_fields' => JsonArray::class,
+
             'unit_value' => 'decimal:3',
             'unit_weight' => 'decimal:3',
         ];
@@ -69,6 +72,7 @@ class Product extends Model
         'unit_price', 'unit_profit', 'unit_profit_percentage', 'unit_loss', 'unit_loss_percentage', 'set_min_order_quantity',
         'set_max_order_quantity', 'min_order_quantity', 'max_order_quantity', 'set_daily_capacity', 'daily_capacity',
         'has_stock', 'stock_quantity_type', 'stock_quantity', 'position', 'parent_product_id', 'user_id', 'store_id',
+        'data_collection_fields'
     ];
 
     /**
@@ -165,6 +169,16 @@ class Product extends Model
     public function categories(): BelongsToMany
     {
         return $this->belongsToMany(Category::class, 'product_category');
+    }
+
+    /**
+     * Get the delivery methods.
+     *
+     * @return BelongsToMany
+     */
+    public function deliveryMethods(): BelongsToMany
+    {
+        return $this->belongsToMany(DeliveryMethod::class, 'product_delivery_method');
     }
 
     /**

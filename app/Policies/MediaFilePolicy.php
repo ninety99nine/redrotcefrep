@@ -107,6 +107,8 @@ class MediaFilePolicy extends BasePolicy
             return $this->isStoreUserWithPermission($user, 'manage orders');
         }else if($uploadFolderName == UploadFolderName::PRODUCT_PHOTO) {
             return $this->isStoreUserWithPermission($user, 'manage products');
+        }else if($uploadFolderName == UploadFolderName::CATEGORY_PHOTO) {
+            return $this->isStoreUserWithPermission($user, 'manage products');
         }else if(in_array(
             $uploadFolderName,
             [

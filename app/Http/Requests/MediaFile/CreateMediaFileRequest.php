@@ -30,7 +30,7 @@ class CreateMediaFileRequest extends FormRequest
         return [
             'file' => ['required', 'file', 'mimes:jpeg,png,jpg,gif,webp,svg', 'max:5120'],
             'mediable_id' => ['required', 'uuid'],
-            'mediable_type' => ['required', 'string', Rule::in(['user', 'store', 'store payment method', 'product', 'transaction', 'order comment'])],
+            'mediable_type' => ['required', 'string', Rule::in(['user', 'store', 'store payment method', 'product', 'category', 'transaction', 'order comment'])],
             'upload_folder_name' => ['required', Rule::enum(UploadFolderName::class)->except(UploadFolderName::QR_CODES)],
         ];
     }
@@ -50,7 +50,7 @@ class CreateMediaFileRequest extends FormRequest
             'mediable_id.required' => 'The mediable ID is required.',
             'mediable_id.uuid' => 'The mediable ID must be a valid UUID.',
             'mediable_type.required' => 'The mediable type is required.',
-            'mediable_type.in' => 'The mediable type must be one of: ' . Arr::join(['user', 'store', 'store payment method', 'product', 'transaction', 'order comment'], ', ', ' or '),
+            'mediable_type.in' => 'The mediable type must be one of: ' . Arr::join(['user', 'store', 'store payment method', 'product', 'category', 'transaction', 'order comment'], ', ', ' or '),
             'upload_folder_name.required' => 'The upload folder name is required.',
             'upload_folder_name.enum' => 'The upload folder name must be one of: ' . Arr::join(UploadFolderName::values(), ', ', ' or '),
         ];

@@ -104,7 +104,7 @@
                 validator: (value) => ["xs", "sm", "md", "lg"].includes(value),
             },
             type: {
-                type: String,
+                type: [String, null],
                 default: "primary",
                 validator: (value) => ["primary", "success", "warning", "danger"].includes(value),
             },

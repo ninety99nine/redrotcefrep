@@ -71,6 +71,7 @@ class UpdateProductsRequest extends FormRequest
             'categories_to_remove.array' => 'The categories to remove must be an array.',
             'categories_to_remove.*.uuid' => 'Each category ID to remove must be a valid UUID.',
             'categories_to_remove.*.exists' => 'One or more category IDs to remove are invalid.',
+            'data_collection_fields.array' => 'The data collection fields must be an array.',
         ];
     }
 }

@@ -55,6 +55,7 @@ return new class extends Migration
             $table->boolean('has_stock')->default(true);
             $table->enum('stock_quantity_type', StockQuantityType::values())->default(StockQuantityType::UNLIMITED->value);
             $table->unsignedMediumInteger('stock_quantity')->default(100);
+            $table->json('data_collection_fields')->nullable();
             $table->unsignedTinyInteger('position')->nullable();
             $table->uuid('parent_product_id')->nullable();
             $table->uuid('user_id')->nullable();

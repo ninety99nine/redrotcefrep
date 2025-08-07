@@ -2,10 +2,12 @@
 
 namespace App\Providers;
 
+use App\Models\Tag;
 use App\Models\Order;
 use App\Models\Store;
 use App\Models\Address;
 use App\Models\Product;
+use App\Models\Category;
 use App\Models\Promotion;
 use App\Models\MediaFile;
 use App\Models\StoreQuota;
@@ -13,6 +15,7 @@ use App\Models\PricingPlan;
 use App\Models\AiAssistant;
 use App\Models\Transaction;
 use App\Models\Subscription;
+use App\Models\OrderComment;
 use App\Models\PaymentMethod;
 use App\Models\DeliveryMethod;
 use App\Models\DeliveryAddress;
@@ -25,7 +28,6 @@ use Illuminate\Support\Facades\Event;
 use Illuminate\Foundation\Http\Kernel;
 use Illuminate\Support\ServiceProvider;
 use App\Http\Middleware\StorePermission;
-use App\Models\OrderComment;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Routing\Middleware\SubstituteBindings;
@@ -50,9 +52,10 @@ class AppServiceProvider extends ServiceProvider
             'order' => 'App\Models\Order',
             'store' => 'App\Models\Store',
             'product' => 'App\Models\Product',
+            'category' => 'App\Models\Category',
             'transaction' => 'App\Models\Transaction',
             'pricing plan' => 'App\Models\PricingPlan',
-            'order comment' => 'App\Models\OrderComment'
+            'order comment' => 'App\Models\OrderComment',
         ]);
 
         JsonResource::withoutWrapping();
@@ -130,6 +133,18 @@ class AppServiceProvider extends ServiceProvider
         Route::bind('product', function ($value) {
             $allowedRoutes = ['show.product'];
             return $this->applyEagerLoading(Product::query(), $allowedRoutes)->findOrFail($value);
+        });
+
+        // Bind Tag model
+        Route::bind('tag', function ($value) {
+            $allowedRoutes = ['show.tag'];
+            return $this->applyEagerLoading(Tag::query(), $allowedRoutes)->findOrFail($value);
+        });
+
+        // Bind Category model
+        Route::bind('category', function ($value) {
+            $allowedRoutes = ['show.category'];
+            return $this->applyEagerLoading(Category::query(), $allowedRoutes)->findOrFail($value);
         });
 
         // Bind Promotion model

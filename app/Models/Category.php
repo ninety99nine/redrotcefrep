@@ -2,10 +2,13 @@
 
 namespace App\Models;
 
+use App\Enums\UploadFolderName;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Attributes\Scope;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
+use Illuminate\Database\Eloquent\Relations\MorphOne;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -15,12 +18,24 @@ class Category extends Model
     use HasFactory, HasUuids;
 
     /**
+     * The attributes that should be cast.
+     *
+     * @var array
+     */
+    protected function casts(): array
+    {
+        return [
+            'visible' => 'boolean'
+        ];
+    }
+
+    /**
      * The attributes that are mass assignable.
      *
      * @var array
      */
     protected $fillable = [
-        'name', 'store_id'
+        'name', 'visible', 'description', 'position', 'store_id'
     ];
 
     /**
@@ -37,6 +52,16 @@ class Category extends Model
     }
 
     /**
+     * Get the store.
+     *
+     * @return BelongsTo
+     */
+    public function store(): BelongsTo
+    {
+        return $this->belongsTo(Store::class);
+    }
+
+    /**
      * Get the products.
      *
      * @return BelongsToMany
@@ -47,12 +72,32 @@ class Category extends Model
     }
 
     /**
-     * Get the store.
+     * Get the photo.
      *
-     * @return BelongsTo
+     * @return MorphOne
      */
-    public function store(): BelongsTo
+    public function photo(): MorphOne
     {
-        return $this->belongsTo(Store::class);
+        return $this->morphOne(MediaFile::class, 'mediable')->where('type', UploadFolderName::CATEGORY_PHOTO->value);
+    }
+
+    /**
+     * Get the photos.
+     *
+     * @return MorphMany
+     */
+    public function photos(): MorphMany
+    {
+        return $this->morphMany(MediaFile::class, 'mediable')->where('type', UploadFolderName::CATEGORY_PHOTO->value);
+    }
+
+    /**
+     * Get the media files (photos and other media file types).
+     *
+     * @return MorphMany
+     */
+    public function mediaFiles(): MorphMany
+    {
+        return $this->morphMany(MediaFile::class, 'mediable');
     }
 }

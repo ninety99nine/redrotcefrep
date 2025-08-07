@@ -22,7 +22,7 @@
                 :columns="columns"
                 :perPage="perPage"
                 @paginate="paginate"
-                @refresh="getOrders"
+                @refresh="showOrders"
                 :searchTerm="searchTerm"
                 :pagination="pagination"
                 :isLoading="isLoadingOrders"
@@ -516,7 +516,7 @@
                     <Input
                         type="checkbox"
                         v-model="includeOrderFieldNames"
-                        inputLabel="Include Order field names">
+                        inputLabel="Include order field names">
                     </Input>
 
                     <div class="border border-gray-200 divide-y overflow-y-auto rounded-lg h-60 px-4 mb-4">
@@ -825,7 +825,7 @@
         watch: {
             store(newValue) {
                 if(newValue) {
-                    this.getOrders();
+                    this.showOrders();
                 }
             },
             selectAll(newValue) {
@@ -936,11 +936,11 @@
                 });
             },
             paginate(page) {
-                this.getOrders(page);
+                this.showOrders(page);
             },
             search(searchTerm) {
                 this.searchTerm = searchTerm;
-                this.getOrders();
+                this.showOrders();
             },
             updatedColumns(columns) {
                 this.columns = columns;
@@ -949,21 +949,21 @@
                 const newFilterExpressions = filters.map((filter) => filter.expression);
                 if(!isEqual(this.filterExpressions, newFilterExpressions)) {
                     this.filterExpressions = newFilterExpressions;
-                    this.getOrders();
+                    this.showOrders();
                 }
             },
             updatedSorting(sorting) {
                 const newSortingExpressions = sorting.map((sort) => sort.expression);
                 if(!isEqual(this.sortingExpressions, newSortingExpressions)) {
                     this.sortingExpressions = newSortingExpressions;
-                    this.getOrders();
+                    this.showOrders();
                 }
             },
             updatedPerPage(perPage) {
                 this.perPage = perPage;
-                this.getOrders();
+                this.showOrders();
             },
-            async getOrders(page = 1) {
+            async showOrders(page = 1) {
 
                 const currentRequestId = ++this.latestRequestId;
 
@@ -1105,7 +1105,7 @@
 
                     await axios.put(`/api/orders`, data);
 
-                    this.getOrders();
+                    this.showOrders();
 
                     if(isChangingStatus) {
                         this.notificationState.showSuccessNotification('Order status updated');
@@ -1263,7 +1263,7 @@
 
                     this.notificationState.showSuccessNotification(orderIds == 1 ? 'Order deleted' : 'Orders deleted');
                     this.orders = this.orders.filter(order => !orderIds.includes(order.id));
-                    if(this.orders.length == 0) this.getOrders();
+                    if(this.orders.length == 0) this.showOrders();
 
                     this.isDeletingOrderIds = this.isDeletingOrderIds.filter(id => !orderIds.includes(id));
 
@@ -1303,7 +1303,7 @@
 
                     this.notificationState.showSuccessNotification('Order deleted');
                     this.orders = this.orders.filter(order => order.id != this.deletableOrder.id);
-                    if(this.orders.length == 0) this.getOrders();
+                    if(this.orders.length == 0) this.showOrders();
 
                 } catch (error) {
                     const message = error?.response?.data?.message || error?.message || 'Something went wrong while deleting order';
@@ -1451,7 +1451,7 @@
             this.searchTerm = this.$route.query.searchTerm;
             if(this.$route.query.filterExpressions) this.filterExpressions = this.$route.query.filterExpressions.split('|');
             if(this.$route.query.sortingExpressions) this.sortingExpressions = this.$route.query.sortingExpressions.split('|');
-            if(this.store) this.getOrders();
+            if(this.store) this.showOrders();
         }
     };
 

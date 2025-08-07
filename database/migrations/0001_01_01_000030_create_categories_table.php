@@ -16,6 +16,9 @@ return new class extends Migration
         Schema::create('categories', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->string('name');
+            $table->boolean('visible')->default(true);
+            $table->string('description', 100)->nullable();
+            $table->unsignedTinyInteger('position')->nullable();
             $table->foreignUuid('store_id');
             $table->timestamps();
 

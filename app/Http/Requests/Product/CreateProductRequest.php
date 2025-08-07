@@ -74,10 +74,13 @@ class CreateProductRequest extends FormRequest
             'user_id' => ['nullable', 'uuid', 'exists:users,id'],
             'store_id' => ['required', 'uuid', 'exists:stores,id'],
             'photo' => ['nullable', 'file', 'mimes:jpeg,png,jpg,gif,webp,svg', 'max:5120'],
+            'data_collection_fields' => ['nullable', 'array'],
             'tags' => ['nullable', 'array'],
             'tags.*' => ['string'],
             'categories' => ['nullable', 'array'],
             'categories.*' => ['string'],
+            'delivery_method_ids' => ['nullable', 'array'],
+            'delivery_method_ids.*' => ['uuid', 'exists:delivery_methods,id'],
         ];
     }
 
@@ -151,6 +154,7 @@ class CreateProductRequest extends FormRequest
             'photo.file' => 'The photo must be a valid file.',
             'photo.mimes' => 'The photo must be a JPEG, PNG, JPG, GIF, or SVG.',
             'photo.max' => 'The photo size must not exceed 5MB.',
+            'data_collection_fields.array' => 'The data collection fields must be an array.',
             'tags.array' => 'The tags must be an array.',
             'tags.string' => 'The product tags must be a string.',
             'categories.array' => 'The categories must be an array.',
@@ -161,6 +165,9 @@ class CreateProductRequest extends FormRequest
             'unit_value.min' => 'The unit value must be at least 0.',
             'tax_overide_amount.numeric' => 'The tax override amount must be a number.',
             'tax_overide_amount.min' => 'The tax override amount must be at least 0.',
+            'delivery_method_ids.array' => 'The delivery method IDs must be an array.',
+            'delivery_method_ids.*.uuid' => 'Each delivery method ID must be a valid UUID.',
+            'delivery_method_ids.*.exists' => 'One or more delivery method IDs do not exist.',
         ];
     }
 }

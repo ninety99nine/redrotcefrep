@@ -16,7 +16,7 @@
                 :columns="columns"
                 :perPage="perPage"
                 @paginate="paginate"
-                @refresh="getProducts"
+                @refresh="showProducts"
                 :searchTerm="searchTerm"
                 :pagination="pagination"
                 :isLoading="isLoadingProducts"
@@ -31,6 +31,15 @@
                 <template #afterRefreshButton>
 
                     <div class="flex items-center space-x-2">
+
+                        <!-- Bulk Edit Products Button -->
+                        <Button
+                            size="xs"
+                            type="outline"
+                            :leftIcon="Pen"
+                            :action="navigateToBulkEdit">
+                            <span>Bulk Edit</span>
+                        </Button>
 
                         <!-- Export Products Button -->
                         <Button
@@ -82,7 +91,7 @@
                     <tr>
 
                         <!-- Checkbox -->
-                        <th scope="col" class="whitespace-nowrap align-top px-4 py-4">
+                        <th scope="col" class="whitespace-nowrap align-center px-4 py-4">
                             <Input
                                 type="checkbox"
                                 v-model="selectAll">
@@ -97,14 +106,14 @@
                             <th
                                 scope="col"
                                 v-if="column.active"
-                                class="whitespace-nowrap align-top pr-4 py-4">
+                                class="whitespace-nowrap align-center pr-4 py-4">
                                 {{ column.name }}
                             </th>
 
                         </template>
 
                         <!-- Actions -->
-                        <th scope="col" class="whitespace-nowrap align-top pr-4 py-4"></th>
+                        <th scope="col" class="whitespace-nowrap align-center pr-4 py-4"></th>
 
                     </tr>
 
@@ -126,7 +135,7 @@
                             <td
                                 @click.stop
                                 v-if="columnIndex == 0"
-                                class="whitespace-nowrap align-top px-4 py-4">
+                                class="whitespace-nowrap align-center px-4 py-4">
 
                                 <Input
                                     type="checkbox"
@@ -138,10 +147,21 @@
                             <template v-if="column.active">
 
                                 <!-- Name -->
-                                <td v-if="column.name == 'Name'" class="whitespace-nowrap align-top pr-4 py-4 text-sm">
+                                <td v-if="column.name == 'Name'" class="whitespace-nowrap align-center pr-4 py-4 text-sm">
 
                                     <div class="flex space-x-1 items-center">
-                                        <span>{{ product.name }}</span>
+
+                                        <div class="flex space-x-2 items-center">
+                                            <div
+                                                v-if="product.photo"
+                                                class="flex items-center justify-center w-10 h-10">
+
+                                                <img class="w-full max-h-full object-contain rounded-lg flex-shrink-0" :src="product.photo.path">
+
+                                            </div>
+                                            <span>{{ product.name }}</span>
+                                        </div>
+
                                         <Popover
                                             placement="top"
                                             wrapperClasses="opacity-0 group-hover:opacity-100">
@@ -184,20 +204,15 @@
                                 </td>
 
                                 <!-- Description -->
-                                <td v-else-if="column.name == 'Description'" class="whitespace-nowrap align-top pr-4 py-4 text-sm">
+                                <td v-else-if="column.name == 'Description'" class="whitespace-nowrap align-center pr-4 py-4 text-sm">
                                     <div class="w-40">
                                         <span v-if="product.description">{{ product.description }}</span>
                                         <NoDataPlaceholder v-else></NoDataPlaceholder>
                                     </div>
                                 </td>
 
-                                <!-- Visible -->
-                                <td v-else-if="column.name == 'Visible'" class="align-top pr-4 py-4 text-sm">
-                                    <Pill :type="product.visible ? 'success' : 'warning'" size="xs">{{ product.visible ? 'visible' : 'hidden' }}</Pill>
-                                </td>
-
                                 <!-- Price -->
-                                <td v-else-if="column.name == 'Price'" class="align-top pr-4 py-4 text-sm">
+                                <td v-else-if="column.name == 'Price'" class="align-center pr-4 py-4 text-sm">
                                     <div class="flex space-x-1 items-center">
 
                                         <Pill v-if="(product.variant ?? product).is_free" type="success" size="xs">free</Pill>
@@ -241,18 +256,23 @@
                                     </div>
                                 </td>
 
+                                <!-- Visibility -->
+                                <td v-else-if="column.name == 'Visibility'" class="align-center pr-4 py-4 text-sm">
+                                    <Pill :type="product.visible ? 'success' : 'warning'" size="xs">{{ product.visible ? 'visible' : 'hidden' }}</Pill>
+                                </td>
+
                                 <!-- Stock -->
-                                <td v-else-if="column.name == 'Stock'" class="align-top pr-4 py-4 text-sm">
+                                <td v-else-if="column.name == 'Stock'" class="align-center pr-4 py-4 text-sm">
                                     <Pill :type="(product.variant ?? product).has_stock ? 'success' : 'warning'" size="xs">{{ (product.variant ?? product).has_stock ? ((product.variant ?? product).stock_quantity_type == 'unlimited' ? 'unlimited' : `${(product.variant ?? product).stock_quantity} left`) : 'no stock' }}</Pill>
                                 </td>
 
                                 <!-- Variants -->
-                                <td v-else-if="column.name == 'Variants'" class="align-top pr-4 py-4 text-sm">
+                                <td v-else-if="column.name == 'Variants'" class="align-center pr-4 py-4 text-sm">
                                     <Pill type="light" size="xs">{{ product.variants_count ? product.variants_count : 'none' }}</Pill>
                                 </td>
 
                                 <!-- Minimum Order Quantity -->
-                                <td v-else-if="column.name == 'Minimum Order Quantity'" class="align-top pr-4 py-4 text-sm">
+                                <td v-else-if="column.name == 'Minimum Order Quantity'" class="align-center pr-4 py-4 text-sm">
                                     <div class="flex space-x-1 items-center">
                                         <Pill type="light" size="xs">{{ product.set_min_order_quantity ? product.min_order_quantity : 'none' }}</Pill>
                                         <Popover
@@ -275,7 +295,7 @@
                                 </td>
 
                                 <!-- Maximum Order Quantity -->
-                                <td v-else-if="column.name == 'Maximum Order Quantity'" class="align-top pr-4 py-4 text-sm">
+                                <td v-else-if="column.name == 'Maximum Order Quantity'" class="align-center pr-4 py-4 text-sm">
                                     <div class="flex space-x-1 items-center">
                                         <Pill type="light" size="xs">{{ product.set_max_order_quantity ? product.max_order_quantity : 'none' }}</Pill>
                                         <Popover
@@ -298,13 +318,13 @@
                                 </td>
 
                                 <!-- Position -->
-                                <td v-else-if="column.name == 'Position'" class="align-top pr-4 py-4 text-sm">
+                                <td v-else-if="column.name == 'Position'" class="align-center pr-4 py-4 text-sm">
                                     <span v-if="product.position">#{{ product.position }}</span>
                                     <NoDataPlaceholder v-else></NoDataPlaceholder>
                                 </td>
 
                                 <!-- Created Date -->
-                                <td v-else-if="column.name == 'Created Date'" class="whitespace-nowrap align-top pr-4 py-4 text-sm">
+                                <td v-else-if="column.name == 'Created Date'" class="whitespace-nowrap align-center pr-4 py-4 text-sm">
                                     <div class="flex space-x-1 items-center">
                                         <span>{{ formattedDatetime(product.created_at) }}</span>
                                         <Popover
@@ -318,18 +338,22 @@
                             </template>
 
                             <!-- Actions -->
-                            <td v-if="columnIndex == (columns.length - 1)" class="align-top pr-4 py-4 flex items-center space-x-4">
+                            <td v-if="columnIndex == (columns.length - 1)" class="align-center pr-4 py-4">
 
-                                <!-- View Button -->
-                                <span v-if="!isDeletingProduct(product)" @click.stop.prevent="onView(product)" class="text-sm font-medium text-blue-600 dark:text-blue-500 hover:underline">View</span>
+                                <div class="flex items-center space-x-4">
 
-                                <!-- Deleting Loader -->
-                                <Loader v-if="isDeletingProduct(product)" type="danger">
-                                    <span class="text-xs ml-2">Deleting...</span>
-                                </Loader>
+                                    <!-- View Button -->
+                                    <span v-if="!isDeletingProduct(product)" @click.stop.prevent="onView(product)" class="text-sm font-medium text-blue-600 dark:text-blue-500 hover:underline">View</span>
 
-                                <!-- Delete Button -->
-                                <span v-else @click.stop.prevent="showDeleteConfirmationModal(product)" class="text-sm font-medium text-red-600 dark:text-red-500 hover:underline">Delete</span>
+                                    <!-- Deleting Loader -->
+                                    <Loader v-if="isDeletingProduct(product)" type="danger">
+                                        <span class="text-xs ml-2">Deleting...</span>
+                                    </Loader>
+
+                                    <!-- Delete Button -->
+                                    <span v-else @click.stop.prevent="showDeleteConfirmationModal(product)" class="text-sm font-medium text-red-600 dark:text-red-500 hover:underline">Delete</span>
+
+                                </div>
 
                             </td>
 
@@ -483,7 +507,7 @@
                     <Input
                         type="checkbox"
                         v-model="includeProductFieldNames"
-                        inputLabel="Include Product field names">
+                        inputLabel="Include product field names">
                     </Input>
 
                     <div class="border border-gray-200 divide-y overflow-y-auto rounded-lg h-60 px-4 mb-4">
@@ -653,7 +677,7 @@
     import { VueDraggableNext } from 'vue-draggable-next';
     import { formattedDatetime, formattedRelativeDate } from '@Utils/dateUtils.js';
     import NoDataPlaceholder from '@Partials/table/components/NoDataPlaceholder.vue';
-    import { Info, Plus, Trash2, Printer, RefreshCcw, ArrowDownToLine } from 'lucide-vue-next';
+    import { Info, Plus, Trash2, Printer, RefreshCcw, ArrowDownToLine, Pen } from 'lucide-vue-next';
 
     export default {
         inject: ['formState', 'storeState', 'notificationState'],
@@ -663,6 +687,7 @@
         },
         data() {
             return {
+                Pen,
                 Plus,
                 Trash2,
                 Printer,
@@ -724,12 +749,12 @@
                 ],
                 bulkSelectionOptions: [
                     {
-                        label: 'Hide',
-                        action: () => this.updateProducts('hide')
-                    },
-                    {
                         label: 'Show',
                         action: () => this.updateProducts('show')
+                    },
+                    {
+                        label: 'Hide',
+                        action: () => this.updateProducts('hide')
                     },
                     {
                         label: 'Add to category',
@@ -761,7 +786,7 @@
         watch: {
             store(newValue) {
                 if(newValue) {
-                    this.getProducts();
+                    this.showProducts();
                 }
             },
             selectAll(newValue) {
@@ -795,8 +820,8 @@
             formattedDatetime: formattedDatetime,
             formattedRelativeDate: formattedRelativeDate,
             prepareColumns() {
-                const columnNames = ['Name', 'Description', 'Visible', 'Price', 'Stock', 'Variants', 'Minimum Order Quantity', 'Maximum Order Quantity', 'Position', 'Created Date'];
-                const defaultColumnNames  = ['Name', 'Description', 'Visible', 'Price', 'Stock', 'Variants', 'Position', 'Created Date'];
+                const columnNames = ['Name', 'Description', 'Price', 'Visibility', 'Stock', 'Variants', 'Minimum Order Quantity', 'Maximum Order Quantity', 'Position', 'Created Date'];
+                const defaultColumnNames  = ['Name', 'Description', 'Price', 'Visibility', 'Stock', 'Variants', 'Position', 'Created Date'];
 
                 return columnNames.map(name => ({
                     name,
@@ -805,8 +830,8 @@
                 }));
             },
             prepareWhatsappFields() {
-                const whatsappFieldNames = ['Name', 'Description', 'Visible', 'Unit Regular Price', 'Unit Sale Price', 'Unit Price', 'Stock', 'Variants', 'Minimum Order Quantity', 'Maximum Order Quantity', 'Position', 'Created Date', 'Product Link'];
-                const defaultWhatsappFieldNames  = ['Name', 'Description', 'Visible', 'Unit Price', 'Stock', 'Variants', 'Position', 'Created Date'];
+                const whatsappFieldNames = ['Name', 'Description', 'Unit Regular Price', 'Unit Sale Price', 'Unit Price', 'Visibility', 'Stock', 'Variants', 'Minimum Order Quantity', 'Maximum Order Quantity', 'Position', 'Created Date', 'Product Link'];
+                const defaultWhatsappFieldNames  = ['Name', 'Description', 'Unit Price', 'Visibility', 'Stock', 'Variants', 'Position', 'Created Date'];
 
                 return whatsappFieldNames.map(name => ({
                     name,
@@ -842,6 +867,17 @@
                 if(product == null) return false;
                 return this.isDeletingProductIds.findIndex((id) => id == product.id) != -1;
             },
+            navigateToBulkEdit() {
+                this.$router.push({
+                    name: 'bulk-edit-products',
+                    query: {
+                        store_id: this.store.id,
+                        searchTerm: this.searchTerm,
+                        filterExpressions: this.filterExpressions.join('|'),
+                        sortingExpressions: this.sortingExpressions.join('|')
+                    }
+                });
+            },
             onView(product) {
                 this.$router.push({
                     name: 'edit-product',
@@ -863,11 +899,11 @@
                 });
             },
             paginate(page) {
-                this.getProducts(page);
+                this.showProducts(page);
             },
             search(searchTerm) {
                 this.searchTerm = searchTerm;
-                this.getProducts();
+                this.showProducts();
             },
             updatedColumns(columns) {
                 this.columns = columns;
@@ -876,21 +912,21 @@
                 const newFilterExpressions = filters.map((filter) => filter.expression);
                 if(!isEqual(this.filterExpressions, newFilterExpressions)) {
                     this.filterExpressions = newFilterExpressions;
-                    this.getProducts();
+                    this.showProducts();
                 }
             },
             updatedSorting(sorting) {
                 const newSortingExpressions = sorting.map((sort) => sort.expression);
                 if(!isEqual(this.sortingExpressions, newSortingExpressions)) {
                     this.sortingExpressions = newSortingExpressions;
-                    this.getProducts();
+                    this.showProducts();
                 }
             },
             updatedPerPage(perPage) {
                 this.perPage = perPage;
-                this.getProducts();
+                this.showProducts();
             },
-            async getProducts(page = 1) {
+            async showProducts(page = 1) {
 
                 const currentRequestId = ++this.latestRequestId;
 
@@ -910,7 +946,7 @@
                             per_page: this.perPage,
                             store_id: this.store.id,
                             association: 'team member',
-                            _relationships: ['variant'].join(','),
+                            _relationships: ['variant', 'photo'].join(','),
                             _countable_relationships: ['variants'].join(',')
                         },
                         cancelToken: this.cancelTokenSource.token // Attach cancel token
@@ -1031,7 +1067,7 @@
 
                     await axios.put(`/api/products`, data);
 
-                    this.getProducts();
+                    this.showProducts();
 
                     if(isShowing || isHiding) {
                         this.notificationState.showSuccessNotification('Product visibility updated');
@@ -1181,7 +1217,7 @@
 
                     this.notificationState.showSuccessNotification(productIds == 1 ? 'Product deleted' : 'Products deleted');
                     this.products = this.products.filter(product => !productIds.includes(product.id));
-                    if(this.products.length == 0) this.getProducts();
+                    if(this.products.length == 0) this.showProducts();
 
                     this.isDeletingProductIds = this.isDeletingProductIds.filter(id => !productIds.includes(id));
 
@@ -1221,7 +1257,7 @@
 
                     this.notificationState.showSuccessNotification('Product deleted');
                     this.products = this.products.filter(product => product.id != this.deletableProduct.id);
-                    if(this.products.length == 0) this.getProducts();
+                    if(this.products.length == 0) this.showProducts();
 
                 } catch (error) {
                     const message = error?.response?.data?.message || error?.message || 'Something went wrong while deleting product';
@@ -1265,8 +1301,8 @@
                                 case "Description":
                                     productMessage += `${checkedProducts[i].show_description && checkedProducts[i].description != null ? checkedProducts[i].description : 'None'}\n`;
                                     break;
-                                case "Visible":
-                                    productMessage += `${checkedProducts[i].visible ? 'Yes' : 'No'}\n`;
+                                case "Visibility":
+                                    productMessage += `${checkedProducts[i].visible ? 'visible' : 'hidden'}\n`;
                                     break;
                                 case "Unit Regular Price":
                                     productMessage += `${(checkedProducts[i].variant ?? checkedProducts[i]).unit_regular_price.amount_with_currency}\n`;
@@ -1331,7 +1367,7 @@
             this.searchTerm = this.$route.query.searchTerm;
             if(this.$route.query.filterExpressions) this.filterExpressions = this.$route.query.filterExpressions.split('|');
             if(this.$route.query.sortingExpressions) this.sortingExpressions = this.$route.query.sortingExpressions.split('|');
-            if(this.store) this.getProducts();
+            if(this.store) this.showProducts();
         }
     };
 

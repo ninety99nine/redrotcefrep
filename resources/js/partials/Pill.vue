@@ -1,13 +1,23 @@
 <template>
     <div :class="badgeClasses" @click.stop.prevent="action">
+
+        <!-- Left Icon -->
+        <component v-if="leftIcon" :is="leftIcon" :size="leftIconSize" />
+
         <StatusDot v-if="showDot" :type="dotType"></StatusDot>
+
         <slot></slot>
+
+        <!-- Right Icon -->
+        <component v-if="rightIcon" :is="rightIcon" :size="rightIconSize" :class="rightIconClass" />
+
         <svg
             v-if="closableAction"
             @click.stop="closableAction"
             class="w-5 h-5 ml-2 -mr-1 cursor-pointer hover:opacity-70 active:scale-90" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" d="m9.75 9.75 4.5 4.5m0-4.5-4.5 4.5M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
         </svg>
+
     </div>
 </template>
 
@@ -37,6 +47,30 @@
             },
             closableAction: {
                 type: Function,
+                default: null
+            },
+            leftIcon: {
+                type: [Object, Function, null],
+                default: null
+            },
+            leftIconSize: {
+                type: String,
+                default: '12',
+            },
+            leftIconClass: {
+                type: String,
+                default: null
+            },
+            rightIcon: {
+                type: [Object, Function, null],
+                default: null
+            },
+            rightIconSize: {
+                type: String,
+                default: '12',
+            },
+            rightIconClass: {
+                type: String,
                 default: null
             },
         },

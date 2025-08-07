@@ -25,6 +25,8 @@ class TagResource extends JsonResource
 
             'store' => new StoreResource($this->whenLoaded('store')),
             'products' => ProductResource::collection($this->whenLoaded('products')),
+
+            'products_count' => $this->whenCounted('products'),
         ];
     }
 }

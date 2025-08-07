@@ -130,6 +130,6 @@ class OrderProduct extends Model
             'mediable_id',     // Foreign key on the MediaFile table (photos.mediable_id = products.id)
             'product_id',      // Foreign key on the OrderProduct table (order_products.product_id)
             'id'               // Primary key on the Product table
-        )->where('type', UploadFolderName::PRODUCT_PHOTO->value);
+        )->where('media_files.type', UploadFolderName::PRODUCT_PHOTO->value);
     }
 }

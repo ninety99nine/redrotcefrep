@@ -40,7 +40,7 @@ class ProductService extends BaseService
             $query = Product::isNotVariant()->where('store_id', $storeId)->visible();
         }
 
-        $query = $query->when(!request()->has('_sort'), fn($query) => $query->latest());
+        $query = $query->when(!request()->has('_sort'), fn($query) => $query->orderBy('position'));
         return $this->setQuery($query)->getOutput();
     }
 
@@ -60,6 +60,8 @@ class ProductService extends BaseService
         $categories = $data['categories'] ?? null;
         unset($data['tags'], $data['categories']);
 
+        $deliveryMethodIds = $data['delivery_method_ids'] ?? null;
+
         $data = array_merge($data, [
             'currency' => $store->currency
         ]);
@@ -72,6 +74,10 @@ class ProductService extends BaseService
 
         if(!is_null($categories)) {
             $this->createProductCategories($product, $categories);
+        }
+
+        if(!is_null($deliveryMethodIds)) {
+            $product->deliveryMethods()->sync($deliveryMethodIds);
         }
 
         $this->updateProductArrangement([
@@ -385,6 +391,8 @@ class ProductService extends BaseService
         $categories = $data['categories'] ?? null;
         unset($data['tags'], $data['categories']);
 
+        $deliveryMethodIds = $data['delivery_method_ids'] ?? null;
+
         $product->update($data);
 
         if(!is_null($tags)) {
@@ -393,6 +401,10 @@ class ProductService extends BaseService
 
         if(!is_null($categories)) {
             $this->createProductCategories($product, $categories);
+        }
+
+        if(!is_null($deliveryMethodIds)) {
+            $product->deliveryMethods()->sync($deliveryMethodIds);
         }
 
         return $this->showUpdatedResource($product);
