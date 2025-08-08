@@ -13,6 +13,7 @@ use App\Http\Requests\Product\UpdateProductRequest;
 use App\Http\Requests\Product\DeleteProductRequest;
 use App\Http\Requests\Product\DeleteProductsRequest;
 use App\Http\Requests\Product\UpdateProductsRequest;
+use App\Http\Requests\Product\ImportProductsRequest;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use App\Http\Requests\Product\DownloadProductsRequest;
 use \Symfony\Component\HttpFoundation\BinaryFileResponse;
@@ -80,6 +81,17 @@ class ProductController extends Controller
     {
         $productIds = request()->input('product_ids', []);
         return $this->service->deleteProducts($productIds);
+    }
+
+    /**
+     * Import products from CSV.
+     *
+     * @param ImportProductsRequest $request
+     * @return array
+     */
+    public function importProducts(ImportProductsRequest $request): array
+    {
+        return $this->service->importProducts($request->validated());
     }
 
     /**

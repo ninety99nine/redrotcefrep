@@ -36,7 +36,7 @@ class CreateProductRequest extends FormRequest
             'visibility_expires_at' => ['nullable', 'date'],
             'show_description' => ['nullable', 'boolean'],
             'description' => ['nullable', 'string', 'max:500'],
-            'sku' => ['nullable', 'string', 'max:50', 'unique:products,sku'],
+            'sku' => ['nullable', 'string', 'max:50'],
             'barcode' => ['nullable', 'string', 'max:50'],
             'unit_weight' => ['nullable', 'numeric', 'min:0'],
             'is_free' => ['nullable', 'boolean'],
@@ -70,9 +70,9 @@ class CreateProductRequest extends FormRequest
             'stock_quantity_type' => ['nullable', Rule::enum(StockQuantityType::class)],
             'stock_quantity' => ['nullable', 'integer', 'min:0', 'max:16777215'],
             'position' => ['nullable', 'integer', 'min:0', 'max:255'],
-            'parent_product_id' => ['nullable', 'uuid', 'exists:products,id'],
-            'user_id' => ['nullable', 'uuid', 'exists:users,id'],
-            'store_id' => ['required', 'uuid', 'exists:stores,id'],
+            'parent_product_id' => ['nullable', 'uuid'],
+            'user_id' => ['nullable', 'uuid'],
+            'store_id' => ['required', 'uuid'],
             'photo' => ['nullable', 'file', 'mimes:jpeg,png,jpg,gif,webp,svg', 'max:5120'],
             'data_collection_fields' => ['nullable', 'array'],
             'tags' => ['nullable', 'array'],
@@ -80,7 +80,7 @@ class CreateProductRequest extends FormRequest
             'categories' => ['nullable', 'array'],
             'categories.*' => ['string'],
             'delivery_method_ids' => ['nullable', 'array'],
-            'delivery_method_ids.*' => ['uuid', 'exists:delivery_methods,id'],
+            'delivery_method_ids.*' => ['uuid'],
         ];
     }
 
@@ -96,7 +96,6 @@ class CreateProductRequest extends FormRequest
             'name.string' => 'The product name must be a string.',
             'name.max' => 'The product name must not exceed 60 characters.',
             'type.enum' => 'The product type must be one of: ' . Arr::join(ProductType::values(), ', ', ' or '),
-            'sku.unique' => 'This SKU is already in use.',
             'sku.max' => 'The SKU must not exceed 50 characters.',
             'barcode.max' => 'The barcode must not exceed 50 characters.',
             'description.max' => 'The description must not exceed 500 characters.',
@@ -142,12 +141,9 @@ class CreateProductRequest extends FormRequest
             'position.min' => 'The position must be at least 0.',
             'position.max' => 'The position must not exceed 255.',
             'parent_product_id.uuid' => 'The parent product ID must be a valid UUID.',
-            'parent_product_id.exists' => 'The specified parent product does not exist.',
             'user_id.uuid' => 'The user ID must be a valid UUID.',
-            'user_id.exists' => 'The specified user does not exist.',
             'store_id.required' => 'The store ID is required.',
             'store_id.uuid' => 'The store ID must be a valid UUID.',
-            'store_id.exists' => 'The specified store does not exist.',
             'set_min_order_quantity.boolean' => 'The minimum order quantity must be a boolean.',
             'set_max_order_quantity.boolean' => 'The maximum order quantity must be a boolean.',
             'stock_quantity_type.enum' => 'The stock quantity type must be one of: ' . Arr::join(StockQuantityType::values(), ', ', ' or '),
@@ -167,7 +163,6 @@ class CreateProductRequest extends FormRequest
             'tax_overide_amount.min' => 'The tax override amount must be at least 0.',
             'delivery_method_ids.array' => 'The delivery method IDs must be an array.',
             'delivery_method_ids.*.uuid' => 'Each delivery method ID must be a valid UUID.',
-            'delivery_method_ids.*.exists' => 'One or more delivery method IDs do not exist.',
         ];
     }
 }

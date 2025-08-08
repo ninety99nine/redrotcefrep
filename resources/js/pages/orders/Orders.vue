@@ -1,6 +1,6 @@
 <template>
 
-    <div class="pt-24 pb-80 px-8 relative select-none">
+    <div class="pt-24 px-8 relative select-none">
 
         <!-- Clouds Image -->
         <img :src="'/images/clouds.png'" class="absolute bottom-0">

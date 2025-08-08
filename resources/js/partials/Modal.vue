@@ -85,6 +85,7 @@
                                 v-if="showDelineButton"
                                 :loading="declineLoading"
                                 :leftIcon="leftDeclineIcon"
+                                :disabled="declineDisabled"
                                 :rightIcon="rightDeclineIcon"
                                 :action="declineAction ? () => declineAction(hideModal) : hideModal">
                                 <slot name="declineIcon"></slot>
@@ -97,6 +98,7 @@
                                 v-if="showApproveButton"
                                 :loading="approveLoading"
                                 :leftIcon="leftApproveIcon"
+                                :disabled="approveDisabled"
                                 :rightIcon="rightApproveIcon"
                                 :action="approveAction ? () => approveAction(hideModal) : hideModal">
                                 <slot name="approveIcon"></slot>
@@ -211,6 +213,10 @@
                 type: [Function, null],
                 default: null
             },
+            declineDisabled: {
+                type: Boolean,
+                default: false
+            },
             declineLoading: {
                 type: Boolean,
                 default: false
@@ -244,6 +250,10 @@
                 default: null
             },
             approveLoading: {
+                type: Boolean,
+                default: false
+            },
+            approveDisabled: {
                 type: Boolean,
                 default: false
             },

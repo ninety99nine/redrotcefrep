@@ -73,10 +73,10 @@
                 </Skeleton>
 
                 <div
-                    v-else
+                    @dragover.prevent
                     @drop="handleDrop"
                     @click="handleClick"
-                    @dragover.prevent
+                    v-else-if="type != 'file' || type == 'file' && filesLeftToUpload"
                     :class="wrapperClass ? wrapperClass : [
                         'flex',
                         wrapperAlignItems,
@@ -251,7 +251,7 @@
                             <p v-if="disabled" class="text-gray-400 cursor-not-allowed">File upload is disabled</p>
                             <p v-else-if="maxFiles == 1 && !filesLeftToUpload" class="text-gray-400 cursor-not-allowed">{{ singleFileUploadMessage || 'File attached' }}</p>
                             <p v-else-if="!filesLeftToUpload" class="text-gray-400 cursor-not-allowed">Upload limit reached</p>
-                            <p v-else-if="!currentFileCount">{{ maxFiles == 1 ? 'Click or Drag & Drop Image' : 'Click or Drag & Drop Images' }}</p>
+                            <p v-else-if="!currentFileCount">{{ placeholder ?? (maxFiles == 1 ? 'Click or Drag & Drop Image' : 'Click or Drag & Drop Images') }}</p>
                             <p v-else>Upload More Images</p>
 
                         </slot>
@@ -916,7 +916,7 @@
                 }
             },
             isTemporaryFile(file) {
-                return file.path && file.path.startsWith("blob:");
+                return !file.id;
             },
             async removeFile(event, temporaryId) {
 

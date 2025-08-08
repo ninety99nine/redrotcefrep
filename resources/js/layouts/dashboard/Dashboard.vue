@@ -339,9 +339,6 @@
             <!-- Dashboard Content -->
             <router-view></router-view>
 
-            <!-- Footer -->
-            <Footer></Footer>
-
         </div>
 
     </div>
@@ -356,7 +353,6 @@
     import Dropdown from '@Partials/Dropdown.vue';
     import Skeleton from '@Partials/Skeleton.vue';
     import StoreLogo from '@Components/StoreLogo.vue';
-    import Footer from '@Layouts/dashboard/components/Footer.vue';
     import { Menu, UserRound, ExternalLink, ChevronUp, ChevronDown } from 'lucide-vue-next';
     import Notifications from '@Layouts/dashboard/components/Notifications.vue';
     import ChangeHistoryNavigation from '@Layouts/dashboard/components/ChangeHistoryNavigation.vue';
@@ -364,7 +360,7 @@
     export default {
         inject: ['uiState', 'formState', 'authState', 'storeState', 'notificationState', 'changeHistoryState'],
         components: {
-            ChevronUp, ChevronDown, Logo, Loader, Button, Dropdown, Skeleton, StoreLogo, Footer,
+            ChevronUp, ChevronDown, Logo, Loader, Button, Dropdown, Skeleton, StoreLogo,
             Notifications, ChangeHistoryNavigation, UserRound
         },
         data() {

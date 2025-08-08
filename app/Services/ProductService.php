@@ -5,9 +5,12 @@ namespace App\Services;
 use Exception;
 use App\Models\Tag;
 use App\Models\Store;
+use League\Csv\Reader;
 use App\Models\Product;
 use App\Models\Category;
 use App\Enums\Association;
+use App\Enums\ProductType;
+use App\Enums\ProductUnitType;
 use Illuminate\Support\Str;
 use App\Enums\SortProductBy;
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -16,6 +19,7 @@ use App\Enums\StockQuantityType;
 use Illuminate\Support\Facades\DB;
 use App\Http\Resources\ProductResource;
 use App\Http\Resources\ProductResources;
+use App\Http\Requests\Product\CreateProductRequest;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use \Symfony\Component\HttpFoundation\BinaryFileResponse;
 
@@ -101,7 +105,7 @@ class ProductService extends BaseService
     }
 
     /**
-     * Update products.
+     * Update multiple products.
      *
      * @param array $data
      * @return array
@@ -109,44 +113,66 @@ class ProductService extends BaseService
     public function updateProducts(array $data): array
     {
         $storeId = $data['store_id'];
-        $productIds = $data['product_ids'];
-        $fillableData = array_intersect_key($data, array_flip([
-            'visible'
-        ]));
+        $productsData = $data['products'] ?? [];
+        $tagsToAdd = $data['tags_to_add'] ?? null;
+        $globalVisible = $data['visible'] ?? null;
+        $tagsToRemove = $data['tags_to_remove'] ?? null;
+        $categoriesToAdd = $data['categories_to_add'] ?? null;
+        $categoriesToRemove = $data['categories_to_remove'] ?? null;
 
-        $query = Product::whereIn('id', $productIds)->where('store_id', $storeId);
+        $totalProducts = 0;
 
-        $products = $query->get();
-        $query->update($fillableData);
-        $totalProducts = count($products);
-
-        if($totalProducts) {
-
-            if (!empty($data['tags_to_add'])) {
-                foreach ($products as $product) {
-                    $product->tags()->syncWithoutDetaching($data['tags_to_add']);
-                }
+        foreach ($productsData as $productData) {
+            if (!isset($productData['id'])) {
+                continue;
             }
 
-            if (!empty($data['tags_to_remove'])) {
-                foreach ($products as $product) {
-                    $product->tags()->detach($data['tags_to_remove']);
-                }
+            $product = Product::where('id', $productData['id'])
+                ->where('store_id', $storeId)
+                ->first();
+
+            if (!$product) {
+                continue;
             }
 
-            if (!empty($data['categories_to_add'])) {
-                foreach ($products as $product) {
-                    $product->categories()->syncWithoutDetaching($data['categories_to_add']);
-                }
+            // Merge global visible setting if provided
+            if (!is_null($globalVisible)) {
+                $productData['visible'] = $globalVisible;
             }
 
-            // Handle categories to remove
-            if (!empty($data['categories_to_remove'])) {
-                foreach ($products as $product) {
-                    $product->categories()->detach($data['categories_to_remove']);
-                }
+            // Filter fillable fields
+            $fillableData = array_intersect_key(
+                $productData,
+                array_flip($product->getFillable())
+            );
+
+            // Update product with fillable data
+            $product->update($fillableData);
+
+            // Handle tags
+            if (!is_null($tagsToAdd)) {
+                $product->tags()->syncWithoutDetaching($tagsToAdd);
             }
 
+            if (!is_null($tagsToRemove)) {
+                $product->tags()->detach($tagsToRemove);
+            }
+
+            // Handle categories
+            if (!is_null($categoriesToAdd)) {
+                $product->categories()->syncWithoutDetaching($categoriesToAdd);
+            }
+
+            if (!is_null($categoriesToRemove)) {
+                $product->categories()->detach($categoriesToRemove);
+            }
+
+            // Handle delivery methods if provided
+            if (isset($productData['delivery_method_ids']) && !is_null($productData['delivery_method_ids'])) {
+                $product->deliveryMethods()->sync($productData['delivery_method_ids']);
+            }
+
+            $totalProducts = $totalProducts + 1;
         }
 
         return ['updated' => true, 'message' => $totalProducts . ($totalProducts == 1 ? ' product': ' products') . ' updated'];
@@ -176,6 +202,317 @@ class ProductService extends BaseService
         } else {
             throw new Exception('No Products deleted');
         }
+    }
+
+    /**
+     * Import products from CSV.
+     *
+     * @param array $data
+     * @return array
+     * @throws Exception
+     */
+    public function importProducts(array $data): array
+    {
+        $errors = [];
+        $file = $data['file'];
+        $storeId = $data['store_id'];
+        $store = Store::findOrFail($storeId);
+
+        // Preload existing products for the store
+        $existingProducts = Product::where('store_id', $storeId)
+            ->select('id', 'name')->get()
+            ->pluck('id', 'name')
+            ->toArray();
+
+        // Map to store pending parent products (name => UUID)
+        $pendingParents = [];
+
+        // Map to store CSV record IDs by name (name => ID)
+        $csvRecordIds = [];
+
+        $csv = Reader::createFromPath($file->getPathname(), 'r');
+        $csv->setHeaderOffset(0);
+        $records = $csv->getRecords();
+
+        // Create non-variants (parents) first
+        DB::beginTransaction();
+
+        try {
+
+            $totalProducts = 0;
+            $productsToCreate = [];
+
+            // First pass: Collect all CSV rows and map parent names
+            foreach ($records as $index => $record) {
+
+                try {
+
+                    $name = $record['Name'] ?? null;
+
+                    if (!$name) {
+                        $errors[] = "Row " . ($index + 2) . ": Name is required.";
+                        continue;
+                    }
+
+                    $productId = ($record['ID'] && Str::isUuid($record['ID'])) ? $record['ID'] : Str::uuid()->toString();
+                    $parentName = $record['Parent Name'] ?? null;
+                    $parentProductId = null;
+
+                    if ($parentName) {
+
+                        // Check existing products or productsToCreate by name
+                        if (isset($existingProducts[$parentName])) {
+
+                            $parentProductId = $existingProducts[$parentName];
+
+                        } else {
+
+                            // Assign UUID for parent if not found
+                            if (!isset($pendingParents[$parentName])) {
+
+                                $pendingParents[$parentName] = Str::uuid()->toString();
+
+                            }
+
+                            $parentProductId = $pendingParents[$parentName];
+
+                        }
+                    }
+
+                    $productData = [
+                        'store_id' => $storeId,
+                        'currency' => $store->currency,
+                        'id' => $productId,
+                        'name' => $name,
+                        'parent_product_id' => $parentProductId,
+                        'is_free' => $this->parseBoolean($record['Free'] ?? false),
+                        'is_estimated_price' => $this->parseBoolean($record['Estimated Price'] ?? false),
+                        'unit_regular_price' => $record['Regular Price'] ? floatval($record['Regular Price']) : '0.00',
+                        'unit_sale_price' => $record['Sale Price'] ? floatval($record['Sale Price']) : '0.00',
+                        'unit_cost_price' => $record['Cost Price'] ? floatval($record['Cost Price']) : '0.00',
+                        'visible' => $this->parseBoolean($record['Visible'] ?? true),
+                        'type' => $record['Type'] ?? ProductType::PHYSICAL->value,
+                        'download_link' => $record['Download Link'] ?? null,
+                        'sku' => $record['Sku'] ?? null,
+                        'barcode' => $record['Barcode'] ?? null,
+                        'show_description' => $this->parseBoolean($record['Show Description'] ?? false),
+                        'description' => $record['Description'] ?? null,
+                        'unit_weight' => $record['Weight'] ? floatval($record['Weight']) : '0.00',
+                        'tax_overide' => $this->parseBoolean($record['Tax Override'] ?? false),
+                        'tax_overide_amount' => $record['Tax Override Amount'] ? floatval($record['Tax Override Amount']) : '0.00',
+                        'show_price_per_unit' => $this->parseBoolean($record['Show Price Per Unit'] ?? false),
+                        'unit_value' => $record['Unit Value'] ? floatval($record['Unit Value']) : '1',
+                        'unit_type' => $record['Unit Type'] ?? ProductUnitType::QUANTITY->value,
+                        'set_daily_capacity' => $this->parseBoolean($record['Set Daily Capacity'] ?? false),
+                        'daily_capacity' => $record['Daily Capacity'] ? intval($record['Daily Capacity']) : '1',
+                        'stock_quantity_type' => $record['Stock Type'] ?? StockQuantityType::UNLIMITED->value,
+                        'stock_quantity' => $record['Stock Quantity'] ? intval($record['Stock Quantity']) : '100',
+                        'set_min_order_quantity' => $this->parseBoolean($record['Set Min Order Quantity'] ?? false),
+                        'min_order_quantity' => $record['Min Order Quantity'] ? intval($record['Min Order Quantity']) : '1',
+                        'set_max_order_quantity' => $this->parseBoolean($record['Set Max Order Quantity'] ?? false),
+                        'max_order_quantity' => $record['Max Order Quantity'] ? intval($record['Max Order Quantity']) : '1',
+                        'categories' => $record['Categories'] ? array_map('trim', explode(',', $record['Categories'])) : null,
+                        'tags' => $record['Tags'] ? array_map('trim', explode(',', $record['Tags'])) : null,
+                        'position' => $record['Position'] ? intval($record['Position']) : null,
+                    ];
+
+                    // Validate product data
+                    $validator = validator($productData, (new \App\Http\Requests\Product\CreateProductRequest)->rules(), (new \App\Http\Requests\Product\CreateProductRequest)->messages());
+
+                    if ($validator->fails()) {
+                        $errors[] = "Row " . ($index + 2) . ": " . implode(', ', $validator->errors()->all());
+                        continue;
+                    }
+
+                    $csvRecordIds[$name] = $record['ID'] ?? null;
+                    $productsToCreate[] = $productData;
+                    $totalProducts++;
+
+                } catch (Exception $e) {
+
+                    $errors[] = "Row " . ($index + 2) . ": " . $e->getMessage();
+
+                }
+
+            }
+
+            if (!empty($errors)) {
+                throw new Exception('Validation errors occurred: ' . implode('; ', $errors));
+            }
+
+            // Second pass: Handle pending parents
+            foreach ($pendingParents as $parentName => $parentId) {
+
+                $parentData = null;
+                $parentIndex = null;
+
+                // Find parent in productsToCreate by name
+                foreach ($productsToCreate as $index => $product) {
+                    if ($product['name'] === $parentName) {
+                        $parentData = $product;
+                        $parentIndex = $index;
+                        break;
+                    }
+                }
+
+                if ($parentData) {
+
+                    // Preserve CSV-provided ID if present and a valid UUID, otherwise use parentId
+                    $csvId = $csvRecordIds[$parentName] ?? null;
+                    $finalParentId = ($csvId && Str::isUuid($csvId)) ? $csvId : $parentId;
+
+                    if ($parentData['id'] !== $finalParentId) {
+                        $productsToCreate[$parentIndex]['id'] = $finalParentId;
+                    }
+
+                    // Update variants to reference the correct parent ID
+                    $productsToCreate = array_map(function ($product) use ($parentId, $finalParentId) {
+                        if ($product['parent_product_id'] === $parentId) {
+                            $product['parent_product_id'] = $finalParentId;
+                        }
+                        return $product;
+                    }, $productsToCreate);
+
+                } else {
+
+                    // Parent not in CSV, create minimal parent
+                    $parentData = [
+                        'id' => $parentId,
+                        'name' => $parentName,
+                        'store_id' => $storeId,
+                        'currency' => $store->currency,
+                    ];
+
+                    $validator = validator($parentData, (new \App\Http\Requests\Product\CreateProductRequest)->rules(), (new \App\Http\Requests\Product\CreateProductRequest)->messages());
+
+                    if ($validator->fails()) {
+                        $errors[] = "Parent product '$parentName': " . implode(', ', $validator->errors()->all());
+                        continue;
+                    }
+
+                    $productsToCreate[] = $parentData;
+                    $totalProducts++;
+
+                }
+            }
+
+            if (!empty($errors)) {
+                throw new Exception('Validation errors occurred: ' . implode('; ', $errors));
+            }
+
+            // Split products into non-variants and variants
+            $nonVariants = [];
+            $variants = [];
+
+            foreach ($productsToCreate as $productData) {
+                if (is_null($productData['parent_product_id'])) {
+                    $nonVariants[] = $productData;
+                } else {
+                    $variants[] = $productData;
+                }
+            }
+
+            try {
+
+                foreach ($nonVariants as $productData) {
+
+                    $product = Product::updateOrCreate(
+                        ['id' => $productData['id']],
+                        $productData
+                    );
+
+                    // Handle tags
+                    if (!empty($productData['tags'])) {
+                        $this->createProductTags($product, $productData['tags']);
+                    }
+
+                    // Handle categories
+                    if (!empty($productData['categories'])) {
+                        $this->createProductCategories($product, $productData['categories']);
+                    }
+
+                }
+
+            } catch (\Exception $e) {
+
+                throw new Exception('Failed to create parent products: ' . $e->getMessage());
+
+            }
+
+            try {
+
+                foreach ($variants as $productData) {
+
+                    $product = Product::updateOrCreate(
+                        ['id' => $productData['id']],
+                        $productData
+                    );
+
+                    // Handle tags
+                    if (!empty($productData['tags'])) {
+                        $this->createProductTags($product, $productData['tags']);
+                    }
+
+                    // Handle categories
+                    if (!empty($productData['categories'])) {
+                        $this->createProductCategories($product, $productData['categories']);
+                    }
+
+                }
+
+            } catch (Exception $e) {
+
+                throw new Exception('Failed to create variant products: ' . $e->getMessage());
+
+            }
+
+            // Sort productsToCreate by 'position' ascending, defaulting to PHP_INT_MAX for null
+            usort($productsToCreate, function ($a, $b) {
+                $aPosition = $a['position'] ?? PHP_INT_MAX;
+                $bPosition = $b['position'] ?? PHP_INT_MAX;
+                return $aPosition <=> $bPosition;
+            });
+
+            // Extract 'id' from the sorted array
+            $productIds = array_column($productsToCreate, 'id');
+
+            if (!empty($productIds)) {
+                $this->updateProductArrangement([
+                    'store_id' => $storeId,
+                    'product_ids' => $productIds
+                ]);
+            }
+
+            DB::commit();
+
+            return ['message' => $totalProducts . ($totalProducts == 1 ? ' product' : ' products') . ' imported successfully'];
+
+        } catch (Exception $e) {
+
+            DB::rollBack();
+
+            throw new Exception($e->getMessage());
+        }
+    }
+
+    /**
+     * Parse boolean values, including yes/no and y/n.
+     *
+     * @param mixed $value
+     * @return bool
+     */
+    private function parseBoolean($value): bool
+    {
+        if (is_string($value)) {
+            $value = strtolower(trim($value));
+            if (in_array($value, ['yes', 'y'])) {
+                return true;
+            }
+            if (in_array($value, ['no', 'n'])) {
+                return false;
+            }
+        }
+        return filter_var($value, FILTER_VALIDATE_BOOLEAN);
     }
 
     /**

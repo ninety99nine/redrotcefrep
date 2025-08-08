@@ -1,6 +1,6 @@
 <template>
 
-    <div class="pt-24 pb-80 px-8 relative select-none">
+    <div class="pt-24 px-8 relative select-none">
 
         <!-- Clouds Image -->
         <img :src="'/images/clouds.png'" class="absolute bottom-0">
@@ -105,7 +105,7 @@
 
                     <tr
                         :key="productForm.id"
-                        v-for="(productForm, productIndex) in bulkProductForm"
+                        v-for="(productForm, productIndex) in productForms"
                         :class="[checkedRows[productForm.id] ? 'bg-blue-50' : 'bg-white hover:bg-gray-50', 'group cursor-pointer border-b border-blue-100']">
 
                         <template
@@ -143,8 +143,8 @@
                                         <Input
                                             type="text"
                                             class="min-w-40"
-                                            v-model="bulkProductForm[productIndex].name"
-                                            @input="productState.saveStateDebounced('Name changed')"
+                                            v-model="productForms[productIndex].name"
+                                            @input="captureChange(productIndex, 'Name changed')"
                                             :errorText="formState.getFormError(`product.${productIndex}.name`)">
                                         </Input>
                                     </div>
@@ -167,8 +167,8 @@
                                         <Input
                                             type="text"
                                             class="min-w-40"
-                                            v-model="bulkProductForm[productIndex].name"
-                                            @input="productState.saveStateDebounced('Name changed')"
+                                            v-model="productForms[productIndex].name"
+                                            @input="captureChange(productIndex, 'Name changed')"
                                             :errorText="formState.getFormError(`product.${productIndex}.name`)">
                                         </Input>
                                     </div>
@@ -189,10 +189,10 @@
 
                                         <Switch
                                             size="xs"
-                                            v-model="bulkProductForm[productIndex].is_free"
-                                            @change="productState.saveStateDebounced('Free status changed')"
+                                            v-model="productForms[productIndex].is_free"
+                                            @change="captureChange(productIndex, 'Free status changed')"
                                             :errorText="formState.getFormError(`product.${productIndex}.is_free`)"
-                                            v-if="!bulkProductForm[productIndex].has_variants || bulkProductForm[productIndex].is_variant">
+                                            v-if="!productForms[productIndex].has_variants || productForms[productIndex].is_variant">
                                         </Switch>
 
                                     </div>
@@ -206,10 +206,10 @@
 
                                         <Switch
                                             size="xs"
-                                            v-model="bulkProductForm[productIndex].is_estimated_price"
-                                            @change="productState.saveStateDebounced('Estimated price status changed')"
+                                            v-model="productForms[productIndex].is_estimated_price"
+                                            @change="captureChange(productIndex, 'Estimated price status changed')"
                                             :errorText="formState.getFormError(`product.${productIndex}.is_estimated_price`)"
-                                            v-if="(!bulkProductForm[productIndex].has_variants || bulkProductForm[productIndex].is_variant) && !bulkProductForm[productIndex].is_free">
+                                            v-if="(!productForms[productIndex].has_variants || productForms[productIndex].is_variant) && !productForms[productIndex].is_free">
                                         </Switch>
 
                                     </div>
@@ -223,11 +223,11 @@
                                         type="money"
                                         class="min-w-28"
                                         :currency="store.currency"
-                                        v-model="bulkProductForm[productIndex].unit_regular_price"
-                                        @input="productState.saveStateDebounced('Regular price changed')"
+                                        v-model="productForms[productIndex].unit_regular_price"
+                                        @input="captureChange(productIndex, 'Regular price changed')"
                                         :errorText="formState.getFormError(`product.${productIndex}.unit_regular_price`)"
-                                        :tooltipContent="bulkProductForm[productIndex].is_free ? 'Disabled because pricing is set to Free' : null"
-                                        v-if="(!bulkProductForm[productIndex].has_variants || bulkProductForm[productIndex].is_variant) && !bulkProductForm[productIndex].is_free">
+                                        :tooltipContent="productForms[productIndex].is_free ? 'Disabled because pricing is set to Free' : null"
+                                        v-if="(!productForms[productIndex].has_variants || productForms[productIndex].is_variant) && !productForms[productIndex].is_free">
                                     </Input>
 
                                 </td>
@@ -239,10 +239,10 @@
                                         type="money"
                                         class="min-w-28"
                                         :currency="store.currency"
-                                        v-model="bulkProductForm[productIndex].unit_sale_price"
-                                        @input="productState.saveStateDebounced('Sale price changed')"
+                                        v-model="productForms[productIndex].unit_sale_price"
+                                        @input="captureChange(productIndex, 'Sale price changed')"
                                         :errorText="formState.getFormError(`product.${productIndex}.unit_sale_price`)"
-                                        v-if="(!bulkProductForm[productIndex].has_variants || bulkProductForm[productIndex].is_variant) && !bulkProductForm[productIndex].is_free">
+                                        v-if="(!productForms[productIndex].has_variants || productForms[productIndex].is_variant) && !productForms[productIndex].is_free">
                                     </Input>
 
                                 </td>
@@ -254,10 +254,10 @@
                                         type="money"
                                         class="min-w-28"
                                         :currency="store.currency"
-                                        v-model="bulkProductForm[productIndex].unit_cost_price"
-                                        @input="productState.saveStateDebounced('Cost price changed')"
+                                        v-model="productForms[productIndex].unit_cost_price"
+                                        @input="captureChange(productIndex, 'Cost price changed')"
                                         :errorText="formState.getFormError(`product.${productIndex}.unit_cost_price`)"
-                                        v-if="(!bulkProductForm[productIndex].has_variants || bulkProductForm[productIndex].is_variant) && !bulkProductForm[productIndex].is_free">
+                                        v-if="(!productForms[productIndex].has_variants || productForms[productIndex].is_variant) && !productForms[productIndex].is_free">
                                     </Input>
 
                                 </td>
@@ -269,10 +269,10 @@
 
                                         <Switch
                                             size="xs"
-                                            v-model="bulkProductForm[productIndex].visible"
-                                            @change="productState.saveStateDebounced('Visibility status changed')"
+                                            v-model="productForms[productIndex].visible"
+                                            @change="captureChange(productIndex, 'Visibility status changed')"
                                             :errorText="formState.getFormError(`product.${productIndex}.visible`)"
-                                            v-if="!bulkProductForm[productIndex].has_variants || bulkProductForm[productIndex].visible">
+                                            v-if="!productForms[productIndex].has_variants || productForms[productIndex].visible">
                                         </Switch>
 
                                     </div>
@@ -286,9 +286,9 @@
                                         :search="false"
                                         class="min-w-40"
                                         :options="productTypes"
-                                        v-model="bulkProductForm[productIndex].type"
-                                        v-if="!bulkProductForm[productIndex].is_variant"
-                                        @change="productState.saveStateDebounced('Type changed')"
+                                        v-model="productForms[productIndex].type"
+                                        v-if="!productForms[productIndex].is_variant"
+                                        @change="captureChange(productIndex, 'Type changed')"
                                         :errorText="formState.getFormError(`product.${productIndex}.type`)">
                                     </Select>
                                     <div
@@ -305,15 +305,15 @@
                                     <Input
                                         type="text"
                                         class="min-w-60"
-                                        v-model="bulkProductForm[productIndex].download_link"
-                                        @input="productState.saveStateDebounced('Download link changed')"
+                                        v-model="productForms[productIndex].download_link"
+                                        @input="captureChange(productIndex, 'Download link changed')"
                                         :errorText="formState.getFormError(`product.${productIndex}.download_link`)"
-                                        v-if="!bulkProductForm[productIndex].is_variant && bulkProductForm[productIndex].type == 'digital'">
+                                        v-if="!productForms[productIndex].is_variant && productForms[productIndex].type == 'digital'">
                                     </Input>
                                     <div
                                         class="flex justify-center"
                                         v-else>
-                                        <Pill v-if="!bulkProductForm[productIndex].is_variant && bulkProductForm[productIndex].type != 'digital'" type="light" size="xs">not applicable</Pill>
+                                        <Pill v-if="!productForms[productIndex].is_variant && productForms[productIndex].type != 'digital'" type="light" size="xs">not applicable</Pill>
                                         <Pill v-else type="light" size="xs" :rightIcon="CornerRightUp" rightIconClass="ml-1" class="opacity-50">see parent</Pill>
                                     </div>
 
@@ -325,8 +325,8 @@
                                     <Input
                                         type="text"
                                         class="min-w-40"
-                                        v-model="bulkProductForm[productIndex].sku"
-                                        @input="productState.saveStateDebounced('SKU changed')"
+                                        v-model="productForms[productIndex].sku"
+                                        @input="captureChange(productIndex, 'SKU changed')"
                                         :errorText="formState.getFormError(`product.${productIndex}.sku`)">
                                     </Input>
 
@@ -338,8 +338,8 @@
                                     <Input
                                         type="text"
                                         class="min-w-40"
-                                        v-model="bulkProductForm[productIndex].barcode"
-                                        @input="productState.saveStateDebounced('Barcode changed')"
+                                        v-model="productForms[productIndex].barcode"
+                                        @input="captureChange(productIndex, 'Barcode changed')"
                                         :errorText="formState.getFormError(`product.${productIndex}.barcode`)">
                                     </Input>
 
@@ -352,14 +352,14 @@
 
                                         <Switch
                                             size="xs"
-                                            v-if="!bulkProductForm[productIndex].is_variant"
-                                            v-model="bulkProductForm[productIndex].show_description"
-                                            @change="productState.saveStateDebounced('Show Description status changed')"
+                                            v-if="!productForms[productIndex].is_variant"
+                                            v-model="productForms[productIndex].show_description"
+                                            @change="captureChange(productIndex, 'Show Description status changed')"
                                             :errorText="formState.getFormError(`product.${productIndex}.show_description`)">
                                         </Switch>
                                         <div
                                             class="flex justify-center"
-                                            v-else-if="bulkProductForm[productIndex].is_variant">
+                                            v-else-if="productForms[productIndex].is_variant">
                                             <Pill type="light" size="xs" :rightIcon="CornerRightUp" rightIconClass="ml-1" class="opacity-50">see parent</Pill>
                                         </div>
 
@@ -373,15 +373,15 @@
                                     <Input
                                         type="text"
                                         class="min-w-60"
-                                        v-model="bulkProductForm[productIndex].description"
-                                        @input="productState.saveStateDebounced('Description changed')"
+                                        v-model="productForms[productIndex].description"
+                                        @input="captureChange(productIndex, 'Description changed')"
                                         :errorText="formState.getFormError(`product.${productIndex}.description`)"
-                                        v-if="!bulkProductForm[productIndex].is_variant && bulkProductForm[productIndex].show_description">
+                                        v-if="!productForms[productIndex].is_variant && productForms[productIndex].show_description">
                                     </Input>
                                     <div
                                         v-else
                                         class="flex justify-center">
-                                        <Pill v-if="bulkProductForm[productIndex].is_variant" type="light" size="xs" :rightIcon="CornerRightUp" rightIconClass="ml-1" class="opacity-50">see parent</Pill>
+                                        <Pill v-if="productForms[productIndex].is_variant" type="light" size="xs" :rightIcon="CornerRightUp" rightIconClass="ml-1" class="opacity-50">see parent</Pill>
                                         <Pill v-else type="light" size="xs" :rightIcon="EyeOff" rightIconClass="ml-1">hidden</Pill>
                                     </div>
 
@@ -393,10 +393,10 @@
                                     <Input
                                         type="number"
                                         class="min-w-20"
-                                        v-model="bulkProductForm[productIndex].unit_weight"
-                                        @change="productState.saveStateDebounced('Weight changed')"
+                                        v-model="productForms[productIndex].unit_weight"
+                                        @change="captureChange(productIndex, 'Weight changed')"
                                         :errorText="formState.getFormError(`product.${productIndex}.unit_weight`)"
-                                        v-if="!bulkProductForm[productIndex].has_variants || bulkProductForm[productIndex].is_variant">
+                                        v-if="!productForms[productIndex].has_variants || productForms[productIndex].is_variant">
                                     </Input>
                                     <div
                                         v-else
@@ -413,14 +413,14 @@
 
                                         <Switch
                                             size="xs"
-                                            v-if="!bulkProductForm[productIndex].is_variant"
-                                            v-model="bulkProductForm[productIndex].tax_overide"
-                                            @change="productState.saveStateDebounced('Tax override status changed')"
+                                            v-if="!productForms[productIndex].is_variant"
+                                            v-model="productForms[productIndex].tax_overide"
+                                            @change="captureChange(productIndex, 'Tax override status changed')"
                                             :errorText="formState.getFormError(`product.${productIndex}.tax_overide`)">
                                         </Switch>
                                         <div
                                             class="flex justify-center"
-                                            v-else-if="bulkProductForm[productIndex].is_variant">
+                                            v-else-if="productForms[productIndex].is_variant">
                                             <Pill type="light" size="xs" :rightIcon="CornerRightUp" rightIconClass="ml-1" class="opacity-50">see parent</Pill>
                                         </div>
 
@@ -435,15 +435,15 @@
                                         type="money"
                                         class="min-w-28"
                                         :currency="store.currency"
-                                        v-model="bulkProductForm[productIndex].tax_overide_amount"
-                                        @change="productState.saveStateDebounced('Tax override amount changed')"
+                                        v-model="productForms[productIndex].tax_overide_amount"
+                                        @change="captureChange(productIndex, 'Tax override amount changed')"
                                         :errorText="formState.getFormError(`product.${productIndex}.tax_overide_amount`)"
-                                        v-if="!bulkProductForm[productIndex].is_variant && bulkProductForm[productIndex].tax_overide">
+                                        v-if="!productForms[productIndex].is_variant && productForms[productIndex].tax_overide">
                                     </Input>
                                     <div
                                         class="flex justify-center"
                                         v-else>
-                                        <Pill v-if="bulkProductForm[productIndex].is_variant" type="light" size="xs" :rightIcon="CornerRightUp" rightIconClass="ml-1" class="opacity-50">see parent</Pill>
+                                        <Pill v-if="productForms[productIndex].is_variant" type="light" size="xs" :rightIcon="CornerRightUp" rightIconClass="ml-1" class="opacity-50">see parent</Pill>
                                         <Pill v-else type="light" size="xs" rightIconClass="ml-1">not applicable</Pill>
                                     </div>
 
@@ -456,10 +456,10 @@
 
                                         <Switch
                                             size="xs"
-                                            v-model="bulkProductForm[productIndex].show_price_per_unit"
-                                            @change="productState.saveStateDebounced('Price per unit status changed')"
+                                            v-model="productForms[productIndex].show_price_per_unit"
+                                            @change="captureChange(productIndex, 'Price per unit status changed')"
                                             :errorText="formState.getFormError(`product.${productIndex}.show_price_per_unit`)"
-                                            v-if="!bulkProductForm[productIndex].has_variants || bulkProductForm[productIndex].is_variant">
+                                            v-if="!productForms[productIndex].has_variants || productForms[productIndex].is_variant">
                                         </Switch>
                                         <div
                                             v-else
@@ -477,15 +477,15 @@
                                     <Input
                                         type="number"
                                         class="min-w-20"
-                                        v-model="bulkProductForm[productIndex].unit_value"
-                                        @change="productState.saveStateDebounced('Unit value changed')"
+                                        v-model="productForms[productIndex].unit_value"
+                                        @change="captureChange(productIndex, 'Unit value changed')"
                                         :errorText="formState.getFormError(`product.${productIndex}.unit_value`)"
-                                        v-if="(!bulkProductForm[productIndex].has_variants || bulkProductForm[productIndex].is_variant) && bulkProductForm[productIndex].show_price_per_unit">
+                                        v-if="(!productForms[productIndex].has_variants || productForms[productIndex].is_variant) && productForms[productIndex].show_price_per_unit">
                                     </Input>
                                     <div
                                         class="flex justify-center"
                                         v-else>
-                                        <Pill v-if="bulkProductForm[productIndex].has_variants" type="light" size="xs" :rightIcon="CornerRightDown" rightIconClass="ml-1" class="opacity-50">see {{ productForm.total_variants == 1 ? 'variant' : 'variants' }}</Pill>
+                                        <Pill v-if="productForms[productIndex].has_variants" type="light" size="xs" :rightIcon="CornerRightDown" rightIconClass="ml-1" class="opacity-50">see {{ productForm.total_variants == 1 ? 'variant' : 'variants' }}</Pill>
                                         <Pill v-else type="light" size="xs">not applicable</Pill>
                                     </div>
 
@@ -498,15 +498,15 @@
                                         :search="false"
                                         class="min-w-40"
                                         :options="pricePerUnitTypes"
-                                        v-model="bulkProductForm[productIndex].unit_type"
-                                        @change="productState.saveStateDebounced('Unit type changed')"
+                                        v-model="productForms[productIndex].unit_type"
+                                        @change="captureChange(productIndex, 'Unit type changed')"
                                         :errorText="formState.getFormError(`product.${productIndex}.unit_type`)"
-                                        v-if="(!bulkProductForm[productIndex].has_variants || bulkProductForm[productIndex].is_variant) && bulkProductForm[productIndex].show_price_per_unit">
+                                        v-if="(!productForms[productIndex].has_variants || productForms[productIndex].is_variant) && productForms[productIndex].show_price_per_unit">
                                     </Select>
                                     <div
                                         class="flex justify-center"
                                         v-else>
-                                        <Pill v-if="bulkProductForm[productIndex].has_variants" type="light" size="xs" :rightIcon="CornerRightDown" rightIconClass="ml-1" class="opacity-50">see {{ productForm.total_variants == 1 ? 'variant' : 'variants' }}</Pill>
+                                        <Pill v-if="productForms[productIndex].has_variants" type="light" size="xs" :rightIcon="CornerRightDown" rightIconClass="ml-1" class="opacity-50">see {{ productForm.total_variants == 1 ? 'variant' : 'variants' }}</Pill>
                                         <Pill v-else type="light" size="xs">not applicable</Pill>
                                     </div>
 
@@ -519,15 +519,15 @@
 
                                         <Switch
                                             size="xs"
-                                            v-if="!bulkProductForm[productIndex].is_variant"
-                                            v-model="bulkProductForm[productIndex].set_daily_capacity"
-                                            @change="productState.saveStateDebounced('Daily capacity status changed')"
+                                            v-if="!productForms[productIndex].is_variant"
+                                            v-model="productForms[productIndex].set_daily_capacity"
+                                            @change="captureChange(productIndex, 'Daily capacity status changed')"
                                             :errorText="formState.getFormError(`product.${productIndex}.set_daily_capacity`)">
                                         </Switch>
                                         <div
                                             v-else
                                             class="flex justify-center">
-                                            <Pill v-if="bulkProductForm[productIndex].is_variant" type="light" size="xs" :rightIcon="CornerRightUp" rightIconClass="ml-1" class="opacity-50">see parent</Pill>
+                                            <Pill v-if="productForms[productIndex].is_variant" type="light" size="xs" :rightIcon="CornerRightUp" rightIconClass="ml-1" class="opacity-50">see parent</Pill>
                                             <Pill v-else type="light" size="xs" rightIconClass="ml-1">none</Pill>
                                         </div>
 
@@ -541,15 +541,15 @@
                                     <Input
                                         type="number"
                                         class="min-w-20"
-                                        v-model="bulkProductForm[productIndex].daily_capacity"
-                                        @change="productState.saveStateDebounced('Daily capacity changed')"
+                                        v-model="productForms[productIndex].daily_capacity"
+                                        @change="captureChange(productIndex, 'Daily capacity changed')"
                                         :errorText="formState.getFormError(`product.${productIndex}.daily_capacity`)"
-                                        v-if="!bulkProductForm[productIndex].is_variant && bulkProductForm[productIndex].set_daily_capacity">
+                                        v-if="!productForms[productIndex].is_variant && productForms[productIndex].set_daily_capacity">
                                     </Input>
                                     <div
                                         v-else
                                         class="flex justify-center">
-                                        <Pill v-if="bulkProductForm[productIndex].is_variant" type="light" size="xs" :rightIcon="CornerRightUp" rightIconClass="ml-1" class="opacity-50">see parent</Pill>
+                                        <Pill v-if="productForms[productIndex].is_variant" type="light" size="xs" :rightIcon="CornerRightUp" rightIconClass="ml-1" class="opacity-50">see parent</Pill>
                                         <Pill v-else type="light" size="xs" rightIconClass="ml-1">none</Pill>
                                     </div>
 
@@ -562,9 +562,9 @@
                                         :search="false"
                                         class="min-w-40"
                                         :options="stockQuantityTypes"
-                                        v-if="!bulkProductForm[productIndex].is_variant"
-                                        v-model="bulkProductForm[productIndex].stock_quantity_type"
-                                        @change="productState.saveStateDebounced('Stock quantity type changed')"
+                                        v-if="!productForms[productIndex].is_variant"
+                                        v-model="productForms[productIndex].stock_quantity_type"
+                                        @change="captureChange(productIndex, 'Stock quantity type changed')"
                                         :errorText="formState.getFormError(`product.${productIndex}.stock_quantity_type`)">
                                     </Select>
                                     <div
@@ -581,15 +581,15 @@
                                     <Input
                                         type="number"
                                         class="min-w-20"
-                                        v-model="bulkProductForm[productIndex].stock_quantity"
-                                        @change="productState.saveStateDebounced('Stock quantity changed')"
+                                        v-model="productForms[productIndex].stock_quantity"
+                                        @change="captureChange(productIndex, 'Stock quantity changed')"
                                         :errorText="formState.getFormError(`product.${productIndex}.stock_quantity`)"
-                                        v-if="(!bulkProductForm[productIndex].has_variants && bulkProductForm[productIndex].stock_quantity_type == 'limited') || (bulkProductForm[productIndex].is_variant && getParent(bulkProductForm[productIndex]).stock_quantity_type == 'limited')">
+                                        v-if="(!productForms[productIndex].has_variants && productForms[productIndex].stock_quantity_type == 'limited') || (productForms[productIndex].is_variant && getParent(productForms[productIndex]).stock_quantity_type == 'limited')">
                                     </Input>
                                     <div
                                         v-else
                                         class="flex justify-center">
-                                        <Pill v-if="bulkProductForm[productIndex].has_variants" type="light" size="xs" :rightIcon="CornerRightDown" rightIconClass="ml-1" class="opacity-50">see {{ productForm.total_variants == 1 ? 'variant' : 'variants' }}</Pill>
+                                        <Pill v-if="productForms[productIndex].has_variants" type="light" size="xs" :rightIcon="CornerRightDown" rightIconClass="ml-1" class="opacity-50">see {{ productForm.total_variants == 1 ? 'variant' : 'variants' }}</Pill>
                                         <Pill v-else type="light" size="xs">not applicable</Pill>
                                     </div>
 
@@ -602,15 +602,15 @@
 
                                         <Switch
                                             size="xs"
-                                            v-if="!bulkProductForm[productIndex].is_variant"
-                                            v-model="bulkProductForm[productIndex].set_min_order_quantity"
-                                            @change="productState.saveStateDebounced('Min order quantity status changed')"
+                                            v-if="!productForms[productIndex].is_variant"
+                                            v-model="productForms[productIndex].set_min_order_quantity"
+                                            @change="captureChange(productIndex, 'Min order quantity status changed')"
                                             :errorText="formState.getFormError(`product.${productIndex}.set_min_order_quantity`)">
                                         </Switch>
                                         <div
                                             v-else
                                             class="flex justify-center">
-                                            <Pill v-if="bulkProductForm[productIndex].is_variant" type="light" size="xs" :rightIcon="CornerRightUp" rightIconClass="ml-1" class="opacity-50">see parent</Pill>
+                                            <Pill v-if="productForms[productIndex].is_variant" type="light" size="xs" :rightIcon="CornerRightUp" rightIconClass="ml-1" class="opacity-50">see parent</Pill>
                                             <Pill v-else type="light" size="xs" rightIconClass="ml-1">none</Pill>
                                         </div>
                                     </div>
@@ -623,16 +623,16 @@
                                     <Input
                                         type="number"
                                         class="min-w-20"
-                                        v-model="bulkProductForm[productIndex].min_order_quantity"
-                                        :disabled="!bulkProductForm[productIndex].set_min_order_quantity"
-                                        @change="productState.saveStateDebounced('Min order quantity changed')"
+                                        v-model="productForms[productIndex].min_order_quantity"
+                                        :disabled="!productForms[productIndex].set_min_order_quantity"
+                                        @change="captureChange(productIndex, 'Min order quantity changed')"
                                         :errorText="formState.getFormError(`product.${productIndex}.min_order_quantity`)"
-                                        v-if="!bulkProductForm[productIndex].is_variant && bulkProductForm[productIndex].set_min_order_quantity">
+                                        v-if="!productForms[productIndex].is_variant && productForms[productIndex].set_min_order_quantity">
                                     </Input>
                                     <div
                                         v-else
                                         class="flex justify-center">
-                                        <Pill v-if="bulkProductForm[productIndex].is_variant" type="light" size="xs" :rightIcon="CornerRightUp" rightIconClass="ml-1" class="opacity-50">see parent</Pill>
+                                        <Pill v-if="productForms[productIndex].is_variant" type="light" size="xs" :rightIcon="CornerRightUp" rightIconClass="ml-1" class="opacity-50">see parent</Pill>
                                         <Pill v-else type="light" size="xs" rightIconClass="ml-1">none</Pill>
                                     </div>
 
@@ -645,15 +645,15 @@
 
                                         <Switch
                                             size="xs"
-                                            v-if="!bulkProductForm[productIndex].is_variant"
-                                            v-model="bulkProductForm[productIndex].set_max_order_quantity"
-                                            @change="productState.saveStateDebounced('Max order quantity status changed')"
+                                            v-if="!productForms[productIndex].is_variant"
+                                            v-model="productForms[productIndex].set_max_order_quantity"
+                                            @change="captureChange(productIndex, 'Max order quantity status changed')"
                                             :errorText="formState.getFormError(`product.${productIndex}.set_max_order_quantity`)">
                                         </Switch>
                                         <div
                                             v-else
                                             class="flex justify-center">
-                                            <Pill v-if="bulkProductForm[productIndex].is_variant" type="light" size="xs" :rightIcon="CornerRightUp" rightIconClass="ml-1" class="opacity-50">see parent</Pill>
+                                            <Pill v-if="productForms[productIndex].is_variant" type="light" size="xs" :rightIcon="CornerRightUp" rightIconClass="ml-1" class="opacity-50">see parent</Pill>
                                             <Pill v-else type="light" size="xs" rightIconClass="ml-1">none</Pill>
                                         </div>
 
@@ -667,16 +667,16 @@
                                     <Input
                                         type="number"
                                         class="min-w-20"
-                                        v-model="bulkProductForm[productIndex].max_order_quantity"
-                                        :disabled="!bulkProductForm[productIndex].set_max_order_quantity"
-                                        @change="productState.saveStateDebounced('Max order quantity changed')"
+                                        v-model="productForms[productIndex].max_order_quantity"
+                                        :disabled="!productForms[productIndex].set_max_order_quantity"
+                                        @change="captureChange(productIndex, 'Max order quantity changed')"
                                         :errorText="formState.getFormError(`product.${productIndex}.max_order_quantity`)"
-                                        v-if="!bulkProductForm[productIndex].is_variant && bulkProductForm[productIndex].set_max_order_quantity">
+                                        v-if="!productForms[productIndex].is_variant && productForms[productIndex].set_max_order_quantity">
                                     </Input>
                                     <div
                                         v-else
                                         class="flex justify-center">
-                                        <Pill v-if="bulkProductForm[productIndex].is_variant" type="light" size="xs" :rightIcon="CornerRightUp" rightIconClass="ml-1" class="opacity-50">see parent</Pill>
+                                        <Pill v-if="productForms[productIndex].is_variant" type="light" size="xs" :rightIcon="CornerRightUp" rightIconClass="ml-1" class="opacity-50">see parent</Pill>
                                         <Pill v-else type="light" size="xs" rightIconClass="ml-1">none</Pill>
                                     </div>
 
@@ -687,8 +687,8 @@
                                     <Input
                                         type="number"
                                         class="min-w-20"
-                                        v-model="bulkProductForm[productIndex].position"
-                                        @change="productState.saveStateDebounced('Position changed')"
+                                        v-model="productForms[productIndex].position"
+                                        @change="captureChange(productIndex, 'Position changed')"
                                         :errorText="formState.getFormError(`product.${productIndex}.position`)">
                                     </Input>
                                 </td>
@@ -701,15 +701,15 @@
                                 <div class="flex items-center space-x-4">
 
                                     <!-- View Button -->
-                                    <span v-if="!isDeletingProduct(bulkProductForm[productIndex])" @click.stop.prevent="onView(bulkProductForm[productIndex])" class="text-sm font-medium text-blue-600 dark:text-blue-500 hover:underline">View</span>
+                                    <span v-if="!isDeletingProduct(productForms[productIndex])" @click.stop.prevent="onView(productForms[productIndex])" class="text-sm font-medium text-blue-600 dark:text-blue-500 hover:underline">View</span>
 
                                     <!-- Deleting Loader -->
-                                    <Loader v-if="isDeletingProduct(bulkProductForm[productIndex])" type="danger">
+                                    <Loader v-if="isDeletingProduct(productForms[productIndex])" type="danger">
                                         <span class="text-xs ml-2">Deleting...</span>
                                     </Loader>
 
                                     <!-- Delete Button -->
-                                    <span v-else @click.stop.prevent="showDeleteConfirmationModal(bulkProductForm[productIndex])" class="text-sm font-medium text-red-600 dark:text-red-500 hover:underline">Delete</span>
+                                    <span v-else @click.stop.prevent="showDeleteConfirmationModal(productForms[productIndex])" class="text-sm font-medium text-red-600 dark:text-red-500 hover:underline">Delete</span>
 
                                 </div>
 
@@ -786,8 +786,6 @@
 
         </Modal>
 
-        {{ bulkProductForm }}
-
         <!-- Confirm Delete Product -->
         <Modal
             approveType="danger"
@@ -822,16 +820,12 @@
     import Popover from '@Partials/Popover.vue';
     import Dropdown from '@Partials/Dropdown.vue';
     import Table from '@Partials/table/Table.vue';
-    import { VueDraggableNext } from 'vue-draggable-next';
-    import { formattedDatetime, formattedRelativeDate } from '@Utils/dateUtils.js';
-    import NoDataPlaceholder from '@Partials/table/components/NoDataPlaceholder.vue';
     import { Plus, EyeOff, Trash2, CornerRightUp, CornerRightDown } from 'lucide-vue-next';
 
     export default {
         inject: ['formState', 'productState', 'storeState', 'changeHistoryState', 'notificationState'],
         components: {
-            CornerRightUp, CornerRightDown, Pill, Input, Modal, Loader, Button, Switch, Select, Popover, Dropdown, Table,
-            draggable: VueDraggableNext, NoDataPlaceholder
+            CornerRightUp, CornerRightDown, Pill, Input, Modal, Loader, Button, Switch, Select, Popover, Dropdown, Table
         },
         data() {
             return {
@@ -841,20 +835,19 @@
                 CornerRightUp,
                 CornerRightDown,
 
-                products: [],
                 perPage: '15',
                 checkedRows: [],
                 pagination: null,
                 searchTerm: null,
                 selectAll: false,
                 latestRequestId: 0,
-                deletableProduct: null,
                 filterExpressions: [],
                 sortingExpressions: [],
-                isDeletingProductIds: [],
+                deletableProduct: null,
                 cancelTokenSource: null,
                 isLoadingProducts: false,
                 isUpdatingProducts: false,
+                isDeletingProducIds: [],
                 includeProductFieldNames: true,
                 columns: this.prepareColumns(),
                 bulkSelectionOptions: [
@@ -914,8 +907,8 @@
                 }
             },
             selectAll(newValue) {
-                this.checkedRows = this.products.reduce((acc, product) => {
-                    acc[product.id] = newValue;
+                this.checkedRows = this.productForms.reduce((acc, productForm) => {
+                    acc[productForm.id] = newValue;
                     return acc;
                 }, {});
             },
@@ -928,7 +921,7 @@
                 return this.searchTerm != null && this.searchTerm.trim() != '';
             },
             isDeletingProducts() {
-                return this.isDeletingProductIds.length > 0;
+                return this.isDeletingProducIds.length > 0;
             },
             totalCheckedRows() {
                 return Object.values(this.checkedRows).filter(checked => checked).length;
@@ -939,13 +932,11 @@
             hasSortingExpressions() {
                 return this.sortingExpressions.length > 0;
             },
-            bulkProductForm() {
-                return this.productState.bulkProductForm;
+            productForms() {
+                return this.productState.productForms;
             },
         },
         methods: {
-            formattedDatetime: formattedDatetime,
-            formattedRelativeDate: formattedRelativeDate,
             prepareColumns() {
                 const columnNames = ['Name', 'Variant', 'Free', 'Estimated Price', 'Regular Price', 'Sale Price', 'Cost Price', 'Visible', 'Type', 'Download Link', 'Sku', 'Barcode', 'Show Description', 'Description', 'Weight', 'Tax Override', 'Tax Override Amount', 'Show Price Per Unit', 'Unit Value', 'Unit Type', 'Set Daily Capacity', 'Daily Capacity', 'Stock Type', 'Stock Quantity', 'Set Min Order Quantity', 'Min Order Quantity', 'Set Max Order Quantity', 'Max Order Quantity', 'Position'];
                 const defaultColumnNames  = ['Name', 'Variant', 'Free', 'Estimated Price', 'Regular Price', 'Sale Price', 'Cost Price', 'Visible', 'Type', 'Download Link', 'Sku', 'Barcode', 'Show Description', 'Description', 'Weight', 'Tax Override', 'Tax Override Amount', 'Show Price Per Unit', 'Unit Value', 'Unit Type', 'Set Daily Capacity', 'Daily Capacity', 'Stock Type', 'Stock Quantity', 'Set Min Order Quantity', 'Min Order Quantity', 'Set Max Order Quantity', 'Max Order Quantity', 'Position'];
@@ -966,7 +957,7 @@
             },
             isDeletingProduct(product) {
                 if(product == null) return false;
-                return this.isDeletingProductIds.findIndex((id) => id == product.id) != -1;
+                return this.isDeletingProducIds.findIndex((id) => id == product.id) != -1;
             },
             onView(product) {
                 this.$router.push({
@@ -989,7 +980,11 @@
                 });
             },
             getParent(productForm) {
-                return this.bulkProductForm.find(currProductForm => currProductForm.id == productForm.parent_product_id);
+                return this.productForms.find(currProductForm => currProductForm.id == productForm.parent_product_id);
+            },
+            captureChange(productIndex, actionName) {
+                this.productForms[productIndex].modified = true;
+                this.productState.saveStateDebounced(actionName);
             },
             paginate(page) {
                 this.showProducts(page);
@@ -1060,12 +1055,12 @@
                     if (currentRequestId !== this.latestRequestId) return;
 
                     this.pagination = response.data;
-                    this.products = this.pagination.data;
+                    const products = this.pagination.data;
 
-                    this.productState.setBulkProductForm(this.products);
+                    this.productState.setProductForms(products);
 
-                    this.checkedRows = this.products.reduce((acc, product) => {
-                        acc[product.id] = false;
+                    this.checkedRows = this.productForms.reduce((acc, productForm) => {
+                        acc[productForm.id] = false;
                         return acc;
                     }, {});
 
@@ -1086,41 +1081,46 @@
                 }
 
             },
-            async updateProducts(type) {
+            async updateProducts(type = null) {
 
                 try {
 
                     if(this.isUpdatingProducts) return;
 
-                    const productIds = this.products.filter(product => this.checkedRows[product.id]).map(product => product.id);
-
                     const data = {
-                        product_ids: productIds,
                         store_id: this.store.id
                     };
 
                     const isHiding = type == 'hide';
                     const isShowing = type == 'show';
 
-                    if(isHiding) data['visible'] = false;
-                    if(isShowing) data['visible'] = true;
+                    if(isHiding || isShowing) {
+                        data['visible'] = isShowing;
+                        data['products'] = this.productForms.filter(productForm => this.checkedRows[productForm.id] && productForm.visible != data['visible']).map(productForm => { return { id: productForm.id } });
 
-                    if(Object.keys(data).length == 2) return;
+                        if(data['products'].length == 0) {
+                            this.notificationState.showSuccessNotification(isShowing ? 'Products are visible' : 'Products are hidden');
+                        }
+                    }else{
+                        data['products'] = this.productForms.filter(productForm => productForm.modified);
+                    }
 
-                    this.isUpdatingProducts = true;
+                    if(data['products'].length > 0) {
 
-                    await axios.put(`/api/products`, data);
+                        this.isUpdatingProducts = true;
 
-                    this.showProducts();
+                        await axios.put(`/api/products`, data);
 
-                    if(isShowing || isHiding) {
-                        this.notificationState.showSuccessNotification('Product visibility updated');
+                        this.showProducts();
+
+                        this.notificationState.showSuccessNotification('Products updated');
+
                     }
 
                     // Uncheck only the related rows
-                    productIds.forEach(productId => {
-                        if (this.checkedRows[productId] !== undefined) {
-                            this.checkedRows[productId] = false;
+                    data['products'].forEach(productForm => {
+                        if (this.checkedRows[productForm.id] !== undefined) {
+                            this.checkedRows[productForm.id] = false;
                         }
                     });
 
@@ -1133,7 +1133,6 @@
                     console.error('Failed to update product:', error);
                 } finally {
                     this.isUpdatingProducts = false;
-                    this.$refs.updateProductsModal.hideModal();
                 }
 
             },
@@ -1141,32 +1140,32 @@
 
                 try {
 
-                    const productIds = this.products.filter(product => this.checkedRows[product.id]).map(product => product.id)
-                                                .filter(productId => !this.isDeletingProductIds.includes(productId));
+                    const productFormIds = this.productForms.filter(productForm => this.checkedRows[productForm.id]).map(productForm => productForm.id)
+                                                .filter(productFormId => !this.isDeletingProducIds.includes(productFormId));
 
-                    if (productIds.length === 0) return;
+                    if (productFormIds.length === 0) return;
 
-                    this.isDeletingProductIds.push(...productIds);
+                    this.isDeletingProducIds.push(...productFormIds);
 
                     const config = {
                         data: {
                             store_id: this.store.id,
-                            product_ids: productIds
+                            product_ids: productFormIds
                         }
                     }
 
                     await axios.delete(`/api/products`, config);
 
-                    this.notificationState.showSuccessNotification(productIds == 1 ? 'Product deleted' : 'Products deleted');
-                    this.products = this.products.filter(product => !productIds.includes(product.id));
-                    if(this.products.length == 0) this.showProducts();
+                    this.notificationState.showSuccessNotification(productFormIds == 1 ? 'Product deleted' : 'Products deleted');
+                    this.productState.productForms = this.productForms.filter(productForm => !productFormIds.includes(productForm.id));
+                    if(this.productForms.length == 0) this.showProducts();
 
-                    this.isDeletingProductIds = this.isDeletingProductIds.filter(id => !productIds.includes(id));
+                    this.isDeletingProducIds = this.isDeletingProducIds.filter(id => !productFormIds.includes(id));
 
                     // Uncheck only the related rows
-                    productIds.forEach(productId => {
-                        if (this.checkedRows[productId] !== undefined) {
-                            this.checkedRows[productId] = false;
+                    productFormIds.forEach(productFormId => {
+                        if (this.checkedRows[productFormId] !== undefined) {
+                            this.checkedRows[productFormId] = false;
                         }
                     });
 
@@ -1185,9 +1184,9 @@
 
                 try {
 
-                    if(this.isDeletingProductIds.includes(this.deletableProduct.id)) return;
+                    if(this.isDeletingProducIds.includes(this.deletableProduct.id)) return;
 
-                    this.isDeletingProductIds.push(this.deletableProduct.id);
+                    this.isDeletingProducIds.push(this.deletableProduct.id);
 
                     const config = {
                         data: {
@@ -1198,8 +1197,8 @@
                     await axios.delete(`/api/products/${this.deletableProduct.id}`, config);
 
                     this.notificationState.showSuccessNotification('Product deleted');
-                    this.products = this.products.filter(product => product.id != this.deletableProduct.id);
-                    if(this.products.length == 0) this.showProducts();
+                    this.productState.productForms = this.productForms.filter(productForm => productForm.id != this.deletableProduct.id);
+                    if(this.productForms.length == 0) this.showProducts();
 
                 } catch (error) {
                     const message = error?.response?.data?.message || error?.message || 'Something went wrong while deleting product';
@@ -1207,7 +1206,7 @@
                     this.formState.setServerFormErrors(error);
                     console.error('Failed to delete product:', error);
                 } finally {
-                    this.isDeletingProductIds.splice(this.isDeletingProductIds.findIndex((id) => id == this.deletableProduct.id), 1);
+                    this.isDeletingProducIds.splice(this.isDeletingProducIds.findIndex((id) => id == this.deletableProduct.id), 1);
                     this.$refs.deleteProductModal.hideModal();
                 }
 
@@ -1222,8 +1221,8 @@
                     null
                 );
             },
-            setBulkProductForm(bulkProductForm) {
-                this.productState.bulkProductForm = bulkProductForm;
+            setProductForms(productForms) {
+                this.productState.productForms = productForms;
             }
         },
         created() {
@@ -1234,7 +1233,7 @@
 
             for (let i = 0; i < listeners.length; i++) {
                 let listener = listeners[i];
-                this.changeHistoryState.listeners[listener] = this.setBulkProductForm;
+                this.changeHistoryState.listeners[listener] = this.setProductForms;
             }
 
             this.isLoadingProducts = true;

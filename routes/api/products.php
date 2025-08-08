@@ -12,6 +12,7 @@ Route::prefix('products')
         Route::post('/', 'createProduct')->name('create.product');
         Route::put('/', 'updateProducts')->name('update.products');
         Route::delete('/', 'deleteProducts')->name('delete.products');
+        Route::post('/import', 'importProducts')->name('import.products');
         Route::post('/download', 'downloadProducts')->name('download.products');
         Route::post('/visibility', 'updateProductVisibility')->name('update.product.visibility');
         Route::post('/arrangement', 'updateProductArrangement')->name('update.product.arrangement');

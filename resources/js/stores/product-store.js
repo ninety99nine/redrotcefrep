@@ -5,9 +5,9 @@ import { useChangeHistoryStore as changeHistoryState } from '@Stores/change-hist
 export const useProductStore = defineStore('product', {
     state: () => ({
         product: null,
+        productForms: [],
         productForm: null,
         isUploading: false,
-        bulkProductForm: [],
         isLoadingProduct: false,
         isCreatingProduct: false,
         isUpdatingProduct: false,
@@ -18,9 +18,9 @@ export const useProductStore = defineStore('product', {
     actions: {
         reset() {
             this.product = null;
+            this.productForms = [];
             this.productForm = null;
             this.isUploading = false;
-            this.bulkProductForm = [];
             this.isLoadingProduct = false;
             this.isCreatingProduct = false;
             this.isUpdatingProduct = false;
@@ -35,16 +35,13 @@ export const useProductStore = defineStore('product', {
             this.isLoadingProduct = isLoadingProduct;
         },
         saveState(actionName) {
-            console.log('saveState');
-            changeHistoryState().saveState(actionName, this.productForm ?? this.bulkProductForm);
+            changeHistoryState().saveState(actionName, this.productForm ?? this.productForms);
         },
         saveStateDebounced(actionName) {
-            console.log('saveStateDebounced');
-            changeHistoryState().saveStateDebounced(actionName, this.productForm ?? this.bulkProductForm);
+            changeHistoryState().saveStateDebounced(actionName, this.productForm ?? this.productForms);
         },
         saveOriginalState(actionName) {
-            console.log('saveOriginalState');
-            changeHistoryState().saveOriginalState(actionName, this.productForm ?? this.bulkProductForm);
+            changeHistoryState().saveOriginalState(actionName, this.productForm ?? this.productForms);
         },
         setProductForm(product = null, saveState = true) {
 
@@ -112,9 +109,9 @@ export const useProductStore = defineStore('product', {
             }
 
         },
-        setBulkProductForm(products = [], saveState = true) {
+        setProductForms(products = [], saveState = true) {
 
-            this.bulkProductForm = products.flatMap((product) => {
+            this.productForms = products.flatMap((product) => {
 
                 const parent = {
                     id: product.id,
@@ -125,10 +122,10 @@ export const useProductStore = defineStore('product', {
                     visible: product.visible,
                     is_free: product.is_free,
                     barcode: product.barcode,
-                    position: product.position,
                     tax_overide: product.tax_overide,
                     description: product.description,
                     download_link: product.download_link,
+                    position: product.position.toString(),
                     unit_type: product.unit_type?.toString(),
                     unit_value: product.unit_value?.toString(),
                     show_description: product.show_description,
@@ -149,6 +146,7 @@ export const useProductStore = defineStore('product', {
                     unit_regular_price: product.unit_regular_price.amount_without_currency,
                     tax_overide_amount: product.tax_overide_amount?.amount_without_currency,
 
+                    modified: false,
                     is_variant: false,
                     total_variants: product.variants.length,
                     has_variants: product.variants.length > 0,
@@ -163,10 +161,10 @@ export const useProductStore = defineStore('product', {
                     visible: variant.visible,
                     is_free: variant.is_free,
                     barcode: variant.barcode,
-                    position: product.position,
                     tax_overide: variant.tax_overide,
                     description: variant.description,
                     download_link: variant.download_link,
+                    position: variant.position.toString(),
                     unit_type: variant.unit_type?.toString(),
                     unit_value: variant.unit_value?.toString(),
                     show_description: variant.show_description,
@@ -187,6 +185,7 @@ export const useProductStore = defineStore('product', {
                     unit_regular_price: variant.unit_regular_price.amount_without_currency,
                     tax_overide_amount: variant.tax_overide_amount?.amount_without_currency,
 
+                    modified: false,
                     is_variant: true,
                     total_variants: 0,
                     has_variants: false
@@ -195,8 +194,6 @@ export const useProductStore = defineStore('product', {
                 // Combine parent and its variants
                 return [parent, ...variants];
             });
-
-            console.log(this.bulkProductForm);
 
             if (saveState) {
                 this.saveOriginalState('Original products');

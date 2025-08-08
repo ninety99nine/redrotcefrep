@@ -165,6 +165,11 @@ const routes = [
                         component: () => import('@Pages/products/product/Product.vue')
                     },
                     {
+                        path: 'import-products',
+                        name: 'import-products',
+                        component: () => import('@Pages/products/import-products/ImportProducts.vue')
+                    },
+                    {
                         path: 'bulk-edit',
                         name: 'bulk-edit-products',
                         component: () => import('@Pages/products/bulk-edit-products/BulkEditProducts.vue')

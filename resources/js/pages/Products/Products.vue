@@ -1,6 +1,6 @@
 <template>
 
-    <div class="pt-24 pb-80 px-8 relative select-none">
+    <div class="pt-24 px-8 relative select-none">
 
         <!-- Clouds Image -->
         <img :src="'/images/clouds.png'" class="absolute bottom-0">
@@ -36,16 +36,22 @@
                         <Button
                             size="xs"
                             type="outline"
-                            :leftIcon="Pen"
                             :action="navigateToBulkEdit">
                             <span>Bulk Edit</span>
+                        </Button>
+
+                        <!-- Import Products Button -->
+                        <Button
+                            size="xs"
+                            type="outline"
+                            :action="navigateImportProducts">
+                            <span>Import</span>
                         </Button>
 
                         <!-- Export Products Button -->
                         <Button
                             size="xs"
                             type="outline"
-                            :leftIcon="ArrowDownToLine"
                             :action="showExportProductsModal"
                             v-if="((pagination ?? {}).meta ?? {}).total > 0">
                             <span>Export</span>
@@ -677,7 +683,7 @@
     import { VueDraggableNext } from 'vue-draggable-next';
     import { formattedDatetime, formattedRelativeDate } from '@Utils/dateUtils.js';
     import NoDataPlaceholder from '@Partials/table/components/NoDataPlaceholder.vue';
-    import { Info, Plus, Trash2, Printer, RefreshCcw, ArrowDownToLine, Pen } from 'lucide-vue-next';
+    import { Info, Plus, Trash2, Printer, RefreshCcw, ArrowDownToLine } from 'lucide-vue-next';
 
     export default {
         inject: ['formState', 'storeState', 'notificationState'],
@@ -687,13 +693,13 @@
         },
         data() {
             return {
-                Pen,
                 Plus,
                 Trash2,
                 Printer,
                 RefreshCcw,
                 ArrowDownToLine,
 
+                csvFile: [],
                 products: [],
                 perPage: '15',
                 checkedRows: [],
@@ -703,8 +709,8 @@
                 latestRequestId: 0,
                 exportLimit: '100',
                 exportFormat: 'csv',
-                deletableProduct: null,
                 filterExpressions: [],
+                deletableProduct: null,
                 sortingExpressions: [],
                 isDeletingProductIds: [],
                 cancelTokenSource: null,
@@ -713,10 +719,10 @@
                 isLoadingProducts: false,
                 isUpdatingProducts: false,
                 isExportingProducts: false,
+                exportMode: 'with_variants',
                 isDownloadingProducts: false,
                 includeProductFieldNames: true,
                 columns: this.prepareColumns(),
-                exportMode: 'product_per_line',
                 whatsappFields: this.prepareWhatsappFields(),
                 exportLimits: [
                     { label: '100', value: '100'},
@@ -729,8 +735,12 @@
                 ],
                 exportModes: [
                     {
-                        label: 'One product per row',
-                        value: 'product_per_line'
+                        label: 'With variants',
+                        value: 'with_variants'
+                    },
+                    {
+                        label: 'Without variants',
+                        value: 'without_variants'
                     },
                 ],
                 exportFormats: [
@@ -870,6 +880,17 @@
             navigateToBulkEdit() {
                 this.$router.push({
                     name: 'bulk-edit-products',
+                    query: {
+                        store_id: this.store.id,
+                        searchTerm: this.searchTerm,
+                        filterExpressions: this.filterExpressions.join('|'),
+                        sortingExpressions: this.sortingExpressions.join('|')
+                    }
+                });
+            },
+            navigateImportProducts() {
+                this.$router.push({
+                    name: 'import-products',
                     query: {
                         store_id: this.store.id,
                         searchTerm: this.searchTerm,

@@ -65,7 +65,7 @@ class Product extends Model
      * @var array
      */
     protected $fillable = [
-        'name', 'type', 'visible', 'visibility_expires_at', 'show_description', 'description', 'sku', 'barcode',
+        'id', 'name', 'type', 'visible', 'visibility_expires_at', 'show_description', 'description', 'sku', 'barcode',
         'unit_weight', 'is_free', 'is_estimated_price', 'show_price_per_unit', 'tax_overide',
         'tax_overide_amount', 'download_link', 'unit_type', 'unit_value', 'currency', 'unit_regular_price', 'on_sale',
         'unit_sale_price', 'unit_sale_discount', 'unit_sale_discount_percentage', 'unit_cost_price', 'has_price',
