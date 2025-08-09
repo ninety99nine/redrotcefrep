@@ -56,8 +56,8 @@
                             placeholder="Main Dish"
                             v-model="categoryForm.name"
                             :errorText="formState.getFormError('name')"
-                            @input="categoryState.saveStateDebounced('Name changed')"
-                            tooltipContent="The name of your category e.g Main Dish">
+                            tooltipContent="The name of your category e.g Main Dish"
+                            @input="categoryState.saveStateDebounced('Name changed')">
                         </Input>
 
                         <!-- Visibility Select -->

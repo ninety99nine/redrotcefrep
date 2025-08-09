@@ -53,8 +53,13 @@ class CategoryService extends BaseService
 
         $category = Category::create($data);
 
-        if(!is_null($productIds)) {
-            $category->products()->sync($productIds);
+        if (!is_null($productIds)) {
+            $syncData = [];
+            foreach ($productIds as $index => $productId) {
+                $syncData[$productId] = ['position' => $index + 1];
+            }
+
+            $category->products()->sync($syncData);
         }
 
         $this->updateCategoryArrangement([
@@ -311,8 +316,13 @@ class CategoryService extends BaseService
 
         $category->update($data);
 
-        if(!is_null($productIds)) {
-            $category->products()->sync($productIds);
+        if (!is_null($productIds)) {
+            $syncData = [];
+            foreach ($productIds as $index => $productId) {
+                $syncData[$productId] = ['position' => $index + 1];
+            }
+
+            $category->products()->sync($syncData);
         }
 
         return $this->showUpdatedResource($category);

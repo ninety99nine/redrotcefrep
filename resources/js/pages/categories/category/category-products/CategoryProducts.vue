@@ -8,7 +8,6 @@
 
             <Pill type="light" size="xs">{{ `${totalCategoryProducts} total` }}</Pill>
 
-
         </div>
 
         <Search
@@ -40,11 +39,16 @@
 
         </Search>
 
-        <div v-if="hasCategoryProducts">
+        <draggable
+            handle=".draggable-handle"
+            ghost-class="bg-yellow-50"
+            v-if="hasCategoryProducts"
+            v-model="categoryForm.products"
+            @change="categoryState.saveStateDebounced('Product arrangement changed')">
 
             <div
                 :key="index"
-                v-for="(categoryProduct, index) in categoryProducts"
+                v-for="(categoryProduct, index) in categoryForm.products"
                 class="flex items-center justify-between hover:bg-gray-100 rounded-lg py-2 px-4">
 
                 <div class="flex space-x-4 items-center">
@@ -59,16 +63,23 @@
                     <Pill :type="categoryProduct.visible ? 'success' : 'warning'" size="xs">{{ categoryProduct.visible ? 'visible' : 'hidden' }}</Pill>
                 </div>
 
-                <Button
-                    size="xs"
-                    type="bareDanger"
-                    :leftIcon="Trash2"
-                    :action="() => removeProduct(index)">
-                </Button>
+                <div class="flex items-center space-x-4">
+
+                    <Button
+                        size="xs"
+                        type="bareDanger"
+                        :leftIcon="Trash2"
+                        :action="() => removeProduct(index)">
+                    </Button>
+
+                    <!-- Drag & Drop Handle -->
+                    <Move @click.stop size="16" class="draggable-handle cursor-grab active:cursor-grabbing text-gray-500 hover:text-yellow-500"></Move>
+
+                </div>
 
             </div>
 
-        </div>
+        </draggable>
 
         <div v-else class="flex justify-center bg-gray-50 rounded-lg p-4">
 
@@ -83,13 +94,14 @@
 <script>
 
     import Pill from '@Partials/Pill.vue';
-    import { Trash2 } from 'lucide-vue-next';
     import Button from '@Partials/Button.vue';
     import Search from '@Partials/Search.vue';
+    import { Move, Trash2 } from 'lucide-vue-next';
+    import { VueDraggableNext } from 'vue-draggable-next';
 
     export default {
         inject: ['formState', 'categoryState', 'storeState', 'notificationState'],
-        components: { Pill, Button, Search },
+        components: { Move, Pill, Button, Search, draggable: VueDraggableNext },
         data() {
             return {
                 Trash2,

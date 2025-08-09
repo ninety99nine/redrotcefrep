@@ -783,9 +783,7 @@
                                     <span class="text-sm">{{ variant.name ?? 'no name' }}</span>
 
                                      <!-- Drag & Drop Handle -->
-                                    <svg class="draggable-handle w-4 h-4 cursor-grab hover:text-yellow-500 visible:cursor-grabbing" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 3.75v4.5m0-4.5h4.5m-4.5 0L9 9M3.75 20.25v-4.5m0 4.5h4.5m-4.5 0L9 15M20.25 3.75h-4.5m4.5 0v4.5m0-4.5L15 9m5.25 11.25h-4.5m4.5 0v-4.5m0 4.5L15 15" />
-                                    </svg>
+                                    <Move @click.stop size="16" class="draggable-handle cursor-grab active:cursor-grabbing text-gray-500 hover:text-yellow-500"></Move>
 
                                 </div>
 
@@ -870,12 +868,12 @@
     import { VueDraggableNext } from 'vue-draggable-next';
     import BackdropLoader from '@Partials/BackdropLoader.vue';
     import DataCollectionFields from '@Pages/Products/product/data-collection-fields/DataCollectionFields.vue';
-    import { X, Plus, Image, Split, Trash2, MoveLeft, ArrowDownUp, ChevronUp, ChevronDown } from 'lucide-vue-next';
+    import { Move, X, Plus, Image, Split, Trash2, MoveLeft, ArrowDownUp, ChevronUp, ChevronDown } from 'lucide-vue-next';
 
     export default {
         inject: ['formState', 'storeState', 'productState', 'changeHistoryState', 'notificationState'],
         components: {
-            Image, Split, Pill, Alert, Input, Modal, Button, Loader, Switch, Select, Popover,
+            Move, Image, Split, Pill, Alert, Input, Modal, Button, Loader, Switch, Select, Popover,
             Skeleton, SelectTags, draggable: VueDraggableNext, BackdropLoader, DataCollectionFields
         },
         data() {
@@ -1103,7 +1101,7 @@
 
                 try {
 
-                    if(this.isChangingVariantArrangement) return;
+                    if(this.productState.isChangingVariantArrangement) return;
 
                     // Create a map of original variants by temporary_id for quick lookup
                     const variantMap = new Map(

@@ -68,7 +68,7 @@ class Category extends Model
      */
     public function products(): BelongsToMany
     {
-        return $this->belongsToMany(Product::class, 'product_category');
+        return $this->belongsToMany(Product::class, 'product_category')->orderByPivot('position');
     }
 
     /**

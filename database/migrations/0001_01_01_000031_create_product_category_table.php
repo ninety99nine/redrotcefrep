@@ -17,6 +17,10 @@ return new class extends Migration
             $table->primary(['product_id', 'category_id']);
             $table->foreignUuid('product_id')->constrained()->cascadeOnDelete();
             $table->foreignUuid('category_id')->constrained()->cascadeOnDelete();
+            $table->unsignedTinyInteger('position')->nullable();
+
+            $table->index('position');
+
             $table->timestamps();
         });
     }

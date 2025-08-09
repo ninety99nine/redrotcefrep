@@ -126,246 +126,253 @@
                 </template>
 
                 <!-- Table Body -->
-                <template #body>
+                <template #tbody>
 
-                    <tr
-                        :key="product.id"
-                        @click.stop="onView(product)" v-for="product in products"
-                        :class="[checkedRows[product.id] ? 'bg-blue-50' : 'bg-white hover:bg-gray-50', 'group cursor-pointer border-b border-blue-100']">
+                    <draggable
+                        tag="tbody"
+                        v-model="products"
+                        handle=".draggable-handle"
+                        ghost-class="bg-yellow-50"
+                        @change="changeProductArrangement">
 
-                        <template
-                            :key="columnIndex"
-                            v-for="(column, columnIndex) in columns">
+                        <tr
+                            :key="product.id"
+                            v-for="product in products"
+                            @click.stop="onView(product)"
+                            :class="[checkedRows[product.id] ? 'bg-blue-50' : 'bg-white hover:bg-gray-50', 'group cursor-pointer border-b border-blue-100']">
 
-                            <!-- Checkbox -->
-                            <td
-                                @click.stop
-                                v-if="columnIndex == 0"
-                                class="whitespace-nowrap align-center px-4 py-4">
+                            <template
+                                :key="columnIndex"
+                                v-for="(column, columnIndex) in columns">
 
-                                <Input
-                                    type="checkbox"
-                                    v-model="checkedRows[product.id]">
-                                </Input>
+                                <!-- Checkbox -->
+                                <td
+                                    @click.stop
+                                    v-if="columnIndex == 0"
+                                    class="whitespace-nowrap align-center px-4 py-4">
 
-                            </td>
+                                    <Input
+                                        type="checkbox"
+                                        v-model="checkedRows[product.id]">
+                                    </Input>
 
-                            <template v-if="column.active">
+                                </td>
 
-                                <!-- Name -->
-                                <td v-if="column.name == 'Name'" class="whitespace-nowrap align-center pr-4 py-4 text-sm">
+                                <template v-if="column.active">
 
-                                    <div class="flex space-x-1 items-center">
+                                    <!-- Name -->
+                                    <td v-if="column.name == 'Name'" class="whitespace-nowrap align-center pr-4 py-4 text-sm">
 
-                                        <div class="flex space-x-2 items-center">
-                                            <div
-                                                v-if="product.photo"
-                                                class="flex items-center justify-center w-10 h-10">
+                                        <div class="flex space-x-1 items-center">
 
-                                                <img class="w-full max-h-full object-contain rounded-lg flex-shrink-0" :src="product.photo.path">
+                                            <div class="flex space-x-2 items-center">
+                                                <div
+                                                    v-if="product.photo"
+                                                    class="flex items-center justify-center w-10 h-10">
 
-                                            </div>
-                                            <span>{{ product.name }}</span>
-                                        </div>
-
-                                        <Popover
-                                            placement="top"
-                                            wrapperClasses="opacity-0 group-hover:opacity-100">
-
-                                            <template #content>
-
-                                                <div class="min-w-40 p-4">
-
-                                                    <p class="border-b border-gray-300 pb-2 mb-2">{{ product.name }}</p>
-
-                                                    <div class="space-y-2">
-
-                                                        <p class="flex items-center space-x-2 mb-2">
-                                                            <span class="text-sm">SKU: </span>
-                                                            <Pill type="light" size="xs">
-                                                                <span>{{ product.sku ?? 'None' }}</span>
-                                                            </Pill>
-                                                        </p>
-
-                                                        <p class="flex items-center space-x-2">
-                                                            <span class="text-sm">Barcode: </span>
-                                                            <Pill type="light" size="xs">
-                                                                <span>{{ product.barcode ?? 'None' }}</span>
-                                                            </Pill>
-                                                        </p>
-
-                                                        <template v-if="product.show_description && product.description != null">
-                                                            <p class="text-sm border-t border-gray-300 pt-2 mt-2">{{ product.description }}</p>
-                                                        </template>
-
-                                                    </div>
+                                                    <img class="w-full max-h-full object-contain rounded-lg flex-shrink-0" :src="product.photo.path">
 
                                                 </div>
+                                                <span>{{ product.name }}</span>
+                                            </div>
 
-                                            </template>
+                                            <Popover
+                                                placement="top"
+                                                wrapperClasses="opacity-0 group-hover:opacity-100">
 
-                                        </Popover>
-                                    </div>
+                                                <template #content>
 
-                                </td>
+                                                    <div class="min-w-40 p-4">
 
-                                <!-- Description -->
-                                <td v-else-if="column.name == 'Description'" class="whitespace-nowrap align-center pr-4 py-4 text-sm">
-                                    <div class="w-40">
-                                        <span v-if="product.description">{{ product.description }}</span>
-                                        <NoDataPlaceholder v-else></NoDataPlaceholder>
-                                    </div>
-                                </td>
+                                                        <p class="border-b border-gray-300 pb-2 mb-2">{{ product.name }}</p>
 
-                                <!-- Price -->
-                                <td v-else-if="column.name == 'Price'" class="align-center pr-4 py-4 text-sm">
-                                    <div class="flex space-x-1 items-center">
+                                                        <div class="space-y-2">
 
-                                        <Pill v-if="(product.variant ?? product).is_free" type="success" size="xs">free</Pill>
+                                                            <p class="flex items-center space-x-2 mb-2">
+                                                                <span class="text-sm">SKU: </span>
+                                                                <Pill type="light" size="xs">
+                                                                    <span>{{ product.sku ?? 'None' }}</span>
+                                                                </Pill>
+                                                            </p>
 
-                                        <template v-else>
-                                            <span>{{ (product.variant ?? product).unit_price.amount_with_currency }}</span>
-                                            <Pill v-if="(product.variant ?? product).on_sale" type="success" size="xs">on sale</Pill>
-                                        </template>
+                                                            <p class="flex items-center space-x-2">
+                                                                <span class="text-sm">Barcode: </span>
+                                                                <Pill type="light" size="xs">
+                                                                    <span>{{ product.barcode ?? 'None' }}</span>
+                                                                </Pill>
+                                                            </p>
 
-                                        <Popover
-                                            placement="top"
-                                            wrapperClasses="opacity-0 group-hover:opacity-100">
+                                                            <template v-if="product.show_description && product.description != null">
+                                                                <p class="text-sm border-t border-gray-300 pt-2 mt-2">{{ product.description }}</p>
+                                                            </template>
 
-                                            <template #content>
-
-                                                <div class="min-w-40 p-4">
-
-                                                    <p class="border-b border-gray-300 pb-2 mb-2">Pricing</p>
-
-                                                    <div class="space-y-2">
-
-                                                        <div v-if="(product.variant ?? product).on_sale" class="border-b border-gray-300 pb-2 mb-2">
-                                                            <p>Regular Price: <span :class="['text-black', { 'line-through' : (product.variant ?? product).on_sale || (product.variant ?? product).is_free }]">{{ (product.variant ?? product).unit_regular_price.amount_with_currency }}</span></p>
-                                                            <p v-if="(product.variant ?? product).on_sale">Sale Price: <span :class="['text-black', { 'line-through' : (product.variant ?? product).is_free }]">{{ (product.variant ?? product).unit_sale_price.amount_with_currency }}</span></p>
                                                         </div>
 
-                                                        <template v-if="(product.variant ?? product).is_free">
-                                                            <p>This product is free</p>
-                                                            <p class="font-bold text-black">Price: <span class="text-green-500">Free</span></p>
-                                                        </template>
+                                                    </div>
 
-                                                        <p v-else class=" text-black">Price: <span class="font-bold">{{ (product.variant ?? product).unit_price.amount_with_currency }}</span></p>
+                                                </template>
+
+                                            </Popover>
+                                        </div>
+
+                                    </td>
+
+                                    <!-- Description -->
+                                    <td v-else-if="column.name == 'Description'" class="whitespace-nowrap align-center pr-4 py-4 text-sm">
+                                        <div class="w-40">
+                                            <span v-if="product.description">{{ product.description }}</span>
+                                            <NoDataPlaceholder v-else></NoDataPlaceholder>
+                                        </div>
+                                    </td>
+
+                                    <!-- Price -->
+                                    <td v-else-if="column.name == 'Price'" class="align-center pr-4 py-4 text-sm">
+                                        <div class="flex space-x-1 items-center">
+
+                                            <Pill v-if="(product.variant ?? product).is_free" type="success" size="xs">free</Pill>
+
+                                            <template v-else>
+                                                <span>{{ (product.variant ?? product).unit_price.amount_with_currency }}</span>
+                                                <Pill v-if="(product.variant ?? product).on_sale" type="success" size="xs">on sale</Pill>
+                                            </template>
+
+                                            <Popover
+                                                placement="top"
+                                                wrapperClasses="opacity-0 group-hover:opacity-100">
+
+                                                <template #content>
+
+                                                    <div class="min-w-40 p-4">
+
+                                                        <p class="border-b border-gray-300 pb-2 mb-2">Pricing</p>
+
+                                                        <div class="space-y-2">
+
+                                                            <div v-if="(product.variant ?? product).on_sale" class="border-b border-gray-300 pb-2 mb-2">
+                                                                <p>Regular Price: <span :class="['text-black', { 'line-through' : (product.variant ?? product).on_sale || (product.variant ?? product).is_free }]">{{ (product.variant ?? product).unit_regular_price.amount_with_currency }}</span></p>
+                                                                <p v-if="(product.variant ?? product).on_sale">Sale Price: <span :class="['text-black', { 'line-through' : (product.variant ?? product).is_free }]">{{ (product.variant ?? product).unit_sale_price.amount_with_currency }}</span></p>
+                                                            </div>
+
+                                                            <template v-if="(product.variant ?? product).is_free">
+                                                                <p>This product is free</p>
+                                                                <p class="font-bold text-black">Price: <span class="text-green-500">Free</span></p>
+                                                            </template>
+
+                                                            <p v-else class=" text-black">Price: <span class="font-bold">{{ (product.variant ?? product).unit_price.amount_with_currency }}</span></p>
+
+                                                        </div>
 
                                                     </div>
 
-                                                </div>
+                                                </template>
 
-                                            </template>
+                                            </Popover>
+                                        </div>
+                                    </td>
 
-                                        </Popover>
+                                    <!-- Visibility -->
+                                    <td v-else-if="column.name == 'Visibility'" class="align-center pr-4 py-4 text-sm">
+                                        <Pill :type="product.visible ? 'success' : 'warning'" size="xs">{{ product.visible ? 'visible' : 'hidden' }}</Pill>
+                                    </td>
+
+                                    <!-- Stock -->
+                                    <td v-else-if="column.name == 'Stock'" class="align-center pr-4 py-4 text-sm">
+                                        <Pill :type="(product.variant ?? product).has_stock ? 'success' : 'warning'" size="xs">{{ (product.variant ?? product).has_stock ? ((product.variant ?? product).stock_quantity_type == 'unlimited' ? 'unlimited' : `${(product.variant ?? product).stock_quantity} left`) : 'no stock' }}</Pill>
+                                    </td>
+
+                                    <!-- Variants -->
+                                    <td v-else-if="column.name == 'Variants'" class="align-center pr-4 py-4 text-sm">
+                                        <Pill type="light" size="xs">{{ product.variants_count ? product.variants_count : 'none' }}</Pill>
+                                    </td>
+
+                                    <!-- Minimum Order Quantity -->
+                                    <td v-else-if="column.name == 'Minimum Order Quantity'" class="align-center pr-4 py-4 text-sm">
+                                        <div class="flex space-x-1 items-center">
+                                            <Pill type="light" size="xs">{{ product.set_min_order_quantity ? product.min_order_quantity : 'none' }}</Pill>
+                                            <Popover
+                                                placement="top"
+                                                wrapperClasses="opacity-0 group-hover:opacity-100">
+
+                                                <template #content>
+
+                                                    <div class="min-w-40 p-4">
+
+                                                    <p class="border-b border-gray-300 pb-2 mb-2">Minimum Order Quantity</p>
+                                                    <p>{{ product.set_min_order_quantity ? `Allows minimum of ${product.min_order_quantity} ${product.min_order_quantity == 1 ? 'quantity' : 'quantities' } per order` : 'Does not have any limits' }}</p>
+
+                                                    </div>
+
+                                                </template>
+
+                                            </Popover>
+                                        </div>
+                                    </td>
+
+                                    <!-- Maximum Order Quantity -->
+                                    <td v-else-if="column.name == 'Maximum Order Quantity'" class="align-center pr-4 py-4 text-sm">
+                                        <div class="flex space-x-1 items-center">
+                                            <Pill type="light" size="xs">{{ product.set_max_order_quantity ? product.max_order_quantity : 'none' }}</Pill>
+                                            <Popover
+                                                placement="top"
+                                                wrapperClasses="opacity-0 group-hover:opacity-100">
+
+                                                <template #content>
+
+                                                    <div class="min-w-40 p-4">
+
+                                                    <p class="border-b border-gray-300 pb-2 mb-2">Maximum Order Quantity</p>
+                                                    <p>{{ product.set_max_order_quantity ? `Allows maximum of ${product.max_order_quantity} ${product.max_order_quantity == 1 ? 'quantity' : 'quantities' } per order` : 'Does not have any limits' }}</p>
+
+                                                    </div>
+
+                                                </template>
+
+                                            </Popover>
+                                        </div>
+                                    </td>
+
+                                    <!-- Created Date -->
+                                    <td v-else-if="column.name == 'Created Date'" class="whitespace-nowrap align-center pr-4 py-4 text-sm">
+                                        <div class="flex space-x-1 items-center">
+                                            <span>{{ formattedDatetime(product.created_at) }}</span>
+                                            <Popover
+                                                placement="top"
+                                                class="opacity-0 group-hover:opacity-100"
+                                                :content="formattedRelativeDate(product.created_at)">
+                                            </Popover>
+                                        </div>
+                                    </td>
+
+                                </template>
+
+                                <!-- Actions -->
+                                <td v-if="columnIndex == (columns.length - 1)" class="align-center pr-4 py-4">
+
+                                    <div class="flex items-center space-x-4">
+
+                                        <!-- View Button -->
+                                        <span v-if="!isDeletingProduct(product)" @click.stop.prevent="onView(product)" class="text-sm font-medium text-blue-600 dark:text-blue-500 hover:underline">View</span>
+
+                                        <!-- Deleting Loader -->
+                                        <Loader v-if="isDeletingProduct(product)" type="danger">
+                                            <span class="text-xs ml-2">Deleting...</span>
+                                        </Loader>
+
+                                        <!-- Delete Button -->
+                                        <span v-else @click.stop.prevent="showDeleteConfirmationModal(product)" class="text-sm font-medium text-red-600 dark:text-red-500 hover:underline">Delete</span>
+
+                                        <!-- Drag & Drop Handle -->
+                                        <Move @click.stop size="16" class="draggable-handle cursor-grab active:cursor-grabbing text-gray-500 hover:text-yellow-500"></Move>
+
                                     </div>
-                                </td>
 
-                                <!-- Visibility -->
-                                <td v-else-if="column.name == 'Visibility'" class="align-center pr-4 py-4 text-sm">
-                                    <Pill :type="product.visible ? 'success' : 'warning'" size="xs">{{ product.visible ? 'visible' : 'hidden' }}</Pill>
-                                </td>
-
-                                <!-- Stock -->
-                                <td v-else-if="column.name == 'Stock'" class="align-center pr-4 py-4 text-sm">
-                                    <Pill :type="(product.variant ?? product).has_stock ? 'success' : 'warning'" size="xs">{{ (product.variant ?? product).has_stock ? ((product.variant ?? product).stock_quantity_type == 'unlimited' ? 'unlimited' : `${(product.variant ?? product).stock_quantity} left`) : 'no stock' }}</Pill>
-                                </td>
-
-                                <!-- Variants -->
-                                <td v-else-if="column.name == 'Variants'" class="align-center pr-4 py-4 text-sm">
-                                    <Pill type="light" size="xs">{{ product.variants_count ? product.variants_count : 'none' }}</Pill>
-                                </td>
-
-                                <!-- Minimum Order Quantity -->
-                                <td v-else-if="column.name == 'Minimum Order Quantity'" class="align-center pr-4 py-4 text-sm">
-                                    <div class="flex space-x-1 items-center">
-                                        <Pill type="light" size="xs">{{ product.set_min_order_quantity ? product.min_order_quantity : 'none' }}</Pill>
-                                        <Popover
-                                            placement="top"
-                                            wrapperClasses="opacity-0 group-hover:opacity-100">
-
-                                            <template #content>
-
-                                                <div class="min-w-40 p-4">
-
-                                                <p class="border-b border-gray-300 pb-2 mb-2">Minimum Order Quantity</p>
-                                                <p>{{ product.set_min_order_quantity ? `Allows minimum of ${product.min_order_quantity} ${product.min_order_quantity == 1 ? 'quantity' : 'quantities' } per order` : 'Does not have any limits' }}</p>
-
-                                                </div>
-
-                                            </template>
-
-                                        </Popover>
-                                    </div>
-                                </td>
-
-                                <!-- Maximum Order Quantity -->
-                                <td v-else-if="column.name == 'Maximum Order Quantity'" class="align-center pr-4 py-4 text-sm">
-                                    <div class="flex space-x-1 items-center">
-                                        <Pill type="light" size="xs">{{ product.set_max_order_quantity ? product.max_order_quantity : 'none' }}</Pill>
-                                        <Popover
-                                            placement="top"
-                                            wrapperClasses="opacity-0 group-hover:opacity-100">
-
-                                            <template #content>
-
-                                                <div class="min-w-40 p-4">
-
-                                                <p class="border-b border-gray-300 pb-2 mb-2">Maximum Order Quantity</p>
-                                                <p>{{ product.set_max_order_quantity ? `Allows maximum of ${product.max_order_quantity} ${product.max_order_quantity == 1 ? 'quantity' : 'quantities' } per order` : 'Does not have any limits' }}</p>
-
-                                                </div>
-
-                                            </template>
-
-                                        </Popover>
-                                    </div>
-                                </td>
-
-                                <!-- Position -->
-                                <td v-else-if="column.name == 'Position'" class="align-center pr-4 py-4 text-sm">
-                                    <span v-if="product.position">#{{ product.position }}</span>
-                                    <NoDataPlaceholder v-else></NoDataPlaceholder>
-                                </td>
-
-                                <!-- Created Date -->
-                                <td v-else-if="column.name == 'Created Date'" class="whitespace-nowrap align-center pr-4 py-4 text-sm">
-                                    <div class="flex space-x-1 items-center">
-                                        <span>{{ formattedDatetime(product.created_at) }}</span>
-                                        <Popover
-                                            placement="top"
-                                            class="opacity-0 group-hover:opacity-100"
-                                            :content="formattedRelativeDate(product.created_at)">
-                                        </Popover>
-                                    </div>
                                 </td>
 
                             </template>
 
-                            <!-- Actions -->
-                            <td v-if="columnIndex == (columns.length - 1)" class="align-center pr-4 py-4">
+                        </tr>
 
-                                <div class="flex items-center space-x-4">
-
-                                    <!-- View Button -->
-                                    <span v-if="!isDeletingProduct(product)" @click.stop.prevent="onView(product)" class="text-sm font-medium text-blue-600 dark:text-blue-500 hover:underline">View</span>
-
-                                    <!-- Deleting Loader -->
-                                    <Loader v-if="isDeletingProduct(product)" type="danger">
-                                        <span class="text-xs ml-2">Deleting...</span>
-                                    </Loader>
-
-                                    <!-- Delete Button -->
-                                    <span v-else @click.stop.prevent="showDeleteConfirmationModal(product)" class="text-sm font-medium text-red-600 dark:text-red-500 hover:underline">Delete</span>
-
-                                </div>
-
-                            </td>
-
-                        </template>
-
-                    </tr>
+                    </draggable>
 
                 </template>
 
@@ -549,9 +556,7 @@
                                         </Input>
 
                                         <!-- Drag & Drop Handle -->
-                                        <svg class="draggable-handle w-4 h-4 cursor-grab hover:text-yellow-500 visible:cursor-grabbing" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 3.75v4.5m0-4.5h4.5m-4.5 0L9 9M3.75 20.25v-4.5m0 4.5h4.5m-4.5 0L9 15M20.25 3.75h-4.5m4.5 0v4.5m0-4.5L15 9m5.25 11.25h-4.5m4.5 0v-4.5m0 4.5L15 15" />
-                                        </svg>
+                                        <Move @click.stop size="16" class="draggable-handle cursor-grab active:cursor-grabbing text-gray-500 hover:text-yellow-500"></Move>
 
                                     </div>
 
@@ -683,12 +688,12 @@
     import { VueDraggableNext } from 'vue-draggable-next';
     import { formattedDatetime, formattedRelativeDate } from '@Utils/dateUtils.js';
     import NoDataPlaceholder from '@Partials/table/components/NoDataPlaceholder.vue';
-    import { Info, Plus, Trash2, Printer, RefreshCcw, ArrowDownToLine } from 'lucide-vue-next';
+    import { Move, Info, Plus, Trash2, Printer, RefreshCcw, ArrowDownToLine } from 'lucide-vue-next';
 
     export default {
         inject: ['formState', 'storeState', 'notificationState'],
         components: {
-            Info, Pill, Input, Modal, Loader, Button, Switch, Select, Popover, Dropdown, Table, draggable: VueDraggableNext,
+            Move, Info, Pill, Input, Modal, Loader, Button, Switch, Select, Popover, Dropdown, Table, draggable: VueDraggableNext,
             NoDataPlaceholder
         },
         data() {
@@ -707,7 +712,6 @@
                 searchTerm: null,
                 selectAll: false,
                 latestRequestId: 0,
-                exportLimit: '100',
                 exportFormat: 'csv',
                 filterExpressions: [],
                 deletableProduct: null,
@@ -719,19 +723,16 @@
                 isLoadingProducts: false,
                 isUpdatingProducts: false,
                 isExportingProducts: false,
+                exportLimit: 'all products',
                 exportMode: 'with_variants',
                 isDownloadingProducts: false,
                 includeProductFieldNames: true,
                 columns: this.prepareColumns(),
+                isChangingProductArrangement: false,
                 whatsappFields: this.prepareWhatsappFields(),
                 exportLimits: [
-                    { label: '100', value: '100'},
-                    { label: '500', value: '500'},
-                    { label: '1000', value: '1000'},
-                    { label: '2000', value: '2000'},
-                    { label: '3000', value: '3000'},
-                    { label: '4000', value: '4000'},
-                    { label: '5000', value: '5000'},
+                    { label: 'Current Page', value: 'current page'},
+                    { label: 'All Products', value: 'all products' }
                 ],
                 exportModes: [
                     {
@@ -830,8 +831,8 @@
             formattedDatetime: formattedDatetime,
             formattedRelativeDate: formattedRelativeDate,
             prepareColumns() {
-                const columnNames = ['Name', 'Description', 'Price', 'Visibility', 'Stock', 'Variants', 'Minimum Order Quantity', 'Maximum Order Quantity', 'Position', 'Created Date'];
-                const defaultColumnNames  = ['Name', 'Description', 'Price', 'Visibility', 'Stock', 'Variants', 'Position', 'Created Date'];
+                const columnNames = ['Name', 'Description', 'Price', 'Visibility', 'Stock', 'Variants', 'Minimum Order Quantity', 'Maximum Order Quantity', 'Created Date'];
+                const defaultColumnNames  = ['Name', 'Description', 'Price', 'Visibility', 'Stock', 'Variants', 'Created Date'];
 
                 return columnNames.map(name => ({
                     name,
@@ -1025,9 +1026,11 @@
                             _export: '1',
                             store_id: this.store.id,
                             export_mode: this.exportMode,
-                            export_limit: this.exportLimit,
-                            export_format: this.exportFormat
-                        }
+                            export_format: this.exportFormat,
+                            export_limit: this.exportLimit == 'current page' ? this.pagination.meta.to : null,
+                            export_offset: this.exportLimit == 'current page' ? this.pagination.meta.from - 1 : null,
+                        },
+                        responseType: 'blob'
                     }
 
                     if(this.hasSearchTerm) config.params['search'] = this.searchTerm;
@@ -1042,7 +1045,8 @@
 
                     const response = await axios.get(`/api/products`, config);
 
-                    const url = window.URL.createObjectURL(new Blob([response.data]));
+                    let url = window.URL.createObjectURL(new Blob([response.data]));
+
                     const link = document.createElement('a');
 
                     link.href = url;
@@ -1111,6 +1115,35 @@
                 } finally {
                     this.isUpdatingProducts = false;
                     this.$refs.updateProductsModal.hideModal();
+                }
+
+            },
+            async changeProductArrangement() {
+
+                try {
+
+                    if(this.isChangingProductArrangement) return;
+
+                    const productIds = this.products.map((product) => product.id);
+
+                    if(productIds.length == 0) return;
+
+                    this.isChangingProductArrangement = true;
+
+                    const data = {
+                        store_id: this.store.id,
+                        product_ids: productIds
+                    };
+
+                    await axios.post(`/api/products/arrangement`, data);
+
+                } catch (error) {
+                    const message = error?.response?.data?.message || error?.message || 'Something went wrong while updating product arrangement';
+                    this.notificationState.showWarningNotification(message);
+                    this.formState.setServerFormErrors(error);
+                    console.error('Failed to update product arrangement:', error);
+                } finally {
+                    this.isChangingProductArrangement = false;
                 }
 
             },

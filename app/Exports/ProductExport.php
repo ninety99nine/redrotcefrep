@@ -74,7 +74,7 @@ class ProductExport implements FromCollection, WithHeadings, ShouldAutoSize, Wit
 
     private function exportWithoutVariants()
     {
-        return $this->query->isNotVariant()->with(['categories', 'tags'])->get()->map(function ($product) {
+        return $this->query->with(['categories', 'tags'])->get()->map(function ($product) {
             return $this->formatProductRow($product);
         });
     }

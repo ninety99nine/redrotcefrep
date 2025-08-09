@@ -37,7 +37,7 @@ class ProductService extends BaseService
         $association = isset($data['association']) ? Association::tryFrom($data['association']) : null;
 
         if($association == Association::SUPER_ADMIN) {
-            $query = Product::query();
+            $query = Product::isNotVariant();
         }else if($association == Association::TEAM_MEMBER) {
             $query = Product::isNotVariant()->where('store_id', $storeId);
         }else {

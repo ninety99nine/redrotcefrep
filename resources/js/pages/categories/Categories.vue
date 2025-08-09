@@ -308,10 +308,10 @@
 
                         <!-- Draggable Whatsapp Fields -->
                         <draggable
-                            class="divide-y divide-gray-200 mb-4"
                             v-model="whatsappFields"
                             handle=".draggable-handle"
-                            ghost-class="bg-yellow-50">
+                            ghost-class="bg-yellow-50"
+                            class="divide-y divide-gray-200 mb-4">
 
                             <template
                                 :key="index"
@@ -337,9 +337,7 @@
                                         </Input>
 
                                         <!-- Drag & Drop Handle -->
-                                        <svg class="draggable-handle w-4 h-4 cursor-grab hover:text-yellow-500 visible:cursor-grabbing" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 3.75v4.5m0-4.5h4.5m-4.5 0L9 9M3.75 20.25v-4.5m0 4.5h4.5m-4.5 0L9 15M20.25 3.75h-4.5m4.5 0v4.5m0-4.5L15 9m5.25 11.25h-4.5m4.5 0v-4.5m0 4.5L15 15" />
-                                        </svg>
+                                        <Move @click.stop size="16" class="draggable-handle cursor-grab active:cursor-grabbing text-gray-500 hover:text-yellow-500"></Move>
 
                                     </div>
 
@@ -418,15 +416,15 @@
     import Popover from '@Partials/Popover.vue';
     import Dropdown from '@Partials/Dropdown.vue';
     import Table from '@Partials/table/Table.vue';
-    import { Info, Plus, Trash2 } from 'lucide-vue-next';
     import { VueDraggableNext } from 'vue-draggable-next';
+    import { Move, Info, Plus, Trash2 } from 'lucide-vue-next';
     import { formattedDatetime, formattedRelativeDate } from '@Utils/dateUtils.js';
     import NoDataPlaceholder from '@Partials/table/components/NoDataPlaceholder.vue';
 
     export default {
         inject: ['formState', 'storeState', 'notificationState'],
         components: {
-            Info, Pill, Input, Modal, Loader, Button, Switch, Select, Popover, Dropdown, Table, draggable: VueDraggableNext,
+            Move, Info, Pill, Input, Modal, Loader, Button, Switch, Select, Popover, Dropdown, Table, draggable: VueDraggableNext,
             NoDataPlaceholder
         },
         data() {

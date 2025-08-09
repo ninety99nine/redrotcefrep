@@ -65,9 +65,7 @@
                                 </Input>
 
                                 <!-- Drag & Drop Handle -->
-                                <svg class="draggable-handle w-4 h-4 cursor-grab hover:text-yellow-500 visible:cursor-grabbing" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 3.75v4.5m0-4.5h4.5m-4.5 0L9 9M3.75 20.25v-4.5m0 4.5h4.5m-4.5 0L9 15M20.25 3.75h-4.5m4.5 0v4.5m0-4.5L15 9m5.25 11.25h-4.5m4.5 0v-4.5m0 4.5L15 15" />
-                                </svg>
+                                <Move @click.stop size="16" class="draggable-handle cursor-grab active:cursor-grabbing text-gray-500 hover:text-yellow-500"></Move>
 
                             </div>
 
@@ -100,18 +98,18 @@
 
 <script>
 
-    import { Logs } from 'lucide-vue-next';
     import Pill from '@Partials/Pill.vue';
     import Input from '@Partials/Input.vue';
     import cloneDeep from 'lodash/cloneDeep';
     import Button from '@Partials/Button.vue';
     import Drawer from '@Partials/Drawer.vue';
     import Switch from '@Partials/Switch.vue';
+    import { Move, Logs } from 'lucide-vue-next';
     import { VueDraggableNext } from 'vue-draggable-next';
 
     export default {
         inject: ['formState'],
-        components: { Logs, draggable: VueDraggableNext, Input, Pill, Button, Drawer, Switch },
+        components: { Move, Logs, draggable: VueDraggableNext, Input, Pill, Button, Drawer, Switch },
         props: {
             columns: {
                 type: Array,

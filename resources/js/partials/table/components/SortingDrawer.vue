@@ -65,9 +65,7 @@
                                     <Pill v-if="countActiveOptions(sorting)" type="primary" size="xs" class="flex-shrink-0">{{ countActiveOptions(sorting) }}</Pill>
 
                                     <!-- Drag & Drop Handle -->
-                                    <svg v-if="countActiveOptions(sorting)" @click.stop class="draggable-handle w-4 h-4 cursor-grab hover:text-yellow-500 visible:cursor-grabbing" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 3.75v4.5m0-4.5h4.5m-4.5 0L9 9M3.75 20.25v-4.5m0 4.5h4.5m-4.5 0L9 15M20.25 3.75h-4.5m4.5 0v4.5m0-4.5L15 9m5.25 11.25h-4.5m4.5 0v-4.5m0 4.5L15 15" />
-                                    </svg>
+                                    <Move v-if="countActiveOptions(sorting)" @click.stop size="16" class="draggable-handle cursor-grab active:cursor-grabbing text-gray-500 hover:text-yellow-500"></Move>
 
                                     <!-- Up Arrow Icon -->
                                     <svg v-if="sorting.active" class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
@@ -144,11 +142,11 @@
     import Drawer from '@Partials/Drawer.vue';
     import Loader from '@Partials/Loader.vue';
     import { VueDraggableNext } from 'vue-draggable-next';
-    import { ArrowDownWideNarrow, ArrowUp, ArrowDown } from 'lucide-vue-next';
+    import { Move, ArrowDownWideNarrow, ArrowUp, ArrowDown } from 'lucide-vue-next';
 
     export default {
         inject: ['notificationState'],
-        components: { draggable: VueDraggableNext, Pill, Input, Button, Drawer, Loader, ArrowDownWideNarrow },
+        components: { Move, draggable: VueDraggableNext, Pill, Input, Button, Drawer, Loader, ArrowDownWideNarrow },
         props: {
             sortingExpressions: {
                 type: Array,

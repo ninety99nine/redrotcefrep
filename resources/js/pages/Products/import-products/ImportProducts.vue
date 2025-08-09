@@ -7,7 +7,19 @@
 
         <div class="relative bg-white/80 p-4 rounded-md">
 
-            <h1 class="text-lg text-gray-700 font-semibold mb-4">Import Products</h1>
+            <div class="flex items-center space-x-4 mb-4">
+
+                <!-- Back -->
+                <Button
+                    size="sm"
+                    type="light"
+                    :leftIcon="ArrowLeft"
+                    :action="navigateToProducts">
+                </Button>
+
+                <h1 class="text-lg text-gray-700 font-semibold">Import Products</h1>
+
+            </div>
 
             <div class="w-full flex items-center justify-center space-x-4 text-sm font-medium text-center text-gray-500 mb-8">
 
@@ -42,7 +54,7 @@
                         <div class="flex flex-col justify-center h-full">
 
                             <p class="font-bold mb-4">Upload CSV</p>
-                            <p class="text-sm mb-4">Start by downloading our <span class="cursor-pointer text-blue-500 hover:underline">sample CSV template</span></p>
+                            <p class="text-sm mb-4">Start by downloading our <a href="\csvs\products.csv" target="_blank" class="cursor-pointer text-blue-500 hover:underline">sample CSV template</a></p>
 
                             <Input
                                 type="file"
@@ -181,7 +193,7 @@
 
             <template v-if="step == 3 && !imported">
 
-                <div class="w-full overflow-x-auto border border-blue-200 rounded-lg">
+                <div class="w-full max-h-96 overflow-auto border border-blue-200 rounded-lg">
 
                     <table class="w-full text-left">
 
@@ -193,7 +205,7 @@
                                     scope="col"
                                     :key="column.name"
                                     v-for="column in includedColumns"
-                                    class="text-sm whitespace-nowrap p-4 border border-gray-200">
+                                    class="text-sm whitespace-nowrap p-3 border border-gray-200">
                                     <div>{{ column.name }}</div>
                                 </th>
 
@@ -211,7 +223,7 @@
                                 <td
                                     :key="column.name"
                                     v-for="column in includedColumns"
-                                    class="text-sm whitespace-nowrap p-4 border border-gray-200">
+                                    class="text-sm whitespace-nowrap p-3 border border-gray-200">
                                     {{ row[column.name.toLowerCase()] || '' }}
                                 </td>
 
@@ -239,9 +251,9 @@
                     <Button
                         size="sm"
                         type="primary"
-                        :rightIcon="ArrowRight"
-                        :action="handleSubmit">
-                        <span>Submit</span>
+                        :leftIcon="Check"
+                        :action="importProducts">
+                        <span>Import Products</span>
                     </Button>
 
                 </div>
@@ -308,6 +320,7 @@
         },
         data() {
             return {
+                Check,
                 step: 1,
                 ArrowLeft,
                 RotateCcw,
@@ -558,7 +571,7 @@
                 );
                 return matchedColumn ? matchedColumn.value : '';
             },
-            async handleSubmit() {
+            async importProducts() {
 
                 try{
 

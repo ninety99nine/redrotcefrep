@@ -816,12 +816,18 @@ abstract class BaseService
         $fileName = $resourceNameInPlural . '.' . $format;
 
         // Limit the export data
-        $exportLimit = request()->input('export_limit', 5000);
-        $exportLimit = is_numeric($exportLimit) ? (int) $exportLimit : 5000;
-        $exportLimit = min($exportLimit, 5000);
+        $maxLimit = 5000;
+        $exportLimit = request()->input('export_limit', $maxLimit);
+        $exportLimit = is_numeric($exportLimit) ? (int) $exportLimit : $maxLimit;
+        $exportLimit = min($exportLimit, $maxLimit);
+
+        // Offset the export data
+        $defaultOffset = 0;
+        $exportOffset = request()->input('export_offset', $defaultOffset);
+        $exportOffset = is_numeric($exportOffset) ? (int) $exportOffset : $defaultOffset;
 
         // Generate export instance
-        $export = new $exportClassName($this->query->limit($exportLimit));
+        $export = new $exportClassName($this->query->offset($exportOffset)->limit($exportLimit));
 
         // Return the exported file in the requested format
         return Excel::download($export, $fileName, $formats[$format]);
