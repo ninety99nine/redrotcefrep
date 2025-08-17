@@ -51,7 +51,7 @@
 
                         <!-- Name Input -->
                         <Input
-                            type=text
+                            type="text"
                             label="Name"
                             placeholder="Main Dish"
                             v-model="categoryForm.name"
@@ -109,7 +109,7 @@
 
                 <div
                     v-if="category"
-                    :class="['flex items-center justify-between space-x-4 overflow-hidden rounded-lg p-4 border', isLoadingCategory ? 'border-gray-300 bg-gray-50' : 'border-red-300 bg-red-50']">
+                    :class="['flex items-center justify-between space-x-4 overflow-hidden rounded-lg p-4 border mb-20', isLoadingCategory ? 'border-gray-300 bg-gray-50' : 'border-red-300 bg-red-50']">
 
                     <div class="space-y-2">
                         <p>Delete <span class="font-bold text-black">{{ categoryForm.name }}</span>?</p>
@@ -125,6 +125,7 @@
                             triggerText="Delete Category"
                             approveText="Delete Category"
                             :approveAction="deleteCategory"
+                            :triggerLoading="isDeletingCategory"
                             :approveLoading="isDeletingCategory">
 
                             <template #content>
@@ -395,7 +396,7 @@
                     console.error('Failed to update category:', error);
                 } finally {
                     this.categoryState.isUploading = false;
-                    this.categoryState.isUpdatingCategory = true;
+                    this.categoryState.isUpdatingCategory = false;
                     this.changeHistoryState.actionButtons[1].loading = false;
                 }
 

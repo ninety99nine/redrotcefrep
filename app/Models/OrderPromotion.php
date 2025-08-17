@@ -91,7 +91,7 @@ class OrderPromotion extends Model
     }
 
     /**
-     * Get the order.
+     * Get order.
      *
      * @return BelongsTo
      */
@@ -101,7 +101,7 @@ class OrderPromotion extends Model
     }
 
     /**
-     * Get the store.
+     * Get store.
      *
      * @return BelongsTo
      */
@@ -111,7 +111,7 @@ class OrderPromotion extends Model
     }
 
     /**
-     * Get the promotion.
+     * Get promotion.
      *
      * @return BelongsTo
      */

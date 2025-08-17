@@ -388,7 +388,7 @@
                             </h1>
 
                             <p class="text-sm text-gray-500">
-                                Your products will appear here once customers start shopping.
+                                Your products will appear here once products start shopping.
                             </p>
 
                         </div>
@@ -413,6 +413,46 @@
             </Table>
 
         </div>
+
+        <!-- Update Products -->
+        <Modal
+            approveType="primary"
+            :scrollOnContent="false"
+            ref="updateProductsModal"
+            :leftApproveIcon="RefreshCcw"
+            approveText="Update Products"
+            :approveLoading="isUpdatingProducts"
+            :approveAction="() => updateProducts(this.updateType)">
+
+            <template #content>
+
+                <p class="text-lg font-bold border-b border-dashed border-gray-200 pb-4 mb-4">Update Products</p>
+
+                <template v-if="['add tag', 'remove tag'].includes(updateType)">
+
+                    <p class="text-sm mb-4">Select tags to {{ updateType == 'add tag' ? 'add to' : 'remove from' }} products</p>
+
+                    <SelectTags
+                        v-model="tags"
+                        :options="tagOptions"
+                        :placeholder="updateType == 'add tag' ? 'Add tags' : 'Remove tags'" />
+
+                </template>
+
+                <template v-else-if="['add to category', 'remove from category'].includes(updateType)">
+
+                    <p class="text-sm mb-4">Select categories to {{ updateType == 'add to category' ? 'add' : 'remove' }} products</p>
+
+                    <SelectTags
+                        v-model="categories"
+                        :options="categoryOptions"
+                        :placeholder="updateType == 'add to category' ? 'Add to categories' : 'Remove from categories'" />
+
+                </template>
+
+            </template>
+
+        </Modal>
 
         <!-- Export Products -->
         <Modal
@@ -574,56 +614,6 @@
 
         </Modal>
 
-        <!-- Download PDF -->
-        <Modal
-            approveType="primary"
-            ref="downloadPdfModal"
-            approveText="Download PDF"
-            :approveAction="downloadProducts"
-            :leftApproveIcon="ArrowDownToLine"
-            :approveLoading="isDownloadingProducts">
-
-            <template #content>
-
-                <p class="text-lg font-bold border-b border-dashed border-gray-200 pb-4 mb-4">Download PDF</p>
-
-                <div class="flex space-x-2 p-4 text-xs bg-blue-100 rounded-lg mb-8">
-
-                    <Info size="20" class="shrink-0"></Info>
-
-                    <span>Creating the PDF to download may take a moment depending on the number of products. Please do not close this window.</span>
-
-                </div>
-
-            </template>
-
-        </Modal>
-
-        <!-- Print PDF -->
-        <Modal
-            ref="printPdfModal"
-            approveType="primary"
-            approveText="Print PDF"
-            :leftApproveIcon="Printer"
-            :approveAction="printProducts"
-            :approveLoading="isDownloadingProducts">
-
-            <template #content>
-
-                <p class="text-lg font-bold border-b border-dashed border-gray-200 pb-4 mb-4">Print PDF</p>
-
-                <div class="flex space-x-2 p-4 text-xs bg-blue-100 rounded-lg mb-8">
-
-                    <Info size="20" class="shrink-0"></Info>
-
-                    <span>Creating the PDF to print may take a moment depending on the number of products. Please do not close this window.</span>
-
-                </div>
-
-            </template>
-
-        </Modal>
-
         <!-- Delete Products -->
         <Modal
             approveType="danger"
@@ -635,9 +625,9 @@
 
             <template #content>
 
-                <p class="text-lg font-bold border-b border-dashed pb-4 mb-4">Delete Products</p>
+                <p class="text-lg font-bold border-b border-gray-300 border-dashed pb-4 mb-4">Delete Products</p>
 
-                <div class="flex space-x-2 items-center p-4 text-xs bg-red-50 border border-red-200 border-dashed rounded-lg mb-8">
+                <div class="flex space-x-2 items-center p-4 text-xs bg-red-50 rounded-lg mb-8">
 
                     <svg class="w-6 h-6 text-red-500 shrink-0" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 3.75h.008v.008H12v-.008Z" />
@@ -685,34 +675,38 @@
     import Popover from '@Partials/Popover.vue';
     import Dropdown from '@Partials/Dropdown.vue';
     import Table from '@Partials/table/Table.vue';
+    import SelectTags from '@Partials/SelectTags.vue';
     import { VueDraggableNext } from 'vue-draggable-next';
     import { formattedDatetime, formattedRelativeDate } from '@Utils/dateUtils.js';
     import NoDataPlaceholder from '@Partials/table/components/NoDataPlaceholder.vue';
-    import { Move, Info, Plus, Trash2, Printer, RefreshCcw, ArrowDownToLine } from 'lucide-vue-next';
+    import { Move, Info, Plus, Trash2, RefreshCcw, ArrowDownToLine } from 'lucide-vue-next';
 
     export default {
         inject: ['formState', 'storeState', 'notificationState'],
         components: {
-            Move, Info, Pill, Input, Modal, Loader, Button, Switch, Select, Popover, Dropdown, Table, draggable: VueDraggableNext,
-            NoDataPlaceholder
+            Move, Info, Pill, Input, Modal, Loader, Button, Switch, Select, Popover, Dropdown, Table,
+            SelectTags, draggable: VueDraggableNext, NoDataPlaceholder
         },
         data() {
             return {
                 Plus,
                 Trash2,
-                Printer,
                 RefreshCcw,
                 ArrowDownToLine,
 
-                csvFile: [],
+                tags: [],
                 products: [],
                 perPage: '15',
+                tagOptions: [],
+                categories: [],
                 checkedRows: [],
                 pagination: null,
+                updateType: null,
                 searchTerm: null,
                 selectAll: false,
                 latestRequestId: 0,
                 exportFormat: 'csv',
+                categoryOptions: [],
                 filterExpressions: [],
                 deletableProduct: null,
                 sortingExpressions: [],
@@ -725,7 +719,6 @@
                 isExportingProducts: false,
                 exportLimit: 'all products',
                 exportMode: 'with_variants',
-                isDownloadingProducts: false,
                 includeProductFieldNames: true,
                 columns: this.prepareColumns(),
                 isChangingProductArrangement: false,
@@ -768,24 +761,24 @@
                         action: () => this.updateProducts('hide')
                     },
                     {
+                        label: 'Add tag',
+                        action: () => this.showUpdateProductsModal('add tag')
+                    },
+                    {
+                        label: 'Remove tag',
+                        action: () => this.showUpdateProductsModal('remove tag')
+                    },
+                    {
                         label: 'Add to category',
-                        action: null
+                        action: () => this.showUpdateProductsModal('add to category')
                     },
                     {
                         label: 'Remove from category',
-                        action: null
+                        action: () => this.showUpdateProductsModal('remove from category')
                     },
                     {
-                        label: 'Send Whatsapp',
+                        label: 'Send as Whatsapp',
                         action: this.showSendToWhatsappModal,
-                    },
-                    {
-                        label: 'Download PDF',
-                        action: this.showDownloadPdfModal,
-                    },
-                    {
-                        label: 'Print PDF',
-                        action: this.showPrintPdfModal,
                     },
                     {
                         label: 'Delete',
@@ -797,6 +790,8 @@
         watch: {
             store(newValue) {
                 if(newValue) {
+                    this.setTags();
+                    this.setCategories();
                     this.showProducts();
                 }
             },
@@ -830,6 +825,24 @@
         methods: {
             formattedDatetime: formattedDatetime,
             formattedRelativeDate: formattedRelativeDate,
+            async setTags() {
+                if(!this.store || this.tags.length) return;
+                this.tagOptions = this.store.product_tags.map((tag) => {
+                    return {
+                        label: tag.name,
+                        value: tag.id
+                    }
+                });
+            },
+            async setCategories() {
+                if(!this.store || this.categories.length) return;
+                this.categoryOptions = this.store.categories.map((category) => {
+                    return {
+                        label: category.name,
+                        value: category.id
+                    }
+                });
+            },
             prepareColumns() {
                 const columnNames = ['Name', 'Description', 'Price', 'Visibility', 'Stock', 'Variants', 'Minimum Order Quantity', 'Maximum Order Quantity', 'Created Date'];
                 const defaultColumnNames  = ['Name', 'Description', 'Price', 'Visibility', 'Stock', 'Variants', 'Created Date'];
@@ -854,17 +867,14 @@
             showExportProductsModal() {
                 this.$refs.exportProductsModal.showModal();
             },
-            showPrintPdfModal() {
-                this.$refs.actionDropdown.hideDropdown();
-                this.$refs.printPdfModal.showModal();
-            },
             showDeleteProductsModal() {
                 this.$refs.actionDropdown.hideDropdown();
                 this.$refs.deleteProductsModal.showModal();
             },
-            showDownloadPdfModal() {
+            showUpdateProductsModal(type = null) {
+                this.updateType = type;
                 this.$refs.actionDropdown.hideDropdown();
-                this.$refs.downloadPdfModal.showModal();
+                this.$refs.updateProductsModal.showModal();
             },
             showSendToWhatsappModal() {
                 this.$refs.actionDropdown.hideDropdown();
@@ -962,7 +972,7 @@
 
                     this.cancelTokenSource = axios.CancelToken.source(); // Create a new cancel token source
 
-                    const config = {
+                    let config = {
                         params: {
                             page: page,
                             per_page: this.perPage,
@@ -1073,35 +1083,35 @@
 
                     if(this.isUpdatingProducts) return;
 
-                    const productIds = this.products.filter(product => this.checkedRows[product.id]).map(product => product.id);
-
-                    const data = {
-                        product_ids: productIds,
+                    let data = {
                         store_id: this.store.id
                     };
 
-                    const isHiding = type == 'hide';
-                    const isShowing = type == 'show';
+                    data['products'] = this.products.filter(product => this.checkedRows[product.id]).map(product => ({ id: product.id }));
 
-                    if(isHiding) data['visible'] = false;
-                    if(isShowing) data['visible'] = true;
+                    if(type == 'show') data['visible'] = true;
+                    if(type == 'hide') data['visible'] = false;
+                    if(type == 'add tag') data['tags_to_add'] = this.tags;
+                    if(type == 'remove tag') data['tags_to_remove'] = this.tags;
+                    if(type == 'add to category') data['categories_to_add'] = this.categories;
+                    if(type == 'remove from category') data['categories_to_remove'] = this.categories;
 
-                    if(Object.keys(data).length == 2) return;
+                    if(data['products'].length > 0) {
 
-                    this.isUpdatingProducts = true;
+                        this.isUpdatingProducts = true;
 
-                    await axios.put(`/api/products`, data);
+                        await axios.put(`/api/products`, data);
 
-                    this.showProducts();
+                        this.showProducts();
 
-                    if(isShowing || isHiding) {
-                        this.notificationState.showSuccessNotification('Product visibility updated');
+                        this.notificationState.showSuccessNotification('Products updated');
+
                     }
 
                     // Uncheck only the related rows
-                    productIds.forEach(productId => {
-                        if (this.checkedRows[productId] !== undefined) {
-                            this.checkedRows[productId] = false;
+                    data['products'].forEach(product => {
+                        if (this.checkedRows[product.id] !== undefined) {
+                            this.checkedRows[product.id] = false;
                         }
                     });
 
@@ -1144,108 +1154,6 @@
                     console.error('Failed to update product arrangement:', error);
                 } finally {
                     this.isChangingProductArrangement = false;
-                }
-
-            },
-            async downloadProducts() {
-
-                try {
-
-                    if(this.isDownloadingProducts) return;
-
-                    const productIds = this.products.filter(product => this.checkedRows[product.id]).map(product => product.id);
-
-                    const data = {
-                        store_id: this.store.id,
-                        product_ids: productIds
-                    };
-
-                    const config = {
-                        responseType: "blob"
-                    };
-
-                    this.isDownloadingProducts = true;
-
-                    const response = await axios.post(`/api/products/download`, data, config);
-
-                    const blob = new Blob([response.data], { type: "application/pdf" });
-                    const link = document.createElement("a");
-
-                    link.href = window.URL.createObjectURL(blob);
-                    link.download = "products.pdf";
-                    document.body.appendChild(link);
-                    link.click();
-                    document.body.removeChild(link);
-
-                    // Uncheck only the related rows
-                    productIds.forEach(productId => {
-                        if (this.checkedRows[productId] !== undefined) {
-                            this.checkedRows[productId] = false;
-                        }
-                    });
-
-                    this.selectAll = false;
-
-                } catch (error) {
-                    const message = error?.response?.data?.message || error?.message || 'Something went wrong while downloading products';
-                    this.notificationState.showWarningNotification(message);
-                    this.formState.setServerFormErrors(error);
-                    console.error('Failed to download products:', error);
-                } finally {
-                    this.isDownloadingProducts = false;
-                    this.$refs.downloadPdfModal.hideModal();
-                }
-
-            },
-            async printProducts() {
-
-                try {
-
-                    if(this.isDownloadingProducts) return;
-
-                    const productIds = this.products.filter(product => this.checkedRows[product.id]).map(product => product.id);
-
-                    const data = {
-                        store_id: this.store.id,
-                        product_ids: productIds
-                    };
-
-                    const config = {
-                        responseType: "blob"
-                    };
-
-                    this.isDownloadingProducts = true;
-
-                    const response = await axios.post(`/api/products/download`, data, config);
-
-                    const blob = new Blob([response.data], { type: "application/pdf" });
-                    const blobUrl = window.URL.createObjectURL(blob);
-
-                    const printWindow = window.open(blobUrl);
-                    if (printWindow) {
-                        printWindow.onload = () => {
-                            printWindow.focus();
-                            printWindow.print();
-                        };
-                    }
-
-                    // Uncheck only the related rows
-                    productIds.forEach(productId => {
-                        if (this.checkedRows[productId] !== undefined) {
-                            this.checkedRows[productId] = false;
-                        }
-                    });
-
-                    this.selectAll = false;
-
-                } catch (error) {
-                    const message = error?.response?.data?.message || error?.message || 'Something went wrong while printing products';
-                    this.notificationState.showWarningNotification(message);
-                    this.formState.setServerFormErrors(error);
-                    console.error('Failed to print products:', error);
-                } finally {
-                    this.isDownloadingProducts = false;
-                    this.$refs.printPdfModal.hideModal();
                 }
 
             },
@@ -1421,7 +1329,11 @@
             this.searchTerm = this.$route.query.searchTerm;
             if(this.$route.query.filterExpressions) this.filterExpressions = this.$route.query.filterExpressions.split('|');
             if(this.$route.query.sortingExpressions) this.sortingExpressions = this.$route.query.sortingExpressions.split('|');
-            if(this.store) this.showProducts();
+            if(this.store) {
+                this.setTags();
+                this.setCategories();
+                this.showProducts();
+            }
         }
     };
 

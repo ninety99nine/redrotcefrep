@@ -88,7 +88,7 @@ class Promotion extends Model
     }
 
     /**
-     * Get the user.
+     * Get user.
      *
      * @return BelongsTo
      */
@@ -98,7 +98,7 @@ class Promotion extends Model
     }
 
     /**
-     * Get the store.
+     * Get store.
      *
      * @return BelongsTo
      */

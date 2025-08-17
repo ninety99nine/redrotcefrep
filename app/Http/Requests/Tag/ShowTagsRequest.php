@@ -28,7 +28,7 @@ class ShowTagsRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'store_id' => ['sometimes', 'uuid', 'exists:stores,id'],
+            'store_id' => ['sometimes', 'uuid'],
             'association' => ['sometimes', Rule::enum(Association::class)->only([Association::SUPER_ADMIN])],
         ];
     }
@@ -42,7 +42,6 @@ class ShowTagsRequest extends FormRequest
     {
         return [
             'tag_id.uuid' => 'The tag ID must be a valid UUID.',
-            'tag_id.exists' => 'The specified tag does not exist.',
             'association.enum' => 'The association must be one of: ' . Arr::join([Association::SUPER_ADMIN->value], ', ', ' or '),
         ];
     }

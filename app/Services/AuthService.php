@@ -10,6 +10,7 @@ use Illuminate\Support\Str;
 use App\Mail\UserRegistered;
 use App\Mail\PasswordResetLink;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Http\RedirectResponse;
@@ -251,7 +252,7 @@ class AuthService
      */
     public function logout(): void
     {
-        auth()->user()->currentAccessToken()?->delete();
+        Auth::user()->currentAccessToken()?->delete();
     }
 
     /**
@@ -263,13 +264,38 @@ class AuthService
      */
     public function updateAuthUser(User $user, array $data): void
     {
-        $user->name = $data['name'];
-
         if (!empty($data['password'])) {
-            $user->password = Hash::make($data['password']);
+            $data['password'] = Hash::make($data['password']);
         }
 
-        $user->save();
+        $user->update($data);
+
+        //  Forget cache
+        (new UssdService)->cacheManager($user)->forget();
+    }
+
+    /**
+     * Show terms and conditions.
+     *
+     * @return array
+     */
+    public function showTermsAndConditions(): array
+    {
+        $website = config('app.url').'/terms-and-conditions';
+
+        return [
+            'website' => $website,
+            'buyer' => [
+                'title' => 'Buyer Takeaways',
+                'instruction' => 'As a buyer on '.config('app.name').', here are the key terms you must accept:',
+                'takeaways' => 'As a buyer on '.config('app.name').', you must create an account with accurate details and keep your login information secure. Before purchasing, carefully review product descriptions, images, and store details, and ensure you buy from trusted sellers. It is crucial to provide a correct delivery address and contact information, as '.config('app.name').' is not responsible for undelivered or misrepresented orders. Please note that '.config('app.name').' does not offer refunds. Payments include the agreed price and any applicable fees. If issues arise, communicate with sellers respectfully, and they are expected to resolve matters promptly. You can leave honest reviews to help future buyers. Your data is protected, and we comply with applicable privacy laws. For disputes, you should first try to resolve them directly with the seller, but '.config('app.name').' can mediate if necessary. Additionally, always adhere to our platform\'s code of conduct, which emphasizes respectful and lawful behavior. For the full terms and conditions, please visit our website at '. $website
+            ],
+            'seller' => [
+                'title' => 'Seller Takeaways',
+                'instruction' => 'As a seller on '.config('app.name').', here are the key terms you must accept:',
+                'takeaways' => 'As a seller on '.config('app.name').', you need to register with accurate and authorized business details. Ensure your product listings are accurate, up-to-date, and comply with relevant laws. Update your product availability regularly to avoid disappointing customers. Fulfill orders promptly and ensure the quality of your products before delivery. Set transparent and fair prices, and note that '.config('app.name').' may deduct fees—review the fee structure on our platform. Respond to customer inquiries promptly and professionally. You are responsible for safeguarding customer data and using it solely for order fulfillment or communication via '.config('app.name').'. Improper use of data can lead to penalties. Customer feedback through reviews and ratings is essential for improving your business. In case of disputes, try to resolve them directly with the buyer, but '.config('app.name').' can mediate if necessary. Unethical behavior or violation of the terms may lead to the suspension or termination of your account. Additionally, the shortcodes provided by '.config('app.name').' remain our property and may be reassigned if your subscription ends. For the full terms and conditions, please visit our website at '. $website
+            ]
+        ];
     }
 
     /**

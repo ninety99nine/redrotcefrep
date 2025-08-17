@@ -26,7 +26,7 @@ class DeletePricingPlansRequest extends FormRequest
     {
         return [
             'pricing_plan_ids' => ['required', 'array', 'min:1'],
-            'pricing_plan_ids.*' => ['uuid', 'exists:pricing_plans,id'],
+            'pricing_plan_ids.*' => ['uuid'],
         ];
     }
 
@@ -42,7 +42,6 @@ class DeletePricingPlansRequest extends FormRequest
             'pricing_plan_ids.array' => 'The pricing plan IDs must be an array.',
             'pricing_plan_ids.min' => 'At least one pricing plan ID is required.',
             'pricing_plan_ids.*.uuid' => 'Each pricing plan ID must be a valid UUID.',
-            'pricing_plan_ids.*.exists' => 'One or more pricing plan IDs do not exist.',
         ];
     }
 }

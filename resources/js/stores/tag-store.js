@@ -36,6 +36,7 @@ export const useTagStore = defineStore('tag', {
             this.tagForm = {
 
                 products: [],
+                customers: [],
                 id: tag?.id ?? null,
                 name: tag?.name ?? null
 
@@ -45,6 +46,10 @@ export const useTagStore = defineStore('tag', {
 
                 tag.products.forEach((product) => {
                     this.addProduct(product, false);
+                });
+
+                tag.customers.forEach((customer) => {
+                    this.addCustomer(customer, false);
                 });
 
             }
@@ -69,6 +74,20 @@ export const useTagStore = defineStore('tag', {
             });
 
             if(saveState) this.saveStateDebounced('Product added');
+        },
+        addCustomer(customer = null, saveState = true) {
+
+            const exists = this.tagForm.customers.some(p => p.id == customer.id);
+            if(exists) return;
+
+            this.tagForm.customers.push({
+
+                id: customer.id,
+                name: customer.name
+
+            });
+
+            if(saveState) this.saveStateDebounced('Customer added');
         },
         removeProduct(index) {
             this.tagForm.products.splice(index, 1);

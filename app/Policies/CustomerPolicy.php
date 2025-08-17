@@ -4,7 +4,6 @@ namespace App\Policies;
 
 use App\Models\User;
 use App\Models\Customer;
-use App\Services\AuthService;
 
 class CustomerPolicy extends BasePolicy
 {
@@ -40,7 +39,7 @@ class CustomerPolicy extends BasePolicy
      */
     public function view(User $user, Customer $customer): bool
     {
-        return true;
+        return $this->isStoreUserWithPermission($user, 'view customers');
     }
 
     /**
@@ -51,7 +50,7 @@ class CustomerPolicy extends BasePolicy
      */
     public function create(User $user): bool
     {
-        return true;
+        return $this->isStoreUserWithPermission($user, 'manage customers');
     }
 
     /**
@@ -63,7 +62,7 @@ class CustomerPolicy extends BasePolicy
      */
     public function update(User $user, Customer $customer): bool
     {
-        return true;
+        return $this->isStoreUserWithPermission($user, 'manage customers');
     }
 
     /**
@@ -75,7 +74,18 @@ class CustomerPolicy extends BasePolicy
      */
     public function delete(User $user, Customer $customer): bool
     {
-        return true;
+        return $this->isStoreUserWithPermission($user, 'manage customers');
+    }
+
+    /**
+     * Determine whether the user can update any customers.
+     *
+     * @param User $user
+     * @return bool
+     */
+    public function updateAny(User $user): bool
+    {
+        return $this->isStoreUserWithPermission($user, 'manage customers');
     }
 
     /**
@@ -86,6 +96,17 @@ class CustomerPolicy extends BasePolicy
      */
     public function deleteAny(User $user): bool
     {
-        return true;
+        return $this->isStoreUserWithPermission($user, 'manage customers');
+    }
+
+    /**
+     * Determine whether the user can download any customers.
+     *
+     * @param User $user
+     * @return bool
+     */
+    public function downloadAny(User $user): bool
+    {
+        return $this->isStoreUserWithPermission($user, 'manage customers');
     }
 }

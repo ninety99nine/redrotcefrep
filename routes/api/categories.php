@@ -5,7 +5,7 @@ use App\Http\Middleware\StorePermission;
 use App\Http\Controllers\CategoryController;
 
 Route::prefix('categories')
-    ->middleware(['auth:sanctum', StorePermission::class])
+    ->middleware(['auth:sanctum', 'store.permission'])
     ->controller(CategoryController::class)
     ->group(function () {
         Route::get('/', 'showCategories')->name('show.categories');

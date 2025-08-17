@@ -26,7 +26,7 @@ class DeletePromotionsRequest extends FormRequest
     {
         return [
             'promotion_ids' => ['required', 'array', 'min:1'],
-            'promotion_ids.*' => ['uuid', 'exists:promotions,id'],
+            'promotion_ids.*' => ['uuid'],
         ];
     }
 
@@ -42,7 +42,6 @@ class DeletePromotionsRequest extends FormRequest
             'promotion_ids.array' => 'The promotion IDs must be an array.',
             'promotion_ids.min' => 'At least one promotion ID is required.',
             'promotion_ids.*.uuid' => 'Each promotion ID must be a valid UUID.',
-            'promotion_ids.*.exists' => 'One or more promotion IDs do not exist.',
         ];
     }
 }

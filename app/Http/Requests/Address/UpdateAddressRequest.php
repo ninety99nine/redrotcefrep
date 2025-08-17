@@ -24,10 +24,10 @@ class UpdateAddressRequest extends FormRequest
      *
      * @return array
      */
-    public function rules(): array
+    public function rules($prefix = '', $overide = []): array
     {
-        return [
-            'type' => ['sometimes', Rule::enum(AddressType::class)],
+        $rules = [
+            'type' => ['nullable', Rule::enum(AddressType::class)],
             'address_line' => ['sometimes', 'string', 'max:255'],
             'address_line2' => ['nullable', 'string', 'max:255'],
             'city' => ['nullable', 'string', 'max:100'],
@@ -38,9 +38,17 @@ class UpdateAddressRequest extends FormRequest
             'latitude' => ['nullable', 'numeric', 'min:-90', 'max:90'],
             'longitude' => ['nullable', 'numeric', 'min:-180', 'max:180'],
             'description' => ['nullable', 'string'],
-            'owner_id' => ['sometimes', 'uuid'],
-            'owner_type' => ['sometimes', 'string', Rule::in(['store', 'customer'])], // Adjust based on allowed owner types
         ];
+
+        $rules = array_merge($rules, $overide);
+
+        if ($prefix) {
+            $rules = collect($rules)
+                ->mapWithKeys(fn($value, $key) => ["{$prefix}.{$key}" => $value])
+                ->toArray();
+        }
+
+        return $rules;
     }
 
     /**
@@ -48,9 +56,9 @@ class UpdateAddressRequest extends FormRequest
      *
      * @return array
      */
-    public function messages(): array
+    public function messages($prefix = '', $overide = []): array
     {
-        return [
+        $messages = [
             'type.enum' => 'The address type must be one of: ' . Arr::join(AddressType::values(), ', ', ' or '),
             'address_line.string' => 'The address line must be a string.',
             'address_line.max' => 'The address line must not exceed 255 characters.',
@@ -72,8 +80,16 @@ class UpdateAddressRequest extends FormRequest
             'longitude.numeric' => 'The longitude must be a number.',
             'longitude.min' => 'The longitude must be at least -180.',
             'longitude.max' => 'The longitude must not exceed 180.',
-            'owner_id.uuid' => 'The owner ID must be a valid UUID.',
-            'owner_type.in' => 'The owner type must be one of: ' . Arr::join(['store', 'customer'], ', ', ' or '),
         ];
+
+        $messages = array_merge($messages, $overide);
+
+        if ($prefix) {
+            $rules = collect($messages)
+                ->mapWithKeys(fn($value, $key) => ["{$prefix}.{$key}" => $value])
+                ->toArray();
+        }
+
+        return $rules;
     }
 }

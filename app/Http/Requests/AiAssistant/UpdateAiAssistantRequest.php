@@ -29,7 +29,7 @@ class UpdateAiAssistantRequest extends FormRequest
             'remaining_paid_tokens' => ['sometimes', 'integer', 'min:0'],
             'remaining_paid_top_up_tokens' => ['sometimes', 'integer', 'min:0'],
             'requires_subscription' => ['sometimes', 'boolean'],
-            'user_id' => ['sometimes', 'uuid', 'exists:users,id'],
+            'user_id' => ['sometimes', 'uuid'],
         ];
     }
 
@@ -51,7 +51,6 @@ class UpdateAiAssistantRequest extends FormRequest
             'remaining_paid_top_up_tokens.min' => 'The remaining paid top-up tokens must be at least 0.',
             'requires_subscription.boolean' => 'The requires subscription field must be a boolean.',
             'user_id.uuid' => 'The user ID must be a valid UUID.',
-            'user_id.exists' => 'The specified user does not exist.',
         ];
     }
 }

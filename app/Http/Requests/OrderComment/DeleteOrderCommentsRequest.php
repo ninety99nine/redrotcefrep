@@ -26,7 +26,7 @@ class DeleteOrderCommentsRequest extends FormRequest
     {
         return [
             'order_comment_ids' => ['required', 'array', 'min:1'],
-            'order_comment_ids.*' => ['uuid', 'exists:order_comments,id'],
+            'order_comment_ids.*' => ['uuid'],
         ];
     }
 
@@ -42,7 +42,6 @@ class DeleteOrderCommentsRequest extends FormRequest
             'order_comment_ids.array' => 'The order comment IDs must be an array.',
             'order_comment_ids.min' => 'At least one order comment ID is required.',
             'order_comment_ids.*.uuid' => 'Each order comment ID must be a valid UUID.',
-            'order_comment_ids.*.exists' => 'One or more order comment IDs do not exist.',
         ];
     }
 }

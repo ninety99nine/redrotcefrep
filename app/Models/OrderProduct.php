@@ -87,7 +87,7 @@ class OrderProduct extends Model
     }
 
     /**
-     * Get the order.
+     * Get order.
      *
      * @return BelongsTo
      */
@@ -97,7 +97,7 @@ class OrderProduct extends Model
     }
 
     /**
-     * Get the store.
+     * Get store.
      *
      * @return BelongsTo
      */
@@ -107,7 +107,7 @@ class OrderProduct extends Model
     }
 
     /**
-     * Get the product.
+     * Get product.
      *
      * @return BelongsTo
      */
@@ -117,7 +117,7 @@ class OrderProduct extends Model
     }
 
     /**
-     * Get the photo.
+     * Get photo.
      *
      * @return BelongsTo
      */

@@ -19,8 +19,9 @@ return new class extends Migration
             $table->boolean('active')->default(true);
             $table->string('name');
             $table->string('type');
-            $table->string('description')->nullable();
             $table->string('billing_type');
+            $table->unsignedSmallInteger('trial_days')->default(0);
+            $table->string('description')->nullable();
             $table->string('currency', 3);
             $table->decimal('price', 12, 3);
             $table->unsignedTinyInteger('discount_percentage_rate')->default(0);

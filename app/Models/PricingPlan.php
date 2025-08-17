@@ -29,6 +29,7 @@ class PricingPlan extends Model
             'supports_mobile' => 'boolean',
 
             'position' => 'integer',
+            'trial_days' => 'integer',
             'discount_percentage_rate' => 'integer',
             'max_auto_billing_attempts' => 'integer',
 
@@ -45,7 +46,7 @@ class PricingPlan extends Model
      * @var array
      */
     protected $fillable = [
-        'active','name','type','description','billing_type','currency','price','discount_percentage_rate',
+        'active','name','type','description','billing_type','trial_days','currency','price','discount_percentage_rate',
         'max_auto_billing_attempts','auto_billing_disabled_sms_message','supports_web','supports_ussd',
         'supports_mobile','metadata','features','position',
     ];

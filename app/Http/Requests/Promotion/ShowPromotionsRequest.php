@@ -25,7 +25,7 @@ class ShowPromotionsRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'promotion_id' => ['sometimes', 'uuid', 'exists:promotions,id'],
+            'promotion_id' => ['sometimes', 'uuid'],
         ];
     }
 
@@ -38,7 +38,6 @@ class ShowPromotionsRequest extends FormRequest
     {
         return [
             'promotion_id.uuid' => 'The promotion ID must be a valid UUID.',
-            'promotion_id.exists' => 'The specified promotion does not exist.',
         ];
     }
 }

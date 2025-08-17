@@ -137,7 +137,6 @@ class UpdateDeliveryMethodRequest extends FormRequest
             'position.min' => 'The position must be at least 0.',
             'position.max' => 'The position must not exceed 255.',
             'store_id.uuid' => 'The store ID must be a valid UUID.',
-            'store_id.exists' => 'The specified store does not exist.',
             'fee_type.enum' => 'The fee type must be one of: ' . Arr::join(DeliveryMethodFeeType::values(), ', ', ' or '),
             'fallback_fee_type.enum' => 'The fallback fee type must be one of: ' . Arr::join(DeliveryMethodFeeType::values(), ', ', ' or '),
             'schedule_type.enum' => 'The schedule type must be one of: ' . Arr::join(DeliveryMethodScheduleType::values(), ', ', ' or '),

@@ -29,7 +29,7 @@ class ShowDeliveryMethodScheduleOptionsRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'store_id' => ['required', 'uuid', 'exists:stores,id'],
+            'store_id' => ['required', 'uuid'],
             'schedule_type' => ['required', Rule::enum(DeliveryMethodScheduleType::class)],
             'daily_order_limit' => ['required_if:set_daily_order_limit,true', 'integer', 'min:0', 'max:16777215'],
             'same_day_delivery' => ['required', 'boolean'],
@@ -64,7 +64,6 @@ class ShowDeliveryMethodScheduleOptionsRequest extends FormRequest
         return [
             'store_id.required' => 'The store ID is required.',
             'store_id.uuid' => 'The store ID must be a valid UUID.',
-            'store_id.exists' => 'The specified store does not exist.',
             'schedule_type.required' => 'The schedule type is required.',
             'schedule_type.enum' => 'The schedule type must be one of: ' . Arr::join(DeliveryMethodScheduleType::values(), ', ', ' or '),
             'daily_order_limit.required_if' => 'The daily order limit is required when set_daily_order_limit is true.',

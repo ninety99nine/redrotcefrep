@@ -73,7 +73,7 @@ class CreateDeliveryMethodRequest extends FormRequest
             'capture_additional_fields' => ['nullable', 'boolean'],
             'additional_fields' => ['nullable', 'array'],
             'position' => ['nullable', 'integer', 'min:0', 'max:255'],
-            'store_id' => ['required', 'uuid', 'exists:stores,id'],
+            'store_id' => ['required', 'uuid'],
         ];
     }
 
@@ -132,7 +132,6 @@ class CreateDeliveryMethodRequest extends FormRequest
             'position.max' => 'The position must not exceed 255.',
             'store_id.required' => 'The store ID is required.',
             'store_id.uuid' => 'The store ID must be a valid UUID.',
-            'store_id.exists' => 'The specified store does not exist.',
             'fee_type.enum' => 'The fee type must be one of: ' . Arr::join(DeliveryMethodFeeType::values(), ', ', ' or '),
             'fallback_fee_type.enum' => 'The fallback fee type must be one of: ' . Arr::join(DeliveryMethodFeeType::values(), ', ', ' or '),
             'schedule_type.enum' => 'The schedule type must be one of: ' . Arr::join(DeliveryMethodScheduleType::values(), ', ', ' or '),

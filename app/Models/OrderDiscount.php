@@ -49,7 +49,7 @@ class OrderDiscount extends Model
     }
 
     /**
-     * Get the order.
+     * Get order.
      *
      * @return BelongsTo
      */
@@ -59,7 +59,7 @@ class OrderDiscount extends Model
     }
 
     /**
-     * Get the store.
+     * Get store.
      *
      * @return BelongsTo
      */

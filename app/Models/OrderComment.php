@@ -39,7 +39,7 @@ class OrderComment extends Model
     }
 
     /**
-     * Get the order.
+     * Get order.
      *
      * @return BelongsTo
      */
@@ -49,7 +49,7 @@ class OrderComment extends Model
     }
 
     /**
-     * Get the store.
+     * Get store.
      *
      * @return BelongsTo
      */
@@ -59,7 +59,7 @@ class OrderComment extends Model
     }
 
     /**
-     * Get the user.
+     * Get user.
      *
      * @return BelongsTo
      */
@@ -69,7 +69,7 @@ class OrderComment extends Model
     }
 
     /**
-     * Get the photo.
+     * Get photo.
      *
      * @return MorphOne
      */
@@ -79,7 +79,7 @@ class OrderComment extends Model
     }
 
     /**
-     * Get the photos.
+     * Get photos.
      *
      * @return MorphMany
      */
@@ -89,7 +89,7 @@ class OrderComment extends Model
     }
 
     /**
-     * Get the media files (photos and other media file types).
+     * Get media files (photos and other media file types).
      *
      * @return MorphMany
      */

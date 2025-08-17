@@ -28,8 +28,8 @@ class CreateStorePaymentMethodRequest extends FormRequest
             'instruction' => ['nullable', 'string'],
             'configs' => ['nullable', 'array'],
             'position' => ['nullable', 'integer', 'min:0', 'max:255'],
-            'store_id' => ['required', 'uuid', 'exists:stores,id'],
-            'payment_method_id' => ['required', 'uuid', 'exists:payment_methods,id'],
+            'store_id' => ['required', 'uuid'],
+            'payment_method_id' => ['required', 'uuid'],
         ];
     }
 }

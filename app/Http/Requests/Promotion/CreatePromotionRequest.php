@@ -66,8 +66,8 @@ class CreatePromotionRequest extends FormRequest
             'activate_for_existing_customer' => ['nullable', 'boolean'],
             'activate_using_usage_limit' => ['nullable', 'boolean'],
             'remaining_quantity' => ['nullable', 'integer', 'min:0', 'max:16777215'],
-            'store_id' => ['required', 'uuid', 'exists:stores,id'],
-            'user_id' => ['nullable', 'uuid', 'exists:users,id'],
+            'store_id' => ['required', 'uuid'],
+            'user_id' => ['nullable', 'uuid'],
         ];
     }
 
@@ -115,9 +115,7 @@ class CreatePromotionRequest extends FormRequest
             'months_of_the_year.*.max' => 'Each month of the year must not exceed 12.',
             'store_id.required' => 'The store ID is required.',
             'store_id.uuid' => 'The store ID must be a valid UUID.',
-            'store_id.exists' => 'The specified store does not exist.',
             'user_id.uuid' => 'The user ID must be a valid UUID.',
-            'user_id.exists' => 'The specified user does not exist.',
             'discount_rate_type.enum' => 'The discount rate type must be one of: ' . Arr::join(RateType::values(), ', ', ' or '),
         ];
     }

@@ -25,9 +25,9 @@ class CreateAddressRequest extends FormRequest
      *
      * @return array
      */
-    public function rules(): array
+    public function rules($prefix = '', $overide = []): array
     {
-        return [
+        $rules = [
             'type' => ['nullable', Rule::enum(AddressType::class)],
             'address_line' => ['required', 'string', 'max:255'],
             'address_line2' => ['nullable', 'string', 'max:255'],
@@ -42,6 +42,16 @@ class CreateAddressRequest extends FormRequest
             'owner_id' => ['required', 'uuid'],
             'owner_type' => ['required', 'string', Rule::in(['store', 'customer'])], // Adjust based on allowed owner types
         ];
+
+        $rules = array_merge($rules, $overide);
+
+        if ($prefix) {
+            $rules = collect($rules)
+                ->mapWithKeys(fn($value, $key) => ["{$prefix}.{$key}" => $value])
+                ->toArray();
+        }
+
+        return $rules;
     }
 
     /**
@@ -49,9 +59,9 @@ class CreateAddressRequest extends FormRequest
      *
      * @return array
      */
-    public function messages(): array
+    public function messages($prefix = '', $overide = []): array
     {
-        return [
+        $messages = [
             'type.enum' => 'The address type must be one of: ' . Arr::join(AddressType::values(), ', ', ' or '),
             'address_line.required' => 'The address line is required.',
             'address_line.string' => 'The address line must be a string.',
@@ -79,5 +89,15 @@ class CreateAddressRequest extends FormRequest
             'owner_type.required' => 'The owner type is required.',
             'owner_type.in' => 'The owner type must be one of: ' . Arr::join(['store', 'customer'], ', ', ' or '),
         ];
+
+        $messages = array_merge($messages, $overide);
+
+        if ($prefix) {
+            $rules = collect($messages)
+                ->mapWithKeys(fn($value, $key) => ["{$prefix}.{$key}" => $value])
+                ->toArray();
+        }
+
+        return $rules;
     }
 }

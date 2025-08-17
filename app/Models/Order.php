@@ -110,7 +110,7 @@ class Order extends Model
     }
 
     /**
-     * Get the store.
+     * Get store.
      *
      * @return BelongsTo
      */
@@ -120,7 +120,7 @@ class Order extends Model
     }
 
     /**
-     * Get the customer
+     * Get customer
      *
      * @return BelongsTo
      */
@@ -130,7 +130,7 @@ class Order extends Model
     }
 
     /**
-     * Get the user who placed the order.
+     * Get user who placed order.
      *
      * @return BelongsTo
      */
@@ -140,7 +140,7 @@ class Order extends Model
     }
 
     /**
-     * Get the user who created the order.
+     * Get user who created order.
      *
      * @return BelongsTo
      */
@@ -150,7 +150,7 @@ class Order extends Model
     }
 
     /**
-     * Get the user assigned to the order.
+     * Get user assigned to order.
      *
      * @return BelongsTo
      */
@@ -160,7 +160,7 @@ class Order extends Model
     }
 
     /**
-     * Get the courier.
+     * Get courier.
      *
      * @return BelongsTo
      */
@@ -170,7 +170,7 @@ class Order extends Model
     }
 
     /**
-     * Get the delivery method.
+     * Get delivery method.
      *
      * @return BelongsTo
      */
@@ -180,7 +180,7 @@ class Order extends Model
     }
 
     /**
-     * Get the delivery address.
+     * Get delivery address.
      *
      * @return HasOne
      */
@@ -190,7 +190,7 @@ class Order extends Model
     }
 
     /**
-     * Get the user who verified the collection.
+     * Get user who verified collection.
      *
      * @return BelongsTo
      */
@@ -200,7 +200,7 @@ class Order extends Model
     }
 
     /**
-     * Get the order products.
+     * Get order products.
      *
      * @return HasMany
      */
@@ -210,7 +210,7 @@ class Order extends Model
     }
 
     /**
-     * Get the order products.
+     * Get order products.
      *
      * @return HasMany
      */
@@ -220,7 +220,7 @@ class Order extends Model
     }
 
     /**
-     * Get the order discounts.
+     * Get order discounts.
      *
      * @return HasMany
      */
@@ -230,7 +230,7 @@ class Order extends Model
     }
 
     /**
-     * Get the order fees.
+     * Get order fees.
      *
      * @return HasMany
      */
@@ -240,7 +240,7 @@ class Order extends Model
     }
 
     /**
-     * Get the order comments.
+     * Get order comments.
      *
      * @return HasMany
      */
@@ -250,7 +250,7 @@ class Order extends Model
     }
 
     /**
-     * Get the transactions.
+     * Get transactions.
      *
      * @return MorphMany
      */
@@ -260,7 +260,7 @@ class Order extends Model
     }
 
     /**
-     * Get the customer's name.
+     * Get customer's name.
      *
      * @return Attribute
      */

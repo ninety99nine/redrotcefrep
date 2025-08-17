@@ -52,7 +52,7 @@ class Category extends Model
     }
 
     /**
-     * Get the store.
+     * Get store.
      *
      * @return BelongsTo
      */
@@ -62,7 +62,7 @@ class Category extends Model
     }
 
     /**
-     * Get the products.
+     * Get products.
      *
      * @return BelongsToMany
      */
@@ -72,7 +72,7 @@ class Category extends Model
     }
 
     /**
-     * Get the photo.
+     * Get photo.
      *
      * @return MorphOne
      */
@@ -82,7 +82,7 @@ class Category extends Model
     }
 
     /**
-     * Get the photos.
+     * Get photos.
      *
      * @return MorphMany
      */
@@ -92,7 +92,7 @@ class Category extends Model
     }
 
     /**
-     * Get the media files (photos and other media file types).
+     * Get media files (photos and other media file types).
      *
      * @return MorphMany
      */

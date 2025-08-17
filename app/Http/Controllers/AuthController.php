@@ -16,6 +16,7 @@ use App\Http\Requests\Auth\SetupPasswordRequest;
 use App\Http\Requests\Auth\UpdateAuthUserRequest;
 use App\Http\Requests\Auth\ForgotPasswordRequest;
 use App\Http\Requests\Auth\ShowSocialLoginLinksRequest;
+use App\Http\Requests\Auth\ShowTermsAndConditionsRequest;
 
 class AuthController extends Controller
 {
@@ -174,6 +175,17 @@ class AuthController extends Controller
         return [
             'message' => 'Account updated successfully.'
         ];
+    }
+
+    /**
+     * Show social login links.
+     *
+     * @param ShowTermsAndConditionsRequest $request
+     * @return array
+     */
+    public function showTermsAndConditions(ShowTermsAndConditionsRequest $request)
+    {
+        return $this->service->showTermsAndConditions();
     }
 
     /**

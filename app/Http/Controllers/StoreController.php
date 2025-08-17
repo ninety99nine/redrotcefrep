@@ -117,6 +117,28 @@ class StoreController extends Controller
     }
 
     /**
+     * Follow store.
+     *
+     * @param Store $store
+     * @return array
+     */
+    public function followStore(Store $store): array
+    {
+        return $this->service->followStore($store);
+    }
+
+    /**
+     * Unfollow store.
+     *
+     * @param Store $store
+     * @return array
+     */
+    public function unfollowStore(Store $store): array
+    {
+        return $this->service->unfollowStore($store);
+    }
+
+    /**
      * Show store insights.
      *
      * @param ShowStoreInsightsRequest $request

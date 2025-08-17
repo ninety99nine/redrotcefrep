@@ -11,7 +11,6 @@ use Illuminate\Support\Arr;
 use Illuminate\Validation\Rule;
 use App\Enums\OrderPaymentStatus;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Database\Query\Builder;
 use App\Enums\DeliveryMethodScheduleType;
 use Illuminate\Foundation\Http\FormRequest;
 
@@ -43,7 +42,7 @@ class CreateOrderRequest extends FormRequest
         return [
             'inspect' => ['sometimes', 'boolean'],
             'association' => ['sometimes', Rule::in([Association::SHOPPER->value, Association::TEAM_MEMBER->value])],
-            'store_id' => ['required', 'uuid', Rule::exists('stores', 'id')],
+            'store_id' => ['required', 'uuid'],
             'guest_id' => [Rule::requiredIf(!Auth::user()), 'uuid'],
             'cart_products' => ['array'],
             'cart_products.*' => ['array'],
@@ -76,22 +75,20 @@ class CreateOrderRequest extends FormRequest
             'delivery_address.description' => ['nullable', 'string'],
             'delivery_date' => $requiresDate ? ['nullable', 'date'] : ['exclude'],
             'delivery_timeslot' => $requiresTimeslot ? ['nullable', 'string', 'regex:/^(?:[01]\d|2[0-3]):[0-5]\d-(?:[01]\d|2[0-3]):[0-5]\d$/'] : ['exclude'],
-            'delivery_method_id' => ['nullable', 'uuid', Rule::exists('delivery_methods', 'id')->where(function (Builder $query) {
-                $query->where('store_id', $this->input('store_id'))->where('active', 1);
-            })],
+            'delivery_method_id' => ['nullable', 'uuid'],
             'customer_first_name' => ['nullable', 'string', 'min:1', 'max:255'],
             'customer_last_name' => ['nullable', 'string', 'min:1', 'max:255'],
             'customer_email' => ['nullable', 'email', 'max:255'],
-            'customer_mobile_number' => ['nullable', 'string', 'max:20', 'phone:INTERNATIONAL'],
+            'customer_mobile_number' => ['nullable', 'phone:INTERNATIONAL'],
             'customer_birthday' => ['nullable', 'date', 'before:today'],
             'remark' => ['nullable', 'string'],
             'internal_note' => ['nullable', 'string'],
             'collection_note' => ['nullable', 'string'],
             'tracking_number' => ['nullable', 'string', 'max:255'],
             'status' => ['nullable', Rule::enum(OrderStatus::class)],
-            'courier_id' => ['nullable', 'uuid', 'exists:couriers,id'],
+            'courier_id' => ['nullable', 'uuid'],
             'cancellation_reason' => ['nullable', 'string', 'max:255'],
-            'assigned_to_user_id' => ['nullable', 'uuid', 'exists:users,id'],
+            'assigned_to_user_id' => ['nullable', 'uuid'],
             'payment_status' => ['nullable', Rule::enum(OrderPaymentStatus::class)],
         ];
     }
@@ -107,7 +104,6 @@ class CreateOrderRequest extends FormRequest
             'association.in' => 'The association must be one of: ' . Arr::join([Association::SHOPPER->value, Association::TEAM_MEMBER->value], ', ', ' or '),
             'store_id.required' => 'The store ID is required.',
             'store_id.uuid' => 'The store ID must be a valid UUID.',
-            'store_id.exists' => 'The specified store does not exist.',
             'guest_id.required' => 'The guest ID is required when not authenticated.',
             'guest_id.uuid' => 'The guest ID must be a valid UUID.',
             'cart_products.array' => 'The cart products must be an array.',
@@ -177,14 +173,10 @@ class CreateOrderRequest extends FormRequest
             'delivery_timeslot.string' => 'The delivery timeslot must be a string.',
             'delivery_timeslot.regex' => 'The delivery timeslot must be in the format HH:MM - HH:MM (e.g., 09:00 - 10:00).',
             'delivery_method_id.uuid' => 'The delivery method ID must be a valid UUID.',
-            'delivery_method_id.exists' => 'The specified delivery method does not exist or is not active for the store.',
             'customer_email.email' => 'The customer email must be a valid email address.',
             'customer_email.max' => 'The customer email must not exceed 255 characters.',
             'customer_email.required' => 'The customer email is required when configured by the store.',
-            'customer_mobile_number.string' => 'The customer mobile number must be a string.',
-            'customer_mobile_number.max' => 'The customer mobile number must not exceed 20 characters.',
             'customer_mobile_number.phone' => 'The customer mobile number must be a valid international phone number.',
-            'customer_mobile_number.required' => 'The customer mobile number is required when configured by the store.',
             'customer_first_name.required' => 'The customer first name is required when configured by the store.',
             'customer_first_name.string' => 'The customer first name must be a string.',
             'customer_first_name.min' => 'The customer first name must be at least 1 character.',
@@ -203,11 +195,9 @@ class CreateOrderRequest extends FormRequest
             'tracking_number.max' => 'The tracking number must not exceed 255 characters.',
             'status.enum' => 'The status must be a valid order status.',
             'courier_id.uuid' => 'The courier ID must be a valid UUID.',
-            'courier_id.exists' => 'The specified courier does not exist.',
             'cancellation_reason.string' => 'The cancellation reason must be a string.',
             'cancellation_reason.max' => 'The cancellation reason must not exceed 255 characters.',
             'assigned_to_user_id.uuid' => 'The assigned user ID must be a valid UUID.',
-            'assigned_to_user_id.exists' => 'The specified assigned user does not exist.',
             'payment_status.enum' => 'The payment status must be a valid order payment status.',
         ];
     }

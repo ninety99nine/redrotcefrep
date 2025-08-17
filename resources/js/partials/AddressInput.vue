@@ -139,7 +139,7 @@
         <template #trigger>
 
             <!-- Edit Address / Add Address Button - Triggers Modal -->
-            <div class="space-y-4 p-4 border border-gray-300 rounded-lg shadow-lg bg-white">
+            <div :class="triggerClass">
 
                 <h1 class="flex items-center font-lg font-bold">
                     <svg class="w-6 h-6 mr-2 flex-shrink-0" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
@@ -154,12 +154,26 @@
                 <div v-if="localAddress" class="flex justify-between items-center space-x-20">
                     <span class="text-sm">{{ localAddress.complete_address }}</span>
 
-                    <Button
-                        size="xs"
-                        type="light"
-                        :action="showModal">
-                        <span class="whitespace-nowrap">Edit Address</span>
-                    </Button>
+                    <div class="flex justify-between items-center space-x-2">
+
+                        <Button
+                            size="xs"
+                            type="light"
+                            :action="showModal"
+                            :leftIcon="SquarePen">
+                            <span class="whitespace-nowrap ml-1">Edit Address</span>
+                        </Button>
+
+                        <Button
+                            size="xs"
+                            type="danger"
+                            :action="deleteAddress"
+                            :disabled="isSubmitting">
+                            <span>Delete</span>
+                        </Button>
+
+                    </div>
+
                 </div>
 
                 <Button
@@ -197,9 +211,9 @@
     import Modal from '@Partials/Modal.vue';
     import cloneDeep from 'lodash/cloneDeep';
     import Button from '@Partials/Button.vue';
-    import { Plus, MoveLeft } from 'lucide-vue-next';
     import GoogleMaps from '@Partials/GoogleMaps.vue';
     import SelectCountry from '@Partials/SelectCountry.vue';
+    import { Plus, MoveLeft, SquarePen } from 'lucide-vue-next';
 
     export default {
         inject: ['formState', 'notificationState'],
@@ -235,6 +249,10 @@
                 type: Boolean,
                 default: false
             },
+            triggerClass: {
+                type: String,
+                default: 'space-y-4 p-4 border border-gray-300 rounded-lg shadow-lg bg-white'
+            },
         },
         emits: ['onValidated', 'onCreated', 'onUpdated', 'onDeleted'],
         data() {
@@ -242,6 +260,7 @@
                 Plus,
                 step: 1,
                 MoveLeft,
+                SquarePen,
                 form: {
                     city: null,
                     state: null,

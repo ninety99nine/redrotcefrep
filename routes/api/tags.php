@@ -5,7 +5,7 @@ use App\Http\Middleware\StorePermission;
 use App\Http\Controllers\TagController;
 
 Route::prefix('tags')
-    ->middleware(['auth:sanctum', StorePermission::class])
+    ->middleware(['auth:sanctum', 'store.permission'])
     ->controller(TagController::class)
     ->group(function () {
         Route::get('/', 'showTags')->name('show.tags');

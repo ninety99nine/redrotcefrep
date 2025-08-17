@@ -26,7 +26,7 @@ class ImportProductsRequest extends FormRequest
     {
         return [
             'file' => ['required', 'file', 'mimes:csv,txt', 'max:10240'],
-            'store_id' => ['required', 'uuid', 'exists:stores,id'],
+            'store_id' => ['required', 'uuid'],
         ];
     }
 
@@ -44,7 +44,6 @@ class ImportProductsRequest extends FormRequest
             'file.max' => 'The file size must not exceed 10MB.',
             'store_id.required' => 'The store ID is required.',
             'store_id.uuid' => 'The store ID must be a valid UUID.',
-            'store_id.exists' => 'The specified store does not exist.',
         ];
     }
 }

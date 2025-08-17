@@ -28,8 +28,8 @@ class ShowAiAssistantTokenUsagesRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'ai_assistant_token_usage_id' => ['sometimes', 'uuid', 'exists:ai_assistant_token_usage,id'],
-            'ai_assistant_id' => ['sometimes', 'uuid', 'exists:ai_assistants,id'],
+            'ai_assistant_token_usage_id' => ['sometimes', 'uuid'],
+            'ai_assistant_id' => ['sometimes', 'uuid'],
             'association' => ['sometimes', Rule::enum(Association::class)->only([Association::ASSOCIATED, Association::UNASSOCIATED])],
         ];
     }
@@ -43,9 +43,7 @@ class ShowAiAssistantTokenUsagesRequest extends FormRequest
     {
         return [
             'ai_assistant_token_usage_id.uuid' => 'The AI assistant token usage ID must be a valid UUID.',
-            'ai_assistant_token_usage_id.exists' => 'The specified AI assistant token usage does not exist.',
             'ai_assistant_id.uuid' => 'The AI assistant ID must be a valid UUID.',
-            'ai_assistant_id.exists' => 'The specified AI assistant does not exist.',
             'association.enum' => 'The association must be one of: ' . Arr::join([Association::ASSOCIATED->value, Association::UNASSOCIATED->value], ', ', ' or '),
         ];
     }

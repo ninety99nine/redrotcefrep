@@ -26,7 +26,7 @@ class DeleteCategoriesRequest extends FormRequest
     {
         return [
             'category_ids' => ['required', 'array', 'min:1'],
-            'category_ids.*' => ['uuid', 'exists:categories,id'],
+            'category_ids.*' => ['uuid'],
         ];
     }
 
@@ -42,7 +42,6 @@ class DeleteCategoriesRequest extends FormRequest
             'category_ids.array' => 'The category IDs must be an array.',
             'category_ids.min' => 'At least one category ID is required.',
             'category_ids.*.uuid' => 'Each category ID must be a valid UUID.',
-            'category_ids.*.exists' => 'One or more category IDs do not exist.',
         ];
     }
 }

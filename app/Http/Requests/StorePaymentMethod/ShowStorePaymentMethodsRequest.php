@@ -23,7 +23,7 @@ class ShowStorePaymentMethodsRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'store_id' => ['required', 'uuid', 'exists:stores,id']
+            'store_id' => ['required', 'uuid']
         ];
     }
 }

@@ -5,7 +5,7 @@ use App\Http\Middleware\StorePermission;
 use App\Http\Controllers\DeliveryMethodController;
 
 Route::prefix('delivery-methods')
-    ->middleware(['auth:sanctum', StorePermission::class])
+    ->middleware(['auth:sanctum', 'store.permission'])
     ->controller(DeliveryMethodController::class)
     ->group(function () {
         Route::get('/', 'showDeliveryMethods')->name('show.delivery.methods');

@@ -28,8 +28,8 @@ class ShowAiAssistantsRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'ai_assistant_id' => ['sometimes', 'uuid', 'exists:ai_assistants,id'],
-            'user_id' => ['sometimes', 'uuid', 'exists:users,id'],
+            'user_id' => ['sometimes', 'uuid'],
+            'ai_assistant_id' => ['sometimes', 'uuid'],
             'association' => ['sometimes', Rule::enum(Association::class)->only([Association::ASSOCIATED, Association::UNASSOCIATED])],
         ];
     }
@@ -42,10 +42,8 @@ class ShowAiAssistantsRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'ai_assistant_id.uuid' => 'The AI assistant ID must be a valid UUID.',
-            'ai_assistant_id.exists' => 'The specified AI assistant does not exist.',
             'user_id.uuid' => 'The user ID must be a valid UUID.',
-            'user_id.exists' => 'The specified user does not exist.',
+            'ai_assistant_id.uuid' => 'The AI assistant ID must be a valid UUID.',
             'association.enum' => 'The association must be one of: ' . Arr::join([Association::ASSOCIATED->value, Association::UNASSOCIATED->value], ', ', ' or '),
         ];
     }

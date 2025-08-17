@@ -5,7 +5,7 @@ use App\Http\Middleware\StorePermission;
 use App\Http\Controllers\StorePaymentMethodController;
 
 Route::prefix('store-payment-methods')
-    ->middleware(['auth:sanctum', StorePermission::class])
+    ->middleware(['auth:sanctum', 'store.permission'])
     ->controller(StorePaymentMethodController::class)
     ->group(function () {
         Route::get('/', 'showStorePaymentMethods')->name('show.store.payment.methods');

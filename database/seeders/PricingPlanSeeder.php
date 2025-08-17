@@ -45,9 +45,10 @@ class PricingPlanSeeder extends Seeder
                 'currency' => 'BWP',
                 'name' => 'Daily @ P1',
                 'discount_percentage_rate' => 0,
-                'max_auto_billing_attempts' => 3,
+                'max_auto_billing_attempts' => 365,
                 'type' => PricingPlanType::STORE_SUBSCRIPTION,
                 'billing_type' => PricingPlanBillingType::RECURRING,
+                'trial_days' => 3,
                 'auto_billing_disabled_sms_message' => 'You have been successfully unsubscribed from {{ store.name }} {{ pricingPlan.name }}. Dial *250# to subscribe.',
                 'description' => '1 day subscription for store access',
                 'supports_ussd' => true,
@@ -61,13 +62,14 @@ class PricingPlanSeeder extends Seeder
                 'features' => null
             ],
             [
-                'price' => 7.00,
+                'price' => 5.00,
                 'currency' => 'BWP',
-                'name' => 'Weekly @ P7',
+                'name' => 'Weekly @ P5',
                 'discount_percentage_rate' => 0,
-                'max_auto_billing_attempts' => 3,
+                'max_auto_billing_attempts' => 365,
                 'type' => PricingPlanType::STORE_SUBSCRIPTION,
                 'billing_type' => PricingPlanBillingType::RECURRING,
+                'trial_days' => 3,
                 'auto_billing_disabled_sms_message' => 'You have been successfully unsubscribed from {{ store.name }} {{ pricingPlan.name }}. Dial *250# to subscribe.',
                 'description' => '1 week subscription for store access',
                 'supports_ussd' => true,
@@ -77,26 +79,6 @@ class PricingPlanSeeder extends Seeder
                         'frequency' => 'day'
                     ],
                     'sms_credits' => 15
-                ],
-                'features' => null
-            ],
-            [
-                'price' => 30.00,
-                'currency' => 'BWP',
-                'name' => 'Monthly @ P30',
-                'discount_percentage_rate' => 0,
-                'max_auto_billing_attempts' => 3,
-                'type' => PricingPlanType::STORE_SUBSCRIPTION,
-                'billing_type' => PricingPlanBillingType::RECURRING,
-                'auto_billing_disabled_sms_message' => 'You have been successfully unsubscribed from {{ store.name }} ({{ pricingPlan.name }}). Dial *250# to subscribe.',
-                'description' => '1 month subscription for store access',
-                'supports_ussd' => true,
-                'metadata' => [
-                    'store_subscription' => [
-                        'duration' => 1,
-                        'frequency' => 'month'
-                    ],
-                    'sms_credits' => 30
                 ],
                 'features' => null
             ],
@@ -110,6 +92,7 @@ class PricingPlanSeeder extends Seeder
                 'max_auto_billing_attempts' => 3,
                 'type' => PricingPlanType::AI_ASSISTANT_SUBSCRIPTION,
                 'billing_type' => PricingPlanBillingType::RECURRING,
+                'trial_days' => 0,
                 'auto_billing_disabled_sms_message' => 'You have been successfully unsubscribed from AI Assist ({{ pricingPlan.name }}). Dial *250# to subscribe.',
                 'description' => '1 day subscription for AI Assistant',
                 'supports_ussd' => true,
@@ -132,6 +115,7 @@ class PricingPlanSeeder extends Seeder
                 'max_auto_billing_attempts' => 1,
                 'type' => PricingPlanType::AI_ASSISTANT_TOP_UP_CREDITS,
                 'billing_type' => PricingPlanBillingType::ONE_TIME,
+                'trial_days' => 0,
                 'description' => 'Top up credits',
                 'supports_ussd' => true,
                 'metadata' => [
@@ -149,6 +133,7 @@ class PricingPlanSeeder extends Seeder
                 'max_auto_billing_attempts' => 1,
                 'type' => PricingPlanType::SMS_CREDITS,
                 'billing_type' => PricingPlanBillingType::ONE_TIME,
+                'trial_days' => 0,
                 'description' => '10 sms alerts',
                 'supports_ussd' => true,
                 'metadata' => [
@@ -166,6 +151,7 @@ class PricingPlanSeeder extends Seeder
                 'max_auto_billing_attempts' => 1,
                 'type' => PricingPlanType::EMAIL_CREDITS,
                 'billing_type' => PricingPlanBillingType::ONE_TIME,
+                'trial_days' => 0,
                 'description' => '50 email alerts',
                 'supports_ussd' => true,
                 'metadata' => [
@@ -183,6 +169,7 @@ class PricingPlanSeeder extends Seeder
                 'max_auto_billing_attempts' => 1,
                 'type' => PricingPlanType::WHATSAPP_CREDITS,
                 'billing_type' => PricingPlanBillingType::ONE_TIME,
+                'trial_days' => 0,
                 'description' => '5 whatsapp alerts',
                 'supports_ussd' => true,
                 'metadata' => [
@@ -207,6 +194,7 @@ class PricingPlanSeeder extends Seeder
                 'max_auto_billing_attempts' => 1,
                 'type' => PricingPlanType::STORE_SUBSCRIPTION,
                 'billing_type' => PricingPlanBillingType::ONE_TIME,
+                'trial_days' => 0,
                 'description' => '1 month basic subscription for store access',
                 'supports_web' => true,
                 'supports_mobile' => true,
@@ -231,6 +219,7 @@ class PricingPlanSeeder extends Seeder
                 'max_auto_billing_attempts' => 1,
                 'type' => PricingPlanType::STORE_SUBSCRIPTION,
                 'billing_type' => PricingPlanBillingType::ONE_TIME,
+                'trial_days' => 0,
                 'description' => '1 year basic subscription for store access',
                 'supports_web' => true,
                 'supports_mobile' => true,
@@ -255,6 +244,7 @@ class PricingPlanSeeder extends Seeder
                 'max_auto_billing_attempts' => 1,
                 'type' => PricingPlanType::STORE_SUBSCRIPTION,
                 'billing_type' => PricingPlanBillingType::ONE_TIME,
+                'trial_days' => 0,
                 'description' => '1 month premium subscription for store access',
                 'supports_web' => true,
                 'supports_mobile' => true,
@@ -284,6 +274,7 @@ class PricingPlanSeeder extends Seeder
                 'max_auto_billing_attempts' => 1,
                 'type' => PricingPlanType::STORE_SUBSCRIPTION,
                 'billing_type' => PricingPlanBillingType::ONE_TIME,
+                'trial_days' => 0,
                 'description' => '1 year premium subscription for store access',
                 'supports_web' => true,
                 'supports_mobile' => true,
@@ -315,6 +306,7 @@ class PricingPlanSeeder extends Seeder
                 'max_auto_billing_attempts' => 1,
                 'type' => PricingPlanType::AI_ASSISTANT_SUBSCRIPTION,
                 'billing_type' => PricingPlanBillingType::ONE_TIME,
+                'trial_days' => 0,
                 'description' => '1 month basic subscription for AI Assistant',
                 'supports_web' => true,
                 'supports_mobile' => true,
@@ -337,6 +329,7 @@ class PricingPlanSeeder extends Seeder
                 'max_auto_billing_attempts' => 1,
                 'type' => PricingPlanType::SMS_CREDITS,
                 'billing_type' => PricingPlanBillingType::ONE_TIME,
+                'trial_days' => 0,
                 'description' => '100 sms alerts',
                 'supports_ussd' => true,
                 'metadata' => [
@@ -354,6 +347,7 @@ class PricingPlanSeeder extends Seeder
                 'max_auto_billing_attempts' => 1,
                 'type' => PricingPlanType::EMAIL_CREDITS,
                 'billing_type' => PricingPlanBillingType::ONE_TIME,
+                'trial_days' => 0,
                 'description' => '500 email alerts',
                 'supports_ussd' => true,
                 'metadata' => [
@@ -371,6 +365,7 @@ class PricingPlanSeeder extends Seeder
                 'max_auto_billing_attempts' => 1,
                 'type' => PricingPlanType::WHATSAPP_CREDITS,
                 'billing_type' => PricingPlanBillingType::ONE_TIME,
+                'trial_days' => 0,
                 'description' => '50 whatsapp alerts',
                 'supports_ussd' => true,
                 'metadata' => [

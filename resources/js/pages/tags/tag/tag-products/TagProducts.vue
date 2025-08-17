@@ -8,7 +8,6 @@
 
             <Pill type="light" size="xs">{{ `${totalTagProducts} total` }}</Pill>
 
-
         </div>
 
         <Search
@@ -138,7 +137,7 @@
 
                     this.cancelTokenSource = axios.CancelToken.source(); // Create a new cancel token source
 
-                    const config = {
+                    let config = {
                         params: {
                             store_id: this.store.id,
                             association: 'team member',

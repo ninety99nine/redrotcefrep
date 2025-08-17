@@ -26,7 +26,7 @@ class DeleteDeliveryMethodsRequest extends FormRequest
     {
         return [
             'delivery_method_ids' => ['required', 'array', 'min:1'],
-            'delivery_method_ids.*' => ['uuid', 'exists:delivery_methods,id'],
+            'delivery_method_ids.*' => ['uuid'],
         ];
     }
 
@@ -42,7 +42,6 @@ class DeleteDeliveryMethodsRequest extends FormRequest
             'delivery_method_ids.array' => 'The delivery method IDs must be an array.',
             'delivery_method_ids.min' => 'At least one delivery method ID is required.',
             'delivery_method_ids.*.uuid' => 'Each delivery method ID must be a valid UUID.',
-            'delivery_method_ids.*.exists' => 'One or more delivery method IDs do not exist.',
         ];
     }
 }

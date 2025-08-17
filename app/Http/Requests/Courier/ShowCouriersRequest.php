@@ -27,7 +27,7 @@ class ShowCouriersRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'courier_id' => ['sometimes', 'uuid', 'exists:couriers,id'],
+            'courier_id' => ['sometimes', 'uuid'],
         ];
     }
 
@@ -40,7 +40,6 @@ class ShowCouriersRequest extends FormRequest
     {
         return [
             'courier_id.uuid' => 'The courier ID must be a valid UUID.',
-            'courier_id.exists' => 'The specified courier does not exist.',
         ];
     }
 }

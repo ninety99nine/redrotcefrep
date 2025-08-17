@@ -54,7 +54,7 @@ class PaymentMethod extends Model
     }
 
     /**
-     * Get the stores.
+     * Get stores.
      *
      * @return BelongsToMany
      */
@@ -70,7 +70,7 @@ class PaymentMethod extends Model
     }
 
     /**
-     * Get the image url.
+     * Get image url.
      *
      * @return Attribute
      */

@@ -28,7 +28,7 @@ class ShowUsersRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'store_id' => ['required_without:association', 'uuid', 'exists:stores,id'],
+            'store_id' => ['required_without:association', 'uuid'],
             'association' => ['sometimes', Rule::enum(Association::class)->only([Association::SUPER_ADMIN])]
         ];
     }
@@ -43,7 +43,6 @@ class ShowUsersRequest extends FormRequest
         return [
             'store_id.required_without' => 'The store ID is required when association is not provided.',
             'store_id.uuid' => 'The store ID must be a valid UUID.',
-            'store_id.exists' => 'The specified store does not exist.',
             'association.enum' => 'The association must be one of: ' . Arr::join([Association::SUPER_ADMIN->value], ', ', ' or '),
         ];
     }

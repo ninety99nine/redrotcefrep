@@ -166,6 +166,7 @@ class PricingPlanService extends BaseService
     {
         $user = $store = $aiAssistant = null;
 
+        $store = $data['store'] ?? null;
         $storeId = $data['store_id'] ?? null;
         $paymentMethodId = $data['payment_method_id'] ?? null;
         $paymentMethodType = $data['payment_method_type'] ?? null;
@@ -183,10 +184,12 @@ class PricingPlanService extends BaseService
                          $pricingPlan->offersEmailCredits() ||
                          $pricingPlan->offersSmsCredits();
 
-        if ($requiresStore) {
+        if (!$store && $requiresStore) {
             $store = Store::find($storeId);
             if (!$store) throw new Exception('The store does not exist');
         }
+
+        $offerTrial = $requiresStore && ($pricingPlan->trial_days > 0) && ($store->subscriptions()->count() == 0);
 
         $requiresAiAssistant = $pricingPlan->offersAiAssistantSubscription() ||
                                $pricingPlan->offersAiAssistantTopUpCredits();
@@ -206,33 +209,52 @@ class PricingPlanService extends BaseService
             throw new Exception('The ' . $paymentMethod->name . ' payment method has been deactivated');
         }
 
-        $transactionPayload = $this->prepareTransactionPayload($user, $store, $aiAssistant, $pricingPlan, $paymentMethod, $createdUsingAutoBilling);
-        $transaction = Transaction::create($transactionPayload);
+        if($offerTrial) {
 
-        $transaction->setRelation('owner', $pricingPlan);
-        if($store) $transaction->setRelation('store', $store);
-        if($aiAssistant) $transaction->setRelation('aiAssistant', $aiAssistant);
+            $data = [
+                'user' => $user,
+                'store' => $store,
+                'pricingPlan' => $pricingPlan,
+                'aiAssistant' => $aiAssistant,
+                'paymentMethod' => $paymentMethod,
+                'createdUsingAutoBilling' => $createdUsingAutoBilling,
+            ];
 
-        if ($paymentMethod->type == PaymentMethodType::DPO->value) {
+            return $this->offerPricingPlan(null, $data);
 
-            $companyToken = config('app.dpo_company_token');
-            $dpoPaymentLinkPayload = $this->prepareDpoPaymentLinkPayload($user, $transaction);
-            $metadata = DirectPayOnlineService::createPaymentLink($companyToken, $dpoPaymentLinkPayload);
+        }else{
 
-            $transaction->update(['metadata' => $metadata]);
-            return (new TransactionService())->showResource($transaction);
+            $transactionPayload = $this->prepareTransactionPayload($user, $store, $aiAssistant, $pricingPlan, $paymentMethod, $createdUsingAutoBilling);
+            $transaction = Transaction::create($transactionPayload);
 
-        } else if ($paymentMethod->type == PaymentMethodType::ORANGE_AIRTIME->value) {
+            $transaction->setRelation('owner', $pricingPlan);
+            $transaction->setRelation('requestedByUser', $user);
+            if($store) $transaction->setRelation('store', $store);
+            $transaction->setRelation('paymentMethod', $paymentMethod);
+            if($aiAssistant) $transaction->setRelation('aiAssistant', $aiAssistant);
 
-            $msisdn = $user->mobile_number->formatE164();
-            $transaction = OrangeAirtimeService::billUsingAirtime($msisdn, $transaction);
+            if ($paymentMethod->type == PaymentMethodType::DPO->value) {
 
-            if ($transaction->payment_status == TransactionPaymentStatus::FAILED_PAYMENT->value) {
+                $companyToken = config('app.dpo_company_token');
+                $dpoPaymentLinkPayload = $this->prepareDpoPaymentLinkPayload($user, $transaction);
+                $metadata = DirectPayOnlineService::createPaymentLink($companyToken, $dpoPaymentLinkPayload);
+
+                $transaction->update(['metadata' => $metadata]);
                 return (new TransactionService())->showResource($transaction);
-            }
-        }
 
-        return $this->offerPricingPlan($store, $aiAssistant, $pricingPlan, $transaction);
+            } else if ($paymentMethod->type == PaymentMethodType::ORANGE_AIRTIME->value) {
+
+                $msisdn = $user->mobile_number->formatE164();
+                $transaction = OrangeAirtimeService::billUsingAirtime($msisdn, $transaction);
+
+                if ($transaction->payment_status == TransactionPaymentStatus::FAILED_PAYMENT->value) {
+                    return (new TransactionService())->showResource($transaction);
+                }
+            }
+
+            return $this->offerPricingPlan($transaction);
+
+        }
     }
 
     /**
@@ -248,7 +270,7 @@ class PricingPlanService extends BaseService
         try {
 
             $store = $aiAssistant = null;
-            $transaction = $transaction->load(['owner', 'store', 'aiAssistant', 'paymentMethod']);
+            $transaction = $transaction->load(['owner', 'store', 'aiAssistant', 'paymentMethod', 'requestedByUser']);
 
             if (!$transaction->isPaid()) {
 
@@ -282,7 +304,7 @@ class PricingPlanService extends BaseService
                     $transactionToken = $transaction->metadata['dpo_transaction_token'];
                     $metadata = DirectPayOnlineService::verifyPayment($companyToken, $transactionToken);
 
-                    $this->offerPricingPlan($store, $aiAssistant, $pricingPlan, $transaction);
+                    $this->offerPricingPlan($transaction);
 
                     $transaction->update([
                         'failure_type' => null,
@@ -316,28 +338,32 @@ class PricingPlanService extends BaseService
     /**
      * Offer pricing plan.
      *
-     * @param Store|null $store
-     * @param AiAssistant|null $aiAssistant
-     * @param PricingPlan $pricingPlan
-     * @param Transaction $transaction
+     * @param Transaction|null $transaction
+     * @param array $data
      * @return array
      */
-    private function offerPricingPlan(Store|null $store, AiAssistant|null $aiAssistant, PricingPlan $pricingPlan, Transaction $transaction): array
+    private function offerPricingPlan(?Transaction $transaction, array $data = []): array
     {
+        $trial = $transaction == null;
+        $store = $transaction?->store ?? $data['store'];
+        $user = $transaction?->requestedByUser ?? $data['user'];
+        $pricingPlan = $transaction?->owner ?? $data['pricingPlan'];
+        $aiAssistant = $transaction?->aiAssistant ?? $data['aiAssistant'];
+        $paymentMethod = $transaction?->paymentMethod ?? $data['paymentMethod'];
+        $createdUsingAutoBilling = $transaction?->created_using_auto_billing ?? $data['createdUsingAutoBilling'];
+
         if ($pricingPlan->offersSubscription()) {
 
             $storeSubscription = null;
             $aiAssistantSubscription = null;
             $message = 'Subscription created';
 
-            $paymentMethod = $transaction->paymentMethod;
-
             $offersStoreSubscription = $pricingPlan->offersStoreSubscription();
             $offersAiAssistantSubscription = $pricingPlan->offersAiAssistantSubscription();
 
             if ($offersStoreSubscription) {
 
-                $storeSubscriptionPayload = $this->prepareStoreSubscriptionPayload($store, $pricingPlan, $transaction);
+                $storeSubscriptionPayload = $this->prepareStoreSubscriptionPayload($user, $store, $pricingPlan, $transaction);
                 $storeSubscriptionResponse = (new SubscriptionService())->createSubscription($storeSubscriptionPayload);
                 $storeSubscription = $storeSubscriptionResponse['subscription']->resource;
 
@@ -345,11 +371,20 @@ class PricingPlanService extends BaseService
 
                 if ($paymentMethod->type == PaymentMethodType::ORANGE_AIRTIME->value) {
 
-                    $smsMessage = $messageCrafterService->craftStoreSubscriptionPaidMessage($store, $transaction, $storeSubscription);
-                    SendSms::dispatch($smsMessage, $transaction->requestedByUser->mobile_number->formatE164());
+                    if(!$createdUsingAutoBilling) {
 
-                    $smsMessage = $messageCrafterService->craftStoreMarketingMessage($store);
-                    SendSms::dispatch($smsMessage, $transaction->requestedByUser->mobile_number->formatE164());
+                        if($trial) {
+                            $smsMessage = $messageCrafterService->craftStoreTrialSubscriptionMessage($store, $pricingPlan);
+                        }else{
+                            $smsMessage = $messageCrafterService->craftStoreSubscriptionPaidMessage($store, $transaction, $storeSubscription);
+                        }
+
+                        SendSms::dispatch($smsMessage, $user->mobile_number->formatE164());
+
+                        $smsMessage = $messageCrafterService->craftStoreMarketingMessage($store);
+                        SendSms::dispatch($smsMessage, $user->mobile_number->formatE164());
+
+                    }
 
                 }
 
@@ -357,13 +392,17 @@ class PricingPlanService extends BaseService
 
             if ($offersAiAssistantSubscription) {
 
-                $aiAssistantSubscriptionPayload = $this->prepareAiAssistantSubscriptionPayload($aiAssistant, $pricingPlan, $transaction);
+                $aiAssistantSubscriptionPayload = $this->prepareAiAssistantSubscriptionPayload($user, $aiAssistant, $pricingPlan, $transaction);
                 $aiAssistantSubscriptionResponse = (new SubscriptionService())->createSubscription($aiAssistantSubscriptionPayload);
                 $aiAssistantSubscription = $aiAssistantSubscriptionResponse['subscription']->resource;
 
                 if ($paymentMethod->type == PaymentMethodType::ORANGE_AIRTIME->value) {
-                    $smsMessage = $messageCrafterService->craftAIAssistantSubscriptionPaidMessage($transaction, $aiAssistantSubscription);
-                    SendSms::dispatch($smsMessage, $transaction->requestedByUser->mobile_number->formatE164());
+
+                    if(!$createdUsingAutoBilling) {
+                        $smsMessage = $messageCrafterService->craftAIAssistantSubscriptionPaidMessage($transaction, $aiAssistantSubscription);
+                        SendSms::dispatch($smsMessage, $user->mobile_number->formatE164());
+                    }
+
                 }
 
             }
@@ -375,17 +414,17 @@ class PricingPlanService extends BaseService
                 $autoBillingSchedule = [
                     'active' => 1,
                     'attempts' => 0,
+                    'user_id' => $user->id,
                     'store_id' => $store?->id,
                     'pricing_plan_id' => $pricingPlan->id,
                     'next_attempt_date' => $nextAttemptDate,
                     'payment_method_id' => $paymentMethod->id,
-                    'user_id' => $transaction->requested_by_user_id
                 ];
 
                 $existingAutoBillingSchedule = DB::table('auto_billing_schedules')->where([
+                    'user_id' => $user->id,
                     'store_id' => $store?->id,
-                    'pricing_plan_id' => $pricingPlan->id,
-                    'user_id' => $transaction->requested_by_user_id
+                    'pricing_plan_id' => $pricingPlan->id
                 ])->first();
 
                 if ($existingAutoBillingSchedule) {
@@ -393,14 +432,20 @@ class PricingPlanService extends BaseService
                     $autoBillingSchedule['total_successful_attempts'] = $existingAutoBillingSchedule->total_successful_attempts + 1;
 
                     DB::table('auto_billing_schedules')->where([
+                        'updated_at' => now(),
+                        'user_id' => $user->id,
                         'store_id' => $store?->id,
                         'pricing_plan_id' => $pricingPlan->id,
-                        'user_id' => $transaction->requested_by_user_id
                     ])->update($autoBillingSchedule);
 
                 } else {
 
-                    $autoBillingSchedule['id'] = Str::uuid();
+                    $autoBillingSchedule = array_merge($autoBillingSchedule, [
+                        'id' => Str::uuid(),
+                        'updated_at' => now(),
+                        'created_at' => now()
+                    ]);
+
                     DB::table('auto_billing_schedules')->insert($autoBillingSchedule);
 
                 }
@@ -429,40 +474,42 @@ class PricingPlanService extends BaseService
     /**
      * Prepare store subscription payload.
      *
+     * @param User $user
      * @param Store $store
      * @param PricingPlan $pricingPlan
-     * @param Transaction $transaction
+     * @param Transaction|null $transaction
      * @return array
      */
-    private function prepareStoreSubscriptionPayload(Store $store, PricingPlan $pricingPlan, Transaction $transaction): array
+    private function prepareStoreSubscriptionPayload(User $user, Store $store, PricingPlan $pricingPlan, ?Transaction $transaction): array
     {
         $duration = $pricingPlan->metadata['store_subscription']['duration'];
         $frequency = $pricingPlan->metadata['store_subscription']['frequency'];
         $subscription = $store->subscriptions()->orderBy('end_at', 'DESC')->first();
 
         $startAt = $subscription ? $subscription->end_at : now();
-        $endAt = $this->calculateSubscriptionEndAt($startAt, $frequency, $duration);
+        $endAt = $transaction ? $this->calculateSubscriptionEndAt($startAt, $frequency, $duration) : (clone $startAt)->addDays($pricingPlan->trial_days);
 
         return [
             'end_at' => $endAt,
             'start_at' => $startAt,
+            'user_id' => $user->id,
             'owner_type' => 'store',
             'owner_id' => $store->id,
-            'transaction_id' => $transaction->id,
+            'transaction_id' => $transaction?->id,
             'pricing_plan_id' => $pricingPlan->id,
-            'user_id' => $transaction->requested_by_user_id
         ];
     }
 
     /**
      * Prepare AI Assistant subscription payload.
      *
+     * @param User $user
      * @param AiAssistant $aiAssistant
      * @param PricingPlan $pricingPlan
-     * @param Transaction $transaction
+     * @param Transaction|null $transaction
      * @return array
      */
-    private function prepareAiAssistantSubscriptionPayload(AiAssistant $aiAssistant, PricingPlan $pricingPlan, Transaction $transaction): array
+    private function prepareAiAssistantSubscriptionPayload(User $user, AiAssistant $aiAssistant, PricingPlan $pricingPlan, ?Transaction $transaction): array
     {
         $credits = $pricingPlan->metadata['ai_assistant_subscription']['credits'];
         $duration = $pricingPlan->metadata['ai_assistant_subscription']['duration'];
@@ -470,17 +517,17 @@ class PricingPlanService extends BaseService
         $subscription = $aiAssistant->subscriptions()->orderBy('end_at', 'DESC')->first();
 
         $startAt = $subscription ? $subscription->end_at : now();
-        $endAt = $this->calculateSubscriptionEndAt($startAt, $frequency, $duration);
+        $endAt = $transaction ? $this->calculateSubscriptionEndAt($startAt, $frequency, $duration) : (clone $startAt)->addDays($pricingPlan->trial_days);
 
         return [
             'end_at' => $endAt,
             'credits' => $credits,
+            'user_id' => $user->id,
             'start_at' => $startAt,
             'owner_type' => 'ai assistant',
             'owner_id' => $aiAssistant->id,
             'transaction_id' => $transaction->id,
-            'pricing_plan_id' => $pricingPlan->id,
-            'user_id' => $transaction->requested_by_user_id
+            'pricing_plan_id' => $pricingPlan->id
         ];
     }
 

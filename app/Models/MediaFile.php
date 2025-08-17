@@ -36,7 +36,7 @@ class MediaFile extends Model
     }
 
     /**
-     * Get the parent mediable model (User, Store or Product).
+     * Get mediable model (User, Store or Product).
      *
      * @return MorphTo
      */

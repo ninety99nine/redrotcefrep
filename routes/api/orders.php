@@ -5,7 +5,7 @@ use App\Http\Middleware\StorePermission;
 use App\Http\Controllers\OrderController;
 
 Route::prefix('orders')
-    ->middleware(['auth:sanctum', StorePermission::class])
+    ->middleware(['auth:sanctum', 'store.permission'])
     ->controller(OrderController::class)
     ->group(function () {
         Route::get('/', 'showOrders')->name('show.orders');

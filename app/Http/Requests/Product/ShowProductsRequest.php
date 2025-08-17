@@ -28,7 +28,7 @@ class ShowProductsRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'store_id' => ['sometimes', 'uuid', 'exists:stores,id'],
+            'store_id' => ['sometimes', 'uuid'],
             'association' => ['sometimes', Rule::enum(Association::class)->only([Association::SUPER_ADMIN, Association::TEAM_MEMBER, Association::SHOPPER])],
         ];
     }
@@ -42,7 +42,6 @@ class ShowProductsRequest extends FormRequest
     {
         return [
             'product_id.uuid' => 'The product ID must be a valid UUID.',
-            'product_id.exists' => 'The specified product does not exist.',
             'association.enum' => 'The association must be one of: ' . Arr::join([Association::SUPER_ADMIN->value, Association::TEAM_MEMBER->value, Association::SHOPPER->value], ', ', ' or '),
         ];
     }

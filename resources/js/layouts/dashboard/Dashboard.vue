@@ -494,8 +494,8 @@
                                 },
                                 {
                                     name: 'Tags',
-                                    routeName: 'show-tags',
-                                    associatedRouteNames: ['create-tags', 'edit-tag']
+                                    routeName: 'show-product-tags',
+                                    associatedRouteNames: ['create-product-tags', 'edit-product-tag']
                                 },
                                 {
                                     name: 'Categories',
@@ -510,8 +510,22 @@
                         },
                         {
                             name: 'Customers',
-                            routeName: 'show-store-customers',
-                            associatedRouteNames: ['show-store-customer', 'create-store-customer'],
+                            children: [
+                                {
+                                    name: 'All',
+                                    routeName: 'show-customers',
+                                    associatedRouteNames: ['create-customer', 'edit-customer']
+                                },
+                                {
+                                    name: 'Tags',
+                                    routeName: 'show-customer-tags',
+                                    associatedRouteNames: ['create-customer-tags', 'edit-customer-tag']
+                                },
+                                {
+                                    name: 'Bulk Edit',
+                                    routeName: 'bulk-edit-customers'
+                                },
+                            ]
                         },
                         {
                             name: 'Promotions',
@@ -604,7 +618,7 @@
 
                     let config = {
                         params: {
-                            _relationships: ['logo', 'tags', 'categories', 'activeSubscription.pricingPlan', /*  'storeRollingNumbers', 'userStoreAssociation'  */].join(',')
+                            _relationships: ['logo', 'productTags', 'customerTags', 'categories', 'activeSubscription.pricingPlan', /*  'storeRollingNumbers', 'userStoreAssociation'  */].join(',')
                         }
                     };
 

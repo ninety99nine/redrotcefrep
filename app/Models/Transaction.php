@@ -61,7 +61,7 @@ class Transaction extends Model
     }
 
     /**
-     * Get the store.
+     * Get store.
      *
      * @return BelongsTo
      */
@@ -71,7 +71,7 @@ class Transaction extends Model
     }
 
     /**
-     * Get the payment method.
+     * Get payment method.
      *
      * @return BelongsTo
      */
@@ -81,7 +81,7 @@ class Transaction extends Model
     }
 
     /**
-     * Get the customer.
+     * Get customer.
      *
      * @return BelongsTo
      */
@@ -91,7 +91,7 @@ class Transaction extends Model
     }
 
     /**
-     * Get the AI assistant.
+     * Get AI assistant.
      *
      * @return BelongsTo
      */
@@ -101,7 +101,7 @@ class Transaction extends Model
     }
 
     /**
-     * Get the user who requested the transaction.
+     * Get user who requested the transaction.
      *
      * @return BelongsTo
      */
@@ -111,7 +111,7 @@ class Transaction extends Model
     }
 
     /**
-     * Get the user who manually verified the transaction.
+     * Get user who manually verified the transaction.
      *
      * @return BelongsTo
      */
@@ -131,7 +131,7 @@ class Transaction extends Model
     }
 
     /**
-     * Get the photo.
+     * Get photo.
      *
      * @return MorphOne
      */
@@ -141,7 +141,7 @@ class Transaction extends Model
     }
 
     /**
-     * Get the photos.
+     * Get photos.
      *
      * @return MorphMany
      */
@@ -151,7 +151,7 @@ class Transaction extends Model
     }
 
     /**
-     * Get the media files (photos and other media file types).
+     * Get media files (photos and other media file types).
      *
      * @return MorphMany
      */

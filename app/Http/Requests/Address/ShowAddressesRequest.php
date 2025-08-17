@@ -28,9 +28,9 @@ class ShowAddressesRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'address_id' => ['sometimes', 'uuid', 'exists:addresses,id'],
+            'address_id' => ['sometimes', 'uuid'],
             'owner_id' => ['sometimes', 'uuid'],
-            'owner_type' => ['sometimes', 'string', Rule::in(['store', 'customer'])]
+            'owner_type' => ['sometimes', 'string', Rule::in(['store', 'customer'])],
             'association' => ['sometimes', Rule::enum(Association::class)->only([Association::ASSOCIATED, Association::UNASSOCIATED])],
         ];
     }
@@ -44,7 +44,6 @@ class ShowAddressesRequest extends FormRequest
     {
         return [
             'address_id.uuid' => 'The address ID must be a valid UUID.',
-            'address_id.exists' => 'The specified address does not exist.',
             'owner_id.uuid' => 'The owner ID must be a valid UUID.',
             'owner_type.in' => 'The owner type must be one of: ' . Arr::join(['store', 'customer'], ', ', ' or '),
             'association.enum' => 'The association must be one of: ' . Arr::join([Association::ASSOCIATED, Association::UNASSOCIATED], ', ', ' or '),

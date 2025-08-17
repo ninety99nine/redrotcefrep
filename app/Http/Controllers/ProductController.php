@@ -14,8 +14,6 @@ use App\Http\Requests\Product\DeleteProductRequest;
 use App\Http\Requests\Product\DeleteProductsRequest;
 use App\Http\Requests\Product\UpdateProductsRequest;
 use App\Http\Requests\Product\ImportProductsRequest;
-use Symfony\Component\HttpFoundation\StreamedResponse;
-use App\Http\Requests\Product\DownloadProductsRequest;
 use \Symfony\Component\HttpFoundation\BinaryFileResponse;
 use App\Http\Requests\Product\showProductVariantsRequest;
 use App\Http\Requests\Product\UpdateProductVisibilityRequest;
@@ -92,17 +90,6 @@ class ProductController extends Controller
     public function importProducts(ImportProductsRequest $request): array
     {
         return $this->service->importProducts($request->validated());
-    }
-
-    /**
-     * Download products.
-     *
-     * @param DownloadProductsRequest $request
-     * @return StreamedResponse
-     */
-    public function downloadProducts(DownloadProductsRequest $request): StreamedResponse
-    {
-        return $this->service->downloadProducts($request->validated());
     }
 
     /**

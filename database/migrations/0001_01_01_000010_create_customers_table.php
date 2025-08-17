@@ -13,11 +13,12 @@ return new class extends Migration
     {
         Schema::create('customers', function (Blueprint $table) {
             $table->uuid('id')->primary();
-            $table->string('first_name');
+            $table->string('first_name')->nullable();
             $table->string('last_name')->nullable();
             $table->string('email')->nullable();
             $table->string('mobile_number', 20)->nullable();
             $table->date('birthday')->nullable();
+            $table->string('referral_code')->nullable();
             $table->text('notes')->nullable();
             $table->char('currency', 3)->default(config('app.currency'));
             $table->foreignUuid('store_id')->cascadeOnDelete();

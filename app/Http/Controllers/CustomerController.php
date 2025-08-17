@@ -12,6 +12,9 @@ use App\Http\Requests\Customer\CreateCustomerRequest;
 use App\Http\Requests\Customer\UpdateCustomerRequest;
 use App\Http\Requests\Customer\DeleteCustomerRequest;
 use App\Http\Requests\Customer\DeleteCustomersRequest;
+use App\Http\Requests\Customer\UpdateCustomersRequest;
+use App\Http\Requests\Customer\ImportCustomersRequest;
+use \Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class CustomerController extends Controller
 {
@@ -34,9 +37,9 @@ class CustomerController extends Controller
      * Show customers.
      *
      * @param ShowCustomersRequest $request
-     * @return CustomerResources|array
+     * @return CustomerResources|BinaryFileResponse|array
      */
-    public function showCustomers(ShowCustomersRequest $request): CustomerResources|array
+    public function showCustomers(ShowCustomersRequest $request): CustomerResources|BinaryFileResponse|array
     {
         return $this->service->showCustomers($request->validated());
     }
@@ -53,6 +56,17 @@ class CustomerController extends Controller
     }
 
     /**
+     * Update customers.
+     *
+     * @param UpdateCustomersRequest $request
+     * @return array
+     */
+    public function updateCustomers(UpdateCustomersRequest $request): array
+    {
+        return $this->service->updateCustomers($request->validated());
+    }
+
+    /**
      * Delete multiple customers.
      *
      * @param DeleteCustomersRequest $request
@@ -62,6 +76,17 @@ class CustomerController extends Controller
     {
         $customerIds = request()->input('customer_ids', []);
         return $this->service->deleteCustomers($customerIds);
+    }
+
+    /**
+     * Import customers from CSV.
+     *
+     * @param ImportCustomersRequest $request
+     * @return array
+     */
+    public function importCustomers(ImportCustomersRequest $request): array
+    {
+        return $this->service->importCustomers($request->validated());
     }
 
     /**

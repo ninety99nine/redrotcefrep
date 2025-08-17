@@ -27,7 +27,7 @@ class ShowDeliveryMethodsRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'store_id' => ['sometimes', 'uuid', 'exists:stores,id'],
+            'store_id' => ['sometimes', 'uuid'],
             'association' => ['sometimes', Rule::enum(Association::class)->only([Association::SHOPPER])],
         ];
     }
@@ -41,7 +41,6 @@ class ShowDeliveryMethodsRequest extends FormRequest
     {
         return [
             'store_id.uuid' => 'The store ID must be a valid UUID.',
-            'store_id.exists' => 'The specified store does not exist.',
             'association.enum' => 'The association must be: shopper.',
         ];
     }

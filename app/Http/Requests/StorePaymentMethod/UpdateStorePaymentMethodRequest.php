@@ -27,7 +27,7 @@ class UpdateStorePaymentMethodRequest extends FormRequest
             'instruction' => ['sometimes', 'string'],
             'configs' => ['sometimes', 'array'],
             'position' => ['sometimes', 'integer', 'min:0', 'max:255'],
-            'payment_method_id' => ['sometimes', 'uuid', 'exists:payment_methods,id'],
+            'payment_method_id' => ['sometimes', 'uuid'],
         ];
     }
 }

@@ -26,7 +26,7 @@ class DeleteUsersRequest extends FormRequest
     {
         return [
             'user_ids' => ['required', 'array', 'min:1'],
-            'user_ids.*' => ['uuid', 'exists:users,id'],
+            'user_ids.*' => ['uuid'],
         ];
     }
 
@@ -42,7 +42,6 @@ class DeleteUsersRequest extends FormRequest
             'user_ids.array' => 'The user IDs must be an array.',
             'user_ids.min' => 'At least one user ID is required.',
             'user_ids.*.uuid' => 'Each user ID must be a valid UUID.',
-            'user_ids.*.exists' => 'One or more user IDs do not exist.',
         ];
     }
 }

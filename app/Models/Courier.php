@@ -46,7 +46,7 @@ class Courier extends Model
     }
 
     /**
-     * Get the order.
+     * Get order.
      *
      * @return HasMany
      */

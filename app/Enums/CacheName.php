@@ -4,7 +4,9 @@ namespace App\Enums;
 
 enum CacheName:string
 {
+    case USSD_HOME = 'ussd home';
     case CURRENCIES = 'currencies';
+    case STORE_VISIT = 'store visit';
     case SHOPPING_CART = 'shopping cart';
     case IS_SUPER_ADMIN = 'is super admin';
     case IS_CUSTOMER_STATUS = 'is customer status';

@@ -10,17 +10,16 @@ use App\Models\Product;
 use App\Models\Category;
 use App\Enums\Association;
 use App\Enums\ProductType;
-use App\Enums\ProductUnitType;
 use Illuminate\Support\Str;
 use App\Enums\SortProductBy;
-use Barryvdh\DomPDF\Facade\Pdf;
+use App\Enums\ProductUnitType;
 use App\Enums\UploadFolderName;
 use App\Enums\StockQuantityType;
+use App\Enums\TagType;
 use Illuminate\Support\Facades\DB;
 use App\Http\Resources\ProductResource;
 use App\Http\Resources\ProductResources;
 use App\Http\Requests\Product\CreateProductRequest;
-use Symfony\Component\HttpFoundation\StreamedResponse;
 use \Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class ProductService extends BaseService
@@ -123,9 +122,6 @@ class ProductService extends BaseService
         $totalProducts = 0;
 
         foreach ($productsData as $productData) {
-            if (!isset($productData['id'])) {
-                continue;
-            }
 
             $product = Product::where('id', $productData['id'])
                 ->where('store_id', $storeId)
@@ -149,20 +145,33 @@ class ProductService extends BaseService
             // Update product with fillable data
             $product->update($fillableData);
 
-            // Handle tags
+            $tags = $productData['tags'] ?? null;
+            $categories = $productData['categories'] ?? null;
+
+            if(!is_null($tags)) {
+                $this->createProductTags($product, $tags);
+            }
+
+            if(!is_null($categories)) {
+                $this->createProductCategories($product, $categories);
+            }
+
+            // Handle tags to add
             if (!is_null($tagsToAdd)) {
                 $product->tags()->syncWithoutDetaching($tagsToAdd);
             }
 
+            // Handle tags to remove
             if (!is_null($tagsToRemove)) {
                 $product->tags()->detach($tagsToRemove);
             }
 
-            // Handle categories
+            // Handle categories to add
             if (!is_null($categoriesToAdd)) {
                 $product->categories()->syncWithoutDetaching($categoriesToAdd);
             }
 
+            // Handle categories to remove
             if (!is_null($categoriesToRemove)) {
                 $product->categories()->detach($categoriesToRemove);
             }
@@ -247,14 +256,18 @@ class ProductService extends BaseService
 
                 try {
 
-                    $name = $record['Name'] ?? null;
+                    $id = empty($record['ID'] ?? null) ? null : $record['ID'];
+                    $id = ($id && Str::isUuid($id)) ? $id : Str::uuid()->toString();
+                    $name = empty($record['Name'] ?? null) ? null : $record['Name'];
 
                     if (!$name) {
-                        $errors[] = "Row " . ($index + 2) . ": Name is required.";
+                        $errors[] = [
+                            'row' => $index,
+                            'messages' => ['Name is required']
+                        ];
                         continue;
                     }
 
-                    $productId = ($record['ID'] && Str::isUuid($record['ID'])) ? $record['ID'] : Str::uuid()->toString();
                     $parentName = $record['Parent Name'] ?? null;
                     $parentProductId = null;
 
@@ -280,47 +293,59 @@ class ProductService extends BaseService
                     }
 
                     $productData = [
+                        'row' => $index,
+
+                        'id' => $id,
+                        'name' => $name,
                         'store_id' => $storeId,
                         'currency' => $store->currency,
-                        'id' => $productId,
-                        'name' => $name,
                         'parent_product_id' => $parentProductId,
-                        'is_free' => $this->parseBoolean($record['Free'] ?? false),
-                        'is_estimated_price' => $this->parseBoolean($record['Estimated Price'] ?? false),
-                        'unit_regular_price' => $record['Regular Price'] ? floatval($record['Regular Price']) : '0.00',
-                        'unit_sale_price' => $record['Sale Price'] ? floatval($record['Sale Price']) : '0.00',
-                        'unit_cost_price' => $record['Cost Price'] ? floatval($record['Cost Price']) : '0.00',
-                        'visible' => $this->parseBoolean($record['Visible'] ?? true),
-                        'type' => $record['Type'] ?? ProductType::PHYSICAL->value,
-                        'download_link' => $record['Download Link'] ?? null,
-                        'sku' => $record['Sku'] ?? null,
-                        'barcode' => $record['Barcode'] ?? null,
-                        'show_description' => $this->parseBoolean($record['Show Description'] ?? false),
-                        'description' => $record['Description'] ?? null,
-                        'unit_weight' => $record['Weight'] ? floatval($record['Weight']) : '0.00',
-                        'tax_overide' => $this->parseBoolean($record['Tax Override'] ?? false),
-                        'tax_overide_amount' => $record['Tax Override Amount'] ? floatval($record['Tax Override Amount']) : '0.00',
-                        'show_price_per_unit' => $this->parseBoolean($record['Show Price Per Unit'] ?? false),
-                        'unit_value' => $record['Unit Value'] ? floatval($record['Unit Value']) : '1',
-                        'unit_type' => $record['Unit Type'] ?? ProductUnitType::QUANTITY->value,
-                        'set_daily_capacity' => $this->parseBoolean($record['Set Daily Capacity'] ?? false),
-                        'daily_capacity' => $record['Daily Capacity'] ? intval($record['Daily Capacity']) : '1',
-                        'stock_quantity_type' => $record['Stock Type'] ?? StockQuantityType::UNLIMITED->value,
-                        'stock_quantity' => $record['Stock Quantity'] ? intval($record['Stock Quantity']) : '100',
-                        'set_min_order_quantity' => $this->parseBoolean($record['Set Min Order Quantity'] ?? false),
-                        'min_order_quantity' => $record['Min Order Quantity'] ? intval($record['Min Order Quantity']) : '1',
-                        'set_max_order_quantity' => $this->parseBoolean($record['Set Max Order Quantity'] ?? false),
-                        'max_order_quantity' => $record['Max Order Quantity'] ? intval($record['Max Order Quantity']) : '1',
-                        'categories' => $record['Categories'] ? array_map('trim', explode(',', $record['Categories'])) : null,
-                        'tags' => $record['Tags'] ? array_map('trim', explode(',', $record['Tags'])) : null,
-                        'position' => $record['Position'] ? intval($record['Position']) : null,
+
+                        'is_free' => $this->parseTruthy($record['Free'] ?? false),
+                        'visible' => $this->parseTruthy($record['Visible'] ?? true),
+                        'tax_overide' => $this->parseTruthy($record['Tax Override'] ?? false),
+                        'show_description' => $this->parseTruthy($record['Show Description'] ?? false),
+                        'is_estimated_price' => $this->parseTruthy($record['Estimated Price'] ?? false),
+                        'set_daily_capacity' => $this->parseTruthy($record['Set Daily Capacity'] ?? false),
+                        'show_price_per_unit' => $this->parseTruthy($record['Show Price Per Unit'] ?? false),
+                        'set_min_order_quantity' => $this->parseTruthy($record['Set Min Order Quantity'] ?? false),
+                        'set_max_order_quantity' => $this->parseTruthy($record['Set Max Order Quantity'] ?? false),
+
+                        'unit_value' => empty($record['Weight'] ?? null) ? '0.00' : floatval($record['Weight']),
+                        'unit_weight' => empty($record['Unit Value'] ?? null) ? '1' : floatval($record['Unit Value']),
+                        'unit_sale_price' => empty($record['Sale Price'] ?? null) ? '0.00' : floatval($record['Sale Price']),
+                        'unit_cost_price' => empty($record['Cost Price'] ?? null) ? '0.00' : floatval($record['Cost Price']),
+                        'unit_regular_price' => empty($record['Regular Price'] ?? null) ? '0.00' : floatval($record['Regular Price']),
+                        'tax_overide_amount' => empty($record['Tax Override Amount'] ?? null) ? '0.00' : floatval($record['Tax Override Amount']),
+
+                        'position' => empty($record['Position'] ?? null) ? '1' : intval($record['Position']),
+                        'daily_capacity' => empty($record['Daily Capacity'] ?? null) ? '1' : intval($record['Daily Capacity']),
+                        'stock_quantity' => empty($record['Stock Quantity'] ?? null) ? '100' : intval($record['Stock Quantity']),
+                        'min_order_quantity' => empty($record['Min Order Quantity'] ?? null) ? '1' : intval($record['Min Order Quantity']),
+                        'max_order_quantity' => empty($record['Max Order Quantity'] ?? null) ? '1' : intval($record['Max Order Quantity']),
+
+                        'type' => empty($record['Type'] ?? null) ? ProductType::PHYSICAL->value : $record['Type'],
+                        'unit_type' => empty($record['Unit Type'] ?? null) ? ProductUnitType::QUANTITY->value : $record['Unit Type'],
+                        'stock_quantity_type' => empty($record['Stock Type'] ?? null) ? StockQuantityType::UNLIMITED->value : $record['Stock Type'],
+
+                        'sku' => empty($record['Sku'] ?? null) ? null : $record['Sku'],
+                        'barcode' => empty($record['Barcode'] ?? null) ? null : $record['Barcode'],
+                        'description' => empty($record['Description'] ?? null) ? null : $record['Description'],
+                        'download_link' => empty($record['Download Link'] ?? null) ? null : $record['Download Link'],
+
+                        'tags' => empty($record['Tags'] ?? null) ? null : array_map('trim', explode(',', $record['Tags'])),
+                        'categories' => empty($record['Categories'] ?? null) ? null : array_map('trim', explode(',', $record['Categories'])),
+
                     ];
 
                     // Validate product data
-                    $validator = validator($productData, (new \App\Http\Requests\Product\CreateProductRequest)->rules(), (new \App\Http\Requests\Product\CreateProductRequest)->messages());
+                    $validator = validator($productData, (new CreateProductRequest)->rules(), (new CreateProductRequest)->messages());
 
                     if ($validator->fails()) {
-                        $errors[] = "Row " . ($index + 2) . ": " . implode(', ', $validator->errors()->all());
+                        $errors[] = [
+                            'row' => $index,
+                            'messages' => $validator->errors()->all()
+                        ];
                         continue;
                     }
 
@@ -330,7 +355,10 @@ class ProductService extends BaseService
 
                 } catch (Exception $e) {
 
-                    $errors[] = "Row " . ($index + 2) . ": " . $e->getMessage();
+                    $errors[] = [
+                        'row' => $index,
+                        'messages' => [$e->getMessage()]
+                    ];
 
                 }
 
@@ -383,10 +411,29 @@ class ProductService extends BaseService
                         'currency' => $store->currency,
                     ];
 
-                    $validator = validator($parentData, (new \App\Http\Requests\Product\CreateProductRequest)->rules(), (new \App\Http\Requests\Product\CreateProductRequest)->messages());
+                    $validator = validator($parentData, (new CreateProductRequest)->rules(), (new CreateProductRequest)->messages());
 
                     if ($validator->fails()) {
-                        $errors[] = "Parent product '$parentName': " . implode(', ', $validator->errors()->all());
+
+                        $keys = [];
+
+                        //  Set errors on the variants since this is a non existent product
+                        foreach ($productsToCreate as $key => $product) {
+                            if ($product['parent_product_id'] === $parentId) {
+                                $keys[] = $key;
+                                $errors[] = [
+                                    'row' => $product['row'],
+                                    'messages' => $validator->errors()->all()
+                                ];
+                                $totalProducts--;
+                            }
+                        }
+
+                        //  Remove variants from the products to create
+                        $productsToCreate = collect($productsToCreate)->filter(function ($value, int $key) use ($keys) {
+                            return !in_array($key, $keys);
+                        })->all();
+
                         continue;
                     }
 
@@ -394,10 +441,6 @@ class ProductService extends BaseService
                     $totalProducts++;
 
                 }
-            }
-
-            if (!empty($errors)) {
-                throw new Exception('Validation errors occurred: ' . implode('; ', $errors));
             }
 
             // Split products into non-variants and variants
@@ -485,7 +528,10 @@ class ProductService extends BaseService
 
             DB::commit();
 
-            return ['message' => $totalProducts . ($totalProducts == 1 ? ' product' : ' products') . ' imported successfully'];
+            return [
+                'message' => $totalProducts . ($totalProducts == 1 ? ' product' : ' products') . ' imported successfully',
+                'errors' => $errors
+            ];
 
         } catch (Exception $e) {
 
@@ -496,50 +542,23 @@ class ProductService extends BaseService
     }
 
     /**
-     * Parse boolean values, including yes/no and y/n.
+     * Parse boolean values.
      *
      * @param mixed $value
      * @return bool
      */
-    private function parseBoolean($value): bool
+    private function parseTruthy($value): bool
     {
         if (is_string($value)) {
             $value = strtolower(trim($value));
-            if (in_array($value, ['yes', 'y'])) {
+            if (in_array($value, ['true', 't', '1', 'yes', 'y'])) {
                 return true;
             }
-            if (in_array($value, ['no', 'n'])) {
+            if (in_array($value, ['false', 'f', '0', 'no', 'n'])) {
                 return false;
             }
         }
         return filter_var($value, FILTER_VALIDATE_BOOLEAN);
-    }
-
-    /**
-     * Download products.
-     *
-     * @param array $data
-     * @return StreamedResponse
-     */
-    public function downloadProducts(array $data): StreamedResponse
-    {
-        $storeId = $data['store_id'];
-        $productIds = $data['product_ids'];
-
-        $store = Store::with(['logo'])->find($storeId);
-        $products = Product::whereIn('id', $productIds)->where('store_id', $storeId)->with(['photos'])->get();
-
-        // Convert objects to arrays
-        $products = $products->map(function ($product) {
-            return json_decode(json_encode($product), true);
-        })->toArray();
-
-        // Generate the PDF
-        $pdf = Pdf::loadView('pdfs.product.show', compact('store', 'products'));
-
-        return response()->streamDownload(function () use ($pdf) {
-            echo $pdf->stream();
-        }, 'name.pdf');
     }
 
     /**
@@ -804,7 +823,7 @@ class ProductService extends BaseService
 
         if (!empty($tags)) {
 
-            $existingTags = Tag::where('store_id', $product->store_id)->get();
+            $existingTags = Tag::where('store_id', $product->store_id)->where('type', TagType::PRODUCT->value)->get();
 
             // Match tags by UUID or name
             $matchingUuidTags = $existingTags->filter(fn($existingTag) => collect($tags)->contains($existingTag->id));
@@ -819,6 +838,7 @@ class ProductService extends BaseService
             foreach ($nonMatchingNameTags as $tagName) {
                 $newTag = Tag::create([
                     'name' => $tagName,
+                    'type' => TagType::PRODUCT->value,
                     'store_id' => $product->store_id
                 ]);
                 $tagIds[] = $newTag->id;

@@ -26,7 +26,7 @@ class DeleteCustomersRequest extends FormRequest
     {
         return [
             'customer_ids' => ['required', 'array', 'min:1'],
-            'customer_ids.*' => ['uuid', 'exists:customers,id'],
+            'customer_ids.*' => ['uuid'],
         ];
     }
 
@@ -42,7 +42,6 @@ class DeleteCustomersRequest extends FormRequest
             'customer_ids.array' => 'The customer IDs must be an array.',
             'customer_ids.min' => 'At least one customer ID is required.',
             'customer_ids.*.uuid' => 'Each customer ID must be a valid UUID.',
-            'customer_ids.*.exists' => 'One or more customer IDs do not exist.',
         ];
     }
 }

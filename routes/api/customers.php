@@ -5,14 +5,16 @@ use App\Http\Middleware\StorePermission;
 use App\Http\Controllers\CustomerController;
 
 Route::prefix('customers')
-    ->middleware(['auth:sanctum', StorePermission::class])
+    ->middleware(['auth:sanctum', 'store.permission'])
     ->controller(CustomerController::class)
     ->group(function () {
         Route::get('/', 'showCustomers')->name('show.customers');
         Route::post('/', 'createCustomer')->name('create.customer');
+        Route::put('/', 'updateCustomers')->name('update.customers');
         Route::delete('/', 'deleteCustomers')->name('delete.customers');
+        Route::post('/import', 'importCustomers')->name('import.customers');
 
-        // Explicit route model binding applied: AppServiceProvider.php
+        //  Explicit route model binding applied: AppServiceProvider.php
         Route::prefix('{customer}')->group(function () {
             Route::get('/', 'showCustomer')->name('show.customer');
             Route::put('/', 'updateCustomer')->name('update.customer');

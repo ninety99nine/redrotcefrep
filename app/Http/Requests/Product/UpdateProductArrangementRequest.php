@@ -28,10 +28,10 @@ class UpdateProductArrangementRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'store_id' => ['required', 'uuid', 'exists:stores,id'],
+            'store_id' => ['required', 'uuid'],
             'product_ids' => ['required_without:sort_by', 'array'],
-            'product_ids.*' => ['uuid', 'exists:products,id'],
-            'parent_product_id' => ['sometimes', 'uuid', 'exists:products,id'],
+            'product_ids.*' => ['uuid'],
+            'parent_product_id' => ['sometimes', 'uuid'],
             'sort_by' => ['required_without:product_ids', Rule::enum(SortProductBy::class)],
         ];
     }
@@ -46,13 +46,10 @@ class UpdateProductArrangementRequest extends FormRequest
         return [
             'store_id.required' => 'The store ID is required.',
             'store_id.uuid' => 'The store ID must be a valid UUID.',
-            'store_id.exists' => 'The specified store does not exist.',
             'product_ids.required_without' => 'Product IDs are required when sort_by is not provided.',
             'product_ids.array' => 'Product IDs must be an array.',
             'product_ids.*.uuid' => 'The product ID must be a valid UUID.',
-            'product_ids.*.exists' => 'The product ID do not exist.',
             'parent_product_id.uuid' => 'The parent product ID must be a valid UUID.',
-            'parent_product_id.exists' => 'The specified parent product does not exist.',
             'sort_by.required_without' => 'Sort by is required when product IDs are not provided.',
             'sort_by.enum' => 'The sort by value must be one of: ' . Arr::join(SortProductBy::values(), ', ', ' or '),
         ];

@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Casts\Money;
+use App\Enums\TagType;
 use App\Casts\JsonArray;
 use App\Casts\CheckoutFees;
 use App\Enums\UploadFolderName;
@@ -18,6 +19,7 @@ use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\belongsToMany;
+use Illuminate\Support\Facades\Auth;
 use Propaganistas\LaravelPhone\Casts\E164PhoneNumberCast;
 
 class Store extends Model
@@ -96,11 +98,12 @@ class Store extends Model
     #[Scope]
     protected function search(Builder $query, string $searchTerm): void
     {
-        $query->where('name', 'like', '%' . $searchTerm . '%');
+        $query->where('name', 'like', '%' . $searchTerm . '%')
+              ->orWhere('ussd_mobile_number', 'like', '%' . $searchTerm . '%');
     }
 
     /**
-     * Get the store quota.
+     * Get store quota.
      *
      * @return BelongsToMany
      */
@@ -110,17 +113,58 @@ class Store extends Model
     }
 
     /**
-     * Get the users.
+     * Get users.
      *
      * @return BelongsToMany
      */
     public function users(): BelongsToMany
     {
-        return $this->belongsToMany(User::class)->withTimestamps();
+        return $this->belongsToMany(User::class)
+                    ->using(StoreUser::class)
+                    ->withTimestamps()
+                    ->as('store_user');
     }
 
     /**
-     * Get the logo.
+     * Get followers.
+     *
+     * @return BelongsToMany
+     */
+    public function followers(): BelongsToMany
+    {
+        return $this->belongsToMany(User::class)
+                    ->using(StoreFollower::class)
+                    ->as('store_follower')
+                    ->withTimestamps();
+    }
+
+    /**
+     * Get following.
+     *
+     * @return hasOne
+     */
+    public function following(): hasOne
+    {
+        return $this->hasOne(StoreFollower::class)->where('user_id', Auth::user()?->id ?? 0);
+    }
+
+    /**
+     * Get visitors.
+     *
+     * @return BelongsToMany
+     */
+    public function visitors(): BelongsToMany
+    {
+        return $this->belongsToMany(User::class)
+                    ->using(StoreVisitor::class)
+                    ->as('store_visitor')
+                    ->withPivot([
+                        'guest_id', 'last_visited_at'
+                    ]);
+    }
+
+    /**
+     * Get logo.
      *
      * @return MorphOne
      */
@@ -130,7 +174,7 @@ class Store extends Model
     }
 
     /**
-     *  Get the team members.
+     *  Get team members.
      */
     public function teamMembers()
     {
@@ -138,7 +182,7 @@ class Store extends Model
     }
 
     /**
-     * Get the orders.
+     * Get orders.
      *
      * @return HasMany
      */
@@ -148,7 +192,7 @@ class Store extends Model
     }
 
     /**
-     * Get the products.
+     * Get products.
      *
      * @return HasMany
      */
@@ -158,7 +202,7 @@ class Store extends Model
     }
 
     /**
-     * Get the promotions.
+     * Get promotions.
      *
      * @return HasMany
      */
@@ -168,7 +212,7 @@ class Store extends Model
     }
 
     /**
-     * Get the customers.
+     * Get customers.
      *
      * @return HasMany
      */
@@ -178,17 +222,27 @@ class Store extends Model
     }
 
     /**
-     * Get the tags.
+     * Get product tags.
      *
      * @return HasMany
      */
-    public function tags(): HasMany
+    public function productTags(): HasMany
     {
-        return $this->hasMany(Tag::class);
+        return $this->hasMany(Tag::class)->where('type', TagType::PRODUCT->value);
     }
 
     /**
-     * Get the categories.
+     * Get customer tags.
+     *
+     * @return HasMany
+     */
+    public function customerTags(): HasMany
+    {
+        return $this->hasMany(Tag::class)->where('type', TagType::CUSTOMER->value);
+    }
+
+    /**
+     * Get categories.
      *
      * @return HasMany
      */
@@ -198,7 +252,7 @@ class Store extends Model
     }
 
     /**
-     * Get the media files.
+     * Get media files.
      *
      * @return MorphMany
      */
@@ -208,7 +262,7 @@ class Store extends Model
     }
 
     /**
-     * Get the payment methods.
+     * Get payment methods.
      *
      * @return BelongsToMany
      */
@@ -224,7 +278,7 @@ class Store extends Model
     }
 
     /**
-     * Get the delivery methods.
+     * Get delivery methods.
      *
      * @return HasMany
      */
@@ -234,7 +288,7 @@ class Store extends Model
     }
 
     /**
-     *  Get the subscriptions.
+     *  Get subscriptions.
      */
     public function subscriptions()
     {
@@ -248,7 +302,7 @@ class Store extends Model
      */
     public function activeSubscription(): MorphOne
     {
-        return $this->morphOne(Subscription::class, 'owner')->active();
+        return $this->morphOne(Subscription::class, 'owner')->oldest()->active();
     }
 
     protected $appends = [

@@ -50,17 +50,37 @@ class User extends Authenticatable
     }
 
     /**
-     * Get the stores.
+     * Get stores.
      *
      * @return BelongsToMany
      */
     public function stores(): BelongsToMany
     {
-        return $this->belongsToMany(Store::class)->withTimestamps();
+        return $this->belongsToMany(Store::class, 'store_user')->withTimestamps();
     }
 
     /**
-     * Get the user's full name.
+     * Get followed stores.
+     *
+     * @return BelongsToMany
+     */
+    public function followedStores(): BelongsToMany
+    {
+        return $this->belongsToMany(Store::class, 'store_follower')->withTimestamps();
+    }
+
+    /**
+     * Get visited stores.
+     *
+     * @return BelongsToMany
+     */
+    public function visitedStores(): BelongsToMany
+    {
+        return $this->belongsToMany(Store::class, 'store_visitor')->withPivot('guest_id', 'last_visited_at');
+    }
+
+    /**
+     * Get user's full name.
      *
      * @return Attribute
      */

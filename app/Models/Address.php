@@ -58,17 +58,17 @@ class Address extends Model
     }
 
     /**
-     * Get the parent mediable model (Order, Store or Customer).
+     * Get owner model.
      *
      * @return MorphTo
      */
-    public function mediable(): MorphTo
+    public function owner(): MorphTo
     {
         return $this->morphTo();
     }
 
     /**
-     * Get the complete address.
+     * Get complete address.
      *
      * @return Attribute
      */

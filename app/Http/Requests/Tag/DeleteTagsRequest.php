@@ -26,7 +26,7 @@ class DeleteTagsRequest extends FormRequest
     {
         return [
             'tag_ids' => ['required', 'array', 'min:1'],
-            'tag_ids.*' => ['uuid', 'exists:tags,id'],
+            'tag_ids.*' => ['uuid'],
         ];
     }
 
@@ -42,7 +42,6 @@ class DeleteTagsRequest extends FormRequest
             'tag_ids.array' => 'The tag IDs must be an array.',
             'tag_ids.min' => 'At least one tag ID is required.',
             'tag_ids.*.uuid' => 'Each tag ID must be a valid UUID.',
-            'tag_ids.*.exists' => 'One or more tag IDs do not exist.',
         ];
     }
 }

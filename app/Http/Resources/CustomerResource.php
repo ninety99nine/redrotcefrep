@@ -27,6 +27,7 @@ class CustomerResource extends JsonResource
             'first_name' => $this->first_name,
             'total_spend' => $this->total_spend,
             'total_orders' => $this->total_orders,
+            'referral_code' => $this->referral_code,
             'mobile_number' => $this->mobile_number ? PhoneNumberService::formatPhoneNumber($this->mobile_number) : null,
             'total_average_spend' => $this->total_average_spend,
             'created_at' => $this->created_at->toDateTimeString(),
@@ -35,6 +36,8 @@ class CustomerResource extends JsonResource
             'last_order_at' => $this->last_order_at ? $this->last_order_at->toDateTimeString() : null,
 
             'store' => StoreResource::make($this->whenLoaded('store')),
+            'tags' => TagResource::collection($this->whenLoaded('tags')),
+            'address' => AddressResource::make($this->whenLoaded('address')),
 
             '_links' => [
                 'show' => route('show.customer', ['customer' => $this->id]),

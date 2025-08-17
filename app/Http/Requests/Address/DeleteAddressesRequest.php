@@ -26,7 +26,7 @@ class DeleteAddressesRequest extends FormRequest
     {
         return [
             'address_ids' => ['required', 'array', 'min:1'],
-            'address_ids.*' => ['uuid', 'exists:addresses,id'],
+            'address_ids.*' => ['uuid'],
         ];
     }
 
@@ -42,7 +42,6 @@ class DeleteAddressesRequest extends FormRequest
             'address_ids.array' => 'The address IDs must be an array.',
             'address_ids.min' => 'At least one address ID is required.',
             'address_ids.*.uuid' => 'Each address ID must be a valid UUID.',
-            'address_ids.*.exists' => 'One or more address IDs do not exist.',
         ];
     }
 }

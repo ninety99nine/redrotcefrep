@@ -10,10 +10,14 @@ use App\Models\Role;
 use App\Models\Store;
 use App\Enums\Platform;
 use App\Models\Category;
+use App\Enums\Association;
 use App\Models\Permission;
+use Illuminate\Support\Str;
 use App\Enums\InsightPeriod;
 use Illuminate\Http\Response;
 use App\Enums\InsightCategory;
+use App\Enums\PaymentMethodType;
+use App\Enums\PricingPlanType;
 use App\Enums\UploadFolderName;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Contracts\View\View;
@@ -21,6 +25,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
 use App\Http\Resources\StoreResource;
 use App\Http\Resources\StoreResources;
+use App\Models\PricingPlan;
 
 class StoreService extends BaseService
 {
@@ -32,7 +37,23 @@ class StoreService extends BaseService
      */
     public function showStores(array $data): StoreResources|array
     {
-        $query = Store::query()->when(!request()->has('_sort'), fn($query) => $query->latest());
+        /** @var User $user */
+        $user = Auth::user();
+        $association = isset($data['association']) ? Association::tryFrom($data['association']) : null;
+
+        if ($association === Association::SUPER_ADMIN) {
+            $query = Store::query()->latest();
+        } else if ($association === Association::SHOPPER) {
+            $query = Store::query()->latest();
+        } elseif ($association === Association::FOLLOWER) {
+            $query = $user->followedStores()->when(!request()->has('_sort'), fn($q) => $q->latest());
+        } elseif ($association === Association::TEAM_MEMBER) {
+            $query = $user->stores()->when(!request()->has('_sort'), fn($q) => $q->latest());
+        } elseif ($association === null || $association === Association::RECENT_VISITOR) {
+            $query = $user->visitedStores();
+            if (!request()->has('_sort')) $query = $query->orderByPivot('last_visited_at', 'desc');
+        }
+
         return $this->setQuery($query)->getOutput();
     }
 
@@ -45,9 +66,7 @@ class StoreService extends BaseService
      */
     public function createStore(array $data): array
     {
-        /**
-         *  @var User $user
-         */
+        /** @var User $user */
         $user = Auth::user();
 
         $store = $user->stores()->create($data);
@@ -98,6 +117,32 @@ class StoreService extends BaseService
 
         $user->assignRole($adminRole);
 
+        //  Follow store
+        $user->followedStores()->attach($store->id);
+
+        //  Capture store recent visit
+        $user->visitedStores()->syncWithoutDetaching([$store->id => [
+            'id' => Str::uuid(),
+            'last_visited_at' => now()
+        ]]);
+
+        $isValidUssdRequest = (new UssdService)->isValidUssdRequest();
+
+        if($isValidUssdRequest) {
+
+            $pricingPlan = PricingPlan::where('type', PricingPlanType::STORE_SUBSCRIPTION->value)->supportsUssd()->active()->orderBy('price')->first();
+
+            //  Creaate trial store subscription
+            (new PricingPlanService)->payPricingPlan($pricingPlan, [
+                'store' => $store,
+                'payment_method_type' => PaymentMethodType::ORANGE_AIRTIME->value
+            ]);
+
+        }
+
+        //  Forget cache
+        (new UssdService)->cacheManager($user)->forget();
+
         // Create store logo if provided
         if (isset($data['logo']) && !empty($data['logo'])) {
 
@@ -144,9 +189,15 @@ class StoreService extends BaseService
 
             foreach ($stores as $store) {
 
-                $this->deleteStore($store);
+                $this->deleteStore($store, false);
 
             }
+
+            /** @var User $user */
+            $user = Auth::user();
+
+            //  Forget cache
+            (new UssdService)->cacheManager($user)->forget();
 
             return ['message' => $totalStores  . ($totalStores  == 1 ? ' Store': ' Stores') . ' deleted'];
 
@@ -185,10 +236,11 @@ class StoreService extends BaseService
      * Delete store.
      *
      * @param Store $store
+     * @param boolean $forgetCache
      * @return array
      * @throws Exception
      */
-    public function deleteStore(Store $store): array
+    public function deleteStore(Store $store, $forgetCache = true): array
     {
         $mediaFileService = new MediaFileService;
 
@@ -198,11 +250,69 @@ class StoreService extends BaseService
 
         $deleted = $store->delete();
 
+        if($forgetCache) {
+
+            /** @var User $user */
+            $user = Auth::user();
+
+            //  Forget cache
+            (new UssdService)->cacheManager($user)->forget();
+
+        }
+
         if ($deleted) {
             return ['message' => 'Store deleted'];
         }else{
             throw new Exception('Store delete unsuccessful');
         }
+    }
+
+    /**
+     * Follow store.
+     *
+     * @param Store $store
+     * @return array
+     * @throws Exception
+     */
+    public function followStore(Store $store): array
+    {
+        /** @var User $user */
+        $user = Auth::user();
+
+        if (!$user->followedStores()->where('store_id', $store->id)->exists()) {
+
+            $user->followedStores()->attach($store->id);
+
+            //  Forget cache
+            (new UssdService)->cacheManager($user)->forget();
+
+        }
+
+        return ['message' => 'Store followed successfully'];
+    }
+
+    /**
+     * Unfollow store.
+     *
+     * @param Store $store
+     * @return array
+     * @throws Exception
+     */
+    public function unfollowStore(Store $store): array
+    {
+        /** @var User $user */
+        $user = Auth::user();
+
+        if ($user->followedStores()->where('store_id', $store->id)->exists()) {
+
+            $user->followedStores()->detach($store->id);
+
+            //  Forget cache
+            (new UssdService)->cacheManager($user)->forget();
+
+        }
+
+        return ['message' => 'Store unfollowed successfully'];
     }
 
     /**

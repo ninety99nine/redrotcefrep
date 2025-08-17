@@ -26,7 +26,7 @@ class DeleteTransactionsRequest extends FormRequest
     {
         return [
             'transaction_ids' => ['required', 'array', 'min:1'],
-            'transaction_ids.*' => ['uuid', 'exists:transactions,id'],
+            'transaction_ids.*' => ['uuid'],
         ];
     }
 
@@ -42,7 +42,6 @@ class DeleteTransactionsRequest extends FormRequest
             'transaction_ids.array' => 'The transaction IDs must be an array.',
             'transaction_ids.min' => 'At least one transaction ID is required.',
             'transaction_ids.*.uuid' => 'Each transaction ID must be a valid UUID.',
-            'transaction_ids.*.exists' => 'One or more transaction IDs do not exist.',
         ];
     }
 }

@@ -27,7 +27,7 @@ class ShowFiltersRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'store_id' => ['sometimes', 'uuid', 'exists:stores,id'],
+            'store_id' => ['sometimes', 'uuid'],
             'type' => ['required', Rule::enum(FilterResourceType::class)],
         ];
     }
@@ -41,7 +41,6 @@ class ShowFiltersRequest extends FormRequest
     {
         return [
             'store_id.uuid' => 'The store ID must be a valid UUID.',
-            'store_id.exists' => 'The specified store does not exist.',
             'type.enum' => 'The type must be one of: ' . Arr::join(FilterResourceType::values(), ', ', ' or '),
         ];
     }

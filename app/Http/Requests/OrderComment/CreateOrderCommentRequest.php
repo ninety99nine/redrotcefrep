@@ -26,7 +26,7 @@ class CreateOrderCommentRequest extends FormRequest
     {
         return [
             'comment' => ['required', 'string', 'max:500'],
-            'order_id' => ['required', 'uuid', 'exists:orders,id'],
+            'order_id' => ['required', 'uuid'],
             'photo' => ['nullable', 'file', 'mimes:jpeg,png,jpg,gif,webp,svg', 'max:5120']
         ];
     }
@@ -44,7 +44,6 @@ class CreateOrderCommentRequest extends FormRequest
             'comment.max' => 'The comment must not exceed 500 characters.',
             'order_id.required' => 'The order ID is required.',
             'order_id.uuid' => 'The order ID must be a valid UUID.',
-            'order_id.exists' => 'The specified order does not exist.',
             'photo.file' => 'The photo must be a valid file.',
             'photo.mimes' => 'The photo must be a JPEG, PNG, JPG, GIF, or SVG.',
             'photo.max' => 'The photo size must not exceed 5MB.'

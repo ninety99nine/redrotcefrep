@@ -32,11 +32,15 @@
                         {{ isCreating ? 'Add Order' : `#${order.number} ${order.customer_first_name}` }}
                     </h1>
 
-                    <!-- Status -->
-                    <Status></Status>
+                    <template v-if="!isCreating">
 
-                    <!-- Payment Status -->
-                    <PaymentStatus></PaymentStatus>
+                        <!-- Status -->
+                        <Status></Status>
+
+                        <!-- Payment Status -->
+                        <PaymentStatus></PaymentStatus>
+
+                    </template>
 
                 </template>
 

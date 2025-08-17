@@ -5,7 +5,7 @@ use App\Http\Middleware\StorePermission;
 use App\Http\Controllers\DeliveryAddressController;
 
 Route::prefix('delivery-addresses')
-    ->middleware(['auth:sanctum', StorePermission::class])
+    ->middleware(['auth:sanctum', 'store.permission'])
     ->controller(DeliveryAddressController::class)
     ->group(function () {
         Route::get('/', 'showDeliveryAddresses')->name('show.delivery.addresses');

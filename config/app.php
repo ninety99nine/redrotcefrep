@@ -13,6 +13,8 @@ return [
     'sms_credentials' => env('SMS_CREDENTIALS'),
     'sms_sender_mobile_number' => env('SMS_SENDER_MOBILE_NUMBER'),
 
+    'ussd_token' => env('USSD_TOKEN'),
+
     'dpo_company_token' => env('DPO_COMPANY_TOKEN'),
 
     /*

@@ -62,7 +62,7 @@ class Subscription extends Model
     }
 
     /**
-     * Get the user.
+     * Get user.
      *
      * @return BelongsTo
      */
@@ -72,7 +72,7 @@ class Subscription extends Model
     }
 
     /**
-     * Get the transaction.
+     * Get transaction.
      *
      * @return BelongsTo
      */
@@ -82,7 +82,7 @@ class Subscription extends Model
     }
 
     /**
-     * Get the pricing plan.
+     * Get pricing plan.
      *
      * @return BelongsTo
      */
@@ -92,7 +92,7 @@ class Subscription extends Model
     }
 
     /**
-     * Get the parent owner model (User or Store).
+     * Get parent owner model (User or Store).
      *
      * @return MorphTo
      */

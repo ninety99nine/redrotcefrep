@@ -25,7 +25,7 @@ class ShowSubscriptionsRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'subscription_id' => ['sometimes', 'uuid', 'exists:subscriptions,id'],
+            'subscription_id' => ['sometimes', 'uuid'],
         ];
     }
 
@@ -38,7 +38,6 @@ class ShowSubscriptionsRequest extends FormRequest
     {
         return [
             'subscription_id.uuid' => 'The subscription ID must be a valid UUID.',
-            'subscription_id.exists' => 'The specified subscription does not exist.',
         ];
     }
 }

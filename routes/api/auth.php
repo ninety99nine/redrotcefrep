@@ -11,11 +11,12 @@ Route::prefix('auth')->group(function () {
     Route::post('/forgot-password', [AuthController::class, 'forgotPassword'])->name('auth.forgot.password');
     Route::post('/validate-token', [AuthController::class, 'validateToken'])->name('auth.validate.token');
     Route::post('/reset-password', [AuthController::class, 'resetPassword'])->name('auth.reset.password');
+    Route::get('/terms-and-conditions', [AuthController::class, 'showTermsAndConditions'])->name('show.terms.and.conditions');
     Route::get('/social-login-links', [AuthController::class, 'showSocialLoginLinks'])->name('show.social.login.links');
 
     Route::middleware('auth:sanctum')->group(function () {
         Route::post('/logout', [AuthController::class, 'logout'])->name('auth.logout');
         Route::get('/user', [AuthController::class, 'showAuthUser'])->name('auth.show.user');
-        Route::post('/update', [AuthController::class, 'updateAuthUser'])->name('auth.update.user');
+        Route::put('/user', [AuthController::class, 'updateAuthUser'])->name('auth.update.user');
     });
 });

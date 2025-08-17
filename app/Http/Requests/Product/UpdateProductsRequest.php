@@ -30,7 +30,7 @@ class UpdateProductsRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'store_id' => ['required', 'uuid', 'exists:stores,id'],
+            'store_id' => ['required', 'uuid'],
             'products' => ['required', 'array', 'min:1'],
             'products.*.id' => ['required', 'uuid'],
             'products.*.name' => ['sometimes', 'string', 'max:60'],
@@ -39,19 +39,7 @@ class UpdateProductsRequest extends FormRequest
             'products.*.visibility_expires_at' => ['nullable', 'date'],
             'products.*.show_description' => ['nullable', 'boolean'],
             'products.*.description' => ['nullable', 'string', 'max:500'],
-            'products.*.sku' => [
-                'nullable',
-                'string',
-                'max:50',
-                function ($attribute, $value, $fail) {
-                    $index = explode('.', $attribute)[1];
-                    $storeId = $this->input("store_id");
-                    $productId = $this->input("products.$index.id");
-                    if ($value && Product::where('sku', $value)->where('id', '!=', $productId)->where('store_id', $storeId)->exists()) {
-                        $fail('This SKU is already in use.');
-                    }
-                }
-            ],
+            'products.*.sku' => ['nullable', 'string', 'max:50'],
             'products.*.barcode' => ['nullable', 'string', 'max:50'],
             'products.*.unit_weight' => ['nullable', 'numeric', 'min:0'],
             'products.*.is_free' => ['nullable', 'boolean'],
@@ -117,7 +105,6 @@ class UpdateProductsRequest extends FormRequest
         return [
             'store_id.required' => 'The store ID is required.',
             'store_id.uuid' => 'The store ID must be a valid UUID.',
-            'store_id.exists' => 'The specified store does not exist.',
             'products.required' => 'At least one product is required.',
             'products.array' => 'The products must be an array.',
             'products.min' => 'At least one product must be provided.',

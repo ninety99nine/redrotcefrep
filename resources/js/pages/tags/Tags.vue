@@ -7,7 +7,7 @@
 
         <div class="relative bg-white/80 p-4 rounded-md">
 
-            <h1 class="text-lg text-gray-700 font-semibold mb-4">Tags</h1>
+            <h1 class="text-lg text-gray-700 font-semibold mb-4">{{ isShowingProductTags ? 'Product Tags' : 'Customer Tags' }}</h1>
 
             <!-- Tags Table -->
             <Table
@@ -135,6 +135,11 @@
                                 <!-- Products -->
                                 <td v-else-if="column.name == 'Products'" class="align-center pr-4 py-4 text-sm">
                                     <Pill type="light" size="xs">{{ tag.products_count ? tag.products_count : 'none' }}</Pill>
+                                </td>
+
+                                <!-- Customers -->
+                                <td v-else-if="column.name == 'Customers'" class="align-center pr-4 py-4 text-sm">
+                                    <Pill type="light" size="xs">{{ tag.customers_count ? tag.customers_count : 'none' }}</Pill>
                                 </td>
 
                                 <!-- Created Date -->
@@ -321,9 +326,9 @@
 
             <template #content>
 
-                <p class="text-lg font-bold border-b border-dashed pb-4 mb-4">Delete Tags</p>
+                <p class="text-lg font-bold border-b border-gray-300 border-dashed pb-4 mb-4">Delete Tags</p>
 
-                <div class="flex space-x-2 items-center p-4 text-xs bg-red-50 border border-red-200 border-dashed rounded-lg mb-8">
+                <div class="flex space-x-2 items-center p-4 text-xs bg-red-50 rounded-lg mb-8">
 
                     <svg class="w-6 h-6 text-red-500 shrink-0" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 3.75h.008v.008H12v-.008Z" />
@@ -404,7 +409,7 @@
                 whatsappFields: this.prepareWhatsappFields(),
                 bulkSelectionOptions: [
                     {
-                        label: 'Send Whatsapp',
+                        label: 'Send as Whatsapp',
                         action: this.showSendToWhatsappModal,
                     },
                     {
@@ -426,6 +431,12 @@
                     return acc;
                 }, {});
             },
+            $route(to, from) {
+                if (['show-product-tags', 'show-customer-tags'].includes(to.name)) {
+                    this.showTags();
+                    this.columns = this.prepareColumns();
+                }
+            }
         },
         computed: {
             store() {
@@ -446,13 +457,16 @@
             hasSortingExpressions() {
                 return this.sortingExpressions.length > 0;
             },
+            isShowingProductTags() {
+                return this.$route.name == 'show-product-tags';
+            },
         },
         methods: {
             formattedDatetime: formattedDatetime,
             formattedRelativeDate: formattedRelativeDate,
             prepareColumns() {
-                const columnNames = ['Name', 'Products', 'Created Date'];
-                const defaultColumnNames  = ['Name', 'Products', 'Created Date'];
+                const columnNames = ['Name', this.$route.name == 'show-product-tags' ? 'Products' : 'Customers', 'Created Date'];
+                const defaultColumnNames  = ['Name', this.$route.name == 'show-product-tags' ? 'Products' : 'Customers', 'Created Date'];
 
                 return columnNames.map(name => ({
                     name,
@@ -461,8 +475,8 @@
                 }));
             },
             prepareWhatsappFields() {
-                const whatsappFieldNames = ['Name', 'Products', 'Created Date', 'Tag Link'];
-                const defaultWhatsappFieldNames  = ['Name', 'Products', 'Created Date'];
+                const whatsappFieldNames = ['Name', this.$route.name == 'show-product-tags' ? 'Products' : 'Customers', 'Created Date', 'Tag Link'];
+                const defaultWhatsappFieldNames  = ['Name', this.$route.name == 'show-product-tags' ? 'Products' : 'Customers', 'Created Date'];
 
                 return whatsappFieldNames.map(name => ({
                     name,
@@ -489,7 +503,7 @@
             },
             onView(tag) {
                 this.$router.push({
-                    name: 'edit-tag',
+                    name: this.$route.name == 'show-product-tags' ? 'edit-product-tag' : 'edit-customer-tag',
                     params: {
                         tag_id: tag.id
                     },
@@ -503,7 +517,7 @@
             },
             onAddTag() {
                 this.$router.push({
-                    name: 'create-tag',
+                    name: this.$route.name == 'show-product-tags' ? 'create-product-tag' : 'create-customer-tag',
                     query: { store_id: this.store.id }
                 });
             },
@@ -549,12 +563,21 @@
 
                     this.cancelTokenSource = axios.CancelToken.source(); // Create a new cancel token source
 
-                    const config = {
+                    let filter = null;
+
+                    if(this.$route.name == 'show-customer-tags') {
+                        filter = 'type:eq:customer';
+                    }else if(this.$route.name == 'show-product-tags') {
+                        filter = 'type:eq:product';
+                    }
+
+                    let config = {
                         params: {
                             page: page,
+                            _filters: filter,
                             per_page: this.perPage,
                             store_id: this.store.id,
-                            _countable_relationships: ['products'].join(',')
+                            _countable_relationships: [this.$route.name == 'show-product-tags' ? 'products' : 'customers'].join(',')
                         },
                         cancelToken: this.cancelTokenSource.token // Attach cancel token
                     }
@@ -562,7 +585,7 @@
                     if(this.hasSearchTerm) config.params['search'] = this.searchTerm;
 
                     if(this.hasFilterExpressions) {
-                        config.params['_filters'] = this.filterExpressions.join('|');
+                        config.params['_filters'] = filter + '|' + this.filterExpressions.join('|');
                     }
 
                     if(this.hasSortingExpressions) {
@@ -708,8 +731,8 @@
                                 case "Name":
                                     tagMessage += `${checkedTags[i].name}\n`;
                                     break;
-                                case "Products":
-                                    tagMessage += `${checkedTags[i].products_count}\n`;
+                                case (this.$route.name == 'show-product-tags' ? 'Products' : 'Customers'):
+                                    tagMessage += `${ this.$route.name == 'show-product-tags' ? checkedTags[i].products_count : checkedTags[i].customers_count }\n`;
                                     break;
                                 case "Created Date":
                                     tagMessage += `${checkedTags[i].created_at}\n`;

@@ -26,7 +26,7 @@ class DeleteStoresRequest extends FormRequest
     {
         return [
             'store_ids' => ['required', 'array', 'min:1'],
-            'store_ids.*' => ['uuid', 'exists:stores,id'],
+            'store_ids.*' => ['uuid'],
         ];
     }
 
@@ -42,7 +42,6 @@ class DeleteStoresRequest extends FormRequest
             'store_ids.array' => 'The store IDs must be an array.',
             'store_ids.min' => 'At least one store ID is required.',
             'store_ids.*.uuid' => 'Each store ID must be a valid UUID.',
-            'store_ids.*.exists' => 'One or more store IDs do not exist.',
         ];
     }
 }

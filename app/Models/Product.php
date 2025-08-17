@@ -102,7 +102,7 @@ class Product extends Model
     }
 
     /**
-     * Get the user.
+     * Get user.
      *
      * @return BelongsTo
      */
@@ -112,7 +112,7 @@ class Product extends Model
     }
 
     /**
-     * Get the store.
+     * Get store.
      *
      * @return BelongsTo
      */
@@ -122,7 +122,7 @@ class Product extends Model
     }
 
     /**
-     * Get the product variant.
+     * Get product variant.
      *
      * @return hasOne
      */
@@ -132,7 +132,7 @@ class Product extends Model
     }
 
     /**
-     * Get the product variants.
+     * Get product variants.
      *
      * @return hasMany
      */
@@ -142,7 +142,7 @@ class Product extends Model
     }
 
     /**
-     * Get the parent product.
+     * Get parent product.
      *
      * @return BelongsTo
      */
@@ -152,7 +152,7 @@ class Product extends Model
     }
 
     /**
-     * Get the tags.
+     * Get tags.
      *
      * @return BelongsToMany
      */
@@ -162,7 +162,7 @@ class Product extends Model
     }
 
     /**
-     * Get the categories.
+     * Get categories.
      *
      * @return BelongsToMany
      */
@@ -172,7 +172,7 @@ class Product extends Model
     }
 
     /**
-     * Get the delivery methods.
+     * Get delivery methods.
      *
      * @return BelongsToMany
      */
@@ -182,7 +182,7 @@ class Product extends Model
     }
 
     /**
-     * Get the photo.
+     * Get photo.
      *
      * @return MorphOne
      */
@@ -192,7 +192,7 @@ class Product extends Model
     }
 
     /**
-     * Get the photos.
+     * Get photos.
      *
      * @return MorphMany
      */
@@ -202,7 +202,7 @@ class Product extends Model
     }
 
     /**
-     * Get the media files (photos and other media file types).
+     * Get media files (photos and other media file types).
      *
      * @return MorphMany
      */

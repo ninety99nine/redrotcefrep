@@ -28,8 +28,8 @@ class ShowDeliveryAddressesRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'delivery_address_id' => ['sometimes', 'uuid', 'exists:delivery_addresses,id'],
-            'order_id' => ['sometimes', 'uuid', 'exists:orders,id'],
+            'delivery_address_id' => ['sometimes', 'uuid'],
+            'order_id' => ['sometimes', 'uuid'],
             'association' => ['sometimes', Rule::enum(Association::class)->only([Association::ASSOCIATED, Association::UNASSOCIATED])],
         ];
     }
@@ -43,9 +43,7 @@ class ShowDeliveryAddressesRequest extends FormRequest
     {
         return [
             'delivery_address_id.uuid' => 'The delivery address ID must be a valid UUID.',
-            'delivery_address_id.exists' => 'The specified delivery address does not exist.',
             'order_id.uuid' => 'The order ID must be a valid UUID.',
-            'order_id.exists' => 'The specified order does not exist.',
             'association.enum' => 'The association must be one of: ' . Arr::join([Association::ASSOCIATED->value, Association::UNASSOCIATED->value], ', ', ' or '),
         ];
     }

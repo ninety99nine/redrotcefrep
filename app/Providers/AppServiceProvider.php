@@ -8,6 +8,7 @@ use App\Models\Store;
 use App\Models\Address;
 use App\Models\Product;
 use App\Models\Category;
+use App\Models\Customer;
 use App\Models\Promotion;
 use App\Models\MediaFile;
 use App\Models\StoreQuota;
@@ -21,6 +22,7 @@ use App\Models\DeliveryMethod;
 use App\Models\DeliveryAddress;
 use App\Observers\StoreObserver;
 use App\Models\StorePaymentMethod;
+use App\Http\Middleware\SetUssdUser;
 use App\Listeners\RoleEventListener;
 use App\Models\AiAssistantTokenUsage;
 use Illuminate\Support\Facades\Route;
@@ -52,6 +54,7 @@ class AppServiceProvider extends ServiceProvider
             'order' => 'App\Models\Order',
             'store' => 'App\Models\Store',
             'product' => 'App\Models\Product',
+            'customer' => 'App\Models\Customer',
             'category' => 'App\Models\Category',
             'transaction' => 'App\Models\Transaction',
             'pricing plan' => 'App\Models\PricingPlan',
@@ -77,6 +80,7 @@ class AppServiceProvider extends ServiceProvider
 
         $kernel->addToMiddlewarePriorityBefore(
             SubstituteBindings::class,
+            SetUssdUser::class,
             StorePermission::class
         );
     }
@@ -133,6 +137,12 @@ class AppServiceProvider extends ServiceProvider
         Route::bind('product', function ($value) {
             $allowedRoutes = ['show.product'];
             return $this->applyEagerLoading(Product::query(), $allowedRoutes)->findOrFail($value);
+        });
+
+        // Bind Customer model
+        Route::bind('customer', function ($value) {
+            $allowedRoutes = ['show.customer'];
+            return $this->applyEagerLoading(Customer::query(), $allowedRoutes)->findOrFail($value);
         });
 
         // Bind Tag model

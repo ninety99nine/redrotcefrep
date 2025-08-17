@@ -28,7 +28,7 @@ class ShowOrderCommentsRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'order_id' => ['required_without:association', 'uuid', 'exists:orders,id'],
+            'order_id' => ['required_without:association', 'uuid'],
             'association' => ['sometimes', Rule::enum(Association::class)->only([Association::SUPER_ADMIN])]
         ];
     }
@@ -43,7 +43,6 @@ class ShowOrderCommentsRequest extends FormRequest
         return [
             'order_id.required_without' => 'The order ID is required when association is not provided.',
             'order_id.uuid' => 'The order ID must be a valid UUID.',
-            'order_id.exists' => 'The specified order does not exist.',
             'association.enum' => 'The association must be one of: ' . Arr::join([Association::SUPER_ADMIN->value], ', ', ' or '),
         ];
     }

@@ -12,7 +12,7 @@ Route::middleware(['auth:sanctum'])
         Route::post('/', 'createPricingPlan')->name('create.pricing.plan');
         Route::delete('/', 'deletePricingPlans')->name('delete.pricing.plans');
 
-        Route::middleware([StorePermission::class])->prefix('{pricingPlan}')->group(function () {
+        Route::middleware(['store.permission'])->prefix('{pricingPlan}')->group(function () {
             Route::get('/', 'showPricingPlan')->name('show.pricing.plan');
             Route::put('/', 'updatePricingPlan')->name('update.pricing.plan');
             Route::delete('/', 'deletePricingPlan')->name('delete.pricing.plan');

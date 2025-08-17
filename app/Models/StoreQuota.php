@@ -54,7 +54,7 @@ class StoreQuota extends Model
     }
 
     /**
-     * Get the store.
+     * Get store.
      *
      * @return BelongsTo
      */

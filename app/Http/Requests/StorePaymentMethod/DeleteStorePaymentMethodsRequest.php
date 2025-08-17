@@ -23,9 +23,9 @@ class DeleteStorePaymentMethodsRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'store_id' => ['required', 'uuid', 'exists:stores,id'],
+            'store_id' => ['required', 'uuid'],
             'store_payment_method_ids' => ['required', 'array'],
-            'store_payment_method_ids.*' => ['uuid', 'exists:store_payment_method,id'],
+            'store_payment_method_ids.*' => ['uuid'],
         ];
     }
 }

@@ -26,8 +26,8 @@ class DownloadOrdersRequest extends FormRequest
     {
         return [
             'order_ids' => ['required', 'array', 'min:1'],
-            'order_ids.*' => ['uuid', 'exists:orders,id'],
-            'store_id' => ['sometimes', 'uuid', 'exists:stores,id'],
+            'order_ids.*' => ['uuid'],
+            'store_id' => ['sometimes', 'uuid'],
         ];
     }
 
@@ -43,9 +43,7 @@ class DownloadOrdersRequest extends FormRequest
             'order_ids.array' => 'The order IDs must be an array.',
             'order_ids.min' => 'At least one order ID is required.',
             'order_ids.*.uuid' => 'Each order ID must be a valid UUID.',
-            'order_ids.*.exists' => 'One or more order IDs do not exist.',
             'store_id.uuid' => 'The store ID must be a valid UUID.',
-            'store_id.exists' => 'The specified store does not exist.',
         ];
     }
 }

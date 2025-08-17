@@ -178,7 +178,77 @@ const routes = [
                         path: ':product_id',
                         name: 'edit-product',
                         component: () => import('@Pages/products/product/Product.vue')
-                    }
+                    },
+                    {
+                        path: 'tags',
+                        children: [
+                            {
+                                path: '',
+                                name: 'show-product-tags',
+                                component: () => import('@Pages/tags/Tags.vue')
+                            },
+                            {
+                                path: 'create',
+                                name: 'create-product-tag',
+                                component: () => import('@Pages/tags/tag/Tag.vue')
+                            },
+                            {
+                                path: ':tag_id',
+                                name: 'edit-product-tag',
+                                component: () => import('@Pages/tags/tag/Tag.vue')
+                            }
+                        ]
+                    },
+                ]
+            },
+            {
+                path: 'customers',
+                children: [
+                    {
+                        path: '',
+                        name: 'show-customers',
+                        component: () => import('@Pages/customers/Customers.vue')
+                    },
+                    {
+                        path: 'create',
+                        name: 'create-customer',
+                        component: () => import('@Pages/customers/customer/Customer.vue')
+                    },
+                    {
+                        path: 'import-customers',
+                        name: 'import-customers',
+                        component: () => import('@Pages/customers/import-customers/ImportCustomers.vue')
+                    },
+                    {
+                        path: 'bulk-edit',
+                        name: 'bulk-edit-customers',
+                        component: () => import('@Pages/customers/bulk-edit-customers/BulkEditCustomers.vue')
+                    },
+                    {
+                        path: ':customer_id',
+                        name: 'edit-customer',
+                        component: () => import('@Pages/customers/customer/Customer.vue')
+                    },
+                    {
+                        path: 'tags',
+                        children: [
+                            {
+                                path: '',
+                                name: 'show-customer-tags',
+                                component: () => import('@Pages/tags/Tags.vue')
+                            },
+                            {
+                                path: 'create',
+                                name: 'create-customer-tag',
+                                component: () => import('@Pages/tags/tag/Tag.vue')
+                            },
+                            {
+                                path: ':tag_id',
+                                name: 'edit-customer-tag',
+                                component: () => import('@Pages/tags/tag/Tag.vue')
+                            }
+                        ]
+                    },
                 ]
             },
             {
@@ -198,26 +268,6 @@ const routes = [
                         path: ':category_id',
                         name: 'edit-category',
                         component: () => import('@Pages/categories/category/Category.vue')
-                    }
-                ]
-            },
-            {
-                path: 'tags',
-                children: [
-                    {
-                        path: '',
-                        name: 'show-tags',
-                        component: () => import('@Pages/tags/Tags.vue')
-                    },
-                    {
-                        path: 'create',
-                        name: 'create-tag',
-                        component: () => import('@Pages/tags/tag/Tag.vue')
-                    },
-                    {
-                        path: ':tag_id',
-                        name: 'edit-tag',
-                        component: () => import('@Pages/tags/tag/Tag.vue')
                     }
                 ]
             },

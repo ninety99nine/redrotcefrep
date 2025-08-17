@@ -26,7 +26,7 @@ class DeleteMediaFilesRequest extends FormRequest
     {
         return [
             'media_file_ids' => ['required', 'array', 'min:1'],
-            'media_file_ids.*' => ['uuid', 'exists:media_files,id'],
+            'media_file_ids.*' => ['uuid'],
         ];
     }
 
@@ -42,7 +42,6 @@ class DeleteMediaFilesRequest extends FormRequest
             'media_file_ids.array' => 'The media file IDs must be an array.',
             'media_file_ids.min' => 'At least one media file ID is required.',
             'media_file_ids.*.uuid' => 'Each media file ID must be a valid UUID.',
-            'media_file_ids.*.exists' => 'One or more media file IDs do not exist.',
         ];
     }
 }

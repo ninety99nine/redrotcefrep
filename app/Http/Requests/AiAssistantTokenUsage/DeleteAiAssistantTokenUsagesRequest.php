@@ -26,7 +26,7 @@ class DeleteAiAssistantTokenUsagesRequest extends FormRequest
     {
         return [
             'ai_assistant_token_usage_ids' => ['required', 'array', 'min:1'],
-            'ai_assistant_token_usage_ids.*' => ['uuid', 'exists:ai_assistant_token_usage,id'],
+            'ai_assistant_token_usage_ids.*' => ['uuid'],
         ];
     }
 
@@ -42,7 +42,6 @@ class DeleteAiAssistantTokenUsagesRequest extends FormRequest
             'ai_assistant_token_usage_ids.array' => 'The AI assistant token usage IDs must be an array.',
             'ai_assistant_token_usage_ids.min' => 'At least one AI assistant token usage ID is required.',
             'ai_assistant_token_usage_ids.*.uuid' => 'Each AI assistant token usage ID must be a valid UUID.',
-            'ai_assistant_token_usage_ids.*.exists' => 'One or more AI assistant token usage IDs do not exist.',
         ];
     }
 }

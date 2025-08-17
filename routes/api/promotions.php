@@ -5,7 +5,7 @@ use App\Http\Middleware\StorePermission;
 use App\Http\Controllers\PromotionController;
 
 Route::prefix('promotions')
-    ->middleware(['auth:sanctum', StorePermission::class])
+    ->middleware(['auth:sanctum', 'store.permission'])
     ->controller(PromotionController::class)
     ->group(function () {
         Route::get('/', 'showPromotions')->name('show.promotions');

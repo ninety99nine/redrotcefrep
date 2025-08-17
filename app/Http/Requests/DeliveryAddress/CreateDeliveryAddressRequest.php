@@ -39,7 +39,7 @@ class CreateDeliveryAddressRequest extends FormRequest
             'latitude' => ['nullable', 'numeric', 'min:-90', 'max:90'],
             'longitude' => ['nullable', 'numeric', 'min:-180', 'max:180'],
             'description' => ['nullable', 'string'],
-            'order_id' => ['required', 'uuid', 'exists:orders,id'],
+            'order_id' => ['required', 'uuid'],
         ];
     }
 
@@ -75,7 +75,6 @@ class CreateDeliveryAddressRequest extends FormRequest
             'longitude.max' => 'The longitude must not exceed 180.',
             'order_id.required' => 'The order ID is required.',
             'order_id.uuid' => 'The order ID must be a valid UUID.',
-            'order_id.exists' => 'The specified order does not exist.',
         ];
     }
 }

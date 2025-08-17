@@ -51,7 +51,7 @@
 
                         <!-- Name Input -->
                         <Input
-                            type=text
+                            type="text"
                             label="Name"
                             placeholder="Main Dish"
                             v-model="tagForm.name"
@@ -68,13 +68,14 @@
 
                     <BackdropLoader v-if="isLoadingTag || isSubmitting" :showSpinningLoader="false" class="rounded-lg"></BackdropLoader>
 
-                    <TagProducts></TagProducts>
+                    <TagProducts v-if="isEditingProductTag || isCreatingProductTag"></TagProducts>
+                    <TagCustomers v-else></TagCustomers>
 
                 </div>
 
                 <div
                     v-if="tag"
-                    :class="['flex items-center justify-between space-x-4 overflow-hidden rounded-lg p-4 border', isLoadingTag ? 'border-gray-300 bg-gray-50' : 'border-red-300 bg-red-50']">
+                    :class="['flex items-center justify-between space-x-4 overflow-hidden rounded-lg p-4 border mb-20', isLoadingTag ? 'border-gray-300 bg-gray-50' : 'border-red-300 bg-red-50']">
 
                     <div class="space-y-2">
                         <p>Delete <span class="font-bold text-black">{{ tagForm.name }}</span>?</p>
@@ -90,6 +91,7 @@
                             triggerText="Delete Tag"
                             approveText="Delete Tag"
                             :approveAction="deleteTag"
+                            :triggerLoading="isDeletingTag"
                             :approveLoading="isDeletingTag">
 
                             <template #content>
@@ -123,11 +125,12 @@
     import { Trash2, MoveLeft } from 'lucide-vue-next';
     import BackdropLoader from '@Partials/BackdropLoader.vue';
     import TagProducts from '@Pages/tags/tag/tag-products/TagProducts.vue';
+    import TagCustomers from '@Pages/tags/tag/tag-customers/TagCustomers.vue';
 
     export default {
         inject: ['formState', 'storeState', 'tagState', 'changeHistoryState', 'notificationState'],
         components: {
-            Input, Modal, Button, Loader, Popover, Skeleton, BackdropLoader, TagProducts
+            Input, Modal, Button, Loader, Popover, Skeleton, BackdropLoader, TagProducts, TagCustomers
         },
         data() {
             return {
@@ -147,7 +150,7 @@
                     this.setup();
                     this.setActionButtons();
                 }
-            },
+            }
         },
         computed: {
             store() {
@@ -169,10 +172,16 @@
                 return this.tagState.isLoadingTag;
             },
             isEditing() {
-                return this.$route.name === 'edit-tag';
+                return ['edit-product-tag', 'edit-customer-tag'].includes(this.$route.name);
             },
             isCreating() {
-                return this.$route.name === 'create-tag';
+                return ['create-product-tag', 'create-customer-tag'].includes(this.$route.name);
+            },
+            isEditingProductTag() {
+                return this.$route.name == 'edit-product-tag';
+            },
+            isCreatingProductTag() {
+                return this.$route.name == 'create-product-tag';
             },
             tagForm() {
                 return this.tagState.tagForm;
@@ -195,7 +204,7 @@
             },
             async navigateToTags() {
                 await this.$router.replace({
-                    name: 'show-tags',
+                    name: this.isEditingProductTag || this.isCreatingProductTag ? 'show-product-tags' : 'show-customer-tags',
                     query: {
                         store_id: this.store.id,
                         searchTerm: this.$route.query.searchTerm,
@@ -206,7 +215,7 @@
             },
             async onView(tag) {
                 await this.$router.push({
-                    name: 'edit-tag',
+                    name: this.$route.name == 'create-product-tag' ? 'edit-product-tag' : 'edit-customer-tag',
                     params: {
                         tag_id: tag.id
                     },
@@ -226,7 +235,7 @@
                     let config = {
                         params: {
                             store_id: this.store.id,
-                            _relationships: ['products.photo'].join(',')
+                            _relationships: [this.isEditingProductTag || this.isCreatingProductTag ? 'products.photo' : 'customers'].join(',')
                         }
                     };
 
@@ -343,7 +352,7 @@
                     this.formState.setServerFormErrors(error);
                     console.error('Failed to update tag:', error);
                 } finally {
-                    this.tagState.isUpdatingTag = true;
+                    this.tagState.isUpdatingTag = false;
                     this.changeHistoryState.actionButtons[1].loading = false;
                 }
 

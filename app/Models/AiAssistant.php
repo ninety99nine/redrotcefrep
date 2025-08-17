@@ -57,7 +57,7 @@ class AiAssistant extends Model
     }
 
     /**
-     * Get the user.
+     * Get user.
      *
      * @return BelongsTo
      */
@@ -67,7 +67,7 @@ class AiAssistant extends Model
     }
 
     /**
-     * Get the transactions.
+     * Get transactions.
      *
      * @return HasMany
      */
@@ -77,7 +77,7 @@ class AiAssistant extends Model
     }
 
     /**
-     * Get the ai assistant token usage.
+     * Get ai assistant token usage.
      *
      * @return HasMany
      */
@@ -87,7 +87,7 @@ class AiAssistant extends Model
     }
 
     /**
-     *  Get the subscriptions.
+     *  Get subscriptions.
      */
     public function subscriptions()
     {

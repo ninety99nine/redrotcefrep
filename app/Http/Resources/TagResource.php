@@ -19,6 +19,7 @@ class TagResource extends JsonResource
         return [
             'id' => $this->id,
             'name' => $this->name,
+            'type' => $this->type,
             'store_id' => $this->store_id,
             'created_at' => $this->created_at->toDateTimeString(),
             'updated_at' => $this->updated_at->toDateTimeString(),
@@ -27,6 +28,7 @@ class TagResource extends JsonResource
             'products' => ProductResource::collection($this->whenLoaded('products')),
 
             'products_count' => $this->whenCounted('products'),
+            'customers_count' => $this->whenCounted('customers'),
         ];
     }
 }

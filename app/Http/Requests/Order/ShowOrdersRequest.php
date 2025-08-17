@@ -28,13 +28,13 @@ class ShowOrdersRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'user_id' => ['sometimes', 'uuid', 'exists:users,id'],
-            'order_id' => ['sometimes', 'uuid', 'exists:orders,id'],
-            'store_id' => ['sometimes', 'uuid', 'exists:stores,id'],
-            'customer_id' => ['sometimes', 'uuid', 'exists:customers,id'],
-            'placed_by_user_id' => ['sometimes', 'uuid', 'exists:users,id'],
-            'created_by_user_id' => ['sometimes', 'uuid', 'exists:users,id'],
-            'assigned_to_user_id' => ['sometimes', 'uuid', 'exists:users,id'],
+            'user_id' => ['sometimes', 'uuid'],
+            'order_id' => ['sometimes', 'uuid'],
+            'store_id' => ['sometimes', 'uuid'],
+            'customer_id' => ['sometimes', 'uuid'],
+            'placed_by_user_id' => ['sometimes', 'uuid'],
+            'created_by_user_id' => ['sometimes', 'uuid'],
+            'assigned_to_user_id' => ['sometimes', 'uuid'],
             'association' => ['sometimes', Rule::enum(Association::class)->only([Association::SUPER_ADMIN, Association::TEAM_MEMBER])],
         ];
     }
@@ -48,11 +48,8 @@ class ShowOrdersRequest extends FormRequest
     {
         return [
             'order_id.uuid' => 'The order ID must be a valid UUID.',
-            'order_id.exists' => 'The specified order does not exist.',
             'store_id.uuid' => 'The store ID must be a valid UUID.',
-            'store_id.exists' => 'The specified store does not exist.',
             'customer_id.uuid' => 'The customer ID must be a valid UUID.',
-            'customer_id.exists' => 'The specified customer does not exist.',
             'association.enum' => 'The association must be one of: ' . Arr::join([Association::SUPER_ADMIN->value, Association::TEAM_MEMBER->value], ', ', ' or '),
         ];
     }

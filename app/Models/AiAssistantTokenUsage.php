@@ -53,7 +53,7 @@ class AiAssistantTokenUsage extends Model
     }
 
     /**
-     * Get the AI assistant.
+     * Get AI assistant.
      *
      * @return BelongsTo
      */

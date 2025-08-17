@@ -2012,6 +2012,16 @@ class PaymentMethodSeeder extends Seeder
                     'ZW'  // Zimbabwe
                 ]
             ],
+
+            [
+                'active' => 1,
+                'name' => 'Orange Airtime',
+                'type' => PaymentMethodType::ORANGE_AIRTIME,
+                'automated_verification' => true,
+                'countries' => [
+                    'BW', // Botswana
+                ]
+            ],
         ];
     }
 }

@@ -12,7 +12,7 @@ Route::middleware(['auth:sanctum'])
         Route::post('/', 'createSubscription')->name('create.subscription');
         Route::delete('/', 'deleteSubscriptions')->name('delete.subscriptions');
 
-        Route::middleware([StorePermission::class])->prefix('{subscription}')->group(function () {
+        Route::middleware(['store.permission'])->prefix('{subscription}')->group(function () {
             Route::get('/', 'showSubscription')->name('show.subscription');
             Route::put('/', 'updateSubscription')->name('update.subscription');
             Route::delete('/', 'deleteSubscription')->name('delete.subscription');

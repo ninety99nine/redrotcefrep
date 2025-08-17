@@ -29,8 +29,8 @@ class CreateCategoryRequest extends FormRequest
             'visible' => ['nullable', 'boolean'],
             'description' => ['nullable', 'string', 'max:100'],
             'product_ids' => ['nullable', 'array'],
-            'product_ids.*' => ['uuid', 'exists:products,id'],
-            'store_id' => ['required', 'uuid', 'exists:stores,id'],
+            'product_ids.*' => ['uuid'],
+            'store_id' => ['required', 'uuid'],
             'photo' => ['nullable', 'file', 'mimes:jpeg,png,jpg,gif,webp,svg', 'max:5120']
         ];
     }
@@ -50,10 +50,8 @@ class CreateCategoryRequest extends FormRequest
             'description.max' => 'The description must not exceed 100 characters.',
             'product_ids.array' => 'The product IDs must be an array.',
             'product_ids.*.uuid' => 'Each product ID must be a valid UUID.',
-            'product_ids.*.exists' => 'One or more product IDs do not exist.',
             'store_id.required' => 'The store ID is required.',
             'store_id.uuid' => 'The store ID must be a valid UUID.',
-            'store_id.exists' => 'The specified store does not exist.',
             'photo.file' => 'The photo must be a valid file.',
             'photo.mimes' => 'The photo must be a JPEG, PNG, JPG, GIF, or SVG.',
             'photo.max' => 'The photo size must not exceed 5MB.'

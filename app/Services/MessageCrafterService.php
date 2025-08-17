@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\Order;
+use App\Models\PricingPlan;
 use Carbon\Carbon;
 use App\Models\Store;
 use App\Models\Transaction;
@@ -10,6 +11,17 @@ use App\Models\Subscription;
 
 class MessageCrafterService
 {
+    /**
+     *  Craft the store trial subscription paid messsage.
+     *
+     *  @param Store $store
+     *  @param Transaction $transaction
+     *  @param Subscription $subscription
+     *  @return string
+     */
+    public function craftStoreTrialSubscriptionMessage(Store $store, PricingPlan $pricingPlan) {
+        return $store->name.' is now open! Enjoy ' . $pricingPlan->trial_days . ' DAYS FREE to showcase products, reach customers & make sales. After that, keep growing for just '.$pricingPlan->price->amount_with_currency.'/'.$pricingPlan->metadata['store_subscription']['frequency'].'.';
+    }
     /**
      *  Craft the store subscription paid messsage.
      *
@@ -29,8 +41,8 @@ class MessageCrafterService
      *  @return string
      */
     public function craftStoreMarketingMessage(Store $store) {
-        return 'Your store '.$store->name.' is live! Customers can order via '.$store->ussd_shortcode.'. Share on WhatsApp, Facebook & flyers!';
-        //  return 'Your store '.$store->name.' is live! Customers can order via '.$store->ussd_shortcode.' or ' . $store->web_link . '. Share on WhatsApp, Facebook & flyers!';
+        return $store->name.' is live! Customers can order via '.$store->ussd_shortcode.'. Share on WhatsApp, Facebook & flyers!';
+        //  return $store->name.' is live! Customers can order via '.$store->ussd_shortcode.' or ' . $store->web_link . '. Share on WhatsApp, Facebook & flyers!';
     }
 
     /**

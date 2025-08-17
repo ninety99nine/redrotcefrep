@@ -51,7 +51,7 @@
 
                         <!-- Name Input -->
                         <Input
-                            type=text
+                            type="text"
                             label="Name"
                             v-model="productForm.name"
                             placeholder="Standard Ticket"
@@ -89,7 +89,7 @@
 
                         <!-- Download Link Input -->
                         <Input
-                            type=text
+                            type="text"
                             label="Download Link"
                             externalLinkName="Learn more"
                             v-model="productForm.download_link"
@@ -219,7 +219,7 @@
                                 <Input
                                     type="money"
                                     label="Regular Price"
-                                    :currency="store.currency"
+                                    :currency="store?.currency"
                                     v-model="productForm.unit_regular_price"
                                     :errorText="formState.getFormError('unit_regular_price')"
                                     @input="productState.saveStateDebounced('Regular price changed')"
@@ -230,7 +230,7 @@
                                 <Input
                                     type="money"
                                     label="Sale Price"
-                                    :currency="store.currency"
+                                    :currency="store?.currency"
                                     v-model="productForm.unit_sale_price"
                                     :errorText="formState.getFormError('unit_sale_price')"
                                     @input="productState.saveStateDebounced('Sale price changed')"
@@ -243,7 +243,7 @@
                             <Input
                                 type="money"
                                 label="Cost Price"
-                                :currency="store.currency"
+                                :currency="store?.currency"
                                 description="Invisible to customers"
                                 v-model="productForm.unit_cost_price"
                                 :errorText="formState.getFormError('unit_cost_price')"
@@ -294,7 +294,7 @@
                             <!-- Tax Overide Input -->
                             <Input
                                 type="money"
-                                :currency="store.currency"
+                                :currency="store?.currency"
                                 v-if="productForm.tax_overide"
                                 v-model="productForm.tax_overide_amount"
                                 :errorText="formState.getFormError('tax_overide_amount')"
@@ -379,7 +379,7 @@
 
                                             <!-- Name Input -->
                                             <Input
-                                                type=text
+                                                type="text"
                                                 label="Name"
                                                 class="w-full"
                                                 placeholder="Standard Ticket"
@@ -411,7 +411,7 @@
                                         <Input
                                             type="money"
                                             label="Regular Price"
-                                            :currency="store.currency"
+                                            :currency="store?.currency"
                                             v-model="productForm.variants[index].unit_regular_price"
                                             @input="productState.saveStateDebounced('Regular price changed')"
                                             :errorText="formState.getFormError(`variants.${index}.unit_regular_price`)"
@@ -422,7 +422,7 @@
                                         <Input
                                             type="money"
                                             label="Sale Price"
-                                            :currency="store.currency"
+                                            :currency="store?.currency"
                                             v-model="productForm.variants[index].unit_sale_price"
                                             @input="productState.saveStateDebounced('Sale price changed')"
                                             :errorText="formState.getFormError(`variants.${index}.unit_sale_price`)"
@@ -833,6 +833,7 @@
                     triggerText="Delete Product"
                     approveText="Delete Product"
                     :approveAction="deleteProduct"
+                    :triggerLoading="isDeletingProduct"
                     :approveLoading="isDeletingProduct">
 
                     <template #content>
@@ -1014,7 +1015,7 @@
 
                 if(this.store) {
 
-                    this.tags = this.store.tags.map((tag) => {
+                    this.tags = this.store.product_tags.map((tag) => {
                         return {
                             label: tag.name,
                             value: tag.id
@@ -1250,6 +1251,13 @@
                             await this.createProduct(createdProduct, index);
                         }
 
+                        if(this.productForm.tags.length || this.productForm.categories.length) {
+
+                            //  Update store silently
+                            this.storeState.silentUpdate();
+
+                        }
+
                         this.notificationState.showSuccessNotification(`Product created`);
                         this.productState.saveOriginalState('Original product');
                         await this.onView(createdProduct);
@@ -1339,8 +1347,9 @@
                             await this.uploadImages(this.productForm.id);
                         }
 
+                        const originalState = this.changeHistoryState.getOriginalState();
+
                         if(this.productForm.variants.length) {
-                            const originalState = this.changeHistoryState.getOriginalState();
 
                             for (let index = 0; index < this.productForm.variants.length; index++) {
 
@@ -1363,6 +1372,13 @@
 
                         }
 
+                        if(!isEqual(this.productForm.tags, originalState.tags) || !isEqual(this.productForm.categories, originalState.categories)) {
+
+                            //  Update store silently
+                            this.storeState.silentUpdate();
+
+                        }
+
                         this.notificationState.showSuccessNotification(`Product updated`);
                         this.productState.saveOriginalState('Original product');
 
@@ -1375,7 +1391,7 @@
                     console.error('Failed to update product:', error);
                 } finally {
                     this.productState.isUploading = false;
-                    this.productState.isUpdatingProduct = true;
+                    this.productState.isUpdatingProduct = false;
                     this.changeHistoryState.actionButtons[1].loading = false;
                 }
 

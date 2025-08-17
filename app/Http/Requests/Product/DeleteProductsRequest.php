@@ -26,7 +26,7 @@ class DeleteProductsRequest extends FormRequest
     {
         return [
             'product_ids' => ['required', 'array', 'min:1'],
-            'product_ids.*' => ['uuid', 'exists:products,id'],
+            'product_ids.*' => ['uuid'],
         ];
     }
 
@@ -42,7 +42,6 @@ class DeleteProductsRequest extends FormRequest
             'product_ids.array' => 'The product IDs must be an array.',
             'product_ids.min' => 'At least one product ID is required.',
             'product_ids.*.uuid' => 'Each product ID must be a valid UUID.',
-            'product_ids.*.exists' => 'One or more product IDs do not exist.',
         ];
     }
 }

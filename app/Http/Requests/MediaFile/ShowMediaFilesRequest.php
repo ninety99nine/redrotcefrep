@@ -25,7 +25,7 @@ class ShowMediaFilesRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'media_file_id' => ['sometimes', 'uuid', 'exists:media_files,id'],
+            'media_file_id' => ['sometimes', 'uuid'],
         ];
     }
 
@@ -38,7 +38,6 @@ class ShowMediaFilesRequest extends FormRequest
     {
         return [
             'media_file_id.uuid' => 'The media file ID must be a valid UUID.',
-            'media_file_id.exists' => 'The specified media file does not exist.',
         ];
     }
 }

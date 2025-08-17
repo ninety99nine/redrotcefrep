@@ -30,7 +30,7 @@ class UpdateStoreQuotaRequest extends FormRequest
             'sms_credits_expire_at' => ['sometimes', 'nullable', 'date'],
             'email_credits_expire_at' => ['sometimes', 'nullable', 'date'],
             'whatsapp_credits_expire_at' => ['sometimes', 'nullable', 'date'],
-            'store_id' => ['sometimes', 'uuid', 'exists:stores,id'],
+            'store_id' => ['sometimes', 'uuid'],
         ];
     }
 
@@ -52,7 +52,6 @@ class UpdateStoreQuotaRequest extends FormRequest
             'email_credits_expire_at.date' => 'The email credits expiration must be a valid date.',
             'whatsapp_credits_expire_at.date' => 'The WhatsApp credits expiration must be a valid date.',
             'store_id.uuid' => 'The store ID must be a valid UUID.',
-            'store_id.exists' => 'The specified store does not exist.',
         ];
     }
 }

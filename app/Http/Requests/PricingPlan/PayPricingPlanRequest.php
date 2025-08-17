@@ -33,9 +33,9 @@ class PayPricingPlanRequest extends FormRequest
                 $pricingPlan->offersSmsCredits() ||
                 $pricingPlan->offersEmailCredits() ||
                 $pricingPlan->offersWhatsappCredits() ||
-                $pricingPlan->offersStoreSubscription() ? 'required' : 'sometimes', 'uuid', 'exists:stores,id'
+                $pricingPlan->offersStoreSubscription() ? 'required' : 'sometimes', 'uuid'
             ],
-            'payment_method_id' => ['required_without:payment_method_type', 'uuid', 'exists:payment_methods,id'],
+            'payment_method_id' => ['required_without:payment_method_type', 'uuid'],
             'payment_method_type' => ['required_without:payment_method_id','string', 'in:' . implode(',', PaymentMethodType::values())],
         ];
     }
@@ -50,10 +50,8 @@ class PayPricingPlanRequest extends FormRequest
         return [
             'store_id.required' => 'The store ID is required.',
             'store_id.uuid' => 'The store ID must be a valid UUID.',
-            'store_id.exists' => 'The specified store does not exist.',
             'payment_method_id.required_without' => 'The payment method ID is required when payment method type is not provided.',
             'payment_method_id.uuid' => 'The payment method ID must be a valid UUID.',
-            'payment_method_id.exists' => 'The specified payment method does not exist.',
             'payment_method_type.required_without' => 'The payment method type is required when payment method ID is not provided.',
             'payment_method_type.in' => 'The payment method type must be one of: ' . Arr::join(PaymentMethodType::values(), ', ', ' or '),
         ];

@@ -5,7 +5,7 @@ use App\Http\Middleware\StorePermission;
 use App\Http\Controllers\OrderCommentController;
 
 Route::prefix('order-comments')
-    ->middleware(['auth:sanctum', StorePermission::class])
+    ->middleware(['auth:sanctum', 'store.permission'])
     ->controller(OrderCommentController::class)
     ->group(function () {
         Route::get('/', 'showOrderComments')->name('show.order.comments');

@@ -366,9 +366,9 @@
 
             <template #content>
 
-                <p class="text-lg font-bold border-b border-dashed pb-4 mb-4">Delete Categories</p>
+                <p class="text-lg font-bold border-b border-gray-300 border-dashed pb-4 mb-4">Delete Categories</p>
 
-                <div class="flex space-x-2 items-center p-4 text-xs bg-red-50 border border-red-200 border-dashed rounded-lg mb-8">
+                <div class="flex space-x-2 items-center p-4 text-xs bg-red-50 rounded-lg mb-8">
 
                     <svg class="w-6 h-6 text-red-500 shrink-0" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 3.75h.008v.008H12v-.008Z" />
@@ -458,7 +458,7 @@
                         action: () => this.updateCategories('hide')
                     },
                     {
-                        label: 'Send Whatsapp',
+                        label: 'Send as Whatsapp',
                         action: this.showSendToWhatsappModal,
                     },
                     {
@@ -603,7 +603,7 @@
 
                     this.cancelTokenSource = axios.CancelToken.source(); // Create a new cancel token source
 
-                    const config = {
+                    let config = {
                         params: {
                             page: page,
                             per_page: this.perPage,

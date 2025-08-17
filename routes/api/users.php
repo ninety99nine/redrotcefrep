@@ -5,7 +5,7 @@ use App\Http\Middleware\StorePermission;
 use App\Http\Controllers\UserController;
 
 Route::prefix('users')
-    ->middleware(['auth:sanctum', StorePermission::class])
+    ->middleware(['auth:sanctum', 'store.permission'])
     ->controller(UserController::class)
     ->group(function () {
         Route::get('/', 'showUsers')->name('show.users');

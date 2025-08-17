@@ -26,7 +26,7 @@ class DeleteSubscriptionsRequest extends FormRequest
     {
         return [
             'subscription_ids' => ['required', 'array', 'min:1'],
-            'subscription_ids.*' => ['uuid', 'exists:subscriptions,id'],
+            'subscription_ids.*' => ['uuid'],
         ];
     }
 
@@ -42,7 +42,6 @@ class DeleteSubscriptionsRequest extends FormRequest
             'subscription_ids.array' => 'The subscription IDs must be an array.',
             'subscription_ids.min' => 'At least one subscription ID is required.',
             'subscription_ids.*.uuid' => 'Each subscription ID must be a valid UUID.',
-            'subscription_ids.*.exists' => 'One or more subscription IDs do not exist.',
         ];
     }
 }

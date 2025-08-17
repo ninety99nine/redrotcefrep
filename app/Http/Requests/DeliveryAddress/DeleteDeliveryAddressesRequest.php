@@ -26,7 +26,7 @@ class DeleteDeliveryAddressesRequest extends FormRequest
     {
         return [
             'delivery_address_ids' => ['required', 'array', 'min:1'],
-            'delivery_address_ids.*' => ['uuid', 'exists:delivery_addresses,id'],
+            'delivery_address_ids.*' => ['uuid'],
         ];
     }
 
@@ -42,7 +42,6 @@ class DeleteDeliveryAddressesRequest extends FormRequest
             'delivery_address_ids.array' => 'The delivery address IDs must be an array.',
             'delivery_address_ids.min' => 'At least one delivery address ID is required.',
             'delivery_address_ids.*.uuid' => 'Each delivery address ID must be a valid UUID.',
-            'delivery_address_ids.*.exists' => 'One or more delivery address IDs do not exist.',
         ];
     }
 }

@@ -28,7 +28,7 @@ class UpdateCategoryRequest extends FormRequest
             'visible' => ['nullable', 'boolean'],
             'description' => ['nullable', 'string', 'max:100'],
             'product_ids' => ['nullable', 'array'],
-            'product_ids.*' => ['uuid', 'exists:products,id'],
+            'product_ids.*' => ['uuid'],
         ];
     }
 
@@ -46,7 +46,6 @@ class UpdateCategoryRequest extends FormRequest
             'description.max' => 'The description must not exceed 100 characters.',
             'product_ids.array' => 'The product IDs must be an array.',
             'product_ids.*.uuid' => 'Each product ID must be a valid UUID.',
-            'product_ids.*.exists' => 'One or more product IDs do not exist.',
         ];
     }
 }

@@ -5,7 +5,7 @@ use App\Http\Middleware\StorePermission;
 use App\Http\Controllers\AddressController;
 
 Route::prefix('addresses')
-    ->middleware(['auth:sanctum', StorePermission::class.':optional'])
+    ->middleware(['auth:sanctum', 'store.permission:optional'])
     ->controller(AddressController::class)
     ->group(function () {
         Route::get('/', 'showAddresses')->name('show.addresses');

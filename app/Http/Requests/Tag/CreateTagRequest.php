@@ -27,8 +27,8 @@ class CreateTagRequest extends FormRequest
         return [
             'name' => ['required', 'string', 'max:60'],
             'product_ids' => ['nullable', 'array'],
-            'product_ids.*' => ['uuid', 'exists:products,id'],
-            'store_id' => ['required', 'uuid', 'exists:stores,id']
+            'product_ids.*' => ['uuid'],
+            'store_id' => ['required', 'uuid']
         ];
     }
 
@@ -45,10 +45,8 @@ class CreateTagRequest extends FormRequest
             'name.max' => 'The tag name must not exceed 60 characters.',
             'product_ids.array' => 'The product IDs must be an array.',
             'product_ids.*.uuid' => 'Each product ID must be a valid UUID.',
-            'product_ids.*.exists' => 'One or more product IDs do not exist.',
             'store_id.required' => 'The store ID is required.',
             'store_id.uuid' => 'The store ID must be a valid UUID.',
-            'store_id.exists' => 'The specified store does not exist.',
         ];
     }
 }

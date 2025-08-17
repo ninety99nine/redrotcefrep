@@ -3,7 +3,6 @@
 namespace App\Services;
 
 use App\Enums\CacheName;
-use App\Helpers\CacheManager;
 use Illuminate\Support\Facades\Cache;
 
 class CacheService
@@ -19,7 +18,7 @@ class CacheService
      *  Make the cache name more unique by appending any string
      *
      *  @param string|null $string
-     *  @return CacheManager
+     *  @return CacheService
      */
     public function append($string)
     {

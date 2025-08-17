@@ -1,7 +1,6 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Middleware\StorePermission;
 use App\Http\Controllers\StoreController;
 
 Route::middleware(['auth:sanctum'])
@@ -13,12 +12,17 @@ Route::middleware(['auth:sanctum'])
         Route::delete('/', 'deleteStores')->name('delete.stores');
         Route::get('/{alias}', 'showStoreByAlias')->name('show.store.by.alias');
 
-        Route::middleware([StorePermission::class])->prefix('{store}')->group(function () {
+        Route::middleware(['store.permission', 'record.store.visit'])->prefix('{store}')->group(function () {
             Route::get('/', 'showStore')->name('show.store');
             Route::put('/', 'updateStore')->name('update.store');
             Route::delete('/', 'deleteStore')->name('delete.store');
+            Route::post('/follow', 'followStore')->name('follow.store');
+            Route::post('/unfollow', 'unfollowStore')->name('unfollow.store');
             Route::get('/insights', 'showStoreInsights')->name('show.store.insights');
-            Route::get('/qr-code', 'showStoreQrCode')->withoutMiddleware(['auth:sanctum', StorePermission::class])->name('show.store.qr.code');
-            Route::get('/qr-code-preview', 'showStoreQrCodePreview')->withoutMiddleware(['auth:sanctum', StorePermission::class])->name('show.store.qr.code.preview');
+
+            Route::withoutMiddleware(['auth:sanctum', 'store.permission', 'record.store.visit'])->group(function () {
+                Route::get('/qr-code', 'showStoreQrCode')->withoutMiddleware(['auth:sanctum', 'store.permission'])->name('show.store.qr.code');
+                Route::get('/qr-code-preview', 'showStoreQrCodePreview')->withoutMiddleware(['auth:sanctum', 'store.permission'])->name('show.store.qr.code.preview');
+            });
         });
     });

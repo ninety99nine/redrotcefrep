@@ -759,6 +759,46 @@
 
         </div>
 
+        <!-- Update Products -->
+        <Modal
+            approveType="primary"
+            :scrollOnContent="false"
+            ref="updateProductsModal"
+            :leftApproveIcon="RefreshCcw"
+            approveText="Update Products"
+            :approveLoading="isUpdatingProducts"
+            :approveAction="() => updateProducts(this.updateType)">
+
+            <template #content>
+
+                <p class="text-lg font-bold border-b border-dashed border-gray-200 pb-4 mb-4">Update Products</p>
+
+                <template v-if="['add tag', 'remove tag'].includes(updateType)">
+
+                    <p class="text-sm mb-4">Select tags to {{ updateType == 'add tag' ? 'add to' : 'remove from' }} products</p>
+
+                    <SelectTags
+                        v-model="tags"
+                        :options="tagOptions"
+                        :placeholder="updateType == 'add tag' ? 'Add tags' : 'Remove tags'" />
+
+                </template>
+
+                <template v-else-if="['add to category', 'remove from category'].includes(updateType)">
+
+                    <p class="text-sm mb-4">Select categories to {{ updateType == 'add to category' ? 'add' : 'remove' }} products</p>
+
+                    <SelectTags
+                        v-model="categories"
+                        :options="categoryOptions"
+                        :placeholder="updateType == 'add to category' ? 'Add to categories' : 'Remove from categories'" />
+
+                </template>
+
+            </template>
+
+        </Modal>
+
         <!-- Delete Products -->
         <Modal
             approveType="danger"
@@ -770,9 +810,9 @@
 
             <template #content>
 
-                <p class="text-lg font-bold border-b border-dashed pb-4 mb-4">Delete Products</p>
+                <p class="text-lg font-bold border-b border-gray-300 border-dashed pb-4 mb-4">Delete Products</p>
 
-                <div class="flex space-x-2 items-center p-4 text-xs bg-red-50 border border-red-200 border-dashed rounded-lg mb-8">
+                <div class="flex space-x-2 items-center p-4 text-xs bg-red-50 rounded-lg mb-8">
 
                     <svg class="w-6 h-6 text-red-500 shrink-0" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 3.75h.008v.008H12v-.008Z" />
@@ -820,34 +860,42 @@
     import Popover from '@Partials/Popover.vue';
     import Dropdown from '@Partials/Dropdown.vue';
     import Table from '@Partials/table/Table.vue';
-    import { Plus, EyeOff, Trash2, CornerRightUp, CornerRightDown } from 'lucide-vue-next';
+    import SelectTags from '@Partials/SelectTags.vue';
+    import { Plus, EyeOff, Trash2, RefreshCcw, CornerRightUp, CornerRightDown } from 'lucide-vue-next';
 
     export default {
         inject: ['formState', 'productState', 'storeState', 'changeHistoryState', 'notificationState'],
         components: {
-            CornerRightUp, CornerRightDown, Pill, Input, Modal, Loader, Button, Switch, Select, Popover, Dropdown, Table
+            CornerRightUp, CornerRightDown, Pill, Input, Modal, Loader, Button,
+            Switch, Select, Popover, Dropdown, Table, SelectTags
         },
         data() {
             return {
                 Plus,
                 Trash2,
                 EyeOff,
+                RefreshCcw,
                 CornerRightUp,
                 CornerRightDown,
 
+                tags: [],
                 perPage: '15',
+                tagOptions: [],
+                categories: [],
                 checkedRows: [],
                 pagination: null,
+                updateType: null,
                 searchTerm: null,
                 selectAll: false,
                 latestRequestId: 0,
+                categoryOptions: [],
                 filterExpressions: [],
                 sortingExpressions: [],
                 deletableProduct: null,
+                isDeletingProducIds: [],
                 cancelTokenSource: null,
                 isLoadingProducts: false,
                 isUpdatingProducts: false,
-                isDeletingProducIds: [],
                 includeProductFieldNames: true,
                 columns: this.prepareColumns(),
                 bulkSelectionOptions: [
@@ -860,12 +908,20 @@
                         action: () => this.updateProducts('hide')
                     },
                     {
+                        label: 'Add tag',
+                        action: () => this.showUpdateProductsModal('add tag')
+                    },
+                    {
+                        label: 'Remove tag',
+                        action: () => this.showUpdateProductsModal('remove tag')
+                    },
+                    {
                         label: 'Add to category',
-                        action: null
+                        action: () => this.showUpdateProductsModal('add to category')
                     },
                     {
                         label: 'Remove from category',
-                        action: null
+                        action: () => this.showUpdateProductsModal('remove from category')
                     },
                     {
                         label: 'Delete',
@@ -903,6 +959,8 @@
         watch: {
             store(newValue) {
                 if(newValue) {
+                    this.setTags();
+                    this.setCategories();
                     this.showProducts();
                 }
             },
@@ -937,6 +995,24 @@
             },
         },
         methods: {
+            async setTags() {
+                if(!this.store || this.tags.length) return;
+                this.tagOptions = this.store.product_tags.map((tag) => {
+                    return {
+                        label: tag.name,
+                        value: tag.id
+                    }
+                });
+            },
+            async setCategories() {
+                if(!this.store || this.categories.length) return;
+                this.categoryOptions = this.store.categories.map((category) => {
+                    return {
+                        label: category.name,
+                        value: category.id
+                    }
+                });
+            },
             prepareColumns() {
                 const columnNames = ['Name', 'Variant', 'Free', 'Estimated Price', 'Regular Price', 'Sale Price', 'Cost Price', 'Visible', 'Type', 'Download Link', 'Sku', 'Barcode', 'Show Description', 'Description', 'Weight', 'Tax Override', 'Tax Override Amount', 'Show Price Per Unit', 'Unit Value', 'Unit Type', 'Set Daily Capacity', 'Daily Capacity', 'Stock Type', 'Stock Quantity', 'Set Min Order Quantity', 'Min Order Quantity', 'Set Max Order Quantity', 'Max Order Quantity', 'Position'];
                 const defaultColumnNames  = ['Name', 'Variant', 'Free', 'Estimated Price', 'Regular Price', 'Sale Price', 'Cost Price', 'Visible', 'Type', 'Download Link', 'Sku', 'Barcode', 'Show Description', 'Description', 'Weight', 'Tax Override', 'Tax Override Amount', 'Show Price Per Unit', 'Unit Value', 'Unit Type', 'Set Daily Capacity', 'Daily Capacity', 'Stock Type', 'Stock Quantity', 'Set Min Order Quantity', 'Min Order Quantity', 'Set Max Order Quantity', 'Max Order Quantity', 'Position'];
@@ -950,6 +1026,11 @@
             showDeleteProductsModal() {
                 this.$refs.actionDropdown.hideDropdown();
                 this.$refs.deleteProductsModal.showModal();
+            },
+            showUpdateProductsModal(type = null) {
+                this.updateType = type;
+                this.$refs.actionDropdown.hideDropdown();
+                this.$refs.updateProductsModal.showModal();
             },
             showDeleteConfirmationModal(product) {
                 this.deletableProduct = product;
@@ -1028,7 +1109,7 @@
 
                     this.cancelTokenSource = axios.CancelToken.source(); // Create a new cancel token source
 
-                    const config = {
+                    let config = {
                         params: {
                             page: page,
                             per_page: this.perPage,
@@ -1087,22 +1168,21 @@
 
                     if(this.isUpdatingProducts) return;
 
-                    const data = {
+                    let data = {
                         store_id: this.store.id
                     };
 
-                    const isHiding = type == 'hide';
-                    const isShowing = type == 'show';
+                    if(type == 'show') data['visible'] = true;
+                    if(type == 'hide') data['visible'] = false;
+                    if(type == 'add tag') data['tags_to_add'] = this.tags;
+                    if(type == 'remove tag') data['tags_to_remove'] = this.tags;
+                    if(type == 'add to category') data['categories_to_add'] = this.categories;
+                    if(type == 'remove from category') data['categories_to_remove'] = this.categories;
 
-                    if(isHiding || isShowing) {
-                        data['visible'] = isShowing;
-                        data['products'] = this.productForms.filter(productForm => this.checkedRows[productForm.id] && productForm.visible != data['visible']).map(productForm => { return { id: productForm.id } });
-
-                        if(data['products'].length == 0) {
-                            this.notificationState.showSuccessNotification(isShowing ? 'Products are visible' : 'Products are hidden');
-                        }
-                    }else{
+                    if(type == null) {
                         data['products'] = this.productForms.filter(productForm => productForm.modified);
+                    }else{
+                        data['products'] = this.productForms.filter(productForm => this.checkedRows[productForm.id]).map(productForm => ({ id: productForm.id }));
                     }
 
                     if(data['products'].length > 0) {
@@ -1133,6 +1213,7 @@
                     console.error('Failed to update product:', error);
                 } finally {
                     this.isUpdatingProducts = false;
+                    this.$refs.updateProductsModal.hideModal();
                 }
 
             },
@@ -1225,6 +1306,10 @@
                 this.productState.productForms = productForms;
             }
         },
+        unmounted() {
+            this.productState.reset();
+            this.changeHistoryState.reset();
+        },
         created() {
 
             this.setActionButtons();
@@ -1240,7 +1325,11 @@
             this.searchTerm = this.$route.query.searchTerm;
             if(this.$route.query.filterExpressions) this.filterExpressions = this.$route.query.filterExpressions.split('|');
             if(this.$route.query.sortingExpressions) this.sortingExpressions = this.$route.query.sortingExpressions.split('|');
-            if(this.store) this.showProducts();
+            if(this.store) {
+                this.setTags();
+                this.setCategories();
+                this.showProducts();
+            }
         }
     };
 

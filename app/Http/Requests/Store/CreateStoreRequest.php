@@ -34,7 +34,7 @@ class CreateStoreRequest extends FormRequest
         return [
             'file' => ['sometimes', 'file', 'mimes:jpeg,png,jpg,gif,webp,svg', 'max:5120'],
             'name' => ['required', 'string', 'max:255'],
-            'alias' => ['required', 'string', 'max:255'],
+            'alias' => ['sometimes', 'string', 'max:255'],
             'email' => ['nullable', 'email', 'max:255'],
             'ussd_mobile_number' => ['nullable', 'phone:INTERNATIONAL'],
             'contact_mobile_number' => ['nullable', 'phone:INTERNATIONAL'],
@@ -111,7 +111,6 @@ class CreateStoreRequest extends FormRequest
             'name.required' => 'The store name is required.',
             'name.string' => 'The store name must be a string.',
             'name.max' => 'The store name must not exceed 255 characters.',
-            'alias.required' => 'The store alias is required.',
             'alias.string' => 'The store alias must be a string.',
             'alias.max' => 'The store alias must not exceed 255 characters.',
             'alias.unique' => 'This store alias is already in use.',

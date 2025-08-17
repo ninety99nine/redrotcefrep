@@ -101,7 +101,7 @@ class DeliveryMethod extends Model
     }
 
     /**
-     * Get the store.
+     * Get store.
      *
      * @return BelongsTo
      */
@@ -111,7 +111,7 @@ class DeliveryMethod extends Model
     }
 
     /**
-     * Get the address.
+     * Get address.
      *
      * @return BelongsTo
      */
@@ -121,7 +121,7 @@ class DeliveryMethod extends Model
     }
 
     /**
-     * Get the products.
+     * Get products.
      *
      * @return BelongsToMany
      */

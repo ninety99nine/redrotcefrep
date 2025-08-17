@@ -26,7 +26,7 @@ class DeleteCouriersRequest extends FormRequest
     {
         return [
             'courier_ids' => ['required', 'array', 'min:1'],
-            'courier_ids.*' => ['uuid', 'exists:couriers,id'],
+            'courier_ids.*' => ['uuid'],
         ];
     }
 
@@ -42,7 +42,6 @@ class DeleteCouriersRequest extends FormRequest
             'courier_ids.array' => 'The courier IDs must be an array.',
             'courier_ids.min' => 'At least one courier ID is required.',
             'courier_ids.*.uuid' => 'Each courier ID must be a valid UUID.',
-            'courier_ids.*.exists' => 'One or more courier IDs do not exist.',
         ];
     }
 }

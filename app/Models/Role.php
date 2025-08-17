@@ -28,7 +28,7 @@ class Role extends SpatieRole
     }
 
     /**
-     * Get the store.
+     * Get store.
      *
      * @return BelongsTo
      */

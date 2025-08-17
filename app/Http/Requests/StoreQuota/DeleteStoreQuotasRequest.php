@@ -26,7 +26,7 @@ class DeleteStoreQuotasRequest extends FormRequest
     {
         return [
             'store_quota_ids' => ['required', 'array', 'min:1'],
-            'store_quota_ids.*' => ['uuid', 'exists:store_quotas,id'],
+            'store_quota_ids.*' => ['uuid'],
         ];
     }
 
@@ -42,7 +42,6 @@ class DeleteStoreQuotasRequest extends FormRequest
             'store_quota_ids.array' => 'The store quota IDs must be an array.',
             'store_quota_ids.min' => 'At least one store quota ID is required.',
             'store_quota_ids.*.uuid' => 'Each store quota ID must be a valid UUID.',
-            'store_quota_ids.*.exists' => 'One or more store quota IDs do not exist.',
         ];
     }
 }

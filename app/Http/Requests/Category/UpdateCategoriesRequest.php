@@ -25,9 +25,9 @@ class UpdateCategoriesRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'store_id' => ['required', 'uuid', 'exists:stores,id'],
+            'store_id' => ['required', 'uuid'],
             'category_ids' => ['required', 'array', 'min:1'],
-            'category_ids.*' => ['uuid', 'exists:categories,id'],
+            'category_ids.*' => ['uuid'],
             'visible' => ['nullable', 'boolean'],
         ];
     }
@@ -42,12 +42,10 @@ class UpdateCategoriesRequest extends FormRequest
         return [
             'store_id.required' => 'The store ID is required.',
             'store_id.uuid' => 'The store ID must be a valid UUID.',
-            'store_id.exists' => 'The specified store does not exist.',
             'category_ids.required' => 'At least one category ID is required.',
             'category_ids.array' => 'The category IDs must be an array.',
             'category_ids.min' => 'At least one category ID must be provided.',
             'category_ids.*.uuid' => 'Each category ID must be a valid UUID.',
-            'category_ids.*.exists' => 'One or more category IDs are invalid.',
             'visible.boolean' => 'The visible field must be a boolean.',
         ];
     }

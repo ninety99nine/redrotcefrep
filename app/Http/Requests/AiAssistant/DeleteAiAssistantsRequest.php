@@ -26,7 +26,7 @@ class DeleteAiAssistantsRequest extends FormRequest
     {
         return [
             'ai_assistant_ids' => ['required', 'array', 'min:1'],
-            'ai_assistant_ids.*' => ['uuid', 'exists:ai_assistants,id'],
+            'ai_assistant_ids.*' => ['uuid'],
         ];
     }
 
@@ -42,7 +42,6 @@ class DeleteAiAssistantsRequest extends FormRequest
             'ai_assistant_ids.array' => 'The AI assistant IDs must be an array.',
             'ai_assistant_ids.min' => 'At least one AI assistant ID is required.',
             'ai_assistant_ids.*.uuid' => 'Each AI assistant ID must be a valid UUID.',
-            'ai_assistant_ids.*.exists' => 'One or more AI assistant IDs do not exist.',
         ];
     }
 }

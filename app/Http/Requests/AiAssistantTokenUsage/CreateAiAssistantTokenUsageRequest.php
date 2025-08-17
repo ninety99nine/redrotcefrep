@@ -30,7 +30,7 @@ class CreateAiAssistantTokenUsageRequest extends FormRequest
             'free_tokens_used' => ['nullable', 'integer', 'min:0'],
             'paid_tokens_used' => ['nullable', 'integer', 'min:0'],
             'paid_top_up_tokens_used' => ['nullable', 'integer', 'min:0'],
-            'ai_assistant_id' => ['required', 'uuid', 'exists:ai_assistants,id'],
+            'ai_assistant_id' => ['required', 'uuid'],
         ];
     }
 
@@ -54,7 +54,6 @@ class CreateAiAssistantTokenUsageRequest extends FormRequest
             'paid_top_up_tokens_used.min' => 'The paid top-up tokens used must be at least 0.',
             'ai_assistant_id.required' => 'The AI assistant ID is required.',
             'ai_assistant_id.uuid' => 'The AI assistant ID must be a valid UUID.',
-            'ai_assistant_id.exists' => 'The specified AI assistant does not exist.',
         ];
     }
 }

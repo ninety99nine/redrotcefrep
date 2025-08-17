@@ -54,9 +54,9 @@ class StorePaymentMethod extends Model
     }
 
     /**
-     * Get the store.
+     * Get store.
      *
-     * @return BelongsToMany
+     * @return belongsTo
      */
     public function store(): belongsTo
     {
@@ -64,9 +64,9 @@ class StorePaymentMethod extends Model
     }
 
     /**
-     * Get the payment method.
+     * Get payment method.
      *
-     * @return BelongsToManyToMany
+     * @return belongsTo
      */
     public function paymentMethod(): belongsTo
     {
@@ -74,7 +74,7 @@ class StorePaymentMethod extends Model
     }
 
     /**
-     * Get the logo.
+     * Get logo.
      *
      * @return MorphOne
      */
@@ -84,7 +84,7 @@ class StorePaymentMethod extends Model
     }
 
     /**
-     * Get the photo.
+     * Get photo.
      *
      * @return MorphOne
      */
@@ -94,7 +94,7 @@ class StorePaymentMethod extends Model
     }
 
     /**
-     * Get the media files.
+     * Get media files.
      *
      * @return MorphMany
      */

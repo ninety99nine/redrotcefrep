@@ -20,7 +20,7 @@ class Tag extends Model
      * @var array
      */
     protected $fillable = [
-        'name', 'store_id'
+        'name', 'type', 'store_id'
     ];
 
     /**
@@ -37,7 +37,7 @@ class Tag extends Model
     }
 
     /**
-     * Get the store.
+     * Get store.
      *
      * @return BelongsTo
      */
@@ -47,12 +47,22 @@ class Tag extends Model
     }
 
     /**
-     * Get the products.
+     * Get products.
      *
      * @return BelongsToMany
      */
     public function products(): BelongsToMany
     {
         return $this->belongsToMany(Product::class, 'product_tag');
+    }
+
+    /**
+     * Get customers.
+     *
+     * @return BelongsToMany
+     */
+    public function customers(): BelongsToMany
+    {
+        return $this->belongsToMany(Customer::class, 'customer_tag');
     }
 }

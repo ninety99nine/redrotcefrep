@@ -7,6 +7,7 @@ use App\Models\Order;
 use App\Enums\Association;
 use App\Models\OrderComment;
 use App\Enums\UploadFolderName;
+use Illuminate\Support\Facades\Auth;
 use App\Http\Resources\OrderCommentResource;
 use App\Http\Resources\OrderCommentResources;
 
@@ -47,7 +48,7 @@ class OrderCommentService extends BaseService
 
         $data = array_merge($data, [
             'store_id' => $order->store_id,
-            'user_id' => auth()->user()->id
+            'user_id' => Auth::user()->id
         ]);
 
         $orderComment = OrderComment::create($data);

@@ -24,9 +24,9 @@ class UpdateStorePaymentMethodArrangementRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'store_id' => ['required', 'uuid', 'exists:stores,id'],
+            'store_id' => ['required', 'uuid'],
             'store_payment_method_ids' => ['required', 'array'],
-            'store_payment_method_ids.*' => ['uuid', 'exists:store_payment_method,id'],
+            'store_payment_method_ids.*' => ['uuid'],
         ];
     }
 
@@ -40,10 +40,8 @@ class UpdateStorePaymentMethodArrangementRequest extends FormRequest
         return [
             'store_id.required' => 'The store ID is required.',
             'store_id.uuid' => 'The store ID must be a valid UUID.',
-            'store_id.exists' => 'The specified store does not exist.',
             'store_payment_method_ids.array' => 'Store payment method IDs must be an array.',
             'store_payment_method_ids.*.uuid' => 'Store payment method ID must be a valid UUID.',
-            'store_payment_method_ids.*.exists' => 'Store payment method ID do not exist.',
         ];
     }
 }

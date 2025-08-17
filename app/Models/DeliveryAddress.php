@@ -58,7 +58,7 @@ class DeliveryAddress extends Model
     }
 
     /**
-     * Get the order.
+     * Get order.
      *
      * @return BelongsTo
      */
@@ -68,7 +68,7 @@ class DeliveryAddress extends Model
     }
 
     /**
-     * Get the complete address.
+     * Get complete address.
      *
      * @return Attribute
      */

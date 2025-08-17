@@ -5,7 +5,7 @@ use App\Http\Middleware\StorePermission;
 use App\Http\Controllers\MediaFileController;
 
 Route::prefix('media-files')
-    ->middleware(['auth:sanctum', StorePermission::class])
+    ->middleware(['auth:sanctum', 'store.permission'])
     ->controller(MediaFileController::class)
     ->group(function () {
         Route::get('/', 'showMediaFiles')->name('show.media.files');

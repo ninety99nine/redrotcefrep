@@ -5,7 +5,7 @@ use App\Http\Middleware\StorePermission;
 use App\Http\Controllers\TransactionController;
 
 Route::prefix('transactions')
-    ->middleware(['auth:sanctum', StorePermission::class])
+    ->middleware(['auth:sanctum', 'store.permission'])
     ->controller(TransactionController::class)
     ->group(function () {
         Route::get('/', 'showTransactions')->name('show.transactions');

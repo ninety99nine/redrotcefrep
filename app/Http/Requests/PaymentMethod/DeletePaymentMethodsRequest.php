@@ -24,7 +24,7 @@ class DeletePaymentMethodsRequest extends FormRequest
     {
         return [
             'payment_method_ids' => ['required', 'array'],
-            'payment_method_ids.*' => ['uuid', 'exists:payment_methods,id'],
+            'payment_method_ids.*' => ['uuid'],
         ];
     }
 }

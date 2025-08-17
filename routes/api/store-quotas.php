@@ -5,7 +5,7 @@ use App\Http\Middleware\StorePermission;
 use App\Http\Controllers\StoreQuotaController;
 
 Route::prefix('store-quotas')
-    ->middleware(['auth:sanctum', StorePermission::class])
+    ->middleware(['auth:sanctum', 'store.permission'])
     ->controller(StoreQuotaController::class)
     ->group(function () {
         Route::get('/', 'showStoreQuotas')->name('show.store.quotas');

@@ -25,10 +25,10 @@ class UpdateProductVisibilityRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'store_id' => ['required', 'uuid', 'exists:stores,id'],
+            'store_id' => ['required', 'uuid'],
             'visibility' => ['required', 'array'],
             'visibility.*.visible' => ['bail', 'boolean'],
-            'visibility.*.id' => ['bail', 'uuid', 'distinct', 'exists:products,id'],
+            'visibility.*.id' => ['bail', 'uuid', 'distinct'],
         ];
     }
 
@@ -42,12 +42,10 @@ class UpdateProductVisibilityRequest extends FormRequest
         return [
             'store_id.required' => 'The store ID is required.',
             'store_id.uuid' => 'The store ID must be a valid UUID.',
-            'store_id.exists' => 'The specified store does not exist.',
             'visibility.required' => 'The visibility data is required.',
             'visibility.array' => 'The visibility data must be an array.',
             'visibility.*.visible.boolean' => 'The product visibility must be a boolean.',
             'visibility.*.id.uuid' => 'The product ID must be a valid UUID.',
-            'visibility.*.id.exists' => 'The product ID do not exist.',
             'visibility.*.id.distinct' => 'Duplicate product IDs are not allowed.',
         ];
     }
