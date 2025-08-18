@@ -43,7 +43,7 @@ class Promotion extends Model
             'activate_using_minimum_total_products' => 'boolean',
             'activate_using_minimum_total_product_quantities' => 'boolean',
 
-            'discount_percentage_rate' => 'decimal:2',
+            'discount_percentage_rate' => 'float',
 
             'discount_flat_rate' => Money::class,
             'minimum_grand_total' => Money::class,

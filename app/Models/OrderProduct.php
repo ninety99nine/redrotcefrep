@@ -25,7 +25,7 @@ class OrderProduct extends Model
     protected function casts(): array
     {
         return [
-            'unit_weight' => 'decimal:2',
+            'unit_weight' => 'float',
 
             'quantity' => 'integer',
             'original_quantity' => 'integer',

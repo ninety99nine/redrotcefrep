@@ -29,7 +29,7 @@ class ShowCustomersRequest extends FormRequest
     {
         return [
             'store_id' => ['sometimes', 'uuid'],
-            'customer_id' => ['sometimes', 'uuid']
+            'association' => ['sometimes', Rule::enum(Association::class)->only([Association::SUPER_ADMIN, Association::TEAM_MEMBER])],
         ];
     }
 
@@ -42,7 +42,7 @@ class ShowCustomersRequest extends FormRequest
     {
         return [
             'store_id.uuid' => 'The store ID must be a valid UUID.',
-            'customer_id.uuid' => 'The customer ID must be a valid UUID.',
+            'association.enum' => 'The association must be one of: ' . Arr::join([Association::SUPER_ADMIN->value, Association::TEAM_MEMBER->value], ', ', ' or '),
         ];
     }
 }

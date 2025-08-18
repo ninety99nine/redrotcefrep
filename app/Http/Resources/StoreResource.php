@@ -81,7 +81,15 @@ class StoreResource extends JsonResource
             'media_files' => MediaFileResource::collection($this->whenLoaded('mediaFiles')),
             'active_subscription' => new SubscriptionResource($this->whenLoaded('activeSubscription')),
 
-            'following_count' => $this->whenCounted('following'),
+            'orders_count' => $this->whenCounted('orders'),
+            'products_count' => $this->whenCounted('products'),
+            'customers_count' => $this->whenCounted('customers'),
+            'promotions_count' => $this->whenCounted('promotions'),
+            'my_following_count' => $this->whenCounted('myFollowing'),
+            'my_membership_count' => $this->whenCounted('myMembership'),
+            'placed_orders_count' => $this->whenCounted('placedOrders'),
+            'created_orders_count' => $this->whenCounted('createdOrders'),
+            'assigned_orders_count' => $this->whenCounted('assignedOrders'),
             'active_subscription_count' => $this->whenCounted('activeSubscription'),
 
             '_links' => [

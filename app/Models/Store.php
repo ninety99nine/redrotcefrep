@@ -126,6 +126,16 @@ class Store extends Model
     }
 
     /**
+     * Get membership.
+     *
+     * @return hasOne
+     */
+    public function myMembership(): hasOne
+    {
+        return $this->hasOne(StoreUser::class)->where('user_id', Auth::user()?->id ?? 0);
+    }
+
+    /**
      * Get followers.
      *
      * @return BelongsToMany
@@ -143,7 +153,7 @@ class Store extends Model
      *
      * @return hasOne
      */
-    public function following(): hasOne
+    public function myFollowing(): hasOne
     {
         return $this->hasOne(StoreFollower::class)->where('user_id', Auth::user()?->id ?? 0);
     }
@@ -189,6 +199,36 @@ class Store extends Model
     public function orders(): HasMany
     {
         return $this->hasMany(Order::class);
+    }
+
+    /**
+     * Get placed orders.
+     *
+     * @return HasMany
+     */
+    public function placedOrders()
+    {
+        return $this->orders()->where('placed_by_user_id', Auth::user()?->id ?? 0);
+    }
+
+    /**
+     * Get created orders.
+     *
+     * @return HasMany
+     */
+    public function createdOrders()
+    {
+        return $this->orders()->where('created_by_user_id', Auth::user()?->id ?? 0);
+    }
+
+    /**
+     * Get assigned orders.
+     *
+     * @return HasMany
+     */
+    public function assignedOrders()
+    {
+        return $this->orders()->where('assigned_to_user_id', Auth::user()?->id ?? 0);
     }
 
     /**

@@ -3,7 +3,9 @@
 namespace App\Services;
 
 use Exception;
+use App\Models\Store;
 use App\Models\Promotion;
+use App\Enums\Association;
 use App\Http\Resources\PromotionResource;
 use App\Http\Resources\PromotionResources;
 
@@ -17,7 +19,16 @@ class PromotionService extends BaseService
      */
     public function showPromotions(array $data): PromotionResources|array
     {
-        $query = Promotion::query()->when(!request()->has('_sort'), fn($query) => $query->latest());
+        $storeId = $data['store_id'] ?? null;
+        $association = isset($data['association']) ? Association::tryFrom($data['association']) : null;
+
+        if($association == Association::SUPER_ADMIN) {
+            $query = Promotion::query();
+        }else {
+            $query = Promotion::where('store_id', $storeId);
+        }
+
+        $query = $query->when(!request()->has('_sort'), fn($query) => $query->latest());
         return $this->setQuery($query)->getOutput();
     }
 
@@ -29,6 +40,13 @@ class PromotionService extends BaseService
      */
     public function createPromotion(array $data): array
     {
+        $storeId = $data['store_id'];
+        $store = Store::findOrFail($storeId);
+
+        $data = array_merge($data, [
+            'currency' => $store->currency
+        ]);
+
         $promotion = Promotion::create($data);
         return $this->showCreatedResource($promotion);
     }

@@ -8,6 +8,7 @@ use App\Models\Store;
 use App\Enums\TagType;
 use League\Csv\Reader;
 use App\Models\Customer;
+use App\Enums\Association;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
 use App\Http\Resources\CustomerResource;
@@ -25,7 +26,16 @@ class CustomerService extends BaseService
      */
     public function showCustomers(array $data): CustomerResources|BinaryFileResponse|array
     {
-        $query = Customer::query()->when(!request()->has('_sort'), fn($query) => $query->latest());
+        $storeId = $data['store_id'] ?? null;
+        $association = isset($data['association']) ? Association::tryFrom($data['association']) : null;
+
+        if($association == Association::SUPER_ADMIN) {
+            $query = Customer::query();
+        }else {
+            $query = Customer::where('store_id', $storeId);
+        }
+
+        $query = $query->when(!request()->has('_sort'), fn($query) => $query->latest());
         return $this->setQuery($query)->getOutput();
     }
 
@@ -38,6 +48,13 @@ class CustomerService extends BaseService
      */
     public function createCustomer(array $data): array
     {
+        $storeId = $data['store_id'];
+        $store = Store::findOrFail($storeId);
+
+        $data = array_merge($data, [
+            'currency' => $store->currency
+        ]);
+
         $tags = $data['tags'] ?? null;
 
         $customer = Customer::create($data);

@@ -28,7 +28,7 @@ class Order extends Model
     {
         return [
 
-            'vat_rate' => 'decimal:2',
+            'vat_rate' => 'float',
 
             'delivery_date' => 'date',
 

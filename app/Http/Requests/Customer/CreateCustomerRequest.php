@@ -28,8 +28,8 @@ class CreateCustomerRequest extends FormRequest
         return [
             'first_name' => ['nullable', 'string', 'max:255'],
             'last_name' => ['nullable', 'string', 'max:255'],
-            'email' => ['required_without:mobile_number', , 'email', 'max:255', $importing ? '' : 'unique:customers,email'],
-            'mobile_number' => ['required_without:email', 'phone:INTERNATIONAL', $importing ? '' : 'unique:customers,mobile_number'],
+            'email' => ['required_without:mobile_number', 'email', 'max:255', $importing ? null : 'unique:customers,email'],
+            'mobile_number' => ['required_without:email', 'phone:INTERNATIONAL', $importing ? null : 'unique:customers,mobile_number'],
             'birthday' => ['nullable', 'date'],
             'referral_code' => ['nullable', 'string', 'max:40'],
             'notes' => ['nullable', 'string', 'max:500'],

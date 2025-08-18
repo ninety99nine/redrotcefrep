@@ -73,7 +73,7 @@ class PromotionController extends Controller
      */
     public function showPromotion(ShowPromotionRequest $request, Promotion $promotion): PromotionResource
     {
-        return $this->service->showPromotion($promotion->id);
+        return $this->service->showPromotion($promotion);
     }
 
     /**
@@ -85,7 +85,7 @@ class PromotionController extends Controller
      */
     public function updatePromotion(UpdatePromotionRequest $request, Promotion $promotion): array
     {
-        return $this->service->updatePromotion($promotion->id, $request->validated());
+        return $this->service->updatePromotion($promotion, $request->validated());
     }
 
     /**
@@ -97,6 +97,6 @@ class PromotionController extends Controller
      */
     public function deletePromotion(DeletePromotionRequest $request, Promotion $promotion): array
     {
-        return $this->service->deletePromotion($promotion->id);
+        return $this->service->deletePromotion($promotion);
     }
 }

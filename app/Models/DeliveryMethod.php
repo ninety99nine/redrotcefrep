@@ -35,8 +35,8 @@ class DeliveryMethod extends Model
         'fallback_flat_fee_rate' => Money::class,
         'free_delivery_minimum_grand_total' => Money::class,
 
-        'percentage_fee_rate' => 'decimal:2',
-        'fallback_percentage_fee_rate' => 'decimal:2',
+        'percentage_fee_rate' => 'float',
+        'fallback_percentage_fee_rate' => 'float',
 
         'position' => 'integer',
         'daily_order_limit' => 'integer',

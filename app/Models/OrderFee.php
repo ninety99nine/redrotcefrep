@@ -23,7 +23,7 @@ class OrderFee extends Model
     {
         return [
             'amount' => Money::class,
-            'percentage_rate' => 'decimal:2',
+            'percentage_rate' => 'float',
         ];
     }
 
