@@ -28,9 +28,8 @@ class ShowAiAssistantsRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'user_id' => ['sometimes', 'uuid'],
-            'ai_assistant_id' => ['sometimes', 'uuid'],
-            'association' => ['sometimes', Rule::enum(Association::class)->only([Association::ASSOCIATED, Association::UNASSOCIATED])],
+            'user_id' => ['nullable', 'uuid'],
+            'association' => ['sometimes', Rule::enum(Association::class)->only([Association::SUPER_ADMIN])],
         ];
     }
 
@@ -43,8 +42,7 @@ class ShowAiAssistantsRequest extends FormRequest
     {
         return [
             'user_id.uuid' => 'The user ID must be a valid UUID.',
-            'ai_assistant_id.uuid' => 'The AI assistant ID must be a valid UUID.',
-            'association.enum' => 'The association must be one of: ' . Arr::join([Association::ASSOCIATED->value, Association::UNASSOCIATED->value], ', ', ' or '),
+            'association.enum' => 'The association must be one of: ' . Arr::join([Association::SUPER_ADMIN->value], ', ', ' or '),
         ];
     }
 }

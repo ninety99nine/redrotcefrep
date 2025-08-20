@@ -91,12 +91,6 @@ class StoreResource extends JsonResource
             'created_orders_count' => $this->whenCounted('createdOrders'),
             'assigned_orders_count' => $this->whenCounted('assignedOrders'),
             'active_subscription_count' => $this->whenCounted('activeSubscription'),
-
-            '_links' => [
-                'show' => route('show.store', ['store' => $this->id]),
-                'update' => route('update.store', ['store' => $this->id]),
-                'delete' => route('delete.store', ['store' => $this->id])
-            ],
         ];
     }
 }

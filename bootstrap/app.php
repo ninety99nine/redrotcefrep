@@ -23,9 +23,9 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware) {
 
         $middleware->alias([
-            'set.ussd.user'    => SetUssdUser::class,
+            'set.ussd.user' => SetUssdUser::class,
             'store.permission' => StorePermission::class,
-            'record.store.visit'    => RecordStoreVisit::class
+            'record.store.visit' => RecordStoreVisit::class
         ]);
 
         $middleware->prependToPriorityList(

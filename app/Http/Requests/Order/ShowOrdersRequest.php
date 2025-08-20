@@ -28,7 +28,6 @@ class ShowOrdersRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'user_id' => ['sometimes', 'uuid'],
             'order_id' => ['sometimes', 'uuid'],
             'store_id' => ['sometimes', 'uuid'],
             'customer_id' => ['sometimes', 'uuid'],
@@ -50,6 +49,9 @@ class ShowOrdersRequest extends FormRequest
             'order_id.uuid' => 'The order ID must be a valid UUID.',
             'store_id.uuid' => 'The store ID must be a valid UUID.',
             'customer_id.uuid' => 'The customer ID must be a valid UUID.',
+            'placed_by_user_id.uuid' => 'The placed by user ID must be a valid UUID.',
+            'created_by_user_id.uuid' => 'The created by user ID must be a valid UUID.',
+            'assigned_to_user_id.uuid' => 'The assigned to user ID must be a valid UUID.',
             'association.enum' => 'The association must be one of: ' . Arr::join([Association::SUPER_ADMIN->value, Association::TEAM_MEMBER->value], ', ', ' or '),
         ];
     }

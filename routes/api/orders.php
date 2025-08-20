@@ -13,6 +13,7 @@ Route::prefix('orders')
         Route::put('/', 'updateOrders')->name('update.orders');
         Route::delete('/', 'deleteOrders')->name('delete.orders');
         Route::post('/download', 'downloadOrders')->name('download.orders');
+        Route::get('/status-counts', 'showOrderStatusCounts')->name('show.order.status.counts');
 
         // Explicit route model binding applied: AppServiceProvider.php
         Route::prefix('{order}')->group(function () {

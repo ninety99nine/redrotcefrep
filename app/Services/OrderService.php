@@ -36,7 +36,6 @@ class OrderService extends BaseService
      */
     public function showOrders(array $data): OrderResources|BinaryFileResponse|array
     {
-        $userId = $data['user_id'] ?? null;
         $storeId = $data['store_id'] ?? null;
         $customerId = $data['customer_id'] ?? null;
         $placedByUserId = $data['placed_by_user_id'] ?? null;
@@ -50,36 +49,97 @@ class OrderService extends BaseService
 
         }else if($association == Association::TEAM_MEMBER) {
 
-            $query = Order::whereHas('store.teamMembers', function ($query) use ($userId) {
-                $query->where('store_user.user_id', $userId);
+            $query = Order::whereHas('store.users', function ($query) {
+                $query->where('store_user.user_id', Auth::user()->id);
             });
 
         }else if($customerId) {
 
             $query = Order::where('customer_id', $customerId);
 
+        }else if($createdByUserId) {
+
+            $query = Order::where('created_by_user_id', $createdByUserId);
+
+        }else if($assignedToUserId) {
+
+            $query = Order::where('assigned_to_user_id', $assignedToUserId);
+
+        }else if($placedByUserId) {
+
+            $query = Order::where('placed_by_user_id', $placedByUserId);
+
         }else{
 
-            if($storeId) {
-                $query = Order::where('store_id', $storeId);
-            }else{
-                $query = Order::query();
-            }
+            $query = Order::where('placed_by_user_id', Auth::user()->id);
 
-            if($createdByUserId) {
-                $query = $query->where('created_by_user_id', $createdByUserId);
-            }else if($assignedToUserId) {
-                $query = $query->where('assigned_to_user_id', $assignedToUserId);
-            }else if($placedByUserId) {
-                $query = $query->where('placed_by_user_id', $placedByUserId);
-            }else{
-                $query = $query->where('placed_by_user_id', Auth::user()->id);
-            }
+        }
 
+        if($storeId) {
+            $query = $query->where('store_id', $storeId);
         }
 
         $query = $query->when(!request()->has('_sort'), fn($query) => $query->latest());
         return $this->setQuery($query)->getOutput();
+    }
+
+    /**
+     * Show order status counts.
+     *
+     * @param array $data
+     * @return array
+     */
+    public function showOrderStatusCounts(array $data): array
+    {
+        $storeId = $data['store_id'];
+        $store = $storeId ? Store::find($storeId) : null;
+        $placedByUserId = $data['placed_by_user_id'] ?? null;
+
+        $query = DB::table('orders')->selectRaw('
+            COUNT(*) as total_orders,
+            CAST(SUM(CASE WHEN status = ? THEN 1 ELSE 0 END) AS UNSIGNED) as waiting_count,
+            CAST(SUM(CASE WHEN status = ? THEN 1 ELSE 0 END) AS UNSIGNED) as cancelled_count,
+            CAST(SUM(CASE WHEN status = ? THEN 1 ELSE 0 END) AS UNSIGNED) as completed_count,
+            CAST(SUM(CASE WHEN status = ? THEN 1 ELSE 0 END) AS UNSIGNED) as on_its_way_count,
+            CAST(SUM(CASE WHEN status = ? THEN 1 ELSE 0 END) AS UNSIGNED) as ready_for_pickup_count,
+            CAST(SUM(CASE WHEN payment_status = ? THEN 1 ELSE 0 END) AS UNSIGNED) as paid_count,
+            CAST(SUM(CASE WHEN payment_status = ? THEN 1 ELSE 0 END) AS UNSIGNED) as unpaid_count,
+            CAST(SUM(CASE WHEN payment_status = ? THEN 1 ELSE 0 END) AS UNSIGNED) as pending_count,
+            CAST(SUM(CASE WHEN payment_status = ? THEN 1 ELSE 0 END) AS UNSIGNED) as partially_paid_count
+        ', [
+            OrderStatus::WAITING->value,
+            OrderStatus::CANCELLED->value,
+            OrderStatus::COMPLETED->value,
+            OrderStatus::ON_ITS_WAY->value,
+            OrderStatus::READY_FOR_PICKUP->value,
+            OrderPaymentStatus::PAID->value,
+            OrderPaymentStatus::UNPAID->value,
+            OrderPaymentStatus::PENDING_PAYMENT->value,
+            OrderPaymentStatus::PARTIALLY_PAID->value,
+        ]);
+
+        if($store) $query->where('store_id', $storeId);
+        if($placedByUserId) $query->where('placed_by_user_id', $placedByUserId);
+
+        $result = $query->first();
+
+        return [
+            'total_orders' => $result->total_orders,
+            'status_counts' => [
+                'waiting' => $result->waiting_count,
+                'completed' => $result->completed_count,
+                'on_its_way' => $result->on_its_way_count,
+                'ready_for_pickup' => $result->ready_for_pickup_count,
+                'cancelled' => $result->cancelled_count,
+            ],
+            'payment_status_counts' => [
+                'paid' => $result->paid_count,
+                'unpaid' => $result->unpaid_count,
+                'pending' => $result->pending_count,
+                'partially_paid' => $result->partially_paid_count,
+            ]
+        ];
+
     }
 
     /**

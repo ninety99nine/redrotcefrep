@@ -3,8 +3,9 @@
 namespace App\Services;
 
 use Exception;
+use App\Enums\Association;
 use App\Models\AiAssistant;
-use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 use App\Http\Resources\AiAssistantResource;
 use App\Http\Resources\AiAssistantResources;
 
@@ -18,7 +19,16 @@ class AiAssistantService extends BaseService
      */
     public function showAiAssistants(array $data): AiAssistantResources|array
     {
-        $query = AiAssistant::query()->when(!request()->has('_sort'), fn($query) => $query->latest());
+        $userId = $data['user_id'] ?? null;
+        $association = isset($data['association']) ? Association::tryFrom($data['association']) : null;
+
+        if($association == Association::SUPER_ADMIN) {
+            $query = AiAssistant::query();
+        }else {
+            $query = AiAssistant::where('user_id', $userId ?? Auth::user()->id);
+        }
+
+        $query = $query->when(!request()->has('_sort'), fn($query) => $query->latest());
         return $this->setQuery($query)->getOutput();
     }
 
@@ -61,6 +71,22 @@ class AiAssistantService extends BaseService
     }
 
     /**
+     * Show My AI assistant.
+     *
+     * @param array $data
+     * @return AiAssistantResource
+     */
+    public function showMyAiAssistant(): AiAssistantResource
+    {
+        /** @var User $user */
+        $user =  Auth::user();
+        $aiAssistant = $user->aiAssistant()->first();
+        if(!$aiAssistant) $aiAssistant = $user->aiAssistant()->create();
+
+        return $this->showResource($aiAssistant);
+    }
+
+    /**
      * Show AI assistant.
      *
      * @param AiAssistant $aiAssistant
@@ -100,5 +126,22 @@ class AiAssistantService extends BaseService
         } else {
             throw new Exception('AI Assistant delete unsuccessful');
         }
+    }
+
+    /**
+     * Assess AI assistant usage eligibility.
+     *
+     * @param AiAssistant $aiAssistant
+     * @return AiAssistant|array
+     */
+    public function assessAiAssistantUsageEligibility(AiAssistant $aiAssistant): AiAssistant|array
+    {
+        $usageEligibility = (new AiMessageService)->assessUsageEligibility($aiAssistant);
+
+        return [
+            'message' => $usageEligibility->message,
+            'can_top_up' => $usageEligibility->can_top_up,
+            'can_subscribe' => $usageEligibility->can_subscribe
+        ];
     }
 }

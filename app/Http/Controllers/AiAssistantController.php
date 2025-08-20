@@ -12,6 +12,7 @@ use App\Http\Requests\AiAssistant\CreateAiAssistantRequest;
 use App\Http\Requests\AiAssistant\UpdateAiAssistantRequest;
 use App\Http\Requests\AiAssistant\DeleteAiAssistantRequest;
 use App\Http\Requests\AiAssistant\DeleteAiAssistantsRequest;
+use App\Http\Requests\AiAssistant\AssessAiAssistantUsageEligibilityRequest;
 
 class AiAssistantController extends Controller
 {
@@ -65,6 +66,16 @@ class AiAssistantController extends Controller
     }
 
     /**
+     * Show My AI assistant.
+     *
+     * @return AiAssistantResource
+     */
+    public function showMyAiAssistant(): AiAssistantResource
+    {
+        return $this->service->showMyAiAssistant();
+    }
+
+    /**
      * Show AI assistant.
      *
      * @param ShowAiAssistantRequest $request
@@ -98,5 +109,16 @@ class AiAssistantController extends Controller
     public function deleteAiAssistant(DeleteAiAssistantRequest $request, AiAssistant $aiAssistant): array
     {
         return $this->service->deleteAiAssistant($aiAssistant);
+    }
+
+    /**
+     * Assess AI assistant usage eligibility.
+     *
+     * @param AssessAiAssistantUsageEligibilityRequest $request
+     * @return array
+     */
+    public function assessAiAssistantUsageEligibility(AssessAiAssistantUsageEligibilityRequest $request, AiAssistant $aiAssistant): array
+    {
+        return $this->service->assessAiAssistantUsageEligibility($aiAssistant);
     }
 }

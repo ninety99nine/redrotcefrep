@@ -34,10 +34,10 @@ class OrangeAirtimeService
         $productId = $pricingPlan->type;
         $purchaseCategoryCode = $pricingPlan->name;
 
-        $clientId = config('app.ORANGE_AIRTIME_BILLING_CLIENT_ID');
-        $billingEnabled = config('app.ORANGE_AIRTIME_BILLING_ENABLED');
-        $onBehalfOf = config('app.ORANGE_AIRTIME_BILLING_ON_BEHALF_OF');
-        $clientSecret = config('app.ORANGE_AIRTIME_BILLING_CLIENT_SECRET');
+        $clientId = config('app.orange_airtime_billing_client_id');
+        $billingEnabled = config('app.orange_airtime_billing_enabled');
+        $onBehalfOf = config('app.orange_airtime_billing_on_behalf_of');
+        $clientSecret = config('app.orange_airtime_billing_client_secret');
 
         try {
 
@@ -465,7 +465,7 @@ class OrangeAirtimeService
             try {
 
                 // Set the request endpoint
-                $endpoint = config('app.ORANGE_AIRTIME_BILLING_URL') . '/token';
+                $endpoint = config('app.orange_airtime_billing_url') . '/token';
 
                 // Set the request options
                 $options = [
@@ -618,7 +618,7 @@ class OrangeAirtimeService
      */
     public static function requestAirtimeBillingProductInventory(string $msisdn, string $accessToken): array
     {
-        $endpoint = config('app.ORANGE_AIRTIME_BILLING_URL') . "/customer/productInventory/v1/product?publicKey=$msisdn";
+        $endpoint = config('app.orange_airtime_billing_url') . "/customer/productInventory/v1/product?publicKey=$msisdn";
 
         $options = [
             'headers' => [
@@ -806,7 +806,7 @@ class OrangeAirtimeService
      */
     public static function requestAirtimeBillingUsageConsumption(string $msisdn, string $accessToken): array
     {
-        $endpoint = config('app.ORANGE_AIRTIME_BILLING_URL') . "/customer/usageConsumption/v1/usageConsumptionReport?publicKey=$msisdn";
+        $endpoint = config('app.orange_airtime_billing_url') . "/customer/usageConsumption/v1/usageConsumptionReport?publicKey=$msisdn";
 
         $options = [
             'headers' => [
@@ -996,7 +996,7 @@ class OrangeAirtimeService
         string $referenceCode
     ): array
     {
-        $endpoint = config('app.ORANGE_AIRTIME_BILLING_URL').'/payment/v1/tel%3A%2B'.$msisdn.'/transactions/amount';
+        $endpoint = config('app.orange_airtime_billing_url').'/payment/v1/tel%3A%2B'.$msisdn.'/transactions/amount';
 
         $chargingMetaData = array_filter([
             'productId' => $productId,
@@ -1016,7 +1016,7 @@ class OrangeAirtimeService
                     'paymentAmount' => [
                         'chargingInformation' => [
                             'amount' => (float) $amount,
-                            'currency' => config('app.CURRENCY', 'BWP'),
+                            'currency' => config('app.currency', 'BWP'),
                             'description' => [$description],
                         ],
                         'chargingMetaData' => $chargingMetaData,

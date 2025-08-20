@@ -13,6 +13,12 @@ return [
     'sms_credentials' => env('SMS_CREDENTIALS'),
     'sms_sender_mobile_number' => env('SMS_SENDER_MOBILE_NUMBER'),
 
+    'orange_airtime_billing_url' => env('ORANGE_AIRTIME_BILLING_URL'),
+    'orange_airtime_billing_enabled' => env('ORANGE_AIRTIME_BILLING_ENABLED'),
+    'orange_airtime_billing_client_id' => env('ORANGE_AIRTIME_BILLING_CLIENT_ID'),
+    'orange_airtime_billing_on_behalf_of' => env('ORANGE_AIRTIME_BILLING_ON_BEHALF_OF'),
+    'orange_airtime_billing_client_secret' => env('ORANGE_AIRTIME_BILLING_CLIENT_SECRET'),
+
     'ussd_token' => env('USSD_TOKEN'),
 
     'dpo_company_token' => env('DPO_COMPANY_TOKEN'),

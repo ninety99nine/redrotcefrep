@@ -22,7 +22,7 @@ return new class extends Migration
             $table->string('ussd_mobile_number', 20)->nullable();
             $table->string('contact_mobile_number', 20)->nullable();
             $table->string('whatsapp_mobile_number', 20)->nullable();
-            $table->string('call_to_action')->default('Order');
+            $table->string('call_to_action')->default('Buy');
             $table->string('description', 120)->nullable();
             $table->string('qr_code_file_path')->nullable();
             $table->boolean('offer_rewards')->default(false);

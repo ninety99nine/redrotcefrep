@@ -345,12 +345,14 @@ class PricingPlanService extends BaseService
     private function offerPricingPlan(?Transaction $transaction, array $data = []): array
     {
         $trial = $transaction == null;
-        $store = $transaction?->store ?? $data['store'];
+        $store = $transaction?->store ?? $data['store'] ?? null;
         $user = $transaction?->requestedByUser ?? $data['user'];
         $pricingPlan = $transaction?->owner ?? $data['pricingPlan'];
         $aiAssistant = $transaction?->aiAssistant ?? $data['aiAssistant'];
         $paymentMethod = $transaction?->paymentMethod ?? $data['paymentMethod'];
         $createdUsingAutoBilling = $transaction?->created_using_auto_billing ?? $data['createdUsingAutoBilling'];
+
+        $messageCrafterService = new MessageCrafterService();
 
         if ($pricingPlan->offersSubscription()) {
 
@@ -366,8 +368,6 @@ class PricingPlanService extends BaseService
                 $storeSubscriptionPayload = $this->prepareStoreSubscriptionPayload($user, $store, $pricingPlan, $transaction);
                 $storeSubscriptionResponse = (new SubscriptionService())->createSubscription($storeSubscriptionPayload);
                 $storeSubscription = $storeSubscriptionResponse['subscription']->resource;
-
-                $messageCrafterService = new MessageCrafterService();
 
                 if ($paymentMethod->type == PaymentMethodType::ORANGE_AIRTIME->value) {
 

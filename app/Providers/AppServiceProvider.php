@@ -6,6 +6,8 @@ use App\Models\Tag;
 use App\Models\Order;
 use App\Models\Store;
 use App\Models\Address;
+use App\Models\AiTopic;
+use App\Models\AiLesson;
 use App\Models\Product;
 use App\Models\Category;
 use App\Models\Customer;
@@ -57,6 +59,7 @@ class AppServiceProvider extends ServiceProvider
             'customer' => 'App\Models\Customer',
             'category' => 'App\Models\Category',
             'transaction' => 'App\Models\Transaction',
+            'ai assistant' => 'App\Models\AiAssistant',
             'pricing plan' => 'App\Models\PricingPlan',
             'order comment' => 'App\Models\OrderComment',
         ]);
@@ -197,6 +200,18 @@ class AppServiceProvider extends ServiceProvider
         Route::bind('pricingPlan', function ($value) {
             $allowedRoutes = ['show.pricing.plan'];
             return $this->applyEagerLoading(PricingPlan::query(), $allowedRoutes)->findOrFail($value);
+        });
+
+        // Bind AiTopic model
+        Route::bind('aiTopic', function ($value) {
+            $allowedRoutes = ['show.ai.topic'];
+            return $this->applyEagerLoading(AiTopic::query(), $allowedRoutes)->findOrFail($value);
+        });
+
+        // Bind AiLesson model
+        Route::bind('aiLesson', function ($value) {
+            $allowedRoutes = ['show.ai.lesson'];
+            return $this->applyEagerLoading(AiLesson::query(), $allowedRoutes)->findOrFail($value);
         });
 
         // Bind AiAssistant model

@@ -8,8 +8,10 @@ use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\Builder;
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Casts\Attribute;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Attributes\Scope;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Propaganistas\LaravelPhone\Casts\E164PhoneNumberCast;
@@ -77,6 +79,26 @@ class User extends Authenticatable
     public function visitedStores(): BelongsToMany
     {
         return $this->belongsToMany(Store::class, 'store_visitor')->withPivot('guest_id', 'last_visited_at');
+    }
+
+    /**
+     * Get AI assistant.
+     *
+     * @return HasOne
+     */
+    public function aiAssistant(): HasOne
+    {
+        return $this->hasOne(AiAssistant::class);
+    }
+
+    /**
+     * Get AI messages.
+     *
+     * @return HasOne
+     */
+    public function aiMessages(): HasMany
+    {
+        return $this->hasMany(AiMessage::class);
     }
 
     /**

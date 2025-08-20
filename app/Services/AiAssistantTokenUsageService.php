@@ -3,11 +3,8 @@
 namespace App\Services;
 
 use Exception;
-use App\Models\AiAssistant;
-use App\Models\AiAssistantTokenUsage;
-use App\Enums\Association;
-use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
+use App\Models\AiAssistantTokenUsage;
 use App\Http\Resources\AiAssistantTokenUsageResource;
 use App\Http\Resources\AiAssistantTokenUsageResources;
 

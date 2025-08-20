@@ -10,8 +10,9 @@ Route::middleware(['auth:sanctum'])
         Route::get('/', 'showStores')->name('show.stores');
         Route::post('/', 'createStore')->name('create.store');
         Route::delete('/', 'deleteStores')->name('delete.stores');
-        Route::get('/{alias}', 'showStoreByAlias')->name('show.store.by.alias');
+        Route::get('/alias/{alias}', 'showStoreByAlias')->name('show.store.by.alias');
 
+        // Explicit route model binding applied: AppServiceProvider.php
         Route::middleware(['store.permission', 'record.store.visit'])->prefix('{store}')->group(function () {
             Route::get('/', 'showStore')->name('show.store');
             Route::put('/', 'updateStore')->name('update.store');

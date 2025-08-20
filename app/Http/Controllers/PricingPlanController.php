@@ -2,130 +2,105 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\PricingPlan;
+use App\Models\AiTopic;
 use App\Models\Transaction;
-use App\Services\PricingPlanService;
+use App\Services\AiTopicService;
 use App\Http\Resources\TransactionResource;
-use App\Http\Resources\PricingPlanResource;
-use App\Http\Resources\PricingPlanResources;
-use App\Http\Requests\PricingPlan\PayPricingPlanRequest;
-use App\Http\Requests\PricingPlan\ShowPricingPlanRequest;
-use App\Http\Requests\PricingPlan\ShowPricingPlansRequest;
-use App\Http\Requests\PricingPlan\CreatePricingPlanRequest;
-use App\Http\Requests\PricingPlan\UpdatePricingPlanRequest;
-use App\Http\Requests\PricingPlan\DeletePricingPlanRequest;
-use App\Http\Requests\PricingPlan\DeletePricingPlansRequest;
-use App\Http\Requests\PricingPlan\VerifyPricingPlanPaymentRequest;
+use App\Http\Resources\AiTopicResource;
+use App\Http\Resources\AiTopicResources;
+use App\Http\Requests\AiTopic\PayAiTopicRequest;
+use App\Http\Requests\AiTopic\ShowAiTopicRequest;
+use App\Http\Requests\AiTopic\ShowAiTopicsRequest;
+use App\Http\Requests\AiTopic\CreateAiTopicRequest;
+use App\Http\Requests\AiTopic\UpdateAiTopicRequest;
+use App\Http\Requests\AiTopic\DeleteAiTopicRequest;
+use App\Http\Requests\AiTopic\DeleteAiTopicsRequest;
+use App\Http\Requests\AiTopic\VerifyAiTopicPaymentRequest;
 
-class PricingPlanController extends Controller
+class AiTopicController extends Controller
 {
     /**
-     * @var PricingPlanService
+     * @var AiTopicService
      */
     protected $service;
 
     /**
-     * PricingPlanController constructor.
+     * AiTopicController constructor.
      *
-     * @param PricingPlanService $service
+     * @param AiTopicService $service
      */
-    public function __construct(PricingPlanService $service)
+    public function __construct(AiTopicService $service)
     {
         $this->service = $service;
     }
 
     /**
-     * Show pricing plans.
+     * Show AI topics.
      *
-     * @param ShowPricingPlansRequest $request
-     * @return PricingPlanResources|array
+     * @param ShowAiTopicsRequest $request
+     * @return AiTopicResources|array
      */
-    public function showPricingPlans(ShowPricingPlansRequest $request): PricingPlanResources|array
+    public function showAiTopics(ShowAiTopicsRequest $request): AiTopicResources|array
     {
-        return $this->service->showPricingPlans($request->validated());
+        return $this->service->showAiTopics($request->validated());
     }
 
     /**
-     * Create pricing plan.
+     * Create AI topic.
      *
-     * @param CreatePricingPlanRequest $request
+     * @param CreateAiTopicRequest $request
      * @return array
      */
-    public function createPricingPlan(CreatePricingPlanRequest $request): array
+    public function createAiTopic(CreateAiTopicRequest $request): array
     {
-        return $this->service->createPricingPlan($request->validated());
+        return $this->service->createAiTopic($request->validated());
     }
 
     /**
-     * Delete multiple pricing plans.
+     * Delete multiple AI topics.
      *
-     * @param DeletePricingPlansRequest $request
+     * @param DeleteAiTopicsRequest $request
      * @return array
      */
-    public function deletePricingPlans(DeletePricingPlansRequest $request): array
+    public function deleteAiTopics(DeleteAiTopicsRequest $request): array
     {
-        $pricingPlanIds = request()->input('pricing_plan_ids', []);
-        return $this->service->deletePricingPlans($pricingPlanIds);
+        $aiTopicIds = request()->input('pricing_plan_ids', []);
+        return $this->service->deleteAiTopics($aiTopicIds);
     }
 
     /**
-     * Show pricing plan.
+     * Show AI topic.
      *
-     * @param ShowPricingPlanRequest $request
-     * @param PricingPlan $pricingPlan
-     * @return PricingPlanResource
+     * @param ShowAiTopicRequest $request
+     * @param AiTopic $aiTopic
+     * @return AiTopicResource
      */
-    public function showPricingPlan(ShowPricingPlanRequest $request, PricingPlan $pricingPlan): PricingPlanResource
+    public function showAiTopic(ShowAiTopicRequest $request, AiTopic $aiTopic): AiTopicResource
     {
-        return $this->service->showPricingPlan($pricingPlan);
+        return $this->service->showAiTopic($aiTopic);
     }
 
     /**
-     * Update pricing plan.
+     * Update AI topic.
      *
-     * @param UpdatePricingPlanRequest $request
-     * @param PricingPlan $pricingPlan
+     * @param UpdateAiTopicRequest $request
+     * @param AiTopic $aiTopic
      * @return array
      */
-    public function updatePricingPlan(UpdatePricingPlanRequest $request, PricingPlan $pricingPlan): array
+    public function updateAiTopic(UpdateAiTopicRequest $request, AiTopic $aiTopic): array
     {
-        return $this->service->updatePricingPlan($pricingPlan, $request->validated());
+        return $this->service->updateAiTopic($aiTopic, $request->validated());
     }
 
     /**
-     * Delete pricing plan.
+     * Delete AI topic.
      *
-     * @param DeletePricingPlanRequest $request
-     * @param PricingPlan $pricingPlan
+     * @param DeleteAiTopicRequest $request
+     * @param AiTopic $aiTopic
      * @return array
      */
-    public function deletePricingPlan(DeletePricingPlanRequest $request, PricingPlan $pricingPlan): array
+    public function deleteAiTopic(DeleteAiTopicRequest $request, AiTopic $aiTopic): array
     {
-        return $this->service->deletePricingPlan($pricingPlan);
-    }
-
-    /**
-     * Pay pricing plan.
-     *
-     * @param PayPricingPlanRequest $request
-     * @param PricingPlan $pricingPlan
-     * @return TransactionResource|array
-     */
-    public function payPricingPlan(PayPricingPlanRequest $request, PricingPlan $pricingPlan): TransactionResource|array
-    {
-        return $this->service->payPricingPlan($pricingPlan, $request->validated());
-    }
-
-    /**
-     * Verify pricing plan payment.
-     *
-     * @param VerifyPricingPlanPaymentRequest $request
-     * @param PricingPlan $pricingPlan
-     * @param Transaction $transaction
-     * @return TransactionResource
-     */
-    public function verifyPricingPlanPayment(VerifyPricingPlanPaymentRequest $request, PricingPlan $pricingPlan, Transaction $transaction): TransactionResource
-    {
-        return $this->service->verifyPricingPlanPayment($pricingPlan, $transaction);
+        return $this->service->deleteAiTopic($aiTopic);
     }
 }

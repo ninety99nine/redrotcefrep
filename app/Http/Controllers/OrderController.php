@@ -15,6 +15,7 @@ use App\Http\Requests\Order\DeleteOrdersRequest;
 use App\Http\Requests\Order\UpdateOrdersRequest;
 use App\Http\Requests\Order\DownloadOrdersRequest;
 use Symfony\Component\HttpFoundation\StreamedResponse;
+use App\Http\Requests\Order\ShowOrderStatusCountsRequest;
 use \Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class OrderController extends Controller
@@ -43,6 +44,17 @@ class OrderController extends Controller
     public function showOrders(ShowOrdersRequest $request): OrderResources|BinaryFileResponse|array
     {
         return $this->service->showOrders($request->validated());
+    }
+
+    /**
+     * Show orders.
+     *
+     * @param ShowOrderStatusCountsRequest $request
+     * @return array
+     */
+    public function showOrderStatusCounts(ShowOrderStatusCountsRequest $request): array
+    {
+        return $this->service->showOrderStatusCounts($request->validated());
     }
 
     /**

@@ -13,6 +13,8 @@ class AiAssistantTokenUsage extends Model
 {
     use HasFactory, HasUuids;
 
+    protected $table = 'ai_assistant_token_usage';
+
     /**
      * The attributes that should be cast.
      *

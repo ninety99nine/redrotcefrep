@@ -184,14 +184,6 @@ class Store extends Model
     }
 
     /**
-     *  Get team members.
-     */
-    public function teamMembers()
-    {
-        return $this->hasMany(User::class);
-    }
-
-    /**
      * Get orders.
      *
      * @return HasMany

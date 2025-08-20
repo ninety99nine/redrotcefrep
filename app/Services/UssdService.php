@@ -20,6 +20,7 @@ class UssdService
         return $this->cacheManager($user)->remember(now()->addHour(), function () use ($user) {
 
             return [
+                'id' => $user->id,
                 'name' => $user->name,
                 'last_name' => $user->last_name,
                 'first_name' => $user->first_name,

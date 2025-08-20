@@ -4,7 +4,6 @@ namespace App\Policies;
 
 use App\Models\User;
 use App\Models\AiAssistant;
-use App\Services\AuthService;
 
 class AiAssistantPolicy extends BasePolicy
 {
@@ -28,7 +27,7 @@ class AiAssistantPolicy extends BasePolicy
      */
     public function viewAny(User $user): bool
     {
-        return $this->isStoreUserWithPermission($user, 'view ai assistants');
+        return true;
     }
 
     /**
@@ -40,7 +39,7 @@ class AiAssistantPolicy extends BasePolicy
      */
     public function view(User $user, AiAssistant $aiAssistant): bool
     {
-        return $this->isStoreUserWithPermission($user, 'view ai assistants');
+        return true;
     }
 
     /**
@@ -51,7 +50,7 @@ class AiAssistantPolicy extends BasePolicy
      */
     public function create(User $user): bool
     {
-        return $this->isStoreUserWithPermission($user, 'manage ai assistants');
+        return true;
     }
 
     /**
@@ -63,7 +62,7 @@ class AiAssistantPolicy extends BasePolicy
      */
     public function update(User $user, AiAssistant $aiAssistant): bool
     {
-        return $this->isStoreUserWithPermission($user, 'manage ai assistants');
+        return true;
     }
 
     /**
@@ -75,7 +74,7 @@ class AiAssistantPolicy extends BasePolicy
      */
     public function delete(User $user, AiAssistant $aiAssistant): bool
     {
-        return $this->isStoreUserWithPermission($user, 'manage ai assistants');
+        return true;
     }
 
     /**
@@ -86,6 +85,6 @@ class AiAssistantPolicy extends BasePolicy
      */
     public function deleteAny(User $user): bool
     {
-        return $this->isStoreUserWithPermission($user, 'manage ai assistants');
+        return true;
     }
 }
