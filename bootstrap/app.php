@@ -5,6 +5,8 @@ use App\Http\Middleware\SetUssdUser;
 use Illuminate\Foundation\Application;
 use App\Http\Middleware\StorePermission;
 use App\Http\Middleware\RecordStoreVisit;
+use App\Jobs\AutoBilling\StartAutoBillingSchedules;
+use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Contracts\Auth\Middleware\AuthenticatesRequests;
@@ -37,6 +39,11 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->api(prepend: [
             SetUssdUser::class
         ]);
+
+    })
+    ->withSchedule(function (Schedule $schedule) {
+
+        $schedule->job(new StartAutoBillingSchedules)->everyFifteenSeconds();
 
     })
     ->withExceptions(function (Exceptions $exceptions) {

@@ -204,7 +204,7 @@ class OrderService extends BaseService
         if($store->storeQuota->sms_credits && $store->ussd_mobile_number) {
             $messageCrafterService = new MessageCrafterService();
             $smsMessage = $messageCrafterService->craftNewOrderForSellerMessage($order);
-            SendSms::dispatch($smsMessage, $store->ussd_mobile_number->formatE164(), $store);
+            SendSms::dispatch($smsMessage, $store->ussd_mobile_number->formatE164(), $store->id);
         }
 
         if(!$this->checkIfHasRelationOnRequest('store')) $order->unsetRelation('store');

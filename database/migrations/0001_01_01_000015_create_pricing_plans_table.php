@@ -25,7 +25,7 @@ return new class extends Migration
             $table->string('currency', 3);
             $table->decimal('price', 12, 3);
             $table->unsignedTinyInteger('discount_percentage_rate')->default(0);
-            $table->unsignedTinyInteger('max_auto_billing_attempts')->default(1);
+            $table->unsignedInteger('max_auto_billing_attempts')->nullable();
             $table->string('auto_billing_disabled_sms_message')->nullable();
             $table->boolean('supports_web')->default(false);
             $table->boolean('supports_ussd')->default(false);

@@ -2,7 +2,8 @@
 
 namespace App\Jobs;
 
-use App\Services\SmsService;
+use App\Models\Store;
+use App\Services\OrangeSmsService;
 use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 
@@ -10,7 +11,7 @@ class SendSms implements ShouldQueue
 {
     use Queueable;
 
-    public $store;
+    public $storeId;
     public $content;
     public $recipientMobileNumber;
 
@@ -23,9 +24,9 @@ class SendSms implements ShouldQueue
      *
      * @return void
      */
-    public function __construct($content, $recipientMobileNumber, $store = null)
+    public function __construct($content, $recipientMobileNumber, $storeId = null)
     {
-        $this->store = $store;
+        $this->storeId = $storeId;
         $this->content = $content;
         $this->recipientMobileNumber = $recipientMobileNumber;
     }
@@ -40,7 +41,10 @@ class SendSms implements ShouldQueue
         $smsEnabled = config('app.sms_enabled');
 
         if($smsEnabled) {
-            SmsService::sendOrangeSms($this->content, $this->recipientMobileNumber, $this->store);
+
+            $store = Store::findOrFail($this->storeId);
+            OrangeSmsService::sendSms($this->content, $this->recipientMobileNumber, $store);
+
         }
     }
 }

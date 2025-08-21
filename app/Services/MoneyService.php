@@ -4,6 +4,7 @@ namespace App\Services;
 
 use stdClass;
 use Exception;
+use Throwable;
 use App\Enums\CacheName;
 use App\Services\CacheService;
 use Illuminate\Support\Facades\Log;
@@ -973,7 +974,7 @@ class MoneyService
                 'response' => $data
             ]);
 
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
 
             Log::error("API exception while fetching rate for $symbol", [
                 'error' => $e->getMessage()

@@ -12,7 +12,7 @@ use App\Enums\SmsFailureType;
 use App\Services\CacheService;
 use Illuminate\Support\Facades\Log;
 
-class SmsService
+class OrangeSmsService
 {
     /**
      *  Send the Orange SMS
@@ -22,14 +22,14 @@ class SmsService
      *  @param Store|null $store - The store sending the message
      *  @return SmsMessage
      */
-    public static function sendOrangeSms($content, $recipientMobileNumber, $store = null): SmsMessage
+    public static function sendSms($content, $recipientMobileNumber, $store = null): SmsMessage
     {
         $failureType = null;
         $failureReason = null;
         $clientCorrelator = Str::uuid();
-        $senderName = config('app.sms_sender_name');
-        $clientCredentials = config('app.sms_credentials');
-        $senderMobileNumber = config('app.sms_sender_mobile_number');
+        $senderName = config('app.orange_sms_sender_name');
+        $clientCredentials = config('app.orange_sms_credentials');
+        $senderMobileNumber = config('app.orange_sms_sender_mobile_number');
 
         if($store && !empty($store->sms_sender_name)) {
 
@@ -193,7 +193,7 @@ class SmsService
 
             return $smsMessage;
 
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
 
             $failureType = SmsFailureType::InternalFailure->value;
             $failureReason = 'Could not send sms due to fatal error';
@@ -268,7 +268,7 @@ class SmsService
             try {
 
                 // Set the request endpoint
-                $endpoint = config('app.sms_url').'/token';
+                $endpoint = config('app.orange_sms_url').'/token';
 
                 // Set the request options
                 $options = [
@@ -400,7 +400,7 @@ class SmsService
      */
     public static function requestSendSms($senderName, $senderMobileNumber, $recipientMobileNumber, $message, $clientCorrelator, $accessToken): array
     {
-        $endpoint = config('app.sms_url').'/smsmessaging/v1/outbound/tel%3A%2B'.$senderMobileNumber.'/requests';
+        $endpoint = config('app.orange_sms_url').'/smsmessaging/v1/outbound/tel%3A%2B'.$senderMobileNumber.'/requests';
 
         $options = [
             'headers' => [
@@ -546,7 +546,7 @@ class SmsService
             $failureType = null;
             $failureReason = null;
             $metadata = $smsMessage->metadata;
-            $clientCredentials = config('app.sms_credentials');
+            $clientCredentials = config('app.orange_sms_credentials');
 
             /**
              *  ------------------------
@@ -650,7 +650,7 @@ class SmsService
 
             return $smsMessage;
 
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
 
             $failureType = SmsFailureType::InternalFailure->value;
             $failureReason = 'Could not verify sms delivery due to fatal error';
@@ -704,7 +704,7 @@ class SmsService
             try {
 
                 // Set the request endpoint
-                $endpoint = config('app.sms_url'). str_replace('tel:+','tel%3A%2B', $smsMessage->metadata['delivery_status_endpoint']);
+                $endpoint = config('app.orange_sms_url'). str_replace('tel:+','tel%3A%2B', $smsMessage->metadata['delivery_status_endpoint']);
 
                 // Set the request options
                 $options = [

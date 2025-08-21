@@ -7,11 +7,11 @@ return [
     'language' => env('DEFAULT_LANGUAGE', 'en'),
     'currency' => env('DEFAULT_CURRENCY', 'bwp'),
 
-    'sms_url' => env('SMS_URL'),
-    'sms_enabled' => env('SMS_ENABLED'),
-    'sms_sender_name' => env('SMS_SENDER_NAME'),
-    'sms_credentials' => env('SMS_CREDENTIALS'),
-    'sms_sender_mobile_number' => env('SMS_SENDER_MOBILE_NUMBER'),
+    'orange_sms_url' => env('ORANGE_SMS_URL'),
+    'orange_sms_enabled' => env('ORANGE_SMS_ENABLED'),
+    'orange_sms_sender_name' => env('ORANGE_SMS_SENDER_NAME'),
+    'orange_sms_credentials' => env('ORANGE_SMS_CREDENTIALS'),
+    'orange_sms_sender_mobile_number' => env('ORANGE_SMS_SENDER_MOBILE_NUMBER'),
 
     'orange_airtime_billing_url' => env('ORANGE_AIRTIME_BILLING_URL'),
     'orange_airtime_billing_enabled' => env('ORANGE_AIRTIME_BILLING_ENABLED'),

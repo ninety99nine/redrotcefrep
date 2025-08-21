@@ -11,6 +11,7 @@ use App\Services\CacheService;
 use Illuminate\Support\Facades\Log;
 use App\Enums\TransactionFailureType;
 use App\Enums\TransactionPaymentStatus;
+use PHPUnit\Framework\Constraint\IsFalse;
 
 class OrangeAirtimeService
 {
@@ -346,11 +347,23 @@ class OrangeAirtimeService
 
             }else{
 
-                $status = true;
-                $failureType = null;
-                $failureReason = null;
-                $ratingType = 'Prepaid';
-                $fundsBeforeDeduction = 100;
+                if(false) {
+
+                    $status = true;
+                    $failureType = null;
+                    $failureReason = null;
+                    $ratingType = 'Prepaid';
+                    $fundsBeforeDeduction = 100;
+
+                }else{
+
+                    $status = false;
+                    $failureType = null;
+                    $failureReason = null;
+                    $ratingType = 'Prepaid';
+                    $fundsBeforeDeduction = 100;
+
+                }
 
             }
 

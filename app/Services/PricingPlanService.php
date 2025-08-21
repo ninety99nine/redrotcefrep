@@ -30,6 +30,7 @@ use App\Enums\TransactionVerificationType;
 use App\Http\Resources\TransactionResource;
 use App\Http\Resources\PricingPlanResource;
 use App\Http\Resources\PricingPlanResources;
+use Illuminate\Support\Facades\Log;
 
 class PricingPlanService extends BaseService
 {
@@ -166,16 +167,16 @@ class PricingPlanService extends BaseService
     {
         $user = $store = $aiAssistant = null;
 
-        $store = $data['store'] ?? null;
         $storeId = $data['store_id'] ?? null;
         $paymentMethodId = $data['payment_method_id'] ?? null;
         $paymentMethodType = $data['payment_method_type'] ?? null;
+
+        $user = $data['user'] ?? null;
+        $store = $data['store'] ?? null;
+        $paymentMethod = $data['payment_method'] ?? null;
         $createdUsingAutoBilling = isset($data['auto_bill']) && $data['auto_bill'] == true;
 
-        if ($createdUsingAutoBilling) {
-            $user = User::find($data['user_id']);
-            throw new Exception('The user does not exist');
-        } else {
+        if (!$user) {
             $user = Auth::user();
         }
 
@@ -199,13 +200,17 @@ class PricingPlanService extends BaseService
             if (!$aiAssistant) throw new Exception('The AI Assistant does not exist');
         }
 
-        if ($paymentMethodId) {
-            $paymentMethod = PaymentMethod::find($paymentMethodId);
-        } else if ($paymentMethodType) {
-            $paymentMethod = PaymentMethod::whereType($paymentMethodType)->first();
+        if(!$paymentMethod) {
+            if ($paymentMethodId) {
+                $paymentMethod = PaymentMethod::find($paymentMethodId);
+            } else if ($paymentMethodType) {
+                $paymentMethod = PaymentMethod::whereType($paymentMethodType)->first();
+            }
         }
 
-        if (!$paymentMethod->active) {
+        if (!$paymentMethod) {
+            throw new Exception('The payment method is required');
+        }else if (!$paymentMethod->active) {
             throw new Exception('The ' . $paymentMethod->name . ' payment method has been deactivated');
         }
 
@@ -348,8 +353,8 @@ class PricingPlanService extends BaseService
         $store = $transaction?->store ?? $data['store'] ?? null;
         $user = $transaction?->requestedByUser ?? $data['user'];
         $pricingPlan = $transaction?->owner ?? $data['pricingPlan'];
-        $aiAssistant = $transaction?->aiAssistant ?? $data['aiAssistant'];
         $paymentMethod = $transaction?->paymentMethod ?? $data['paymentMethod'];
+        $aiAssistant = $transaction?->aiAssistant ?? $data['aiAssistant'] ?? null;
         $createdUsingAutoBilling = $transaction?->created_using_auto_billing ?? $data['createdUsingAutoBilling'];
 
         $messageCrafterService = new MessageCrafterService();
@@ -413,7 +418,8 @@ class PricingPlanService extends BaseService
 
                 $autoBillingSchedule = [
                     'active' => 1,
-                    'attempts' => 0,
+                    'attempt' => 0,
+                    'updated_at' => now(),
                     'user_id' => $user->id,
                     'store_id' => $store?->id,
                     'pricing_plan_id' => $pricingPlan->id,
@@ -429,20 +435,24 @@ class PricingPlanService extends BaseService
 
                 if ($existingAutoBillingSchedule) {
 
-                    $autoBillingSchedule['total_successful_attempts'] = $existingAutoBillingSchedule->total_successful_attempts + 1;
+                    if($createdUsingAutoBilling) {
+
+                        $autoBillingSchedule = array_merge($autoBillingSchedule, [
+                            'overall_attempts' => $existingAutoBillingSchedule->overall_attempts + 1,
+                            'overall_successful_attempts' => $existingAutoBillingSchedule->overall_successful_attempts + 1
+                        ]);
+                    }
 
                     DB::table('auto_billing_schedules')->where([
-                        'updated_at' => now(),
                         'user_id' => $user->id,
                         'store_id' => $store?->id,
-                        'pricing_plan_id' => $pricingPlan->id,
+                        'pricing_plan_id' => $pricingPlan->id
                     ])->update($autoBillingSchedule);
 
                 } else {
 
                     $autoBillingSchedule = array_merge($autoBillingSchedule, [
                         'id' => Str::uuid(),
-                        'updated_at' => now(),
                         'created_at' => now()
                     ]);
 

@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use Throwable;
 use App\Models\PaymentMethod;
 use Illuminate\Database\Seeder;
 use App\Enums\PaymentMethodType;
@@ -114,7 +115,7 @@ class PaymentMethodSeeder extends Seeder
 
         try {
             return $popularityOrder[$paymentMethod['type']->value];
-        } catch (\Throwable $th) {
+        } catch (Throwable $th) {
             Log::error($paymentMethod['type']->value);
             Log::error($popularityOrder);
         }

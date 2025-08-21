@@ -2,12 +2,15 @@
 
 namespace App\Services;
 
-use App\Models\Order;
-use App\Models\PricingPlan;
 use Carbon\Carbon;
+use App\Models\Order;
 use App\Models\Store;
+use Illuminate\Support\Str;
+use App\Models\PricingPlan;
 use App\Models\Transaction;
 use App\Models\Subscription;
+use App\Models\AutoBillingSchedule;
+use Illuminate\Database\Eloquent\Model;
 
 class MessageCrafterService
 {
@@ -91,5 +94,87 @@ class MessageCrafterService
 
         return $message;
 
+    }
+
+    /**
+     *  Craft the auto billing disabled message.
+     *
+     *  @param AutoBillingSchedule $autoBillingSchedule
+     *  @return string
+     */
+    public function craftAutoBillingDisabledMessage(AutoBillingSchedule $autoBillingSchedule) {
+
+        $store = $autoBillingSchedule->store;
+        $pricingPlan = $autoBillingSchedule->pricingPlan;
+
+        return $this->replacePlaceholders($pricingPlan->auto_billing_disabled_sms_message, [
+            'store' => $store,
+            'pricingPlan' => $pricingPlan
+        ]);
+
+    }
+
+    /**
+     * Replace placeholders in the text with values from provided models.
+     *
+     * @param string $text The text containing placeholders like {{ modelName.attribute }}
+     * @param array<string, Model> $models An associative array of model instances (e.g., ['store' => $store, 'pricingPlan' => $pricingPlan])
+     * @return string The text with placeholders replaced by model attribute values
+     */
+    public function replacePlaceholders(string $text, array $models): string
+    {
+        // Find all placeholders like {{ modelName.attribute }}
+        preg_match_all('/{{(.*?)}}/', $text, $matches);
+        $placeholders = $matches[0]; // Full placeholders, e.g., {{ store.name }}
+        $keys = $matches[1]; // Keys, e.g., store.name, pricingPlan.name
+
+        $replacements = [];
+        foreach ($keys as $index => $key) {
+
+            // Trim whitespace and split the key into model and attribute
+            [$modelName, $attribute] = explode('.', trim($key), 2);
+
+            // Get the model instance by name (case-insensitive)
+            $modelInstance = $models[$modelName] ?? null;
+
+            // Initialize value as empty string for fallback
+            $value = '';
+
+            if ($modelInstance instanceof Model) {
+
+                // Handle accessors (methods) or casted attributes
+                if (method_exists($modelInstance, $attribute)) {
+
+                    // If the attribute is an accessor (e.g., a method), call it
+                    $value = $modelInstance->$attribute();
+
+                } elseif ($modelInstance->hasGetMutator($attribute)) {
+
+                    // Handle Laravel mutators (getAttributeNameAttribute)
+                    $value = $modelInstance->$attribute;
+
+                } elseif ($modelInstance->hasCast($attribute)) {
+
+                    // Handle casted attributes (e.g., Money, JsonToArray)
+                    $value = $modelInstance->getAttributes()[$attribute] ?? '';
+
+                } else {
+
+                    // Direct attribute access
+                    $value = $modelInstance->$attribute ?? '';
+
+                }
+
+            }
+
+            $replacements[$placeholders[$index]] = $value;
+        }
+
+        // Perform the replacement
+        return Str::replace(
+            array_keys($replacements),
+            array_values($replacements),
+            $text
+        );
     }
 }

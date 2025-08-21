@@ -22,9 +22,10 @@ return new class extends Migration
             $table->foreignUuid('payment_method_id');
             $table->foreignUuid('store_id')->nullable();
             $table->datetime('next_attempt_date')->nullable();
-            $table->unsignedTinyInteger('attempts')->default(0);
-            $table->unsignedSmallInteger('total_failed_attempts')->default(0);
-            $table->unsignedSmallInteger('total_successful_attempts')->default(0);
+            $table->unsignedInteger('attempt')->default(0);
+            $table->unsignedInteger('overall_attempts')->default(0);
+            $table->unsignedInteger('overall_failed_attempts')->default(0);
+            $table->unsignedInteger('overall_successful_attempts')->default(0);
             $table->timestamps();
 
             $table->foreign('user_id')->references('id')->on('users')->cascadeOnDelete();
