@@ -347,23 +347,11 @@ class OrangeAirtimeService
 
             }else{
 
-                if(false) {
-
-                    $status = true;
-                    $failureType = null;
-                    $failureReason = null;
-                    $ratingType = 'Prepaid';
-                    $fundsBeforeDeduction = 100;
-
-                }else{
-
-                    $status = false;
-                    $failureType = null;
-                    $failureReason = null;
-                    $ratingType = 'Prepaid';
-                    $fundsBeforeDeduction = 100;
-
-                }
+                $status = true;
+                $failureType = null;
+                $failureReason = null;
+                $ratingType = 'Prepaid';
+                $fundsBeforeDeduction = 100;
 
             }
 

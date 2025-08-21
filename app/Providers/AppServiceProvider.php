@@ -24,6 +24,7 @@ use App\Models\DeliveryMethod;
 use App\Models\DeliveryAddress;
 use App\Observers\StoreObserver;
 use App\Models\StorePaymentMethod;
+use App\Models\AutoBillingSchedule;
 use App\Http\Middleware\SetUssdUser;
 use App\Listeners\RoleEventListener;
 use App\Models\AiAssistantTokenUsage;
@@ -200,6 +201,12 @@ class AppServiceProvider extends ServiceProvider
         Route::bind('pricingPlan', function ($value) {
             $allowedRoutes = ['show.pricing.plan'];
             return $this->applyEagerLoading(PricingPlan::query(), $allowedRoutes)->findOrFail($value);
+        });
+
+        // Bind AutoBillingSchedule model
+        Route::bind('autoBillingSchedule', function ($value) {
+            $allowedRoutes = ['show.auto.billing.Schedule'];
+            return $this->applyEagerLoading(AutoBillingSchedule::query(), $allowedRoutes)->findOrFail($value);
         });
 
         // Bind AiTopic model
