@@ -50,6 +50,8 @@ class OrangeSmsService
             'client_correlator' => $clientCorrelator
         ];
 
+        Log::info('before create');
+
         $smsMessage = SmsMessage::create([
             'content' => $content,
             'metadata' => $metadata,
@@ -60,10 +62,15 @@ class OrangeSmsService
             'recipient_mobile_number' => $recipientMobileNumber
         ]);
 
+        Log::info('after create');
+
         try {
 
             $senderMobileNumber = ltrim($senderMobileNumber, '+');
             $recipientMobileNumber = ltrim($recipientMobileNumber, '+');
+
+            Log::info($senderMobileNumber);
+            Log::info($recipientMobileNumber);
 
             /**
              *  ------------------------
