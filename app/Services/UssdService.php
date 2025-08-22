@@ -72,7 +72,7 @@ class UssdService
             'bw' => '250'
         ];
 
-        return isset(self::$ussdCodesByCountryCodes[$countryCode]) ? '*'.$codes[$countryCode].'#' : null;
+        return isset($codes[$countryCode]) ? '*'.$codes[$countryCode].'#' : null;
     }
 
     /**
