@@ -30,12 +30,11 @@ class MessageCrafterService
      *  Craft the store subscription paid messsage.
      *
      *  @param Store $store
-     *  @param Transaction $transaction
-     *  @param Subscription $subscription
      *  @return string
      */
-    public function craftStoreSubscriptionPaidMessage(Store $store, Transaction $transaction, Subscription $subscription) {
-        return $transaction->amount->amount_with_currency.' subscription successfully paid for '.$store->name.'. Valid till '.Carbon::parse($subscription->end_date)->format('d M Y H:i'). '. Enjoy ;)';
+    public function craftStoreSubscriptionPaidMessage(Store $store) {
+        return $store->name.' is now open! Customers can order via '.$store->ussd_shortcode.'. Share on WhatsApp, Facebook & flyers!';
+        //  return $store->name.' is live! Customers can order via '.$store->ussd_shortcode.' or ' . $store->web_link . '. Share on WhatsApp, Facebook & flyers!';
     }
 
     /**
@@ -45,8 +44,7 @@ class MessageCrafterService
      *  @return string
      */
     public function craftStoreMarketingMessage(Store $store) {
-        return $store->name.' is live! Customers can order via '.$store->ussd_shortcode.'. Share on WhatsApp, Facebook & flyers!';
-        //  return $store->name.' is live! Customers can order via '.$store->ussd_shortcode.' or ' . $store->web_link . '. Share on WhatsApp, Facebook & flyers!';
+        return 'Customers can buy by dialing '.$store->ussd_shortcode.' or visiting your website ' . $store->web_link . '. Share on WhatsApp, Facebook & flyers!';
     }
 
     /**

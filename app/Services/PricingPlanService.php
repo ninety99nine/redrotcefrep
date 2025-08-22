@@ -379,15 +379,17 @@ class PricingPlanService extends BaseService
                     if(!$createdUsingAutoBilling) {
 
                         if($trial) {
+
                             $smsMessage = $messageCrafterService->craftStoreTrialSubscriptionMessage($store, $pricingPlan);
+                            SendSms::dispatch($smsMessage, $user->mobile_number->formatE164())->delay(5);
+
+                            $smsMessage = $messageCrafterService->craftStoreMarketingMessage($store);
+                            SendSms::dispatch($smsMessage, $user->mobile_number->formatE164());
+
                         }else{
-                            $smsMessage = $messageCrafterService->craftStoreSubscriptionPaidMessage($store, $transaction, $storeSubscription);
+                            $smsMessage = $messageCrafterService->craftStoreSubscriptionPaidMessage($store);
+                            SendSms::dispatch($smsMessage, $user->mobile_number->formatE164());
                         }
-
-                        SendSms::dispatch($smsMessage, $user->mobile_number->formatE164());
-
-                        $smsMessage = $messageCrafterService->craftStoreMarketingMessage($store);
-                        SendSms::dispatch($smsMessage, $user->mobile_number->formatE164());
 
                     }
 
