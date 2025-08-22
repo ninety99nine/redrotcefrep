@@ -24,6 +24,7 @@ class OrangeSmsService
      */
     public static function sendSms($content, $recipientMobileNumber, $store = null): SmsMessage
     {
+        Log::info('SendSms: stage 3');
         $failureType = null;
         $failureReason = null;
         $clientCorrelator = Str::uuid();
