@@ -645,8 +645,8 @@
                     this.isLoggingOut = true;
                     await axios.post('/api/auth/logout');
 
-                    authState.unsetUser();
-                    authState.unsetToken();
+                    this.authState.unsetUser();
+                    this.authState.unsetToken();
                     this.$router.replace({ name: 'login' });
 
                 } catch (error) {
