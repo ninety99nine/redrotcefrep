@@ -74,8 +74,8 @@ class BackendCodeDesignTemplate extends Command
             }
         }
 
-        // Save to sample-design-template.txt in the project root
-        $outputPath = base_path('sample-design-template.txt');
+        // Save to sample_design_template.txt in the project root
+        $outputPath = base_path('sample_design_template.txt');
         File::put($outputPath, $output);
 
         $this->info("Design template generated successfully at: $outputPath");

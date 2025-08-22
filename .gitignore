@@ -23,4 +23,5 @@ Homestead.json
 Homestead.yaml
 Thumbs.db
 
-sample-design-template.txt
+rename_migrations.php
+sample_design_template.txt
