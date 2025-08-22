@@ -300,6 +300,11 @@ class OrangeSmsService
                 // Create a new HTTP Guzzle Client
                 $httpClient = new Client();
 
+                Log::info('SMS Request Payload', [
+                    'endpoint' => $endpoint,
+                    'options' => $options,
+                ]);
+
                 // Perform the HTTP request
                 $response = $httpClient->request('POST', $endpoint, $options);
 
@@ -449,6 +454,11 @@ class OrangeSmsService
 
                 // Create a new HTTP Guzzle Client
                 $httpClient = new Client();
+
+                Log::info('SMS Request Payload', [
+                    'endpoint' => $endpoint,
+                    'options' => $options,
+                ]);
 
                 // Perform the HTTP request
                 $response = $httpClient->request('POST', $endpoint, $options);
