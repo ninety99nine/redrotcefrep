@@ -69,9 +69,10 @@ class UssdService
     public static function getMainShortcode(string $countryCode): string|null
     {
         $codes = [
-            'bw' => '250'
+            'BW' => '250'
         ];
 
+        $countryCode = strtoupper($countryCode);
         return isset($codes[$countryCode]) ? '*'.$codes[$countryCode].'#' : null;
     }
 
