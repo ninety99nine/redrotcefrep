@@ -6,7 +6,6 @@ use App\Models\Store;
 use App\Services\OrangeSmsService;
 use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Support\Facades\Log;
 
 class SendSms implements ShouldQueue
 {
@@ -39,15 +38,11 @@ class SendSms implements ShouldQueue
      */
     public function handle()
     {
-        Log::info('smsEnabled: handle');
-        $smsEnabled = config('app.sms_enabled');
+        $smsEnabled = config('app.orange_sms_enabled');
 
         if($smsEnabled) {
-            Log::info('smsEnabled: smsEnabled');
-
             $store = Store::findOrFail($this->storeId);
             OrangeSmsService::sendSms($this->content, $this->recipientMobileNumber, $store);
-
         }
     }
 }
