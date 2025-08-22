@@ -7,6 +7,7 @@ use App\Enums\TagType;
 use App\Casts\JsonArray;
 use App\Casts\CheckoutFees;
 use App\Enums\UploadFolderName;
+use App\Services\UssdService;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -338,13 +339,20 @@ class Store extends Model
     }
 
     protected $appends = [
-        'web_link'
+        'web_link', 'ussd_shortcode'
     ];
 
     public function webLink(): Attribute
     {
         return new Attribute(
             get: fn() => $this->alias ? config('app.url').'/'.$this->alias : null
+        );
+    }
+
+    public function ussdShortcode(): Attribute
+    {
+        return new Attribute(
+            get: fn () => $this->ussd_mobile_number == null ? null : UssdService::appendToMainShortcode($this->ussd_mobile_number->formatNational(), $this->ussd_mobile_number->getCountry())
         );
     }
 }

@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\User;
 use App\Enums\CacheName;
+use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Auth;
 
 class UssdService
@@ -57,5 +58,32 @@ class UssdService
     {
         $ussdToken = request()->header('USSD-Token');
         return filled($ussdToken) && $ussdToken === config('app.ussd_token');
+    }
+
+    /**
+     *  Get main shortcode e.g *250#
+     *
+     *  @param string $countryCode
+     *  @return string|null
+     */
+    public static function getMainShortcode(string $countryCode): string|null
+    {
+        $codes = [
+            'BW' => '250'
+        ];
+
+        return isset(self::$ussdCodesByCountryCodes[$countryCode]) ? '*'.$codes[$countryCode].'#' : null;
+    }
+
+    /**
+     *  Append to main shortcode e.g *123*250#
+     *
+     *  @param string $countryCode
+     *  @return string|null
+     */
+    public static function appendToMainShortcode(string $number, string $countryCode): string|null
+    {
+        $number = Str::replace(' ', '', $number);
+        return ($mainShortcode = self::getMainShortcode($countryCode)) ? Str::replaceFirst('#', '*'.$number.'#', $mainShortcode) : null;
     }
 }
