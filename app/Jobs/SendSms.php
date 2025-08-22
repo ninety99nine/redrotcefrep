@@ -43,23 +43,16 @@ class SendSms implements ShouldQueue
 
             $smsEnabled = config('app.orange_sms_enabled');
 
-            Log::info('SendSms: '.$smsEnabled);
-            Log::info('SendSms: stage 1');
-
             if($smsEnabled) {
 
-                Log::info('SendSms: stage 2');
-                Log::info('$this->storeId: '.$this->storeId);
                 $store = $this->storeId ? Store::findOrFail($this->storeId) : null;
-                Log::info('$store: '.$store);
-
                 OrangeSmsService::sendSms($this->content, $this->recipientMobileNumber, $store);
 
             }
 
         } catch (\Throwable $th) {
 
-            Log::info('SendSms Error: '.$th->getMessage());
+            Log::error('Send SMS Error: '.$th->getMessage());
 
         }
     }

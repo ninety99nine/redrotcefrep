@@ -24,20 +24,12 @@ class OrangeSmsService
      */
     public static function sendSms($content, $recipientMobileNumber, $store = null): SmsMessage
     {
-        Log::info('SendSms: stage 3');
         $failureType = null;
         $failureReason = null;
         $clientCorrelator = Str::uuid();
         $senderName = config('app.orange_sms_sender_name');
         $clientCredentials = config('app.orange_sms_credentials');
         $senderMobileNumber = config('app.orange_sms_sender_mobile_number');
-
-        Log::info($content);
-        Log::info($recipientMobileNumber);
-
-        Log::info($senderName);
-        Log::info($clientCredentials);
-        Log::info($senderMobileNumber);
 
         if($store && !empty($store->sms_sender_name)) {
 
@@ -50,17 +42,6 @@ class OrangeSmsService
             'client_correlator' => $clientCorrelator
         ];
 
-        Log::info('before create');
-        Log::info([
-            'content' => $content,
-            'metadata' => $metadata,
-            'store_id' => $store?->id,
-            'sender_name' => $senderName,
-            'status' => SmsStatus::PENDING->value,
-            'sender_mobile_number' => $senderMobileNumber,
-            'recipient_mobile_number' => $recipientMobileNumber
-        ]);
-
         $smsMessage = SmsMessage::create([
             'content' => $content,
             'metadata' => $metadata,
@@ -71,15 +52,10 @@ class OrangeSmsService
             'recipient_mobile_number' => $recipientMobileNumber
         ]);
 
-        Log::info('after create');
-
         try {
 
             $senderMobileNumber = ltrim($senderMobileNumber, '+');
             $recipientMobileNumber = ltrim($recipientMobileNumber, '+');
-
-            Log::info($senderMobileNumber);
-            Log::info($recipientMobileNumber);
 
             /**
              *  ------------------------
@@ -309,11 +285,6 @@ class OrangeSmsService
                 // Create a new HTTP Guzzle Client
                 $httpClient = new Client();
 
-                Log::info('SMS Request Payload', [
-                    'endpoint' => $endpoint,
-                    'options' => $options,
-                ]);
-
                 // Perform the HTTP request
                 $response = $httpClient->request('POST', $endpoint, $options);
 
@@ -463,11 +434,6 @@ class OrangeSmsService
 
                 // Create a new HTTP Guzzle Client
                 $httpClient = new Client();
-
-                Log::info('SMS Request Payload', [
-                    'endpoint' => $endpoint,
-                    'options' => $options,
-                ]);
 
                 // Perform the HTTP request
                 $response = $httpClient->request('POST', $endpoint, $options);
