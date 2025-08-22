@@ -49,7 +49,7 @@ class SendSms implements ShouldQueue
             if($smsEnabled) {
 
                 Log::info('SendSms: stage 2');
-                $store = Store::findOrFail($this->storeId);
+                $store = $this->storeId ? Store::findOrFail($this->storeId) : null;
                 OrangeSmsService::sendSms($this->content, $this->recipientMobileNumber, $store);
 
             }
