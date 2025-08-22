@@ -4,9 +4,9 @@ namespace App\Jobs;
 
 use App\Models\Store;
 use App\Services\OrangeSmsService;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Support\Facades\Log;
 
 class SendSms implements ShouldQueue
 {
@@ -39,15 +39,25 @@ class SendSms implements ShouldQueue
      */
     public function handle()
     {
-        $smsEnabled = config('app.orange_sms_enabled');
+        try {
 
-        Log::info('SendSms: '.$smsEnabled);
-        Log::info('SendSms: stage 1');
+            $smsEnabled = config('app.orange_sms_enabled');
 
-        if($smsEnabled) {
-        Log::info('SendSms: stage 2');
-            $store = Store::findOrFail($this->storeId);
-            OrangeSmsService::sendSms($this->content, $this->recipientMobileNumber, $store);
+            Log::info('SendSms: '.$smsEnabled);
+            Log::info('SendSms: stage 1');
+
+            if($smsEnabled) {
+
+                Log::info('SendSms: stage 2');
+                $store = Store::findOrFail($this->storeId);
+                OrangeSmsService::sendSms($this->content, $this->recipientMobileNumber, $store);
+
+            }
+
+        } catch (\Throwable $th) {
+
+            Log::info('SendSms Error: '.$th->getMessage());
+
         }
     }
 }
