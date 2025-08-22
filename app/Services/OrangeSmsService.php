@@ -51,6 +51,15 @@ class OrangeSmsService
         ];
 
         Log::info('before create');
+        Log::info([
+            'content' => $content,
+            'metadata' => $metadata,
+            'store_id' => $store?->id,
+            'sender_name' => $senderName,
+            'status' => SmsStatus::PENDING->value,
+            'sender_mobile_number' => $senderMobileNumber,
+            'recipient_mobile_number' => $recipientMobileNumber
+        ]);
 
         $smsMessage = SmsMessage::create([
             'content' => $content,
