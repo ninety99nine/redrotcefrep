@@ -2,8 +2,6 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
-use App\Jobs\SendSms;
-use App\Models\Store;
 
 Route::prefix('auth')->group(function () {
     Route::get('/google', [AuthController::class, 'redirectToGoogle'])->name('social.auth.google');
@@ -13,18 +11,6 @@ Route::prefix('auth')->group(function () {
     Route::get('/linkedin', [AuthController::class, 'redirectToLinkedIn'])->name('social.auth.linkedin');
     Route::get('/linkedin/callback', [AuthController::class, 'handleLinkedInCallback'])->name('social.auth.linkedin.callback');
 });
-
-Route::get('/test-sms', function () {
-
-    SendSms::dispatch('Hello, this is a test sms', '+26772882239');
-    return 'Test sms sent!';
-
-})->where('any', '.*');
-
-Route::get('/test-ussd-mobile', function () {
-    return Store::first()->ussd_shortcode;
-
-})->where('any', '.*');
 
 Route::get('/{any}', function () {
     return view('welcome');
