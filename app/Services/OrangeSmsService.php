@@ -31,6 +31,13 @@ class OrangeSmsService
         $clientCredentials = config('app.orange_sms_credentials');
         $senderMobileNumber = config('app.orange_sms_sender_mobile_number');
 
+        Log::info($content);
+        Log::info($recipientMobileNumber);
+
+        Log::info($senderName);
+        Log::info($clientCredentials);
+        Log::info($senderMobileNumber);
+
         if($store && !empty($store->sms_sender_name)) {
 
             $senderName = $store->sms_sender_name;
