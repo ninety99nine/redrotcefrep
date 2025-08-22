@@ -69,7 +69,7 @@ class UssdService
     public static function getMainShortcode(string $countryCode): string|null
     {
         $codes = [
-            'BW' => '250'
+            'bw' => '250'
         ];
 
         return isset(self::$ussdCodesByCountryCodes[$countryCode]) ? '*'.$codes[$countryCode].'#' : null;
