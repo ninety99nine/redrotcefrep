@@ -1,6 +1,6 @@
 <template>
 
-    <ul class="inline-flex -space-x-px rtl:space-x-reverse text-sm h-8">
+    <ul class="select-none inline-flex -space-x-px rtl:space-x-reverse text-sm h-8">
         <li v-for="(link, index) in pagination.meta.links" :key="index">
             <a :href="link.url ?? '#'" @click.prevent="onClick(link)" :disabled="isDisabled(link)" :class="getLinkClass(index, link)">
                 <span v-html="link.label"></span>
@@ -25,7 +25,7 @@
                 if (link.url) {
                     // Extract page number from URL query parameter
                     const page = new URL(link.url).searchParams.get('page');
-                    this.$emit('paginate', page);
+                    this.$emit('paginate', parseInt(page));
                 }
             },
             isDisabled(link) {

@@ -44,12 +44,13 @@
             ghost-class="bg-yellow-50"
             v-if="hasCategoryProducts"
             v-model="categoryForm.products"
+            class="divide-y divide-gray-200 mb-4"
             @change="categoryState.saveStateDebounced('Product arrangement changed')">
 
             <div
                 :key="index"
                 v-for="(categoryProduct, index) in categoryForm.products"
-                class="flex items-center justify-between hover:bg-gray-100 rounded-lg py-2 px-4">
+                class="flex items-center justify-between hover:bg-gray-100 min-h-16 px-4">
 
                 <div class="flex space-x-4 items-center">
                     <div
@@ -59,7 +60,7 @@
                         <img class="w-full max-h-full object-contain rounded-lg flex-shrink-0" :src="categoryProduct.photo.path">
 
                     </div>
-                    <span class="truncate">{{ categoryProduct.name }}</span>
+                    <span class="text-sm truncate">{{ categoryProduct.name }}</span>
                     <Pill :type="categoryProduct.visible ? 'success' : 'warning'" size="xs">{{ categoryProduct.visible ? 'visible' : 'hidden' }}</Pill>
                 </div>
 
@@ -112,8 +113,8 @@
             }
         },
         watch: {
-            store(newValue) {
-                if(newValue) {
+            store(newValue, oldValue) {
+                if(!oldValue && newValue) {
                     this.showProducts();
                 }
             }

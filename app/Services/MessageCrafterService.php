@@ -23,7 +23,7 @@ class MessageCrafterService
      *  @return string
      */
     public function craftStoreTrialSubscriptionMessage(Store $store, PricingPlan $pricingPlan) {
-        return $store->name.' is now open! Enjoy ' . $pricingPlan->trial_days . ' DAYS FREE to showcase products, reach customers & make sales. After that, keep growing for just '.$pricingPlan->price->amount_with_currency.'/'.$pricingPlan->metadata['store_subscription']['frequency'].'.';
+        return $store->name.' is now open! Enjoy ' . $pricingPlan->trial_days . ' DAYS FREE to showcase products, reach customers & make sales. After that, keep growing for just '.$pricingPlan->price->amount_with_currency.'/'.$pricingPlan->metadata['store_subscription']['frequency'].' or opt out.';
     }
 
     /**

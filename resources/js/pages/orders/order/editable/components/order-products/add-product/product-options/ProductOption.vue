@@ -1,7 +1,7 @@
 <template>
 
     <div
-        @click="() => onSelectProduct(product)"
+        @click="() => onSelectProduct(product, parentProduct)"
         class="flex justify-between items-center cursor-pointer p-2 space-x-4 rounded-lg bg-gray-50 hover:bg-gray-100">
 
         <div :class="['flex items-center justify-center w-10 h-10 rounded-lg', { 'border border-dashed border-gray-200' : !hasPhoto }]">
@@ -24,7 +24,7 @@
                 </p>
             </div>
 
-            <Pill v-if="product.allow_variations.status" type="light" size="xs">{{ product.total_visible_variations }} options</Pill>
+            <Pill v-if="product.variants && product.variants.length" type="light" size="xs">{{ product.variants.length }} {{ product.variants.length == 1 ? 'option' : 'options' }}</Pill>
 
         </div>
 
@@ -41,6 +41,10 @@
             Pill
         },
         props: {
+            parentProduct: {
+                type: Object,
+                default: null
+            },
             product: {
                 type: Object
             },

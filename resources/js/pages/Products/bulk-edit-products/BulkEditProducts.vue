@@ -957,8 +957,8 @@
             }
         },
         watch: {
-            store(newValue) {
-                if(newValue) {
+            store(newValue, oldValue) {
+                if(!oldValue && newValue) {
                     this.setTags();
                     this.setCategories();
                     this.showProducts();

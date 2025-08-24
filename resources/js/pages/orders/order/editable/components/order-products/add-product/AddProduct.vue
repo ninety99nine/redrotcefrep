@@ -6,10 +6,10 @@
             ref="modal"
             :onShow="onShow"
             triggerSize="sm"
-            :leftTriggerIcon="Plus"
             contentClass="px-4"
             triggerType="light"
             header="Add Product"
+            :leftTriggerIcon="Plus"
             :scrollOnContent="false"
             triggerText="Add Product"
             :showApproveButton="false"
@@ -66,18 +66,29 @@
 
                 <template v-else-if="selectedProduct">
 
-                    <Button
-                        size="xs"
-                        type="light"
-                        buttonClass="mt-4"
-                        :leftIcon="ArrowLeft"
-                        :action="removeSelectedProduct">
-                        <span>Back</span>
-                    </Button>
+                    <div class="flex items-center space-x-4 border-b border-dashed border-gray-300 my-4 pb-4">
 
-                    <p class="text-lg font-bold border-b border-dashed my-4 pb-4">
-                        {{ selectedProduct.name }}
-                    </p>
+                        <Button
+                            size="xs"
+                            type="light"
+                            :leftIcon="ArrowLeft"
+                            :action="removeSelectedProduct">
+                            <span>Back</span>
+                        </Button>
+
+                        <div class="flex items-center space-x-2">
+
+                            <div v-if="selectedProduct.photo.path" class="flex items-center justify-center w-10 h-10 rounded-lg">
+                                <img class="w-full max-h-10 object-contain rounded-lg flex-shrink-0" :src="selectedProduct.photo.path">
+                            </div>
+
+                            <p class="text-lg font-bold">
+                                {{ selectedProduct.name }}
+                            </p>
+
+                        </div>
+
+                    </div>
 
                     <ProductVariationOptions
                         :onSelectProduct=onSelectProduct
@@ -174,9 +185,9 @@
 
                     let config = {
                         params: {
-                            _relationships: 'photo',
                             store_id: this.store.id,
-                            association: 'team member'
+                            association: 'team member',
+                            _relationships: 'photo,variants'
                         }
                     };
 
@@ -207,15 +218,15 @@
                     this.isLoadingProducts = false;
                 }
             },
-            onSelectProduct(product) {
+            onSelectProduct(product, parentProduct) {
 
-                const allowVariations = product.allow_variations.status;
+                const hasVariants = product.variants && product.variants.length > 0;
 
-                if(allowVariations) {
+                if(hasVariants) {
                     this.selectedProduct = product;
                 }else{
                     this.$refs.modal.hideModal();
-                    this.orderState.addCartProductUsingProduct(product);
+                    this.orderState.addCartProductUsingProduct(product, parentProduct);
                 }
 
             },

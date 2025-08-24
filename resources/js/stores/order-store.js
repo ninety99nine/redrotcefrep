@@ -154,16 +154,17 @@ export const useOrderStore = defineStore('order', {
 
             }
         },
-        addCartProductUsingProduct(product) {
+        addCartProductUsingProduct(product, parentProduct = null) {
 
             const photo = product.photo;
+            const name = parentProduct ? parentProduct.name+' '+product.name : product.name;
 
             // Convert numeric values to numbers for consistent comparison
             const unitSalePrice = Number(product.unit_sale_price.amount);
             const unitRegularPrice = Number(product.unit_regular_price.amount);
 
             const existingProduct = this.orderForm.cart_products.find(p =>
-                p.name === product.name &&
+                p.name === name &&
                 Number(p.unit_sale_price) === unitSalePrice &&
                 Number(p.unit_regular_price) === unitRegularPrice
             );
@@ -177,9 +178,9 @@ export const useOrderStore = defineStore('order', {
 
                 // Add as a new product
                 this.orderForm.cart_products.push({
+                    'name': name,
                     'quantity': '1',
                     'id': product.id,
-                    'name': product.name,
                     'is_free': product.is_free,
                     'photo_path': photo ? photo.path : null,
                     'unit_weight': product.unit_weight.toString(),

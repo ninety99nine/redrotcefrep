@@ -28,6 +28,7 @@ class ShowCustomersRequest extends FormRequest
     public function rules(): array
     {
         return [
+            'tag_id' => ['sometimes', 'uuid'],
             'store_id' => ['sometimes', 'uuid'],
             'association' => ['sometimes', Rule::enum(Association::class)->only([Association::SUPER_ADMIN, Association::TEAM_MEMBER])],
         ];
@@ -41,6 +42,7 @@ class ShowCustomersRequest extends FormRequest
     public function messages(): array
     {
         return [
+            'tag_id.uuid' => 'The tag ID must be a valid UUID.',
             'store_id.uuid' => 'The store ID must be a valid UUID.',
             'association.enum' => 'The association must be one of: ' . Arr::join([Association::SUPER_ADMIN->value, Association::TEAM_MEMBER->value], ', ', ' or '),
         ];

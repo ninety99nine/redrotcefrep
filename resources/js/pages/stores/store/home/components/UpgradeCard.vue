@@ -81,8 +81,8 @@
             };
         },
         watch: {
-            store(newValue) {
-                if (newValue && !this.activeSubscription) {
+            store(newValue, oldValue) {
+                if(!oldValue && newValue && !this.activeSubscription) {
                     this.$nextTick(() => {
                         this.manageUpgradeButtonAnimation();
                     });

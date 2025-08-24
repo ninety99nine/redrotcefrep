@@ -495,7 +495,7 @@
                                 {
                                     name: 'Tags',
                                     routeName: 'show-product-tags',
-                                    associatedRouteNames: ['create-product-tags', 'edit-product-tag']
+                                    associatedRouteNames: ['create-product-tag', 'edit-product-tag']
                                 },
                                 {
                                     name: 'Categories',
@@ -519,7 +519,7 @@
                                 {
                                     name: 'Tags',
                                     routeName: 'show-customer-tags',
-                                    associatedRouteNames: ['create-customer-tags', 'edit-customer-tag']
+                                    associatedRouteNames: ['create-customer-tag', 'edit-customer-tag']
                                 },
                                 {
                                     name: 'Bulk Edit',

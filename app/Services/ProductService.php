@@ -19,6 +19,7 @@ use App\Enums\StockQuantityType;
 use Illuminate\Support\Facades\DB;
 use App\Http\Resources\ProductResource;
 use App\Http\Resources\ProductResources;
+use Illuminate\Database\Eloquent\Builder;
 use App\Http\Requests\Product\CreateProductRequest;
 use \Symfony\Component\HttpFoundation\BinaryFileResponse;
 
@@ -32,6 +33,7 @@ class ProductService extends BaseService
      */
     public function showProducts(array $data): ProductResources|BinaryFileResponse|array
     {
+        $tagId = $data['tag_id'] ?? null;
         $storeId = $data['store_id'] ?? null;
         $association = isset($data['association']) ? Association::tryFrom($data['association']) : null;
 
@@ -39,11 +41,27 @@ class ProductService extends BaseService
             $query = Product::isNotVariant();
         }else if($association == Association::TEAM_MEMBER) {
             $query = Product::isNotVariant()->where('store_id', $storeId);
+        }elseif($tagId) {
+            $query = Product::whereHas('tags', function (Builder $query) use ($tagId) {
+                $query->where('id', $tagId);
+            });
         }else {
             $query = Product::isNotVariant()->where('store_id', $storeId)->visible();
         }
 
-        $query = $query->when(!request()->has('_sort'), fn($query) => $query->orderBy('position'));
+        if($storeId) $query = $query->where('store_id', $storeId);
+
+        if($tagId) {
+            $query = $query->when(!request()->has('_sort'), function ($query) use ($tagId) {
+                return $query->join('product_tag', 'products.id', '=', 'product_tag.product_id')
+                            ->where('product_tag.tag_id', $tagId)
+                            ->orderBy('product_tag.updated_at', 'desc')
+                            ->select('products.*');
+            });
+        }else{
+            $query = $query->when(!request()->has('_sort'), fn($query) => $query->orderBy('position'));
+        }
+
         return $this->setQuery($query)->getOutput();
     }
 

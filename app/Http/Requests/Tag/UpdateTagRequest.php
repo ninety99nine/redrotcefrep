@@ -25,8 +25,14 @@ class UpdateTagRequest extends FormRequest
     {
         return [
             'name' => ['sometimes', 'string', 'max:60'],
-            'product_ids' => ['nullable', 'array'],
-            'product_ids.*' => ['uuid'],
+            'product_ids_to_add' => ['nullable', 'array'],
+            'product_ids_to_add.*' => ['uuid'],
+            'product_ids_to_remove' => ['nullable', 'array'],
+            'product_ids_to_remove.*' => ['uuid'],
+            'customer_ids_to_add' => ['nullable', 'array'],
+            'customer_ids_to_add.*' => ['uuid'],
+            'customer_ids_to_remove' => ['nullable', 'array'],
+            'customer_ids_to_remove.*' => ['uuid'],
         ];
     }
 
@@ -40,8 +46,14 @@ class UpdateTagRequest extends FormRequest
         return [
             'name.string' => 'The tag name must be a string.',
             'name.max' => 'The tag name must not exceed 60 characters.',
-            'product_ids.array' => 'The product IDs must be an array.',
-            'product_ids.*.uuid' => 'Each product ID must be a valid UUID.',
+            'product_ids_to_add.array' => 'The product IDs must be an array.',
+            'product_ids_to_add.*.uuid' => 'Each product ID must be a valid UUID.',
+            'product_ids_to_remove.array' => 'The product IDs must be an array.',
+            'product_ids_to_remove.*.uuid' => 'Each product ID must be a valid UUID.',
+            'customer_ids_to_add.array' => 'The customer IDs must be an array.',
+            'customer_ids_to_add.*.uuid' => 'Each customer ID must be a valid UUID.',
+            'customer_ids_to_remove.array' => 'The customer IDs must be an array.',
+            'customer_ids_to_remove.*.uuid' => 'Each customer ID must be a valid UUID.',
         ];
     }
 }

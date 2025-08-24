@@ -101,7 +101,7 @@
 
                         <!-- Scrollable Options List -->
                         <ul
-                            class="max-h-60 overflow-auto"
+                            class="max-h-60 divide-y divide-gray-100 overflow-auto"
                             v-if="isSearching || options.length > 0">
 
                             <template v-if="isSearching">

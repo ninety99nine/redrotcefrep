@@ -159,7 +159,6 @@
 
 <script>
 
-    import Loader from '@Partials/Loader.vue';
     import Skeleton from '@Partials/Skeleton.vue';
     import StoreLogo from '@Components/StoreLogo.vue';
 

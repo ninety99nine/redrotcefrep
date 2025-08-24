@@ -33,7 +33,10 @@
                                     {{ isCreating ? 'Add Tag' : tagForm.name || '...' }}
                                 </h1>
 
-                                <Popover content="Tags are keywords or labels that highlight specific features of your products, helping customers discover related items more easily." placement="top"></Popover>
+                                <Popover
+                                     placement="top"
+                                    :content="isEditingProductTag || isCreatingProductTag ? 'Tags are labels you add to products to highlight features, making it easier for customers to find related items e.g. organic, new arrival, or best seller.' : 'Tags are labels you add to customers to group them by traits or behavior, making it easier to organize and personalize interactions e.g vip, frequent buyer or needs follow-up'">
+                                </Popover>
 
                             </div>
 
@@ -53,11 +56,12 @@
                         <Input
                             type="text"
                             label="Name"
-                            placeholder="Main Dish"
                             v-model="tagForm.name"
                             :errorText="formState.getFormError('name')"
                             @input="tagState.saveStateDebounced('Name changed')"
-                            tooltipContent="The name of your tag e.g Main Dish">
+                            :placeholder="isEditingProductTag || isCreatingProductTag ? 'main dish' : 'vip'"
+                            :disabled="isEditingProductTag || isCreatingProductTag ? !tagProductsReady : !tagCustomersReady"
+                            :tooltipContent="`The name of your tag e.g ${isEditingProductTag || isCreatingProductTag ? 'main dish' : 'vip'}`">
                         </Input>
 
                     </div>
@@ -68,8 +72,15 @@
 
                     <BackdropLoader v-if="isLoadingTag || isSubmitting" :showSpinningLoader="false" class="rounded-lg"></BackdropLoader>
 
-                    <TagProducts v-if="isEditingProductTag || isCreatingProductTag"></TagProducts>
-                    <TagCustomers v-else></TagCustomers>
+                    <TagProducts
+                        @tagProductsReady="tagProductsReady = true"
+                        v-if="isEditingProductTag || isCreatingProductTag">
+                    </TagProducts>
+
+                    <TagCustomers
+                        v-else
+                        @tagCustomersReady="tagCustomersReady = true">
+                    </TagCustomers>
 
                 </div>
 
@@ -136,19 +147,26 @@
             return {
                 Trash2,
                 MoveLeft,
-                products: []
+                products: [],
+                tagProductsReady: false,
+                tagCustomersReady: false
             }
         },
         watch: {
-            store(newValue) {
-                if(newValue) {
+            store(newValue, oldValue) {
+                if(!oldValue && newValue) {
                     this.setup();
                 }
             },
-            '$route.params.tag_id'(newValue) {
+            tagId(newValue) {
                 if(newValue) {
                     this.setup();
                     this.setActionButtons();
+                }
+            },
+            isReady(newValue) {
+                if (newValue && this.changeHistoryState.data == null) {
+                    this.tagState.saveOriginalState('Original tag');
                 }
             }
         },
@@ -172,10 +190,10 @@
                 return this.tagState.isLoadingTag;
             },
             isEditing() {
-                return ['edit-product-tag', 'edit-customer-tag'].includes(this.$route.name);
+                return this.isEditingProductTag || this.isEditingCustomerTag;
             },
             isCreating() {
-                return ['create-product-tag', 'create-customer-tag'].includes(this.$route.name);
+                return this.isCreatingProductTag || this.isCreatingCustomerTag;
             },
             isEditingProductTag() {
                 return this.$route.name == 'edit-product-tag';
@@ -183,8 +201,17 @@
             isCreatingProductTag() {
                 return this.$route.name == 'create-product-tag';
             },
+            isEditingCustomerTag() {
+                return this.$route.name == 'edit-customer-tag';
+            },
+            isCreatingCustomerTag() {
+                return this.$route.name == 'create-customer-tag';
+            },
             tagForm() {
                 return this.tagState.tagForm;
+            },
+            isReady() {
+                return this.isEditingProductTag || this.isCreatingProductTag ? this.tagProductsReady : this.tagCustomersReady;
             },
             isSubmitting() {
                 if(this.changeHistoryState.actionButtons.length == 0) return false;
@@ -192,15 +219,17 @@
             },
             isDeletingTag() {
                 return this.tagState.isDeletingTag;
-            }
+            },
         },
         methods: {
             goBack() {
                 this.navigateToTags();
             },
             async setup() {
-                if(this.tagForm == null) this.tagState.setTagForm(null, this.isCreating);
-                if(this.isEditing && this.store) await this.showTag();
+                if(this.tagForm == null) this.tagState.setTagForm(null);
+                if(this.isEditing && this.store) {
+                    await this.showTag();
+                }
             },
             async navigateToTags() {
                 await this.$router.replace({
@@ -215,7 +244,7 @@
             },
             async onView(tag) {
                 await this.$router.push({
-                    name: this.$route.name == 'create-product-tag' ? 'edit-product-tag' : 'edit-customer-tag',
+                    name: this.isCreatingProductTag ? 'edit-product-tag' : 'edit-customer-tag',
                     params: {
                         tag_id: tag.id
                     },
@@ -229,7 +258,6 @@
             },
             async showTag() {
                 try {
-
                     this.tagState.isLoadingTag = true;
 
                     let config = {
@@ -338,7 +366,11 @@
                         store_id: this.store.id
                     }
 
-                    await axios.put(`/api/tags/${this.tagForm.id}`, data);
+                    const response = await axios.put(`/api/tags/${this.tagForm.id}`, data);
+                    const tag = response.data.tag;
+
+                    this.tagState.setTag(tag);
+                    this.tagState.setTagForm(tag);
 
                     //  Update store silently
                     this.storeState.silentUpdate();
@@ -396,8 +428,24 @@
             },
             getPayload() {
                 let data = cloneDeep(this.tagForm);
-                data.product_ids = data.products.map(product => product.id);
-                delete data.products;
+
+                if(this.isCreatingProductTag) {
+                    data.product_ids = data.products_to_add.map(product => product.id);
+                }else if(this.isEditingProductTag) {
+                    data.product_ids_to_add = data.products_to_add.map(product => product.id);
+                    data.product_ids_to_remove = data.products_to_remove.map(product => product.id);
+                }else if(this.isCreatingCustomerTag) {
+                    data.customer_ids = data.customers_to_add.map(product => product.id);
+                }else if(this.isEditingCustomerTag) {
+                    data.customer_ids_to_add = data.customers_to_add.map(customer => customer.id);
+                    data.customer_ids_to_remove = data.customers_to_remove.map(customer => customer.id);
+                }
+
+                delete data.products_to_add;
+                delete data.products_to_remove;
+                delete data.customers_to_add;
+                delete data.customers_to_remove;
+
                 return data;
             },
             setActionButtons() {

@@ -523,10 +523,10 @@
 
                         <!-- Draggable Whatsapp Fields -->
                         <draggable
-                            class="divide-y divide-gray-200 mb-4"
                             v-model="whatsappFields"
                             handle=".draggable-handle"
-                            ghost-class="bg-yellow-50">
+                            ghost-class="bg-yellow-50"
+                            class="divide-y divide-gray-200 mb-4">
 
                             <template
                                 :key="index"
@@ -821,8 +821,8 @@
             }
         },
         watch: {
-            store(newValue) {
-                if(newValue) {
+            store(newValue, oldValue) {
+                if(!oldValue && newValue) {
                     this.showOrders();
                 }
             },

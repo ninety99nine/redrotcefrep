@@ -1,6 +1,7 @@
 import { diff } from 'deep-diff';
 import { defineStore } from 'pinia';
 import debounce from 'lodash.debounce';
+import cloneDeep from 'lodash.clonedeep';
 
 export const useChangeHistoryStore = defineStore('change-history', {
   state: () => {
@@ -58,47 +59,58 @@ export const useChangeHistoryStore = defineStore('change-history', {
       });
     },
     async saveOriginalState(actionName, data) {
-      this.data = data;
       this.resetHistory();
-      await this.saveState(actionName);
+      data = cloneDeep(data);
+      await this.saveState(actionName, data);
     },
-    saveStateDebounced: debounce(function (actionName) {
-      this.saveState(actionName);
+    saveStateDebounced: debounce(function (actionName, data) {
+      this.saveState(actionName, data);
     }, 500),
-    async saveState(actionName) {
+    async saveState(actionName, data) {
+
       if (!actionName) {
         console.warn('Action name is required to save the state.');
         return;
       }
 
       // Convert files to Base64 before saving
-      const serializedData = await this.convertFilesToBase64(this.data);
+      const serializedData = await this.convertFilesToBase64(data);
 
       if (this.history.timeline.length === 0) {
+
         this.history.timeline.unshift({
           state: JSON.stringify(serializedData),
           timestamp: new Date().toISOString(),
           name: actionName,
         });
-        this.history.currentIndex = 0;
-        return;
-      }
 
-      if (this.history.currentIndex > 0) {
-        this.history.timeline = this.history.timeline.slice(this.history.currentIndex);
         this.history.currentIndex = 0;
-      }
+        this.data = serializedData;
 
-      const lastState = JSON.parse(this.history.timeline[0].state);
-      const differences = diff(lastState, serializedData);
+      }else{
 
-      if (differences && differences.length > 0) {
-        this.history.timeline.unshift({
-          state: JSON.stringify(serializedData),
-          timestamp: new Date().toISOString(),
-          name: actionName,
-        });
-        this.history.currentIndex = 0;
+        const lastState = JSON.parse(this.history.timeline[0].state);
+        const differences = diff(lastState, serializedData);
+
+        if (differences && differences.length > 0) {
+
+            if (this.history.currentIndex > 0) {
+
+                this.history.timeline = this.history.timeline.slice(this.history.currentIndex);
+                this.history.currentIndex = 0;
+
+            }
+
+            this.history.timeline.unshift({
+                state: JSON.stringify(serializedData),
+                timestamp: new Date().toISOString(),
+                name: actionName,
+            });
+            this.history.currentIndex = 0;
+            this.data = serializedData;
+
+        }
+
       }
     },
     undo() {

@@ -5,6 +5,7 @@
         <ProductOption
             :key="index"
             :product="product"
+            :parentProduct="parentProduct"
             :onSelectProduct="onSelectProduct"
             v-for="(product, index) in products">
         </ProductOption>
@@ -20,6 +21,10 @@
     export default {
         components: { ProductOption },
         props: {
+            parentProduct: {
+                type: Object,
+                default: null
+            },
             products: {
                 type: Array
             },

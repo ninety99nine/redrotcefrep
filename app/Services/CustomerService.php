@@ -13,6 +13,7 @@ use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
 use App\Http\Resources\CustomerResource;
 use App\Http\Resources\CustomerResources;
+use Illuminate\Database\Eloquent\Builder;
 use App\Http\Requests\Customer\CreateCustomerRequest;
 use \Symfony\Component\HttpFoundation\BinaryFileResponse;
 
@@ -26,16 +27,33 @@ class CustomerService extends BaseService
      */
     public function showCustomers(array $data): CustomerResources|BinaryFileResponse|array
     {
+        $tagId = $data['tag_id'] ?? null;
         $storeId = $data['store_id'] ?? null;
         $association = isset($data['association']) ? Association::tryFrom($data['association']) : null;
 
         if($association == Association::SUPER_ADMIN) {
             $query = Customer::query();
+        }elseif($tagId) {
+            $query = Customer::whereHas('tags', function (Builder $query) use ($tagId) {
+                $query->where('id', $tagId);
+            });
         }else {
-            $query = Customer::where('store_id', $storeId);
+            $query = Customer::query();
         }
 
-        $query = $query->when(!request()->has('_sort'), fn($query) => $query->latest());
+        if($storeId) $query = $query->where('store_id', $storeId);
+
+        if($tagId) {
+            $query = $query->when(!request()->has('_sort'), function ($query) use ($tagId) {
+                return $query->join('customer_tag', 'customers.id', '=', 'customer_tag.customer_id')
+                            ->where('customer_tag.tag_id', $tagId)
+                            ->orderBy('customer_tag.created_at', 'desc')
+                            ->select('customers.*');
+            });
+        }else{
+            $query = $query->when(!request()->has('_sort'), fn($query) => $query->latest());
+        }
+
         return $this->setQuery($query)->getOutput();
     }
 

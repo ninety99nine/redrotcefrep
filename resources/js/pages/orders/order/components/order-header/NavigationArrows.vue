@@ -126,7 +126,7 @@
 
                         // Load the next page of orders
                         const page = new URL(this.pagination.next_page_url).searchParams.get('page');
-                        this.getOrders(page);
+                        this.getOrders(parseInt(page));
 
                     }
 
@@ -147,7 +147,7 @@
 
                         // Load the previous page of orders
                         const page = new URL(this.pagination.prev_page_url).searchParams.get('page');
-                        this.getOrders(page);
+                        this.getOrders(parseInt(page));
 
                     }
 
