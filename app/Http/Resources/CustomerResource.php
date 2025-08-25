@@ -28,22 +28,16 @@ class CustomerResource extends JsonResource
             'total_spend' => $this->total_spend,
             'total_orders' => $this->total_orders,
             'referral_code' => $this->referral_code,
-            'mobile_number' => $this->mobile_number ? PhoneNumberService::formatPhoneNumber($this->mobile_number) : null,
             'total_average_spend' => $this->total_average_spend,
             'created_at' => $this->created_at->toDateTimeString(),
             'updated_at' => $this->updated_at->toDateTimeString(),
             'birthday' => $this->birthday ? $this->birthday->toDateString() : null,
             'last_order_at' => $this->last_order_at ? $this->last_order_at->toDateTimeString() : null,
+            'mobile_number' => $this->mobile_number ? PhoneNumberService::formatPhoneNumber($this->mobile_number) : null,
 
             'store' => StoreResource::make($this->whenLoaded('store')),
             'tags' => TagResource::collection($this->whenLoaded('tags')),
             'address' => AddressResource::make($this->whenLoaded('address')),
-
-            '_links' => [
-                'show' => route('show.customer', ['customer' => $this->id]),
-                'update' => route('update.customer', ['customer' => $this->id]),
-                'delete' => route('delete.customer', ['customer' => $this->id]),
-            ],
         ];
     }
 }

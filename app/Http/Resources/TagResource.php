@@ -24,7 +24,7 @@ class TagResource extends JsonResource
             'created_at' => $this->created_at->toDateTimeString(),
             'updated_at' => $this->updated_at->toDateTimeString(),
 
-            'store' => new StoreResource($this->whenLoaded('store')),
+            'store' => StoreResource::make($this->whenLoaded('store')),
             'products' => ProductResource::collection($this->whenLoaded('products')),
 
             'products_count' => $this->whenCounted('products'),

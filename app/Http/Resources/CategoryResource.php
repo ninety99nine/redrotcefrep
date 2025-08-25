@@ -25,8 +25,8 @@ class CategoryResource extends JsonResource
             'created_at' => $this->created_at->toDateTimeString(),
             'updated_at' => $this->updated_at->toDateTimeString(),
 
-            'store' => new StoreResource($this->whenLoaded('store')),
-            'photo' => new MediaFileResource($this->whenLoaded('photo')),
+            'store' => StoreResource::make($this->whenLoaded('store')),
+            'photo' => MediaFileResource::make($this->whenLoaded('photo')),
             'photos' => MediaFileResource::collection($this->whenLoaded('photos')),
             'products' => ProductResource::collection($this->whenLoaded('products')),
             'media_files' => MediaFileResource::collection($this->whenLoaded('mediaFiles')),

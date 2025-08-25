@@ -59,15 +59,9 @@ class OrderPromotionResource extends JsonResource
             'end_datetime' => $this->end_datetime ? $this->end_datetime->toDateTimeString() : null,
             'start_datetime' => $this->start_datetime ? $this->start_datetime->toDateTimeString() : null,
 
-            'order' => UserResource::collection($this->whenLoaded('order')),
+            'order' => OrderResource::make($this->whenLoaded('order')),
             'store' => StoreResource::make($this->whenLoaded('store')),
-            'promotion' => UserResource::collection($this->whenLoaded('promotion')),
-
-            '_links' => [
-                //  'show' => route('show.order_promotion', ['order_promotion' => $this->id]),
-                //  'update' => route('update.order_promotion', ['order_promotion' => $this->id]),
-                //  'delete' => route('delete.order_promotion', ['order_promotion' => $this->id]),
-            ],
+            'promotion' => PromotionResource::make($this->whenLoaded('promotion')),
         ];
     }
 }

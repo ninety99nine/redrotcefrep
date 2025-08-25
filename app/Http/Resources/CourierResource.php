@@ -22,12 +22,6 @@ class CourierResource extends JsonResource
             'tracking_page' => $this->tracking_page,
             'created_at' => $this->created_at->toDateTimeString(),
             'updated_at' => $this->updated_at->toDateTimeString(),
-
-            '_links' => [
-                'show' => route('show.courier', ['courier' => $this->id]),
-                'update' => route('update.courier', ['courier' => $this->id]),
-                'delete' => route('delete.courier', ['courier' => $this->id]),
-            ],
         ];
     }
 }

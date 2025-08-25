@@ -97,26 +97,20 @@ class OrderResource extends JsonResource
             'updated_at' => $this->updated_at->toDateTimeString(),
 
             'store' => StoreResource::make($this->whenLoaded('store')),
+            'courier' => CourierResource::make($this->whenLoaded('courier')),
             'customer' => CustomerResource::make($this->whenLoaded('customer')),
             'placed_by_user' => UserResource::make($this->whenLoaded('placedByUser')),
             'created_by_user' => UserResource::make($this->whenLoaded('createdByUser')),
             'assigned_to_user' => UserResource::make($this->whenLoaded('assignedToUser')),
-            'courier' => CourierResource::make($this->whenLoaded('courier')),
             'delivery_method' => DeliveryMethodResource::make($this->whenLoaded('deliveryMethod')),
             'delivery_address' => DeliveryAddressResource::make($this->whenLoaded('deliveryAddress')),
             'collection_verified_by_user' => UserResource::make($this->whenLoaded('collectionVerifiedByUser')),
 
-            'order_products' => OrderProductResource::collection($this->whenLoaded('orderProducts')),
-            'order_promotions' => OrderPromotionResource::collection($this->whenLoaded('orderPromotions')),
             'order_fees' => OrderFeeResource::collection($this->whenLoaded('orderFees')),
-            'order_discounts' => OrderDiscountResource::collection($this->whenLoaded('orderDiscounts')),
             'order_comments' => OrderCommentResource::collection($this->whenLoaded('orderComments')),
-
-            '_links' => [
-                'show' => route('show.order', ['order' => $this->id]),
-                'update' => route('update.order', ['order' => $this->id]),
-                'delete' => route('delete.order', ['order' => $this->id]),
-            ],
+            'order_products' => OrderProductResource::collection($this->whenLoaded('orderProducts')),
+            'order_discounts' => OrderDiscountResource::collection($this->whenLoaded('orderDiscounts')),
+            'order_promotions' => OrderPromotionResource::collection($this->whenLoaded('orderPromotions')),
         ];
     }
 }

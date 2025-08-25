@@ -60,15 +60,9 @@ class DeliveryMethodResource extends JsonResource
             'created_at' => $this->created_at->toDateTimeString(),
             'updated_at' => $this->updated_at->toDateTimeString(),
 
-            'store' => new StoreResource($this->whenLoaded('store')),
-            //  'address' => new AddressResource($this->whenLoaded('address')),
+            'store' => StoreResource::make($this->whenLoaded('store')),
+            'address' => AddressResource::make($this->whenLoaded('address')),
             'products' => ProductResource::collection($this->whenLoaded('products')),
-
-            '_links' => [
-                'show' => route('show.delivery.method', ['deliveryMethod' => $this->id]),
-                'update' => route('update.delivery.method', ['deliveryMethod' => $this->id]),
-                'delete' => route('delete.delivery.method', ['deliveryMethod' => $this->id]),
-            ],
         ];
     }
 }

@@ -26,14 +26,8 @@ class OrderDiscountResource extends JsonResource
             'created_at' => $this->created_at->toDateTimeString(),
             'updated_at' => $this->updated_at->toDateTimeString(),
 
-            'order' => UserResource::collection($this->whenLoaded('order')),
+            'order' => OrderResource::make($this->whenLoaded('order')),
             'store' => StoreResource::make($this->whenLoaded('store')),
-
-            '_links' => [
-                //  'show' => route('show.order.discount', ['order_discount' => $this->id]),
-                //  'update' => route('update.order.discount', ['order_discount' => $this->id]),
-                //  'delete' => route('delete.order.discount', ['order_discount' => $this->id]),
-            ],
         ];
     }
 }

@@ -26,15 +26,9 @@ class StorePaymentMethodResource extends JsonResource
             'instruction' => $this->instruction,
             'payment_method_id' => $this->payment_method_id,
 
-            'logo' => new MediaFileResource($this->whenLoaded('logo')),
-            'photo' => new MediaFileResource($this->whenLoaded('photo')),
-            'payment_method' => new PaymentMethodResource($this->whenLoaded('paymentMethod')),
-
-            '_links' => [
-                'show' => route('show.store.payment.method', ['storePaymentMethod' => $this->id]),
-                'update' => route('update.store.payment.method', ['storePaymentMethod' => $this->id]),
-                'delete' => route('delete.store.payment.method', ['storePaymentMethod' => $this->id]),
-            ],
+            'logo' => MediaFileResource::make($this->whenLoaded('logo')),
+            'photo' => MediaFileResource::make($this->whenLoaded('photo')),
+            'payment_method' => PaymentMethodResource::make($this->whenLoaded('paymentMethod')),
         ];
     }
 }

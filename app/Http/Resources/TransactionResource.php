@@ -47,20 +47,16 @@ class TransactionResource extends JsonResource
             'created_using_auto_billing' => $this->created_using_auto_billing,
             'manually_verified_by_user_id' => $this->manually_verified_by_user_id,
 
-            'store' => new StoreResource($this->whenLoaded('store')),
-            'photo' => new MediaFileResource($this->whenLoaded('photo')),
-            'customer' => new CustomerResource($this->whenLoaded('customer')),
+            'store' => StoreResource::make($this->whenLoaded('store')),
+            'photo' => MediaFileResource::make($this->whenLoaded('photo')),
+            'customer' => CustomerResource::make($this->whenLoaded('customer')),
             'photos' => MediaFileResource::collection($this->whenLoaded('photos')),
             'owner' => $this->whenLoaded('owner', fn() => $this->getOwnerResource()),
-            'ai_assistant' => new AiAssistantResource($this->whenLoaded('aiAssistant')),
-            'requested_by_user' => new UserResource($this->whenLoaded('requestedByUser')),
+            'ai_assistant' => AiAssistantResource::make($this->whenLoaded('aiAssistant')),
+            'requested_by_user' => UserResource::make($this->whenLoaded('requestedByUser')),
             'media_files' => MediaFileResource::collection($this->whenLoaded('mediaFiles')),
-            'payment_method' => new PaymentMethodResource($this->whenLoaded('paymentMethod')),
-            'manually_verified_by_user' => new UserResource($this->whenLoaded('manuallyVerifiedByUser')),
-
-            '_links' => [
-                'show' => route('show.transaction', ['transaction' => $this->id]),
-            ],
+            'payment_method' => PaymentMethodResource::make($this->whenLoaded('paymentMethod')),
+            'manually_verified_by_user' => UserResource::make($this->whenLoaded('manuallyVerifiedByUser')),
         ];
     }
 
@@ -72,11 +68,11 @@ class TransactionResource extends JsonResource
     private function getOwnerResource()
     {
         if ($this->owner_type === 'store') {
-            return new StoreResource($this->owner);
+            return StoreResource::make($this->owner);
         }
 
         if ($this->owner_type === 'pricing plan') {
-            return new PricingPlanResource($this->owner);
+            return PricingPlanResource::make($this->owner);
         }
 
         return null;

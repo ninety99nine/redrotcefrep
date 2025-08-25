@@ -58,12 +58,6 @@ class PromotionResource extends JsonResource
 
             'user' => UserResource::make($this->whenLoaded('user')),
             'store' => StoreResource::make($this->whenLoaded('store')),
-
-            '_links' => [
-                'show' => route('show.promotion', ['promotion' => $this->id]),
-                'update' => route('update.promotion', ['promotion' => $this->id]),
-                'delete' => route('delete.promotion', ['promotion' => $this->id]),
-            ],
         ];
     }
 }

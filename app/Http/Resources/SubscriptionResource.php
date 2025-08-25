@@ -30,15 +30,9 @@ class SubscriptionResource extends JsonResource
             'end_at' => $this->end_at ? $this->end_at->toDateTimeString() : null,
             'start_at' => $this->start_at ? $this->start_at->toDateTimeString() : null,
 
-            'user' => new UserResource($this->whenLoaded('user')),
+            'user' => UserResource::make($this->whenLoaded('user')),
             'owner' => $this->whenLoaded('owner', fn() => $this->getOwnerResource()),
-            'pricing_plan' => new PricingPlanResource($this->whenLoaded('pricingPlan')),
-
-            '_links' => [
-                'show' => route('show.subscription', ['subscription' => $this->id]),
-                'update' => route('update.subscription', ['subscription' => $this->id]),
-                'delete' => route('delete.subscription', ['subscription' => $this->id]),
-            ],
+            'pricing_plan' => PricingPlanResource::make($this->whenLoaded('pricingPlan')),
         ];
     }
 
@@ -50,11 +44,11 @@ class SubscriptionResource extends JsonResource
     private function getOwnerResource()
     {
         if ($this->owner_type === 'user') {
-            return new UserResource($this->owner);
+            return UserResource::make($this->owner);
         }
 
         if ($this->owner_type === 'store') {
-            return new StoreResource($this->owner);
+            return StoreResource::make($this->owner);
         }
 
         return null;

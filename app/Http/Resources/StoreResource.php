@@ -73,13 +73,13 @@ class StoreResource extends JsonResource
             'contact_mobile_number' => $this->contact_mobile_number ? PhoneNumberService::formatPhoneNumber($this->contact_mobile_number) : null,
             'whatsapp_mobile_number' => $this->whatsapp_mobile_number ? PhoneNumberService::formatPhoneNumber($this->whatsapp_mobile_number) : null,
 
-            'logo' => new MediaFileResource($this->whenLoaded('logo')),
+            'logo' => MediaFileResource::make($this->whenLoaded('logo')),
             'users' => UserResource::collection($this->whenLoaded('users')),
             'product_tags' => TagResource::collection($this->whenLoaded('productTags')),
             'customer_tags' => TagResource::collection($this->whenLoaded('customerTags')),
             'categories' => CategoryResource::collection($this->whenLoaded('categories')),
             'media_files' => MediaFileResource::collection($this->whenLoaded('mediaFiles')),
-            'active_subscription' => new SubscriptionResource($this->whenLoaded('activeSubscription')),
+            'active_subscription' => SubscriptionResource::make($this->whenLoaded('activeSubscription')),
 
             'orders_count' => $this->whenCounted('orders'),
             'products_count' => $this->whenCounted('products'),

@@ -28,13 +28,7 @@ class StoreQuotaResource extends JsonResource
             'email_credits_expire_at' => $this->email_credits_expire_at ? $this->email_credits_expire_at->toDateTimeString() : null,
             'whatsapp_credits_expire_at' => $this->whatsapp_credits_expire_at ? $this->whatsapp_credits_expire_at->toDateTimeString() : null,
 
-            'store' => StoreResource::collection($this->whenLoaded('store')),
-
-            '_links' => [
-                'show' => route('show.store.quota', ['storeQuota' => $this->id]),
-                'update' => route('update.store.quota', ['storeQuota' => $this->id]),
-                'delete' => route('delete.store.quota', ['storeQuota' => $this->id]),
-            ],
+            'store' => StoreResource::make($this->whenLoaded('store')),
         ];
     }
 }

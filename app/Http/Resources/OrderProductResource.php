@@ -3,7 +3,6 @@
 namespace App\Http\Resources;
 
 use Illuminate\Http\Request;
-use App\Http\Resources\UserResource;
 use App\Http\Resources\MediaFileResource;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -55,16 +54,10 @@ class OrderProductResource extends JsonResource
             'created_at' => $this->created_at->toDateTimeString(),
             'updated_at' => $this->updated_at->toDateTimeString(),
 
-            'photo' => new MediaFileResource($this->whenLoaded('photo')),
-            'order' => UserResource::collection($this->whenLoaded('order')),
+            'order' => OrderResource::make($this->whenLoaded('order')),
             'store' => StoreResource::make($this->whenLoaded('store')),
-            'product' => UserResource::collection($this->whenLoaded('product')),
-
-            '_links' => [
-                //  'show' => route('show.order.product', ['order_product' => $this->id]),
-                //  'update' => route('update.order.product', ['order_product' => $this->id]),
-                //  'delete' => route('delete.order.product', ['order_product' => $this->id]),
-            ],
+            'photo' => MediaFileResource::make($this->whenLoaded('photo')),
+            'product' => ProductResource::make($this->whenLoaded('product')),
         ];
     }
 }

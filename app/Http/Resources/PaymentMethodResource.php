@@ -29,12 +29,6 @@ class PaymentMethodResource extends JsonResource
             'config_schema' => $this->config_schema,
             'allowed_countries' => $this->allowed_countries,
             'automated_verification' => $this->automated_verification,
-
-            '_links' => [
-                'show' => route('show.payment.method', ['paymentMethod' => $this->id]),
-                'update' => route('update.payment.method', ['paymentMethod' => $this->id]),
-                'delete' => route('delete.payment.method', ['paymentMethod' => $this->id]),
-            ],
         ];
     }
 }

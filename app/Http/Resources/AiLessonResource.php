@@ -26,7 +26,7 @@ class AiLessonResource extends JsonResource
             'updated_at' => $this->updated_at?->toDateTimeString(),
 
             // Relationships
-            'ai_topic' => new AiTopicResource($this->whenLoaded('aiTopic')),
+            'ai_topic' => AiTopicResource::make($this->whenLoaded('aiTopic')),
         ];
     }
 }

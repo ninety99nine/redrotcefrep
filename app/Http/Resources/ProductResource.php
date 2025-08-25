@@ -65,25 +65,19 @@ class ProductResource extends JsonResource
             'visibility_expires_at' => $this->visibility_expires_at ? $this->visibility_expires_at->toDateTimeString() : null,
             'data_collection_fields' => $this->data_collection_fields,
 
-            'user' => new UserResource($this->whenLoaded('user')),
-            'store' => new StoreResource($this->whenLoaded('store')),
-            'photo' => new MediaFileResource($this->whenLoaded('photo')),
+            'user' => UserResource::make($this->whenLoaded('user')),
+            'store' => StoreResource::make($this->whenLoaded('store')),
+            'photo' => MediaFileResource::make($this->whenLoaded('photo')),
             'tags' => TagResource::collection($this->whenLoaded('tags')),
-            'variant' => new ProductResource($this->whenLoaded('variant')),
+            'variant' => ProductResource::make($this->whenLoaded('variant')),
             'photos' => MediaFileResource::collection($this->whenLoaded('photos')),
             'variants' => ProductResource::collection($this->whenLoaded('variants')),
-            'parent_product' => new ProductResource($this->whenLoaded('parentProduct')),
+            'parent_product' => ProductResource::make($this->whenLoaded('parentProduct')),
             'categories' => CategoryResource::collection($this->whenLoaded('categories')),
             'media_files' => MediaFileResource::collection($this->whenLoaded('mediaFiles')),
             'delivery_methods' => DeliveryMethodResource::collection($this->whenLoaded('deliveryMethods')),
 
             'variants_count' => $this->whenCounted('variants'),
-
-            '_links' => [
-                'show' => route('show.product', ['product' => $this->id]),
-                'update' => route('update.product', ['product' => $this->id]),
-                'delete' => route('delete.product', ['product' => $this->id]),
-            ],
         ];
     }
 }

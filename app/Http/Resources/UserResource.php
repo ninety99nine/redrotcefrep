@@ -26,13 +26,6 @@ class UserResource extends JsonResource
             'updated_at' => $this->updated_at->toDateTimeString(),
             'email_verified_at' => $this->email_verified_at ? $this->email_verified_at->toDateTimeString() : null,
             'mobile_number' => $this->mobile_number ? PhoneNumberService::formatPhoneNumber($this->mobile_number) : null,
-            '_links' => [
-                /*
-                'show' => route('show.user', ['user' => $this->id]),
-                'update' => route('update.user', ['user' => $this->id]),
-                'delete' => route('delete.user', ['user' => $this->id])
-                */
-            ]
         ];
     }
 }

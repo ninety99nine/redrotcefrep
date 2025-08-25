@@ -25,12 +25,6 @@ class MediaFileResource extends JsonResource
             'mime_type' => $this->mime_type,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
-
-            '_links' => [
-                'show' => route('show.media.file', ['mediaFile' => $this->id]),
-                'update' => route('update.media.file', ['mediaFile' => $this->id]),
-                'delete' => route('delete.media.file', ['mediaFile' => $this->id]),
-            ],
         ];
     }
 }

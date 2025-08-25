@@ -28,12 +28,6 @@ class AiAssistantTokenUsageResource extends JsonResource
             'paid_top_up_tokens_used' => $this->paid_top_up_tokens_used,
 
             'ai_assistant' => AiAssistantResource::make($this->whenLoaded('aiAssistant')),
-
-            '_links' => [
-                'show' => route('show.ai.assistant.token.usage', ['aiAssistantTokenUsage' => $this->id]),
-                'update' => route('update.ai.assistant.token.usage', ['aiAssistantTokenUsage' => $this->id]),
-                'delete' => route('delete.ai.assistant.token.usage', ['aiAssistantTokenUsage' => $this->id]),
-            ],
         ];
     }
 }

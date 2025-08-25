@@ -35,11 +35,6 @@ class PricingPlanResource extends JsonResource
             'position' => $this->position,
             'created_at' => $this->created_at->toDateTimeString(),
             'updated_at' => $this->updated_at->toDateTimeString(),
-            '_links' => [
-                'show' => route('show.pricing.plan', ['pricingPlan' => $this->id]),
-                'update' => route('update.pricing.plan', ['pricingPlan' => $this->id]),
-                'delete' => route('delete.pricing.plan', ['pricingPlan' => $this->id]),
-            ],
         ];
     }
 }
