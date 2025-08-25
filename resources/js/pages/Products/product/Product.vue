@@ -937,7 +937,7 @@
                     this.setup();
                 }
             },
-            '$route.params.product_id'(newValue) {
+            productId(newValue) {
                 if(newValue) {
                     this.setup();
                     this.setActionButtons();

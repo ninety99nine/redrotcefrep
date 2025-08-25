@@ -2,7 +2,7 @@
 
     <div
         ref="dropdown"
-        class="relative">
+        :class="[dropdownWrapperClasses, 'relative']">
 
         <!-- Trigger Slot -->
         <slot name="trigger" :isOpen="isOpen" :toggleDropdown="toggleDropdown">
@@ -131,6 +131,10 @@
             dropdownClasses: {
                 type: String,
                 default: "w-full"
+            },
+            dropdownWrapperClasses: {
+                type: String,
+                default: ""
             }
         },
         data() {

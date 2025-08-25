@@ -228,7 +228,7 @@
                     this.setup();
                 }
             },
-            '$route.params.customer_id'(newValue) {
+            customerId(newValue) {
                 if(newValue) {
                     this.setup();
                     this.setActionButtons();

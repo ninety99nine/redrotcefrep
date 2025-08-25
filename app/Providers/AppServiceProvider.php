@@ -24,6 +24,7 @@ use App\Models\DeliveryMethod;
 use App\Models\DeliveryAddress;
 use App\Observers\StoreObserver;
 use App\Models\StorePaymentMethod;
+use App\Observers\ProductObserver;
 use App\Models\AutoBillingSchedule;
 use App\Http\Middleware\SetUssdUser;
 use App\Listeners\RoleEventListener;
@@ -74,6 +75,7 @@ class AppServiceProvider extends ServiceProvider
 
         //  Observers
         Store::observe(StoreObserver::class);
+        Product::observe(ProductObserver::class);
 
         /**
          *  Reference: https://spatie.be/docs/laravel-permission/v6/basic-usage/teams-permissions

@@ -272,6 +272,17 @@ const routes = [
                 ]
             },
             {
+                path: 'design',
+                component: () => import('@Pages/design/Design.vue'),
+                children: [
+                    {
+                        path: '',
+                        name: 'edit-storefront',
+                        component: () => import('@Pages/design/storefront/Storefront.vue'),
+                    },
+                ]
+            },
+            {
                 path: 'pricing-plans',
                 children: [
                     {
