@@ -57,7 +57,7 @@ class MessageCrafterService
      *  @return string
      */
     public function craftAIAssistantSubscriptionPaidMessage(Transaction $transaction, Subscription $subscription) {
-        return $transaction->amount->amount_with_currency.' paid for AI Assistant. Valid till '.Carbon::parse($subscription->end_date)->format('d M Y H:i');
+        return $transaction->amount->amount_with_currency.' paid for AI chat. Valid till '.Carbon::parse($subscription->end_date)->format('d M Y H:i');
     }
 
     /**
