@@ -40,7 +40,7 @@ class OrderPolicy extends BasePolicy
      */
     public function view(User $user, Order $order): bool
     {
-        return $this->isStoreUserWithPermission($user, 'view orders');
+        return $order->placed_by_user_id == $user->id || $this->isStoreUserWithPermission($user, 'view orders');
     }
 
     /**
@@ -51,7 +51,7 @@ class OrderPolicy extends BasePolicy
      */
     public function create(User $user): bool
     {
-        return $this->isStoreUserWithPermission($user, 'manage orders');
+        return true;
     }
 
     /**
