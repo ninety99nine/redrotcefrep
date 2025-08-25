@@ -29,7 +29,15 @@ class AiAssistantResource extends JsonResource
 
             'user' => UserResource::collection($this->whenLoaded('user')),
             'transactions' => TransactionResource::collection($this->whenLoaded('transactions')),
+            'subscriptions' => SubscriptionResources::collection($this->whenLoaded('subscriptions')),
+            'active_subscription' => SubscriptionResource::make($this->whenLoaded('activeSubscription')),
             'ai_assistant_token_usage' => AiAssistantTokenUsageResource::make($this->whenLoaded('aiAssistantTokenUsage')),
+
+            'user' => $this->whenCounted('user'),
+            'transactions' => $this->whenCounted('transactions'),
+            'subscriptions' => $this->whenCounted('subscriptions'),
+            'active_subscription_count' => $this->whenCounted('activeSubscription'),
+            'ai_assistant_token_usage_count' => $this->whenCounted('aiAssistantTokenUsage')
         ];
     }
 }
