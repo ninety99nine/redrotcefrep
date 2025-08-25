@@ -29,7 +29,7 @@ class OrderFeeResource extends JsonResource
             'updated_at' => $this->updated_at->toDateTimeString(),
 
             'order' => UserResource::collection($this->whenLoaded('order')),
-            'store' => UserResource::collection($this->whenLoaded('store')),
+            'store' => StoreResource::make($this->whenLoaded('store')),
 
             '_links' => [
                 //  'show' => route('show.order_fee', ['order_fee' => $this->id]),

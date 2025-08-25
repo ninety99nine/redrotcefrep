@@ -56,8 +56,8 @@ class PromotionResource extends JsonResource
             'start_datetime' => $this->start_datetime ? $this->start_datetime->toDateTimeString() : null,
             'activate_using_minimum_total_product_quantities' => $this->activate_using_minimum_total_product_quantities,
 
-            'user' => UserResource::collection($this->whenLoaded('user')),
-            'store' => UserResource::collection($this->whenLoaded('store')),
+            'user' => UserResource::make($this->whenLoaded('user')),
+            'store' => StoreResource::make($this->whenLoaded('store')),
 
             '_links' => [
                 'show' => route('show.promotion', ['promotion' => $this->id]),

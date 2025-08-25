@@ -27,9 +27,9 @@ class AiAssistantResource extends JsonResource
             'remaining_paid_tokens' => $this->remaining_paid_tokens,
             'remaining_paid_top_up_tokens' => $this->remaining_paid_top_up_tokens,
 
-            'user' => UserResource::collection($this->whenLoaded('user')),
+            'user' => UserResource::make($this->whenLoaded('user')),
             'transactions' => TransactionResource::collection($this->whenLoaded('transactions')),
-            'subscriptions' => SubscriptionResources::collection($this->whenLoaded('subscriptions')),
+            'subscriptions' => SubscriptionResource::collection($this->whenLoaded('subscriptions')),
             'active_subscription' => SubscriptionResource::make($this->whenLoaded('activeSubscription')),
             'ai_assistant_token_usage' => AiAssistantTokenUsageResource::make($this->whenLoaded('aiAssistantTokenUsage')),
 

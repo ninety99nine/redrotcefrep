@@ -57,7 +57,7 @@ class OrderProductResource extends JsonResource
 
             'photo' => new MediaFileResource($this->whenLoaded('photo')),
             'order' => UserResource::collection($this->whenLoaded('order')),
-            'store' => UserResource::collection($this->whenLoaded('store')),
+            'store' => StoreResource::make($this->whenLoaded('store')),
             'product' => UserResource::collection($this->whenLoaded('product')),
 
             '_links' => [

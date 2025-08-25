@@ -60,7 +60,7 @@ class OrderPromotionResource extends JsonResource
             'start_datetime' => $this->start_datetime ? $this->start_datetime->toDateTimeString() : null,
 
             'order' => UserResource::collection($this->whenLoaded('order')),
-            'store' => UserResource::collection($this->whenLoaded('store')),
+            'store' => StoreResource::make($this->whenLoaded('store')),
             'promotion' => UserResource::collection($this->whenLoaded('promotion')),
 
             '_links' => [
