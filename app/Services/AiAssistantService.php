@@ -80,8 +80,17 @@ class AiAssistantService extends BaseService
     {
         /** @var User $user */
         $user =  Auth::user();
-        $aiAssistant = $user->aiAssistant()->first();
-        if(!$aiAssistant) $aiAssistant = $user->aiAssistant()->create();
+        $aiAssistant = $user->aiAssistant()
+            ->with($this->getRequestRelationships())
+            ->withCount($this->getRequestCountableRelationships())->first();
+
+        if(!$aiAssistant) {
+            $aiAssistant = $user->aiAssistant()->create();
+
+            $aiAssistant = $aiAssistant
+                ->load($this->getRequestRelationships())
+                ->loadCount($this->getRequestCountableRelationships())->first();
+        }
 
         return $this->showResource($aiAssistant);
     }
