@@ -44,7 +44,8 @@ class MessageCrafterService
      *  @return string
      */
     public function craftStoreMarketingMessage(Store $store) {
-        return 'Customers can buy by dialing '.$store->ussd_shortcode.' or visiting your website ' . $store->web_link . '. Share on WhatsApp, Facebook & flyers!';
+        return 'Customers can buy by dialing '.$store->ussd_shortcode.'. Share on WhatsApp, Facebook & flyers!';
+        //  return 'Customers can buy by dialing '.$store->ussd_shortcode.' or visiting your website ' . $store->web_link . '. Share on WhatsApp, Facebook & flyers!';
     }
 
     /**
