@@ -89,7 +89,7 @@ class AiAssistantService extends BaseService
 
             $aiAssistant = $aiAssistant
                 ->load($this->getRequestRelationships())
-                ->loadCount($this->getRequestCountableRelationships())->first();
+                ->loadCount($this->getRequestCountableRelationships());
         }
 
         return $this->showResource($aiAssistant);
