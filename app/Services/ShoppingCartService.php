@@ -2055,7 +2055,7 @@ class ShoppingCartService
     private function calculateCartFeeTotals(): void
     {
         collect($this->cartFees)->each(function($cartFee) {
-            if(!empty($cartFee['name'])) {
+            if(isset($cartFee['name']) && isset($cartFee['active']) && isset($cartFee['rate_type'])) {
                 $this->handleCartFlatFee($cartFee);
                 $this->handleCartPercentageFee($cartFee);
             }
@@ -2083,7 +2083,7 @@ class ShoppingCartService
      */
     private function handleCartFlatFee(array $cartFee): void
     {
-        $name = $cartFee['name'];
+        $name = $cartFee['name'] ?? null;
         $active = $cartFee['active'] ?? false;
         $rateType = $cartFee['rate_type'] ?? null;
 
@@ -2113,7 +2113,7 @@ class ShoppingCartService
      */
     private function handleCartPercentageFee(array $cartFee): void
     {
-        $name = $cartFee['name'];
+        $name = $cartFee['name'] ?? null;
         $active = $cartFee['active'] ?? false;
         $rateType = $cartFee['rate_type'] ?? null;
 
@@ -2146,9 +2146,10 @@ class ShoppingCartService
     {
         $name = $checkoutFee['name'];
         $rateType = $checkoutFee['rate_type'];
-        $amount = $checkoutFee['flat_rate']->amount;
 
         if($rateType == RateType::FLAT->value) {
+
+            $amount = $checkoutFee['flat_rate']->amount;
 
             $data = [
                 'name' => $name,
@@ -2172,10 +2173,10 @@ class ShoppingCartService
     {
         $name = $checkoutFee['name'];
         $rateType = $checkoutFee['rate_type'];
-        $percentageRate = $checkoutFee['percentage_rate']['value'];
 
         if($rateType == RateType::PERCENTAGE->value) {
 
+            $percentageRate = $checkoutFee['percentage_rate']['value'];
             $amount = $this->subtotalAfterDiscount * ($percentageRate / 100);
 
             $data = [
