@@ -382,26 +382,40 @@ class AiMessageService extends BaseService
     }
 
     /**
-     * Get system message.
+     * Get system message for OpenAI Chat API.
      *
      * @param AiLesson|null $aiLesson
      * @return array
      */
-    private function getSystemMessage(AiLesson|null $aiLesson): array
+    private function getSystemMessage(?AiLesson $aiLesson): array
     {
-        $content = $aiLesson?->aiTopic?->system_prompt ?? 'Your name is Perfect Assistant and you are an expert consultant assisting businesses in Botswana.';
+        // Default system prompt
+        $defaultPrompt = 'You are Perfect Assistant, an expert consultant assisting businesses in Botswana. Provide clear, accurate, concise and practical responses tailored to the user’s query.';
 
-        $platform = (new PlatformService);
+        // Use lesson-specific prompt if available, otherwise default
+        $content = $aiLesson?->aiTopic?->system_prompt ?? $defaultPrompt;
 
-        if($platform->isUssd()) {
-            $content .= 'This is served on USSD, therefore avoid line breaks.';
-        }else if($platform->isSms()) {
-            $content .= 'This is served on SMS, therefore avoid line breaks.';
+        // Platform-specific formatting instructions
+        $platformInstructions = [
+            'ussd' => 'Responses are served on USSD. Keep it short, direct, and under 800 characters.',
+            'sms' => 'Responses are served on SMS. Keep it short, direct, and under 300 characters.',
+            'web' => 'Responses are served on a web platform. Use structured responses with paragraphs for clarity, and keep responses detailed but concise.',
+        ];
+
+        $platformService = (new PlatformService);
+
+        // Determine platform and append instructions
+        if ($platformService->isUssd()) {
+            $content .= ' ' . $platformInstructions['ussd'];
+        } elseif ($platformService->isSms()) {
+            $content .= ' ' . $platformInstructions['sms'];
+        } else {
+            $content .= ' ' . $platformInstructions['web'];
         }
 
         return [
             'role' => 'system',
-            'content' => $content
+            'content' => trim($content)
         ];
     }
 
