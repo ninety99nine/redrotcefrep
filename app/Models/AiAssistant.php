@@ -81,6 +81,16 @@ class AiAssistant extends Model
      *
      * @return HasMany
      */
+    public function aiMessages(): HasMany
+    {
+        return $this->HasMany(AiMessage::class);
+    }
+
+    /**
+     * Get ai assistant token usage.
+     *
+     * @return HasMany
+     */
     public function aiAssistantTokenUsage(): HasOne
     {
         return $this->hasOne(AiAssistantTokenUsage::class);
