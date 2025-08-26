@@ -741,9 +741,10 @@
                     let formData = new FormData();
                     formData.append('return', '1');
                     formData.append('store_id', this.store.id);
-                    formData.append('type', `store_payment_method_${attribute}`);
+                    formData.append('mediable_type', 'store payment method');
                     formData.append('file', paymentMethod.configs[attribute].file_ref);
-                    formData.append('store_payment_method_id', paymentMethod.store_payment_method_id);
+                    formData.append('mediable_id', paymentMethod.store_payment_method_id);
+                    formData.append('upload_folder_name', `store_payment_method_${attribute}`);
 
                     paymentMethod.configs[attribute].uploading = true;
                     paymentMethod.configs[attribute].error_message = null;

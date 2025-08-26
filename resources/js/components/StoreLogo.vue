@@ -107,8 +107,9 @@
 
                     let formData = new FormData();
                     formData.append('return', 1);
-                    formData.append('type', 'store_logo');
-                    formData.append('store_id', this.localStore.id);
+                    formData.append('mediable_type', 'store');
+                    formData.append('mediable_id', this.localStore.id);
+                    formData.append('upload_folder_name', 'store_logo');
                     formData.append('file', this.$refs.fileInput.files[0]);
 
                     const config = {

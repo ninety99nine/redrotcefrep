@@ -558,9 +558,10 @@
 
                     let formData = new FormData();
                     formData.append('file', photo.file_ref);
-                    formData.append('type', 'product_photo');
                     formData.append('store_id', this.store.id);
-                    formData.append('product_id', localProduct.id);
+                    formData.append('mediable_type', 'product');
+                    formData.append('mediable_id', localProduct.id);
+                    formData.append('upload_folder_name', 'product_photo');
 
                     photo.uploading = true;
                     photo.error_message = null;
