@@ -5,10 +5,12 @@ use App\Http\Middleware\SetUssdUser;
 use Illuminate\Foundation\Application;
 use App\Http\Middleware\StorePermission;
 use App\Http\Middleware\RecordStoreVisit;
-use App\Jobs\AutoBilling\StartAutoBillingSchedules;
+use App\Http\Middleware\SetResponseStatus;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
+use App\Jobs\AutoBilling\StartAutoBillingSchedules;
+use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Contracts\Auth\Middleware\AuthenticatesRequests;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
@@ -30,6 +32,12 @@ return Application::configure(basePath: dirname(__DIR__))
             'record.store.visit' => RecordStoreVisit::class
         ]);
 
+        //  Reference: https://spatie.be/docs/laravel-permission/v6/basic-usage/teams-permissions
+        $middleware->prependToPriorityList(
+            before: SubstituteBindings::class,
+            prepend: StorePermission::class,
+        );
+
         $middleware->prependToPriorityList(
             before: AuthenticatesRequests::class,
             prepend: SetUssdUser::class,
@@ -37,7 +45,8 @@ return Application::configure(basePath: dirname(__DIR__))
 
         //  Global registration to execute for every api route
         $middleware->api(prepend: [
-            SetUssdUser::class
+            SetUssdUser::class,
+            SetResponseStatus::class
         ]);
 
     })

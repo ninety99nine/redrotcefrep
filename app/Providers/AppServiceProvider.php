@@ -26,17 +26,13 @@ use App\Observers\StoreObserver;
 use App\Models\StorePaymentMethod;
 use App\Observers\ProductObserver;
 use App\Models\AutoBillingSchedule;
-use App\Http\Middleware\SetUssdUser;
 use App\Listeners\RoleEventListener;
 use App\Models\AiAssistantTokenUsage;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Event;
-use Illuminate\Foundation\Http\Kernel;
 use Illuminate\Support\ServiceProvider;
-use App\Http\Middleware\StorePermission;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Database\Eloquent\Relations\Relation;
-use Illuminate\Routing\Middleware\SubstituteBindings;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -76,19 +72,6 @@ class AppServiceProvider extends ServiceProvider
         //  Observers
         Store::observe(StoreObserver::class);
         Product::observe(ProductObserver::class);
-
-        /**
-         *  Reference: https://spatie.be/docs/laravel-permission/v6/basic-usage/teams-permissions
-         *
-         *  @var Kernel $kernel
-         */
-        $kernel = app()->make(Kernel::class);
-
-        $kernel->addToMiddlewarePriorityBefore(
-            SubstituteBindings::class,
-            SetUssdUser::class,
-            StorePermission::class
-        );
     }
 
     /**
