@@ -592,7 +592,7 @@
                         return: true,
                         active: true,
                         charge_fee: true,
-                        fee_type: 'flat',
+                        fee_type: 'flat fee',
                         store_id: this.store.id,
                         description: 'We deliver to you',
                         name: this.additionalFeatures.delivery.name,
@@ -616,7 +616,7 @@
                     let data = {
                         return: true,
                         charge_fee: true,
-                        fee_type: 'flat',
+                        fee_type: 'flat fee',
                         store_id: this.store.id,
                         description: 'We deliver to you',
                         name: this.additionalFeatures.delivery.name,
