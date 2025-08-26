@@ -48,8 +48,8 @@ class OpenAiService
 
             $totalTokens = $response->usage->totalTokens;
             $promptTokens = $response->usage->promptTokens;
-            $content = $response->choices[0]->message->content;
             $completionTokens = $response->usage->completionTokens;
+            $content = $this->cleanText($response->choices[0]->message->content);
 
         }else{
 
@@ -80,5 +80,32 @@ class OpenAiService
         }
 
         return $aiMessage;
+    }
+
+    /**
+     * Clean hidden characters from a string.
+     *
+     * @param string $text
+     * @return string
+     */
+    function cleanText(string $text): string
+    {
+        // Normalize non-breaking spaces and soft hyphens
+        $text = str_replace(["\xC2\xA0", "\xC2\xAD"], ' ', $text);
+
+        // Remove zero-width and invisible Unicode chars
+        $text = preg_replace('/[\x{200B}-\x{200D}\x{FEFF}]/u', '', $text);
+
+        // Remove uncommon Unicode spaces (en quad to hair space, line/paragraph sep)
+        $text = preg_replace('/[\x{2000}-\x{200A}\x{2028}\x{2029}]/u', ' ', $text);
+
+        // Remove other control characters (except line breaks and tabs)
+        $text = preg_replace('/[[:cntrl:]](?<!\r)(?<!\n)(?<!\t)/', '', $text);
+
+        // Collapse multiple spaces
+        $text = preg_replace('/ {2,}/', ' ', $text);
+
+        // Trim spaces at start and end
+        return trim($text);
     }
 }
