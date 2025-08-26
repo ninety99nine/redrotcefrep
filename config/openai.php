@@ -10,6 +10,7 @@ return [
     | Here you may specify other OpenAI API settings.
     */
     'model' => env('OPENAI_API_MODEL'),
+    'enabled' => env('OPENAI_API_ENABLED'),
     'max_tokens' => env('OPENAI_API_MAX_TOKENS'),
     'temperature' => env('OPENAI_API_TEMPERATURE'),
 

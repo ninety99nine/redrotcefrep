@@ -5,7 +5,7 @@ return [
     'fcs_api_key' => env('FCS_API_KEY'),
     'country' => env('DEFAULT_COUNTRY', 'bw'),
     'language' => env('DEFAULT_LANGUAGE', 'en'),
-    'currency' => env('DEFAULT_CURRENCY', 'bwp'),
+    'currency' => env('DEFAULT_CURRENCY', 'BWP'),
 
     'orange_sms_url' => env('ORANGE_SMS_URL'),
     'orange_sms_enabled' => env('ORANGE_SMS_ENABLED'),

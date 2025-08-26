@@ -29,23 +29,36 @@ class OpenAiService
             ]
         ];
 
-        $response = OpenAI::chat()->create([
-            'model' => config('openai.model'),
-            'max_tokens' => (int) config('openai.max_tokens'),
-            'temperature' => (float) config('openai.temperature'),
-            'messages' => [
-                ...$messages,
-                [
-                    'role' => 'user',
-                    'content' => $userContent,
-                ],
-            ],
-        ]);
+        $enabled = config('openai.enabled', false);
 
-        $totalTokens = $response->usage->totalTokens;
-        $promptTokens = $response->usage->promptTokens;
-        $content = $response->choices[0]->message->content;
-        $completionTokens = $response->usage->completionTokens;
+        if($enabled) {
+
+            $response = OpenAI::chat()->create([
+                'model' => config('openai.model'),
+                'max_tokens' => (int) config('openai.max_tokens'),
+                'temperature' => (float) config('openai.temperature'),
+                'messages' => [
+                    ...$messages,
+                    [
+                        'role' => 'user',
+                        'content' => $userContent,
+                    ],
+                ],
+            ]);
+
+            $totalTokens = $response->usage->totalTokens;
+            $promptTokens = $response->usage->promptTokens;
+            $content = $response->choices[0]->message->content;
+            $completionTokens = $response->usage->completionTokens;
+
+        }else{
+
+            $totalTokens = 20;
+            $promptTokens = 10;
+            $completionTokens = 10;
+            $content = 'This is a test response from our AI Assistant';
+
+        }
 
         $data = [
             'response_at' => now(),
@@ -57,7 +70,7 @@ class OpenAiService
             'assistant_content' => $content,
             'prompt_tokens' => $promptTokens,
             'ai_assistant_id' => $aiAssistantId,
-            'completion_tokens' => $completionTokens,
+            'completion_tokens' => $completionTokens
         ];
 
         if($aiMessage) {
