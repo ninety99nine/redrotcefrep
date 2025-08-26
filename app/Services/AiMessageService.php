@@ -397,8 +397,8 @@ class AiMessageService extends BaseService
 
         // Platform-specific formatting instructions
         $platformInstructions = [
-            'ussd' => 'Responses are served on USSD. Keep it short, direct, and under 800 characters.',
-            'sms' => 'Responses are served on SMS. Keep it short, direct, and under 300 characters.',
+            'ussd' => 'Responses are served on USSD. Don\'t use numbering e.g "1. ". Don\'t use lists. Use only one paragraph (not multiline content). Keep it short, direct, and under 800 characters.',
+            'sms' => 'Responses are served on SMS. Don\'t use numbering e.g "1. ". Don\'t use lists. Use only one paragraph (not multiline content). Keep it short, direct, and under 300 characters.',
             'web' => 'Responses are served on a web platform. Use structured responses with paragraphs for clarity, and keep responses detailed but concise.',
         ];
 
