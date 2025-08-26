@@ -165,99 +165,116 @@ class PricingPlanService extends BaseService
      */
     public function payPricingPlan(PricingPlan $pricingPlan, array $data): TransactionResource|array
     {
-        $user = $store = $aiAssistant = null;
+        try{
 
-        $storeId = $data['store_id'] ?? null;
-        $paymentMethodId = $data['payment_method_id'] ?? null;
-        $paymentMethodType = $data['payment_method_type'] ?? null;
+            $user = $store = $aiAssistant = null;
 
-        $user = $data['user'] ?? null;
-        $store = $data['store'] ?? null;
-        $paymentMethod = $data['payment_method'] ?? null;
-        $createdUsingAutoBilling = isset($data['auto_bill']) && $data['auto_bill'] == true;
+            $storeId = $data['store_id'] ?? null;
+            $paymentMethodId = $data['payment_method_id'] ?? null;
+            $paymentMethodType = $data['payment_method_type'] ?? null;
 
-        if (!$user) {
-            $user = Auth::user();
-        }
+            $user = $data['user'] ?? null;
+            $store = $data['store'] ?? null;
+            $paymentMethod = $data['payment_method'] ?? null;
+            $createdUsingAutoBilling = isset($data['auto_bill']) && $data['auto_bill'] == true;
 
-        $requiresStore = $pricingPlan->offersStoreSubscription() ||
-                         $pricingPlan->offersWhatsappCredits() ||
-                         $pricingPlan->offersEmailCredits() ||
-                         $pricingPlan->offersSmsCredits();
-
-        if (!$store && $requiresStore) {
-            $store = Store::find($storeId);
-            if (!$store) throw new Exception('The store does not exist');
-        }
-
-        $offerTrial = $requiresStore && ($pricingPlan->trial_days > 0) && ($store->subscriptions()->count() == 0);
-
-        $requiresAiAssistant = $pricingPlan->offersAiAssistantSubscription() ||
-                               $pricingPlan->offersAiAssistantTopUpCredits();
-
-        if($requiresAiAssistant) {
-            $aiAssistant = $user->aiAssistant;
-            if (!$aiAssistant) throw new Exception('The AI Assistant does not exist');
-        }
-
-        if(!$paymentMethod) {
-            if ($paymentMethodId) {
-                $paymentMethod = PaymentMethod::find($paymentMethodId);
-            } else if ($paymentMethodType) {
-                $paymentMethod = PaymentMethod::whereType($paymentMethodType)->first();
+            if (!$user) {
+                $user = Auth::user();
             }
-        }
 
-        if (!$paymentMethod) {
-            throw new Exception('The payment method is required');
-        }else if (!$paymentMethod->active) {
-            throw new Exception('The ' . $paymentMethod->name . ' payment method has been deactivated');
-        }
+            $requiresStore = $pricingPlan->offersStoreSubscription() ||
+                            $pricingPlan->offersWhatsappCredits() ||
+                            $pricingPlan->offersEmailCredits() ||
+                            $pricingPlan->offersSmsCredits();
 
-        if($offerTrial) {
+            if (!$store && $requiresStore) {
+                $store = Store::find($storeId);
+                if (!$store) throw new Exception('The store does not exist');
+            }
 
-            $data = [
-                'user' => $user,
-                'store' => $store,
-                'pricingPlan' => $pricingPlan,
-                'aiAssistant' => $aiAssistant,
-                'paymentMethod' => $paymentMethod,
-                'createdUsingAutoBilling' => $createdUsingAutoBilling,
-            ];
+            $offerTrial = $requiresStore && ($pricingPlan->trial_days > 0) && ($store->subscriptions()->count() == 0);
 
-            return $this->offerPricingPlan(null, $data);
+            $requiresAiAssistant = $pricingPlan->offersAiAssistantSubscription() ||
+                                $pricingPlan->offersAiAssistantTopUpCredits();
 
-        }else{
+            if($requiresAiAssistant) {
+                $aiAssistant = $user->aiAssistant;
+                if (!$aiAssistant) throw new Exception('The AI Assistant does not exist');
+            }
 
-            $transactionPayload = $this->prepareTransactionPayload($user, $store, $aiAssistant, $pricingPlan, $paymentMethod, $createdUsingAutoBilling);
-            $transaction = Transaction::create($transactionPayload);
-
-            $transaction->setRelation('owner', $pricingPlan);
-            $transaction->setRelation('requestedByUser', $user);
-            if($store) $transaction->setRelation('store', $store);
-            $transaction->setRelation('paymentMethod', $paymentMethod);
-            if($aiAssistant) $transaction->setRelation('aiAssistant', $aiAssistant);
-
-            if ($paymentMethod->type == PaymentMethodType::DPO->value) {
-
-                $companyToken = config('app.dpo_company_token');
-                $dpoPaymentLinkPayload = $this->prepareDpoPaymentLinkPayload($user, $transaction);
-                $metadata = DirectPayOnlineService::createPaymentLink($companyToken, $dpoPaymentLinkPayload);
-
-                $transaction->update(['metadata' => $metadata]);
-                return (new TransactionService())->showResource($transaction);
-
-            } else if ($paymentMethod->type == PaymentMethodType::ORANGE_AIRTIME->value) {
-
-                $msisdn = $user->mobile_number->formatE164();
-                $transaction = OrangeAirtimeService::billUsingAirtime($msisdn, $transaction);
-
-                if ($transaction->payment_status == TransactionPaymentStatus::FAILED_PAYMENT->value) {
-                    return (new TransactionService())->showResource($transaction);
+            if(!$paymentMethod) {
+                if ($paymentMethodId) {
+                    $paymentMethod = PaymentMethod::find($paymentMethodId);
+                } else if ($paymentMethodType) {
+                    $paymentMethod = PaymentMethod::whereType($paymentMethodType)->first();
                 }
             }
 
-            return $this->offerPricingPlan($transaction);
+            if (!$paymentMethod) {
+                throw new Exception('The payment method is required');
+            }else if (!$paymentMethod->active) {
+                throw new Exception('The ' . $paymentMethod->name . ' payment method has been deactivated');
+            }
+
+            if($offerTrial) {
+
+                $data = [
+                    'user' => $user,
+                    'store' => $store,
+                    'pricingPlan' => $pricingPlan,
+                    'aiAssistant' => $aiAssistant,
+                    'paymentMethod' => $paymentMethod,
+                    'createdUsingAutoBilling' => $createdUsingAutoBilling,
+                ];
+
+                return $this->offerPricingPlan(null, $data);
+
+            }else{
+
+                $transactionPayload = $this->prepareTransactionPayload($user, $store, $aiAssistant, $pricingPlan, $paymentMethod, $createdUsingAutoBilling);
+                $transaction = Transaction::create($transactionPayload);
+
+                $transaction->setRelation('owner', $pricingPlan);
+                $transaction->setRelation('requestedByUser', $user);
+                if($store) $transaction->setRelation('store', $store);
+                $transaction->setRelation('paymentMethod', $paymentMethod);
+                if($aiAssistant) $transaction->setRelation('aiAssistant', $aiAssistant);
+
+                if ($paymentMethod->type == PaymentMethodType::DPO->value) {
+
+                    $companyToken = config('app.dpo_company_token');
+                    $dpoPaymentLinkPayload = $this->prepareDpoPaymentLinkPayload($user, $transaction);
+                    $metadata = DirectPayOnlineService::createPaymentLink($companyToken, $dpoPaymentLinkPayload);
+
+                    $transaction->update(['metadata' => $metadata]);
+                    return (new TransactionService())->showResource($transaction);
+
+                } else if ($paymentMethod->type == PaymentMethodType::ORANGE_AIRTIME->value) {
+
+                    $msisdn = $user->mobile_number->formatE164();
+                    $transaction = OrangeAirtimeService::billUsingAirtime($msisdn, $transaction);
+
+                    if ($transaction->payment_status == TransactionPaymentStatus::FAILED_PAYMENT->value) {
+
+                        return [
+                            'successful' => false,
+                            'message' => $transaction->failure_reason
+                        ];
+
+                    }
+
+                }
+
+                return $this->offerPricingPlan($transaction);
+
+            }
+
+        } catch (Exception $e) {
+
+            return [
+                'successful' => false,
+                'message' => $e->getMessage()
+            ];
 
         }
     }
