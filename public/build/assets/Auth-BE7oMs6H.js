@@ -1,0 +1,1 @@
+import{N as r}from"./Notifications-Dc64Fmmo.js";import{c as s,a as o,r as t,F as c,o as a}from"./app-Cn46GS3I.js";import{_ as i}from"./_plugin-vue_export-helper-DlAUqK2U.js";const p={components:{Notifications:r}};function _(m,f,u,l,d,N){const e=t("Notifications"),n=t("router-view");return a(),s(c,null,[o(e),o(n)],64)}const h=i(p,[["render",_]]);export{h as default};

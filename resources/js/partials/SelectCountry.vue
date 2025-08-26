@@ -9,7 +9,7 @@
         <!-- Custom Styled Selected Option -->
         <template #selectedOption="{ selectedOption }">
             <div v-if="selectedOption" class="flex items-center space-x-2">
-                <img :src="`/svgs/country-flags/${selectedOption.value}.svg`" class="w-4 h-4" />
+                <img :src="`/svgs/country-flags/${selectedOption.value.toLowerCase()}.svg`" class="w-4 h-4" />
                 <span class="text-gray-700 text-sm leading-3">{{ selectedOption.label }}</span>
             </div>
             <span v-else class="text-gray-700 text-sm">Select a country</span>
@@ -18,7 +18,7 @@
         <!-- Custom Styled Dropdown Select Option -->
         <template #option="{ option }">
             <div class="flex items-center space-x-2">
-                <img :src="`/svgs/country-flags/${option.value}.svg`" class="w-4 h-4" />
+                <img :src="`/svgs/country-flags/${option.value.toLowerCase()}.svg`" class="w-4 h-4" />
                 <span class="text-gray-700 text-sm">{{ option.label }}</span>
             </div>
         </template>
