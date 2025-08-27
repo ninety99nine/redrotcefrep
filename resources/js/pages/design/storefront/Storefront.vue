@@ -35,6 +35,7 @@
                             <Box v-if="designCardOption.value == 'products'" size="20"></Box>
                             <Image v-if="designCardOption.value == 'image'" size="20"></Image>
                             <Video v-if="designCardOption.value == 'video'" size="20"></Video>
+                            <AtSign v-if="designCardOption.value == 'socials'" size="20"></AtSign>
                             <Clock v-if="designCardOption.value == 'countdown'" size="20"></Clock>
                             <Contact v-if="designCardOption.value == 'contact'" size="20"></Contact>
                             <span class="text-xs whitespace-nowrap">{{ designCardOption.label }}</span>
@@ -77,13 +78,25 @@
                                 <Box v-if="designCard.metadata.type == 'products'" size="16"></Box>
                                 <Image v-if="designCard.metadata.type == 'image'" size="16"></Image>
                                 <Video v-if="designCard.metadata.type == 'video'" size="16"></Video>
+                                <AtSign v-if="designCard.metadata.type == 'socials'" size="16"></AtSign>
                                 <Clock v-if="designCard.metadata.type == 'countdown'" size="16"></Clock>
                                 <Contact v-if="designCard.metadata.type == 'contact'" size="16"></Contact>
                                 <span class="text-xs whitespace-nowrap">{{ getDesignCardLabel(designCard) }}</span>
                             </div>
 
-                            <!-- Drag & Drop Handle -->
-                            <Move @click.stop size="16" class="draggable-handle cursor-grab active:cursor-grabbing text-gray-500 hover:text-yellow-500"></Move>
+
+                            <div class="flex justify-end space-x-4">
+
+                                <!-- Visible Toggle -->
+                                <div class="cursor-pointer hover:text-blue-500 transition-all duration-500">
+                                    <Eye v-if="designCard.visible" size="16" @click.stop="() => toggleVisible(index)"></Eye>
+                                    <EyeOff v-else size="16" @click.stop="() => toggleVisible(index)"></EyeOff>
+                                </div>
+
+                                <!-- Drag & Drop Handle -->
+                                <Move @click.stop size="16" class="draggable-handle cursor-grab active:cursor-grabbing text-gray-500 hover:text-yellow-500"></Move>
+
+                            </div>
 
                         </div>
 
@@ -159,12 +172,12 @@
 
                             </div>
 
-              <vue-easymde
-                v-model="designCard.metadata.body"
-                :options="editorOptions"
-                class="text-xs"
-                @input="designState.saveStateDebounced('Text content changed')"
-              />
+                            <vue-easymde
+                                v-model="designCard.metadata.body"
+                                :options="editorOptions"
+                                class="text-xs"
+                                @input="designState.saveStateDebounced('Text content changed')"
+                            />
 
                         </template>
 
@@ -295,13 +308,69 @@
 
                         </template>
 
-                        <div class="flex justify-end space-x-4 mt-4">
+                        <template v-if="designCard.metadata.type == 'socials'">
 
-                            <!-- Visible Toggle -->
-                            <div class="cursor-pointer hover:text-blue-500 transition-all duration-500">
-                                <Eye v-if="designCard.visible" size="16" @click.stop="() => toggleVisible(index)"></Eye>
-                                <EyeOff v-else size="16" @click.stop="() => toggleVisible(index)"></EyeOff>
+                            <Input
+                                type="text"
+                                class="w-full mb-4"
+                                placeholder="Title"
+                                v-model="designCard.metadata.title"
+                                @input="designState.saveStateDebounced('Title changed')"
+                                :errorText="formState.getFormError(`design_cards.${index}.metadata.title`)">
+                            </Input>
+
+                            <!-- Draggable Fields -->
+                            <draggable
+                                class="space-y-2 mb-4"
+                                ghost-class="bg-yellow-50"
+                                handle=".draggable-handle2"
+                                @change="designState.saveStateDebounced('Design card moved')"
+                                v-model="designState.designForm.design_cards[index].metadata.platforms">
+
+                                <template
+                                    :key="index2"
+                                    v-for="(platform, index2) in designCard.metadata.platforms">
+
+                                    <div class="flex items-center space-x-2"
+                                        v-if="designCard.metadata.show_more || (!designCard.metadata.show_more && index2 <= 2)">
+
+                                        <img class="w-6"
+                                            :src="`/images/social-media-icons/${designCard.metadata.platforms[index2].name.toLowerCase()}.png`" />
+
+                                        <Input
+                                            type="text"
+                                            class="w-full"
+                                            placeholder="https://"
+                                            v-model="designCard.metadata.platforms[index2].link"
+                                            @input="designState.saveStateDebounced('Social link changed')"
+                                            :errorText="formState.getFormError(`design_cards.${index}.metadata.platforms.${index2}.link`)">
+                                        </Input>
+
+                                        <!-- Drag & Drop Handle -->
+                                        <Move @click.stop size="16" class="draggable-handle2 cursor-grab active:cursor-grabbing text-gray-500 hover:text-yellow-500"></Move>
+
+                                    </div>
+
+                                </template>
+
+                            </draggable>
+
+                            <div class="flex justify-center">
+
+                                <!-- Show More Or Less Button -->
+                                <Button
+                                    size="sm"
+                                    type="bare"
+                                    :rightIcon="designCard.metadata.show_more ? ChevronUp : ChevronDown"
+                                    :action="() => designCard.metadata.show_more = !designCard.metadata.show_more">
+                                    <span>{{ designCard.metadata.show_more ? 'show less' : 'show more' }}</span>
+                                </Button>
+
                             </div>
+
+                        </template>
+
+                        <div class="flex justify-end space-x-4 mt-4">
 
                             <Trash size="16" class="cursor-pointer" @click.stop="() => removeDesignCard(index)"></Trash>
 
@@ -344,19 +413,21 @@
     import Datepicker from '@Partials/Datepicker.vue';
     import AddressInput from '@Partials/AddressInput.vue';
     import { VueDraggableNext } from 'vue-draggable-next';
-    import { Box, Eye, Map, Move, Plus, List, Link, Type, Store, Clock, Trash, Image, Video, EyeOff, LayoutGrid, Contact } from 'lucide-vue-next';
+    import { Box, Eye, Map, Move, Plus, List, Link, Type, Store, Clock, Trash, Image, Video, EyeOff, ChevronUp, ChevronDown, AtSign, LayoutGrid, Contact } from 'lucide-vue-next';
 
 
     export default {
         inject: ['formState', 'storeState', 'designState', 'notificationState', 'changeHistoryState'],
         components: {
-            Box, Eye, Map, Move, List, Link, Type, Store, Clock, Trash, Image, Video, EyeOff, LayoutGrid, Contact,
+            Box, Eye, Map, Move, List, Link, Type, Store, Clock, Trash, Image, Video, EyeOff, AtSign, LayoutGrid, Contact,
             Pill, Tabs, Input, Button, Select, Switch, Dropdown, Datepicker, AddressInput, draggable: VueDraggableNext
         },
         emits: ['designCards'],
         data() {
             return {
                 Plus,
+                ChevronUp,
+                ChevronDown,
                 categories: [],
                 isUploading: false,
                 editorOptions: {
@@ -376,13 +447,10 @@
                         'image',         // Image ![alt](url)
                         'quote',         // Blockquote (> Quote)
                         'code',          // Inline code (`code`)
-                        'table',         // Table
-                        '|',
-                        'fullscreen',    // Fullscreen mode
                     ],
                     spellChecker: false, // Disable spell check for simplicity
                     status: false,       // Hide status bar
-                    autofocus: true,     // Focus editor on load
+                    autofocus: false,     // Focus editor on load
                     minHeight: '200px',  // Comfortable editing area
                     placeholder: 'Type your content... Use the toolbar for formatting',
                     previewRender: (plainText) => {
@@ -402,13 +470,18 @@
                 ],
                 designCardOptions: [
                     { label: 'Products', value: 'products'},
-                    { label: 'Link', value: 'link'},
                     { label: 'Text', value: 'text'},
                     { label: 'Image', value: 'image'},
                     { label: 'Video', value: 'video'},
+                    { label: 'Link', value: 'link'},
                     { label: 'Contact', value: 'contact'},
                     { label: 'Countdown', value: 'countdown'},
                     { label: 'Map', value: 'map'},
+                    { label: 'Socials', value: 'socials'},
+                ],
+                socialPlatforms: [
+                    'Facebook', 'Instagram', 'LinkedIn', 'Messenger', 'Snapchat',
+                    'Telegram', 'Threads', 'Tiktok', 'Twitch', 'Whatsapp', 'X'
                 ],
                 isLoadingDesignCards: false,
                 hasLoadedInitialdesignCards: false,
@@ -508,6 +581,20 @@
                 }else if(type == 'map') {
                     metadata = {
                         address: null
+                    };
+                }else if(type == 'socials') {
+                    let socialPlatforms = [
+                        'Whatsapp', 'Facebook', 'Instagram', 'Youtube', 'LinkedIn', 'Tiktok', 'Messenger',
+                        'Telegram', 'Snapchat', 'Threads', 'Twitch', 'X'
+                    ];
+
+                    metadata = {
+                        title: '',
+                        show_more: false,
+                        platforms: socialPlatforms.map((platform) => ({
+                            name: platform,
+                            link: ''
+                        }))
                     };
                 }
 
@@ -769,195 +856,3 @@
         }
     }
 </script>
-
-
-<style scoped>
-@reference 'tailwindcss';
-
-:deep(.EasyMDEContainer.border-red-500) {
-  @apply border-red-500 ring-1 ring-red-500;
-}
-
-/* Toolbar styles */
-:deep(.editor-toolbar) {
-  @apply bg-gray-100 border-b border-gray-300 rounded-t-md p-2 flex flex-wrap gap-1;
-}
-
-:deep(.editor-toolbar button) {
-  @apply text-gray-700 hover:bg-gray-200 hover:text-gray-900 rounded p-1 transition-colors;
-}
-
-:deep(.editor-toolbar button.active) {
-  @apply bg-blue-100 text-blue-700;
-}
-
-:deep(.editor-toolbar .separator) {
-  @apply border-l border-gray-300 mx-1;
-}
-
-/* Editor content styles to match Storefront.vue */
-:deep(.CodeMirror) {
-  @apply border-l border-r border-b bg-white text-gray-700 font-sans text-base leading-6 p-3 rounded-b-md;
-  min-height: 200px;
-}
-
-:deep(.CodeMirror .CodeMirror-placeholder) {
-  @apply text-gray-400;
-}
-
-/* Match markdown-content styles for editing area */
-:deep(.CodeMirror .cm-header-1) {
-  @apply text-3xl font-bold text-red-900;
-}
-
-:deep(.CodeMirror .cm-header-2) {
-  @apply text-2xl font-bold text-red-900;
-}
-
-:deep(.CodeMirror .cm-header-3) {
-  @apply text-xl font-bold text-red-900;
-}
-
-:deep(.CodeMirror .cm-header-4) {
-  @apply text-lg font-bold text-red-900;
-}
-
-:deep(.CodeMirror .cm-header-5) {
-  @apply text-base font-bold text-red-900;
-}
-
-:deep(.CodeMirror .cm-header-6) {
-  @apply text-sm font-bold text-red-900;
-}
-
-:deep(.CodeMirror .cm-string:not(.cm-url):not(.cm-comment)) {
-  @apply text-base text-gray-700;
-}
-
-:deep(.CodeMirror .cm-strong) {
-  @apply font-bold;
-}
-
-:deep(.CodeMirror .cm-em) {
-  @apply italic;
-}
-
-:deep(.CodeMirror .cm-strikethrough) {
-  @apply line-through;
-}
-
-:deep(.CodeMirror .cm-link) {
-  @apply text-blue-600 underline;
-}
-
-:deep(.CodeMirror .cm-quote) {
-  @apply text-gray-600 italic;
-}
-
-:deep(.CodeMirror .cm-code) {
-  @apply font-mono text-sm bg-gray-100 rounded;
-}
-
-:deep(.CodeMirror .cm-variable-2) {
-  /* Lists */
-  @apply text-gray-700;
-}
-
-/* Preview styles to match Storefront.vue */
-:deep(.editor-preview) {
-  @apply bg-white p-4 rounded-b-md text-gray-700;
-}
-
-:deep(.editor-preview h1) {
-  @apply text-3xl font-bold text-gray-900 mb-4;
-}
-
-:deep(.editor-preview h2) {
-  @apply text-2xl font-bold text-gray-900 mb-3;
-}
-
-:deep(.editor-preview h3) {
-  @apply text-xl font-bold text-gray-900 mb-2;
-}
-
-:deep(.editor-preview h4) {
-  @apply text-lg font-bold text-gray-900 mb-2;
-}
-
-:deep(.editor-preview h5) {
-  @apply text-base font-bold text-gray-900 mb-2;
-}
-
-:deep(.editor-preview h6) {
-  @apply text-sm font-bold text-gray-900 mb-2;
-}
-
-:deep(.editor-preview p) {
-  @apply text-base text-gray-700 mb-4;
-}
-
-:deep(.editor-preview strong) {
-  @apply font-bold;
-}
-
-:deep(.editor-preview em) {
-  @apply italic;
-}
-
-:deep(.editor-preview del) {
-  @apply line-through;
-}
-
-:deep(.editor-preview ul) {
-  @apply list-disc pl-6 mb-4;
-}
-
-:deep(.editor-preview ol) {
-  @apply list-decimal pl-6 mb-4;
-}
-
-:deep(.editor-preview li) {
-  @apply mb-2;
-}
-
-:deep(.editor-preview a) {
-  @apply text-blue-600 underline hover:text-blue-800;
-}
-
-:deep(.editor-preview blockquote) {
-  @apply border-l-4 border-gray-300 pl-4 text-gray-600 italic mb-4;
-}
-
-:deep(.editor-preview pre) {
-  @apply bg-gray-100 p-4 rounded-md overflow-x-auto mb-4;
-}
-
-:deep(.editor-preview code) {
-  @apply font-mono text-sm;
-}
-
-:deep(.editor-preview table) {
-  @apply w-full border-collapse mb-4;
-}
-
-:deep(.editor-preview th, .editor-preview td) {
-  @apply border border-gray-300 p-2;
-}
-
-:deep(.editor-preview th) {
-  @apply bg-gray-50 font-semibold text-gray-900;
-}
-
-:deep(.editor-preview img) {
-  @apply max-w-full h-auto mb-4;
-}
-
-/* Fullscreen mode */
-:deep(.editor-toolbar.fullscreen) {
-  @apply fixed top-0 left-0 right-0 z-50 bg-gray-100;
-}
-
-:deep(.CodeMirror-fullscreen) {
-  @apply fixed top-12 left-0 right-0 bottom-0 z-50 bg-white;
-}
-</style>

@@ -1,6 +1,8 @@
 @import 'tailwindcss';
 
-/* Preline UI */
+/**
+ *  Preline UI
+ */
 @import "../../node_modules/preline/variants.css";
 @source "../../node_modules/preline/dist/*.js";
 
@@ -9,10 +11,14 @@
 @source '../**/*.blade.php';
 @source '../**/*.js';
 
-/* Required styles for Vue Flow */
+/**
+ *  Required styles for Vue Flow
+ */
 @import '@vue-flow/core/dist/style.css';
 
-/* Optional: Default theme for Vue Flow (includes basic styling for nodes and edges) */
+/**
+ *  Optional: Default theme for Vue Flow (includes basic styling for nodes and edges)
+ */
 @import '@vue-flow/core/dist/theme-default.css';
 
 @theme {
@@ -21,7 +27,9 @@
 }
 
 /**
- *  Overide mobile number inputs using the intl-tel-input package to display in full-width.
+ *  intl-tel-input styles
+ *
+ *  Overide mobile number inputs that are using the intl-tel-input package to display in full-width.
  *  Refer to: resources/js/partials/inputs/MobileNumberInput.vue
  */
 .iti { width: 100% !important; }
@@ -48,6 +56,7 @@
     }
 }
 
+/* Animated Gradient Border Effect - Part 3: Define border */
 .animated-border-cyan {
     background: linear-gradient(45deg, #ffffff, #ffffff, #ffffff) padding-box,
                 conic-gradient(from var(--border-angle),
@@ -61,7 +70,6 @@
     animation: borderAnimation 4s linear infinite;
 }
 
-/* Animated Gradient Border Effect - Part 3: Define border */
 .animated-border-blue {
     background: linear-gradient(45deg, #ffffff, #ffffff, #ffffff) padding-box,
                 conic-gradient(from var(--border-angle),
@@ -112,4 +120,56 @@
     border-radius: 16px;
     border: 1px solid transparent; /* Ensure border is visible */
     animation: borderAnimation 4s linear infinite;
+}
+
+/**
+ *  vue-easymde-editor
+ */
+
+.vue-easymde-editor .editor-toolbar {
+    @apply p-1!;
+}
+
+.vue-easymde-editor .editor-toolbar .active {
+    @apply bg-blue-100! text-blue-800 border-blue-500!;
+}
+
+.vue-easymde-editor .CodeMirror-scroll {
+    @apply max-h-60;
+}
+
+.vue-easymde-editor .CodeMirror-lines {
+    @apply p-2;
+}
+
+.vue-easymde-editor .cm-header-1 {
+  @apply text-3xl! font-bold text-black;
+}
+
+.vue-easymde-editor .cm-header-2 {
+  @apply text-2xl! font-bold text-black;
+}
+
+.vue-easymde-editor .cm-header-3 {
+  @apply text-xl! font-bold text-black;
+}
+
+/**
+ *  markdown-content (To match the vue-easymde-editor styles above)
+ */
+
+.markdown-content {
+  @apply text-black!;
+}
+
+.markdown-content h1 {
+  @apply text-3xl font-bold text-black;
+}
+
+.markdown-content h2 {
+  @apply text-2xl font-bold text-black;
+}
+
+.markdown-content h3 {
+  @apply text-xl font-bold text-black;
 }

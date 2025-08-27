@@ -26,9 +26,13 @@
 
             <div class="w-96">
 
-                <div class="scale-75 w-[360px] h-[800px] border-8 border-slate-900 rounded-4xl fixed top-8 right-8 overflow-y-auto shadow-lg shadow-gray-500">
+                <div class="scale-75 overflow-hidden border-8 border-slate-900 rounded-4xl fixed top-8 right-8 shadow-lg shadow-gray-500">
 
-                    <Storefront :designCards="designCards"></Storefront>
+                    <div class="w-[360px] h-[800px] overflow-y-auto rounded-4xl text-gray-700">
+
+                        <Storefront :designCards="designCards"></Storefront>
+
+                    </div>
 
                 </div>
 
