@@ -26,6 +26,8 @@
         "chart.js": "^4.4.9",
         "dayjs": "^1.11.13",
         "deep-diff": "^1.0.2",
+        "dompurify": "^3.2.6",
+        "easymde": "^2.20.0",
         "intl-tel-input": "^25.3.1",
         "libphonenumber-js": "^1.12.6",
         "lodash.clonedeep": "^4.5.0",
@@ -33,6 +35,7 @@
         "lodash.isequal": "^4.5.0",
         "lucide-vue-next": "^0.488.0",
         "lz-string": "^1.5.0",
+        "marked": "^16.2.0",
         "papaparse": "^5.5.3",
         "pinia": "^3.0.3",
         "preline": "^3.1.0",
@@ -45,6 +48,7 @@
         "vue-draggable-next": "^2.2.1",
         "vue-router": "^4.5.1",
         "vue-slide-up-down": "^3.0.0",
+        "vue3-easymde": "^1.0.1",
         "vue3-google-map": "^0.23.0"
     }
 }

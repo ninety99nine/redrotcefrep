@@ -27,6 +27,7 @@ return new class extends Migration
 
             $table->index('name');
             $table->index('type');
+            $table->index('position');
         });
     }
 

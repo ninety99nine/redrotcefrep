@@ -142,9 +142,9 @@
                     this.notificationState.showWarningNotification(message);
                     this.formState.setServerFormErrors(error);
                     console.error('Failed to delete order:', error);
+                    this.$refs.deleteOrderModal.hideModal();
                 } finally {
                     this.isDeletingOrder = false;
-                    this.$refs.deleteOrderModal.hideModal();
                 }
 
             },

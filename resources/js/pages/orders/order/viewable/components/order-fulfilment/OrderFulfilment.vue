@@ -91,7 +91,9 @@
 
             </div>
 
-            <div class="bg-gray-50 p-4 border border-gray-200 rounded-lg space-y-2 text-sm">
+            <div
+                class="bg-gray-50 p-4 border border-gray-200 rounded-lg space-y-2 text-sm"
+                v-if="order.customer_name || order.customer_email || order.customer_mobile_number || deliveryMethod || deliveryAddress || order.delivery_date">
 
                 <div v-if="order.customer_name" class="grid grid-cols-3 items-center">
                     <span>Name</span>
@@ -278,7 +280,7 @@
             },
             navigateToCustomer() {
                 this.$router.push({
-                    name: 'show-customer',
+                    name: 'edit-customer',
                     params: {
                         'customer_id': this.customer.id
                     },

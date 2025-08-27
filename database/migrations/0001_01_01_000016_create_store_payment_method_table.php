@@ -23,6 +23,7 @@ return new class extends Migration
             $table->timestamps();
 
             $table->index('store_id');
+            $table->index('position');
             $table->index('payment_method_id');
 
             $table->foreign('store_id')->references('id')->on('stores')->cascadeOnDelete();

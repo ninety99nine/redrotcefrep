@@ -6,8 +6,9 @@ use App\Casts\Money;
 use App\Enums\TagType;
 use App\Casts\JsonArray;
 use App\Casts\CheckoutFees;
-use App\Enums\UploadFolderName;
 use App\Services\UssdService;
+use App\Enums\UploadFolderName;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -20,7 +21,6 @@ use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\belongsToMany;
-use Illuminate\Support\Facades\Auth;
 use Propaganistas\LaravelPhone\Casts\E164PhoneNumberCast;
 
 class Store extends Model
@@ -295,6 +295,26 @@ class Store extends Model
     }
 
     /**
+     * Get design cards.
+     *
+     * @return HasMany
+     */
+    public function designCards(): HasMany
+    {
+        return $this->hasMany(DesignCard::class);
+    }
+
+    /**
+     * Get delivery methods.
+     *
+     * @return HasMany
+     */
+    public function deliveryMethods(): HasMany
+    {
+        return $this->hasMany(DeliveryMethod::class);
+    }
+
+    /**
      * Get payment methods.
      *
      * @return BelongsToMany
@@ -308,16 +328,6 @@ class Store extends Model
                     ])
                     ->using(StorePaymentMethod::class)
                     ->as('store_payment_method');
-    }
-
-    /**
-     * Get delivery methods.
-     *
-     * @return HasMany
-     */
-    public function deliveryMethods(): HasMany
-    {
-        return $this->hasMany(DeliveryMethod::class);
     }
 
     /**

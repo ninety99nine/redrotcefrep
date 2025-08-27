@@ -670,7 +670,7 @@
 <script>
 
     import axios from 'axios';
-    import Tabs from '@Partials/tabs.vue';
+    import Tabs from '@Partials/Tabs.vue';
     import isEqual from 'lodash/isEqual';
     import Input from '@Partials/Input.vue';
     import Modal from '@Partials/Modal.vue';

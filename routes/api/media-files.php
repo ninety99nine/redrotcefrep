@@ -1,7 +1,6 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Middleware\StorePermission;
 use App\Http\Controllers\MediaFileController;
 
 Route::prefix('media-files')

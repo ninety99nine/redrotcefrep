@@ -70,6 +70,7 @@ return new class extends Migration
             $table->timestamps();
 
             $table->index('name');
+            $table->index('position');
             $table->index('store_id');
 
             $table->foreign('store_id')->references('id')->on('stores')->cascadeOnDelete();

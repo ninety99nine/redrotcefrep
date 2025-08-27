@@ -8,17 +8,23 @@
                 type="button"
                 @click.prevent.stop="selectTab(tab.value)"
                 :class="[
-                    'flex items-center gap-x-2 px-4 py-2 text-sm font-medium rounded-md transition cursor-pointer',
+                    'w-full flex items-center justify-center gap-x-2 rounded-md transition cursor-pointer font-medium',
+                    size === 'md'
+                        ? 'px-4 py-2 text-sm'
+                        : 'px-4 py-1 text-sm',
                     tab.value === modelValue
-                    ? 'bg-white shadow text-gray-900 dark:bg-neutral-700 dark:text-white'
-                    : 'text-gray-500 hover:text-gray-700 hover:bg-white dark:text-neutral-400 dark:hover:text-white'
+                        ? 'bg-white shadow text-gray-900 dark:bg-neutral-700 dark:text-white'
+                        : 'text-gray-500 hover:text-gray-700 hover:bg-white dark:text-neutral-400 dark:hover:text-white'
                 ]">
 
-                <!-- Icon -->
-                <component v-if="tab.icon" :is="tab.icon" class="w-4 h-4" />
+                <!-- Left Icon -->
+                <component v-if="tab.leftIcon" :is="tab.leftIcon" :size="tab.leftIconSize ?? 16" />
 
                 <!-- Label -->
                 <span>{{ tab.label }}</span>
+
+                <!-- Right Icon -->
+                <component v-if="tab.rightIcon" :is="tab.rightIcon" :size="tab.rightIconSize ?? 16" />
 
             </button>
 
@@ -39,6 +45,11 @@
                 type: Array,
                 required: true,
                 default: () => [],
+            },
+            size: {
+                type: String,
+                default: 'md',
+                validator: value => ['sm', 'md'].includes(value)
             },
         },
         methods: {

@@ -19,6 +19,8 @@ return new class extends Migration
             $table->string('tracking_page');
             $table->unsignedTinyInteger('position')->nullable();
             $table->timestamps();
+
+            $table->index('position');
         });
     }
 

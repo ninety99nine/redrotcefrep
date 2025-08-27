@@ -133,7 +133,10 @@
                         @keydown.enter="(event) => $emit('onEnter', event)"
                         :class="[
                             inputClass ? inputClass : [
-                                'w-full h-full text-sm leading-6 font-medium text-gray-700 placeholder:text-gray-400 placeholder:font-normal invalid:text-red-400 focus-within:outline-none bg-transparent appearance-none [&::-webkit-search-cancel-button]:cursor-pointer resize-none',
+                                'w-full h-full text-sm leading-6 font-medium text-gray-700 placeholder:text-gray-400 placeholder:font-normal invalid:text-red-400 focus-within:outline-none bg-transparent appearance-none [&::-webkit-search-cancel-button]:cursor-pointer',
+                                {
+                                    'resize-none': !resize,
+                                },
                                 {
                                     'cursor-not-allowed': disabled
                                 }
@@ -525,6 +528,10 @@
                 type: [String, null],
                 default: '4'
             },
+            resize: {
+                type: Boolean,
+                default: false
+            },
 
             //  Number
             step: {
@@ -623,7 +630,7 @@
                 default: false
             },
 
-            emits: ['update:modelValue', 'focus', 'blur', 'onEnter', 'retryUpload', 'retryUploads'],
+            emits: ['update:modelValue', 'change', 'focus', 'blur', 'onEnter', 'retryUpload', 'retryUploads'],
         },
         data() {
             return {
@@ -935,6 +942,7 @@
 
                 }else if (this.onDelete) {
                     this.onDelete(this.modelValue, temporaryId);
+                    this.$emit('change', this.modelValue);
                 }else {
 
                     try {
@@ -954,6 +962,7 @@
 
                         fileIndex = this.modelValue.findIndex((file) => file.temporary_id == temporaryId);
                         this.modelValue.splice(fileIndex, 1);
+                        this.$emit('change', this.modelValue);
 
                     } catch (error) {
                         const message = error?.response?.data?.message || error?.message || 'Something went wrong while deleting media file';
@@ -1028,12 +1037,14 @@
                     this.debouncedEmit(value);
                 }else{
                     this.$emit('update:modelValue', value);
+                    this.$emit('change', value);
                 }
             }
         },
         created() {
             this.debouncedEmit = debounce((value) => {
                 this.$emit('update:modelValue', value);
+                this.$emit('change', value);
             }, 1000);
         },
     }

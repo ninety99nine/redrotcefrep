@@ -23,6 +23,7 @@ return new class extends Migration
             $table->timestamps();
 
             /* Add Indexes */
+            $table->index('position');
             $table->index('ai_topic_id');
 
             $table->foreign('ai_topic_id')->references('id')->on('ai_topics')->cascadeOnDelete();

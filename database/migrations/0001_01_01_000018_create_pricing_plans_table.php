@@ -34,6 +34,8 @@ return new class extends Migration
             $table->json('features')->nullable();
             $table->unsignedTinyInteger('position')->nullable();
             $table->timestamps();
+
+            $table->index('position');
         });
     }
 

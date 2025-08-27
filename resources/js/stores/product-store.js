@@ -27,6 +27,7 @@ export const useProductStore = defineStore('product', {
             this.isDeletingProduct = false;
             this.isCreatingVariants = false;
             this.isChangingVariantArrangement = false;
+            changeHistoryState().reset();
         },
         setProduct(product) {
             this.product = product;

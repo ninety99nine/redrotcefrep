@@ -20,6 +20,8 @@ return new class extends Migration
             $table->boolean('visible')->default(true);
             $table->unsignedTinyInteger('position')->nullable();
             $table->timestamps();
+
+            $table->index('position');
         });
     }
 

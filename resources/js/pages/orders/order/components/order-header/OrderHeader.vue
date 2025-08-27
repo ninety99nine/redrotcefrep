@@ -29,7 +29,7 @@
 
                     <!-- Heading -->
                     <h1 class="text-lg text-gray-700 font-semibold">
-                        {{ isCreating ? 'Add Order' : `#${order.number} ${order.customer_first_name}` }}
+                          {{ isCreating ? "Add Order" : `#${order.number}${order.customer_first_name ? ' ' + order.customer_first_name : ''}` }}
                     </h1>
 
                     <template v-if="!isCreating">

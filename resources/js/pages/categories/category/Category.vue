@@ -89,6 +89,7 @@
                         <Input
                             type="file"
                             :maxFiles="1"
+                            :imagePreviewGridCols="1"
                             v-model="categoryForm.photos"
                             @retryUploads="(files) => uploadImages(categoryForm.id)"
                             @change="categoryState.saveStateDebounced('Photos changed')"
@@ -432,9 +433,9 @@
                     this.notificationState.showWarningNotification(message);
                     this.formState.setServerFormErrors(error);
                     console.error('Failed to delete category:', error);
+                    hideModal();
                 } finally {
                     this.categoryState.isDeletingCategory = false;
-                    hideModal();
                 }
 
             },
@@ -555,7 +556,6 @@
         },
         unmounted() {
             this.categoryState.reset();
-            this.changeHistoryState.reset();
         },
         created() {
 

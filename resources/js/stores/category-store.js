@@ -20,6 +20,7 @@ export const useCategoryStore = defineStore('category', {
             this.isCreatingCategory = false;
             this.isUpdatingCategory = false;
             this.isDeletingCategory = false;
+            changeHistoryState().reset();
         },
         setCategory(category) {
             this.category = category;

@@ -420,9 +420,9 @@
                     this.notificationState.showWarningNotification(message);
                     this.formState.setServerFormErrors(error);
                     console.error('Failed to delete tag:', error);
+                    hideModal();
                 } finally {
                     this.tagState.isDeletingTag = false;
-                    hideModal();
                 }
 
             },
@@ -476,7 +476,6 @@
         },
         unmounted() {
             this.tagState.reset();
-            this.changeHistoryState.reset();
         },
         created() {
 

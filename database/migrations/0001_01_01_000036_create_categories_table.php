@@ -22,6 +22,8 @@ return new class extends Migration
             $table->foreignUuid('store_id');
             $table->timestamps();
 
+            $table->index('position');
+
             $table->foreign('store_id')->references('id')->on('stores')->cascadeOnDelete();
         });
     }

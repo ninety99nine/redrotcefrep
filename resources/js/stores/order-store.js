@@ -18,6 +18,7 @@ export const useOrderStore = defineStore('order', {
             this.shoppingCart = null;
             this.isLoadingOrder = false;
             this.isInspectingShoppingCart = false;
+            changeHistoryState().reset();
         },
         setOrder(order) {
             this.order = order;

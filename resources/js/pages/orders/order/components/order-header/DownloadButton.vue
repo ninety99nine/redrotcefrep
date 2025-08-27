@@ -7,9 +7,9 @@
         triggerText="Download"
         approveType="primary"
         approveText="Download PDF"
+        :approveAction="downloadOrder"
         :leftApproveIcon="ArrowDownToLine"
         :leftTriggerIcon="ArrowDownToLine"
-        :approveAction="downloadOrder"
         :approveLoading="isDownloadingOrder"
         :triggerLoading="isLoadingStore || isLoadingOrder">
 

@@ -141,7 +141,7 @@
             <!-- Edit Address / Add Address Button - Triggers Modal -->
             <div :class="triggerClass">
 
-                <h1 class="flex items-center font-lg font-bold">
+                <h1 v-if="title" class="flex items-center font-lg font-bold">
                     <svg class="w-6 h-6 mr-2 flex-shrink-0" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
                         <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z" />
@@ -149,7 +149,7 @@
                     <span>{{ title }}</span>
                 </h1>
 
-                <p class="text-sm text-gray-500 mb-2 pb-4 border-b border-dashed border-gray-300">{{ subtitle }}</p>
+                <p v-if="subtitle" class="text-sm text-gray-500 mb-2 pb-4 border-b border-dashed border-gray-300">{{ subtitle }}</p>
 
                 <div v-if="localAddress" class="flex justify-between items-center space-x-20">
                     <span class="text-sm">{{ localAddress.complete_address }}</span>
@@ -188,7 +188,7 @@
 
                 <!-- Google Maps -->
                 <GoogleMaps
-                    height="350px"
+                    :height="height"
                     :gmpDraggable="false"
                     :latitude="previewLatitude"
                     :longitude="previewLongitude"
@@ -235,11 +235,11 @@
             },
             title: {
                 type: String,
-                default: 'Address'
+                default: null
             },
             subtitle: {
                 type: String,
-                default: 'Address used by customers to know your store location.'
+                default: null
             },
             pinLocationOnMap: {
                 type: Boolean,
@@ -249,12 +249,16 @@
                 type: Boolean,
                 default: false
             },
+            height: {
+                type: String,
+                default: '350px'
+            },
             triggerClass: {
                 type: String,
                 default: 'space-y-4 p-4 border border-gray-300 rounded-lg shadow-lg bg-white'
             },
         },
-        emits: ['onValidated', 'onCreated', 'onUpdated', 'onDeleted'],
+        emits: ['change', 'onValidated', 'onCreated', 'onUpdated', 'onDeleted'],
         data() {
             return {
                 Plus,
@@ -443,7 +447,11 @@
 
                     this.localAddress = response.data;
                     this.setFields(this.localAddress);
-                    this.$emit('onValidated', cloneDeep(this.localAddress));
+
+                    let emittableAddress = cloneDeep(this.localAddress);
+                    this.$emit('onValidated', emittableAddress);
+                    this.$emit('change', emittableAddress);
+
                     this.hideModal();
 
                 } catch (error) {
@@ -471,7 +479,11 @@
 
                     this.localAddress = response.data;
                     this.setFields(this.localAddress);
-                    this.$emit('onCreated', cloneDeep(this.localAddress));
+
+                    let emittableAddress = cloneDeep(this.localAddress);
+                    this.$emit('onCreated', emittableAddress);
+                    this.$emit('change', emittableAddress);
+
                     this.notificationState.showSuccessNotification('Address created');
                     this.hideModal();
 
@@ -500,7 +512,11 @@
 
                     this.localAddress = response.data;
                     this.setFields(this.localAddress);
-                    this.$emit('onUpdated', cloneDeep(this.localAddress));
+
+                    let emittableAddress = cloneDeep(this.localAddress);
+                    this.$emit('onUpdated', emittableAddress);
+                    this.$emit('change', emittableAddress);
+
                     this.notificationState.showSuccessNotification('Address updated');
                     this.hideModal();
 
@@ -519,7 +535,9 @@
                 try {
 
                     if(!this.hasAddress) {
-                        this.$emit('onDeleted', this.localAddress);
+                        this.$emit('onDeleted');
+                        this.$emit('change');
+
                         this.localAddress = null;
                         this.setFields(null);
                         this.hideModal();
@@ -532,7 +550,10 @@
 
                     this.setFields(null);
                     this.localAddress = null;
-                    this.$emit('onDeleted', null);
+
+                    this.$emit('onDeleted');
+                    this.$emit('change');
+
                     this.notificationState.showSuccessNotification('Address deleted');
                     this.hideModal();
 

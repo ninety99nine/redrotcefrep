@@ -739,7 +739,6 @@
         },
         unmounted() {
             this.customerState.reset();
-            this.changeHistoryState.reset();
         },
         created() {
 

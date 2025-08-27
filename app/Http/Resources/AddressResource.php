@@ -35,12 +35,6 @@ class AddressResource extends JsonResource
             'updated_at' => $this->updated_at?->toDateTimeString(),     //  not available when validating address
 
             'owner' => $this->whenLoaded('owner', fn() => $this->getOwnerResource()),
-
-            '_links' => $this->id ? [
-                'show' => route('show.address', ['address' => $this->id]),
-                'update' => route('update.address', ['address' => $this->id]),
-                'delete' => route('delete.address', ['address' => $this->id]),
-            ] : []
         ];
     }
 

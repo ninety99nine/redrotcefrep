@@ -20,6 +20,7 @@ export const useCustomerStore = defineStore('customer', {
             this.isCreatingCustomer = false;
             this.isUpdatingCustomer = false;
             this.isDeletingCustomer = false;
+            changeHistoryState().reset();
         },
         setCustomer(customer) {
             this.customer = customer;

@@ -73,9 +73,9 @@
                                     :maxFiles="1"
                                     v-model="form.photo"
                                     label="Proof Of Payment"
+                                    :imagePreviewGridCols="1"
                                     singleFileUploadMessage="proof of payment attached">
                                 </Input>
-
 
                             </div>
 

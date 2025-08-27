@@ -491,9 +491,9 @@
                     this.notificationState.showWarningNotification(message);
                     this.formState.setServerFormErrors(error);
                     console.error('Failed to delete customer:', error);
+                    hideModal();
                 } finally {
                     this.customerState.isDeletingCustomer = false;
-                    hideModal();
                 }
 
             },
@@ -525,7 +525,6 @@
         },
         unmounted() {
             this.customerState.reset();
-            this.changeHistoryState.reset();
         },
         created() {
 

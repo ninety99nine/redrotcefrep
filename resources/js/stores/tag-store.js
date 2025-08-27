@@ -18,6 +18,7 @@ export const useTagStore = defineStore('tag', {
             this.isCreatingTag = false;
             this.isUpdatingTag = false;
             this.isDeletingTag = false;
+            changeHistoryState().reset();
         },
         setTag(tag) {
             this.tag = tag;

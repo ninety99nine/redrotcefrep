@@ -20,8 +20,13 @@
         inject: ['orderState', 'storeState', 'formState', 'notificationState', 'changeHistoryState'],
         components: { OrderHeader },
         watch: {
-            store(newValue, oldValue) {
-                if(!oldValue && newValue) {
+            store(newValue) {
+                if(newValue) {
+                    this.setup();
+                }
+            },
+            orderId(newValue) {
+                if(newValue) {
                     this.setup();
                 }
             },
@@ -210,7 +215,6 @@
         },
         unmounted() {
             this.orderState.reset();
-            this.changeHistoryState.reset();
         },
         created() {
             this.setup();

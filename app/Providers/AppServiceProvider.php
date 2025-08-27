@@ -13,6 +13,7 @@ use App\Models\Category;
 use App\Models\Customer;
 use App\Models\Promotion;
 use App\Models\MediaFile;
+use App\Models\DesignCard;
 use App\Models\StoreQuota;
 use App\Models\PricingPlan;
 use App\Models\AiAssistant;
@@ -180,6 +181,12 @@ class AppServiceProvider extends ServiceProvider
         Route::bind('deliveryMethod', function ($value) {
             $allowedRoutes = ['show.delivery.method'];
             return $this->applyEagerLoading(DeliveryMethod::query(), $allowedRoutes)->findOrFail($value);
+        });
+
+        // Bind DesignCard model
+        Route::bind('designCard', function ($value) {
+            $allowedRoutes = ['show.design.card'];
+            return $this->applyEagerLoading(DesignCard::query(), $allowedRoutes)->findOrFail($value);
         });
 
         // Bind PricingPlan model

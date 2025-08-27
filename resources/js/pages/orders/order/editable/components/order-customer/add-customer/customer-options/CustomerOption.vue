@@ -10,7 +10,8 @@
 
         <div>
             <p class="text-sm font-semibold">{{ customer.name }}</p>
-            <p class="text-xs text-gray-500">{{ customer.email || customer.mobile_number.national }}</p>
+            <p class="text-xs text-gray-500"
+               v-if="customer.email || customer.mobile_number">{{ customer.email || customer.mobile_number.national }}</p>
         </div>
 
     </div>

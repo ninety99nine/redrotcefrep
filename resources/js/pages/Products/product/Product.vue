@@ -475,10 +475,11 @@
 
                                     </div>
 
-                                    <!-- Images Input -->
+                                    <!-- Image Input -->
                                     <Input
                                         type="file"
                                         :maxFiles="1"
+                                        :imagePreviewGridCols="1"
                                         singleFileUploadMessage="Photo attached"
                                         v-if="productForm.variants[index].show_more"
                                         v-model="productForm.variants[index].photos"
@@ -1424,9 +1425,9 @@
                     this.notificationState.showWarningNotification(message);
                     this.formState.setServerFormErrors(error);
                     console.error('Failed to delete product:', error);
+                    hideModal();
                 } finally {
                     this.productState.isDeletingProduct = false;
-                    hideModal();
                 }
 
             },
@@ -1599,7 +1600,6 @@
         },
         unmounted() {
             this.productState.reset();
-            this.changeHistoryState.reset();
         },
         created() {
 
