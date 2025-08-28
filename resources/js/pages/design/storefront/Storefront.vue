@@ -173,47 +173,64 @@
                             </div>
 
                             <vue-easymde
-                                v-model="designCard.metadata.body"
-                                :options="editorOptions"
                                 class="text-xs"
-                                @input="designState.saveStateDebounced('Text content changed')"
-                            />
+                                :options="editorOptions"
+                                v-model="designCard.metadata.body"
+                                @input="designState.saveStateDebounced('Text content changed')" />
 
                         </template>
 
                         <template v-if="designCard.metadata.type == 'image'">
 
-                            <Input
-                                type="text"
-                                class="w-full mb-4"
-                                placeholder="Title"
-                                v-model="designCard.metadata.title"
-                                @input="designState.saveStateDebounced('Title changed')"
-                                :errorText="formState.getFormError(`design_cards.${index}.metadata.title`)">
-                            </Input>
+                            <div class="flex items-center space-x-2 mb-4">
 
-                            <Input
-                                type="file"
+                                <Pill :type="designCard.metadata.mode == 'image' ? 'primary' : 'light'" size="sm" :action="() => designCard.metadata.mode = 'image'">Image</Pill>
+                                <Pill :type="designCard.metadata.mode == 'upper_text' ? 'primary' : 'light'" size="sm" :action="() => designCard.metadata.mode = 'upper_text'">Upper text</Pill>
+                                <Pill :type="designCard.metadata.mode == 'lower_text' ? 'primary' : 'light'" size="sm" :action="() => designCard.metadata.mode = 'lower_text'">Lower text</Pill>
+                                <Pill :type="designCard.metadata.mode == 'design' ? 'primary' : 'light'" size="sm" :action="() => designCard.metadata.mode = 'design'">Design</Pill>
+
+                            </div>
+
+                            <template v-if="designCard.metadata.mode == 'image'">
+
+                                <Input
+                                    type="file"
+                                    class="mb-4"
+                                    :maxFiles="1"
+                                    :imagePreviewGridCols="1"
+                                    v-model="designCard.photo"
+                                    singleFileUploadMessage="Image attached"
+                                    @change="(photo) => designState.saveStateDebounced(photo.length ? 'Image added' : 'Image removed')">
+                                </Input>
+
+                                <Input
+                                    type="text"
+                                    label="Link"
+                                    class="w-full mb-4"
+                                    placeholder="https://"
+                                    secondaryLabel="(optional)"
+                                    v-model="designCard.metadata.link"
+                                    @input="designState.saveStateDebounced('Link changed')"
+                                    tooltipContent="Include https:// at the begining of your link"
+                                    description="We will redirect to this link when image is clicked"
+                                    :errorText="formState.getFormError(`design_cards.${index}.metadata.link`)">
+                                </Input>
+
+                            </template>
+
+                            <vue-easymde
                                 class="mb-4"
-                                :maxFiles="1"
-                                :imagePreviewGridCols="1"
-                                v-model="designCard.photo"
-                                singleFileUploadMessage="Image attached"
-                                @change="(photo) => designState.saveStateDebounced(photo.length ? 'Image added' : 'Image removed')">
-                            </Input>
+                                :options="editorOptions"
+                                v-model="designCard.metadata.upper_text"
+                                v-if="designCard.metadata.mode == 'upper_text'"
+                                @input="designState.saveStateDebounced('Text content changed')" />
 
-                            <Input
-                                type="text"
-                                label="Link"
-                                class="w-full"
-                                placeholder="https://"
-                                secondaryLabel="(optional)"
-                                v-model="designCard.metadata.link"
-                                @input="designState.saveStateDebounced('Link changed')"
-                                tooltipContent="Include https:// at the begining of your link"
-                                description="We will redirect to this link when image is clicked"
-                                :errorText="formState.getFormError(`design_cards.${index}.metadata.link`)">
-                            </Input>
+                            <vue-easymde
+                                class="mb-4"
+                                :options="editorOptions"
+                                v-model="designCard.metadata.lower_text"
+                                v-else-if="designCard.metadata.mode == 'lower_text'"
+                                @input="designState.saveStateDebounced('Text content changed')" />
 
                         </template>
 
@@ -252,59 +269,114 @@
                                 :errorText="formState.getFormError(`design_cards.${index}.metadata.title`)">
                             </Input>
 
+                            <Input
+                                type="text"
+                                class="w-full"
+                                placeholder="+26772000001"
+                                v-model="designCard.metadata.mobile_number"
+                                @input="designState.saveStateDebounced('Mobile number changed')"
+                                :errorText="formState.getFormError(`design_cards.${index}.metadata.mobile_number`)">
+                            </Input>
+
                         </template>
 
                         <template v-if="designCard.metadata.type == 'countdown'">
 
-                            <Input
-                                type="text"
-                                class="w-full mb-4"
-                                placeholder="Title"
-                                v-model="designCard.metadata.title"
-                                @input="designState.saveStateDebounced('Title changed')"
-                                :errorText="formState.getFormError(`design_cards.${index}.metadata.title`)">
-                            </Input>
+                            <div class="flex items-center space-x-2 mb-4">
 
-                            <Input
-                                rows="2"
-                                type="textarea"
-                                class="w-full mb-4"
-                                placeholder="Description"
-                                v-model="designCard.metadata.description"
-                                @input="designState.saveStateDebounced('Description changed')"
-                                :errorText="formState.getFormError(`design_cards.${index}.metadata.description`)">
-                            </Input>
+                                <Pill :type="designCard.metadata.mode == 'countdown' ? 'primary' : 'light'" size="sm" :action="() => designCard.metadata.mode = 'countdown'">Countdown</Pill>
+                                <Pill :type="designCard.metadata.mode == 'upper_text' ? 'primary' : 'light'" size="sm" :action="() => designCard.metadata.mode = 'upper_text'">Upper text</Pill>
+                                <Pill :type="designCard.metadata.mode == 'lower_text' ? 'primary' : 'light'" size="sm" :action="() => designCard.metadata.mode = 'lower_text'">Lower text</Pill>
+                                <Pill :type="designCard.metadata.mode == 'design' ? 'primary' : 'light'" size="sm" :action="() => designCard.metadata.mode = 'design'">Design</Pill>
 
-                            <Datepicker
+                            </div>
+
+                            <template v-if="designCard.metadata.mode == 'countdown'">
+
+                                <Datepicker
+                                    class="mb-4"
+                                    :enableTimePicker="true"
+                                    format="dd MMM yyyy HH:mm"
+                                    modelType="yyyy-MM-dd HH:mm"
+                                    placeholder="Countdown to date"
+                                    v-model="designCard.metadata.date"
+                                    @change="designState.saveStateDebounced('Countdown date changed')"
+                                    :errorText="formState.getFormError(`design_cards.${index}.metadata.date`)">
+                                </Datepicker>
+
+                                <Input
+                                    type="file"
+                                    :maxFiles="1"
+                                    :imagePreviewGridCols="1"
+                                    v-model="designCard.photo"
+                                    singleFileUploadMessage="Image attached"
+                                    @change="(photo) => designState.saveStateDebounced(photo.length ? 'Image added' : 'Image removed')">
+                                </Input>
+
+                            </template>
+
+                            <vue-easymde
                                 class="mb-4"
-                                placeholder="Countdown to date"
-                                v-model="designCard.metadata.date"
-                                @change="designState.saveStateDebounced('Countdown date changed')"
-                                :errorText="formState.getFormError(`design_cards.${index}.metadata.date`)">
-                            </Datepicker>
+                                :options="editorOptions"
+                                v-model="designCard.metadata.upper_text"
+                                v-if="designCard.metadata.mode == 'upper_text'"
+                                @input="designState.saveStateDebounced('Text content changed')" />
 
-                            <Input
-                                type="file"
-                                :maxFiles="1"
-                                :imagePreviewGridCols="1"
-                                v-model="designCard.photo"
-                                singleFileUploadMessage="Image attached"
-                                @change="(photo) => designState.saveStateDebounced(photo.length ? 'Image added' : 'Image removed')">
-                            </Input>
+                            <vue-easymde
+                                class="mb-4"
+                                :options="editorOptions"
+                                v-model="designCard.metadata.lower_text"
+                                v-else-if="designCard.metadata.mode == 'lower_text'"
+                                @input="designState.saveStateDebounced('Text content changed')" />
 
                         </template>
 
                         <template v-if="designCard.metadata.type == 'map'">
 
-                            <AddressInput
-                                height="250px"
-                                :onlyValidate="true"
-                                :pinLocationOnMap="true"
-                                triggerClass="space-y-4"
-                                :address="designCard.metadata.address"
-                                @onDeleted="() => unsetAddress(index)"
-                                @onValidated="(address) => setAddress(index, address)">
-                            </AddressInput>
+                            <div class="flex items-center space-x-2 mb-4">
+
+                                <Pill :type="designCard.metadata.mode == 'map' ? 'primary' : 'light'" size="sm" :action="() => designCard.metadata.mode = 'map'">Map</Pill>
+                                <Pill :type="designCard.metadata.mode == 'upper_text' ? 'primary' : 'light'" size="sm" :action="() => designCard.metadata.mode = 'upper_text'">Upper text</Pill>
+                                <Pill :type="designCard.metadata.mode == 'lower_text' ? 'primary' : 'light'" size="sm" :action="() => designCard.metadata.mode = 'lower_text'">Lower text</Pill>
+                                <Pill :type="designCard.metadata.mode == 'design' ? 'primary' : 'light'" size="sm" :action="() => designCard.metadata.mode = 'design'">Design</Pill>
+
+                            </div>
+
+                            <template v-if="designCard.metadata.mode == 'map'">
+
+                                <AddressInput
+                                    class="mb-4"
+                                    height="250px"
+                                    :onlyValidate="true"
+                                    :pinLocationOnMap="true"
+                                    triggerClass="space-y-4"
+                                    :address="designCard.metadata.address"
+                                    @onDeleted="() => unsetAddress(index)"
+                                    @onValidated="(address) => setAddress(index, address)">
+                                </AddressInput>
+
+                                <Input
+                                    type="checkbox"
+                                    inputLabel="Show address"
+                                    v-model="designCard.metadata.show_address"
+                                    @change="designState.saveStateDebounced(`Show address status changed`)">
+                                </Input>
+
+                            </template>
+
+                            <vue-easymde
+                                class="mb-4"
+                                :options="editorOptions"
+                                v-model="designCard.metadata.upper_text"
+                                v-if="designCard.metadata.mode == 'upper_text'"
+                                @input="designState.saveStateDebounced('Text content changed')" />
+
+                            <vue-easymde
+                                class="mb-4"
+                                :options="editorOptions"
+                                v-model="designCard.metadata.lower_text"
+                                v-else-if="designCard.metadata.mode == 'lower_text'"
+                                @input="designState.saveStateDebounced('Text content changed')" />
 
                         </template>
 
@@ -543,44 +615,65 @@
                     metadata = {
                         category_id: this.categories.length ? this.categories[0].value : null,
                         layout: 'grid',
-                        feature: '4'
+                        feature: '4',
+                        mode: 'content'
                     };
                 }else if(type == 'link') {
                     metadata = {
                         title: '',
-                        link: ''
+                        link: '',
+                        mode: 'content'
                     };
                 }else if(type == 'text') {
 
                     let markdown = `# Heading 1\n## Heading 2\n### Heading 3\n**bold**\n~strike~\n_italic_\n**_Bold italic_**`;
 
                     metadata = {
-                        body: markdown
+                        body: markdown,
+                        mode: 'content'
                     };
 
                 }else if(type == 'image') {
                     metadata = {
-                        title: '',
-                        link: ''
+                        link: '',
+                        upper_text: '',
+                        lower_text: '',
+                        mode: 'image',
+                        design: {
+                            image: {
+                                //  image settings
+                            },
+                            card: {
+                                //  card settings
+                            }
+                        }
                     };
                 }else if(type == 'video') {
                     metadata = {
                         title: '',
-                        link: ''
+                        link: '',
+                        mode: 'content'
                     };
                 }else if(type == 'contact') {
                     metadata = {
-                        title: ''
+                        title: '',
+                        mobile_number: '',
+                        mode: 'content'
                     };
                 }else if(type == 'countdown') {
                     metadata = {
                         date: '',
-                        title: '',
-                        description: ''
+                        upper_text: '',
+                        lower_text: '',
+                        mode: 'countdown'
                     };
                 }else if(type == 'map') {
                     metadata = {
-                        address: null
+                        address: null,
+                        upper_text: '',
+                        lower_text: '',
+                        show_address: true,
+                        mode: 'map'
                     };
                 }else if(type == 'socials') {
                     let socialPlatforms = [
@@ -594,12 +687,12 @@
                         platforms: socialPlatforms.map((platform) => ({
                             name: platform,
                             link: ''
-                        }))
+                        })),
+                        mode: 'content'
                     };
                 }
 
                 metadata.type = type;
-                metadata.mode = 'content';
 
                 let designCard = {
                     visible: true,

@@ -126,8 +126,12 @@
  *  vue-easymde-editor
  */
 
+.vue-easymde-editor {
+    @apply text-xs;
+}
+
 .vue-easymde-editor .editor-toolbar {
-    @apply p-1!;
+    @apply p-1;
 }
 
 .vue-easymde-editor .editor-toolbar .active {
@@ -152,6 +156,10 @@
 
 .vue-easymde-editor .cm-header-3 {
   @apply text-xl! font-bold text-black;
+}
+
+.vue-easymde-editor span {
+  @apply text-xs;
 }
 
 /**

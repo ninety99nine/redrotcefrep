@@ -151,40 +151,46 @@
 
                 <p v-if="subtitle" class="text-sm text-gray-500 mb-2 pb-4 border-b border-dashed border-gray-300">{{ subtitle }}</p>
 
-                <div v-if="localAddress" class="flex justify-between items-center space-x-20">
-                    <span class="text-sm">{{ localAddress.complete_address }}</span>
+                <template v-if="editable">
 
-                    <div class="flex justify-between items-center space-x-2">
+                    <div v-if="localAddress" class="flex justify-between items-center space-x-20">
+                        <span class="text-sm">{{ localAddress.complete_address }}</span>
 
-                        <Button
-                            size="xs"
-                            type="light"
-                            :action="showModal"
-                            :leftIcon="SquarePen">
-                            <span class="whitespace-nowrap ml-1">Edit Address</span>
-                        </Button>
+                        <div
 
-                        <Button
-                            size="xs"
-                            type="danger"
-                            :action="deleteAddress"
-                            :disabled="isSubmitting">
-                            <span>Delete</span>
-                        </Button>
+                            class="flex justify-between items-center space-x-2">
+
+                            <Button
+                                size="xs"
+                                type="light"
+                                :action="showModal"
+                                :leftIcon="SquarePen">
+                                <span class="whitespace-nowrap ml-1">Edit Address</span>
+                            </Button>
+
+                            <Button
+                                size="xs"
+                                type="danger"
+                                :action="deleteAddress"
+                                :disabled="isSubmitting">
+                                <span>Delete</span>
+                            </Button>
+
+                        </div>
 
                     </div>
 
-                </div>
+                    <Button
+                        v-else
+                        size="xs"
+                        type="light"
+                        :leftIcon="Plus"
+                        :action="showModal"
+                        buttonClass="w-full">
+                        <span>Add Address</span>
+                    </Button>
 
-                <Button
-                    v-else
-                    size="xs"
-                    type="light"
-                    :leftIcon="Plus"
-                    :action="showModal"
-                    buttonClass="w-full">
-                    <span>Add Address</span>
-                </Button>
+                </template>
 
                 <!-- Google Maps -->
                 <GoogleMaps
@@ -248,6 +254,10 @@
             onlyValidate: {
                 type: Boolean,
                 default: false
+            },
+            editable: {
+                type: Boolean,
+                default: true
             },
             height: {
                 type: String,
