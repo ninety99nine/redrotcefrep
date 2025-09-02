@@ -2176,7 +2176,7 @@ class ShoppingCartService
 
         if($rateType == RateType::PERCENTAGE->value) {
 
-            $percentageRate = $checkoutFee['percentage_rate']['value'];
+            $percentageRate = $checkoutFee['percentage_rate'];
             $amount = $this->subtotalAfterDiscount * ($percentageRate / 100);
 
             $data = [

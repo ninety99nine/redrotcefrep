@@ -27,6 +27,9 @@ class DesignCardResource extends JsonResource
             'updated_at' => $this->updated_at->toDateTimeString(),
 
             'store' => StoreResource::make($this->whenLoaded('store')),
+            'photo' => MediaFileResource::make($this->whenLoaded('photo')),
+            'photos' => MediaFileResource::collection($this->whenLoaded('photos')),
+            'media_files' => MediaFileResource::collection($this->whenLoaded('mediaFiles')),
         ];
     }
 }

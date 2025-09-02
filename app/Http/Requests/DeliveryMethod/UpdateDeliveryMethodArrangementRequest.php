@@ -14,7 +14,7 @@ class UpdateDeliveryMethodArrangementRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return $this->user()->can('update', DeliveryMethod::class);
+        return $this->user()->can('updateAny', DeliveryMethod::class);
     }
 
     /**

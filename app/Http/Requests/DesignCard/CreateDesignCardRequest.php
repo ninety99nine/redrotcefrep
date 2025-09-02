@@ -33,6 +33,7 @@ class CreateDesignCardRequest extends FormRequest
             'metadata' => ['required', 'array'],
             'position' => ['nullable', 'integer', 'min:0', 'max:255'],
             'store_id' => ['required', 'uuid'],
+            'photo' => ['nullable', 'file', 'mimes:jpeg,png,jpg,gif,webp,svg', 'max:5120'],
         ];
     }
 
@@ -53,6 +54,9 @@ class CreateDesignCardRequest extends FormRequest
             'position.max' => 'The position must not exceed 255.',
             'store_id.required' => 'The store ID is required.',
             'store_id.uuid' => 'The store ID must be a valid UUID.',
+            'photo.file' => 'The photo must be a valid file.',
+            'photo.mimes' => 'The photo must be a JPEG, PNG, JPG, GIF, or SVG.',
+            'photo.max' => 'The photo size must not exceed 5MB.',
         ];
     }
 }

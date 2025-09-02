@@ -243,9 +243,6 @@ export const useOrderStore = defineStore('order', {
         },
         addCartPromotionUsingPromotion(promotion = null) {
 
-            console.log(promotion);
-            console.log(this.orderForm.cart_promotions);
-
             const existingPromotion = this.orderForm.cart_promotions.find(p =>
                 p.name === promotion.name &&
                 p.offer_discount === promotion.offer_discount &&

@@ -14,7 +14,7 @@ class UpdateDesignCardArrangementRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return $this->user()->can('update', DesignCard::class);
+        return $this->user()->can('updateAny', DesignCard::class);
     }
 
     /**

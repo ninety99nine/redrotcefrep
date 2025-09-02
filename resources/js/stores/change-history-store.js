@@ -1,7 +1,7 @@
 import { diff } from 'deep-diff';
 import { defineStore } from 'pinia';
 import debounce from 'lodash.debounce';
-import cloneDeep from 'lodash.clonedeep';
+import cloneDeep from 'lodash/cloneDeep';
 
 export const useChangeHistoryStore = defineStore('change-history', {
   state: () => {

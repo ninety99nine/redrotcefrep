@@ -1,0 +1,70 @@
+<template>
+
+    <div>
+
+        <Switch
+            size="xs"
+            class="mb-4"
+            suffixText="Show delivery methods"
+            v-model="designCard.metadata.show_delivery_methods"
+            @change="designState.saveStateDebounced('Delivery methods status changed')"
+        />
+
+        <template v-if="designCard.metadata.show_delivery_methods">
+
+            <Input
+                type="text"
+                class="w-full mb-2"
+                placeholder="Title"
+                v-model="designCard.metadata.title"
+                @input="designState.saveStateDebounced('Title changed')"
+                :errorText="formState.getFormError(`design_cards.${index}.metadata.title`)">
+            </Input>
+
+            <div class="p-4 bg-blue-50 rounded-lg">
+
+                <Input
+                    type="text"
+                    class="w-full mb-2"
+                    placeholder="Schedule title"
+                    v-model="designCard.metadata.schedule_title"
+                    @input="designState.saveStateDebounced('Title changed')"
+                    :errorText="formState.getFormError(`design_cards.${index}.metadata.schedule_title`)">
+                </Input>
+
+                <Input
+                    type="text"
+                    class="w-full"
+                    placeholder="Address title"
+                    v-model="designCard.metadata.address_title"
+                    @input="designState.saveStateDebounced('Title changed')"
+                    :errorText="formState.getFormError(`design_cards.${index}.metadata.address_title`)">
+                </Input>
+
+            </div>
+
+        </template>
+
+    </div>
+
+
+</template>
+
+<script>
+
+    import Input from '@Partials/Input.vue';
+    import Switch from '@Partials/Switch.vue';
+
+    export default {
+        inject: ['formState', 'designState'],
+        components: { Input, Switch },
+        props: {
+            index: {
+                type: Number
+            },
+            designCard: {
+                type: Object
+            }
+        }
+    }
+</script>

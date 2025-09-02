@@ -277,9 +277,50 @@ const routes = [
                 children: [
                     {
                         path: '',
-                        name: 'edit-storefront',
-                        component: () => import('@Pages/design/storefront/Storefront.vue'),
+                        redirect: { name: 'edit-storefront' }
                     },
+                    {
+                        path: 'storefront',
+                        name: 'edit-storefront',
+                        components: {
+                            default: () => import('@Pages/design/storefront/Storefront.vue'),
+                            preview: () => import('@Pages/shop/storefront/Storefront.vue')
+                        }
+                    },
+                    {
+                        path: 'checkout',
+                        name: 'edit-checkout',
+                        components: {
+                            default: () => import('@Pages/design/checkout/Checkout.vue'),
+                            preview: () => import('@Pages/shop/checkout/Checkout.vue')
+                        }
+                    },
+                    /*
+                    {
+                        path: 'payment',
+                        name: 'edit-payment',
+                        components: {
+                            default: () => import('@Pages/design/payment/Payment.vue'),
+                            preview: () => import('@Pages/shop/payment/Payment.vue')
+                        }
+                    },
+                    {
+                        path: 'appearance',
+                        name: 'edit-appearance',
+                        components: {
+                            default: () => import('@Pages/design/appearance/Appearance.vue'),
+                            preview: () => import('@Pages/shop/appearance/Appearance.vue')
+                        }
+                    },
+                    {
+                        path: 'menus',
+                        name: 'edit-menus',
+                        components: {
+                            default: () => import('@Pages/design/menus/Menus.vue'),
+                            preview: () => import('@Pages/shop/menus/Menus.vue')
+                        }
+                    }
+                    */
                 ]
             },
             {
@@ -297,6 +338,23 @@ const routes = [
                     },
                 ]
             }
+        ]
+    },
+    {
+        path: '/:alias',
+        component: () => import('@Layouts/shop/Shop.vue'),
+        children: [
+            {
+                path: '',
+                name: 'show-storefront',
+                component: () => import('@Pages/shop/storefront/Storefront.vue'),
+            },
+            {
+                path: 'checkout',
+                name: 'show-checkout',
+                component: () => import('@Pages/shop/checkout/Checkout.vue'),
+            },
+
         ]
     },
     {

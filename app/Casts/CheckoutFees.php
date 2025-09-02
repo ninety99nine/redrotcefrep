@@ -28,7 +28,7 @@ class CheckoutFees implements CastsAttributes
 
         foreach ($value as $key => $checkoutFee) {
             $value[$key]['flat_rate'] = MoneyService::convertToMoneyFormat($checkoutFee['flat_rate'], $attributes['currency']);
-            $value[$key]['percentage_rate'] = PercentageService::convertToPercentageFormat($checkoutFee['percentage_rate']);
+            $value[$key]['percentage_rate'] = $checkoutFee['percentage_rate'];
         }
 
         return $value;

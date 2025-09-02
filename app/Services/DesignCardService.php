@@ -4,8 +4,9 @@ namespace App\Services;
 
 use Exception;
 use App\Models\Store;
-use App\Enums\Association;
 use App\Models\DesignCard;
+use App\Enums\DesignCardType;
+use App\Enums\UploadFolderName;
 use Illuminate\Support\Facades\DB;
 use App\Http\Resources\DesignCardResource;
 use App\Http\Resources\DesignCardResources;
@@ -21,22 +22,16 @@ class DesignCardService extends BaseService
     public function showDesignCards(array $data): DesignCardResources|array
     {
         $storeId = $data['store_id'] ?? null;
+        $type = isset($data['type']) ? DesignCardType::tryFrom($data['type']) : null;
+
+        $query = DesignCard::query();
+
+        if ($type) {
+            $query = $query->where('type', $type->value);
+        }
 
         if ($storeId) {
-
-            $store = Store::find($storeId);
-            $association = isset($data['association']) ? Association::tryFrom($data['association']) : null;
-
-            if ($association == Association::SHOPPER) {
-                $query = $store->designCards()->active();
-            } else {
-                $query = $store->designCards();
-            }
-
-        }else{
-
-            $query = DesignCard::query();
-
+            $query = $query->where('store_id', $storeId);
         }
 
         return $this->setQuery($query->when(!request()->has('_sort'), fn($query) => $query->orderBy('position')))->getOutput();
@@ -58,6 +53,18 @@ class DesignCardService extends BaseService
         ]);
 
         $designCard = DesignCard::create($data);
+
+        // Create transaction photo if provided
+        if (isset($data['photo']) && !empty($data['photo'])) {
+
+            (new MediaFileService)->createMediaFile([
+                'file' => $data['photo'],
+                'mediable_type' => 'design card',
+                'mediable_id' => $designCard->id,
+                'upload_folder_name' => UploadFolderName::DESIGN_CARD_PHOTO->value
+            ]);
+
+        }
 
         $this->updateDesignCardArrangement([
             'store_id' => $storeId,
@@ -169,6 +176,12 @@ class DesignCardService extends BaseService
      */
     public function deleteDesignCard(DesignCard $designCard): array
     {
+        $mediaFileService = new MediaFileService;
+
+        foreach ($designCard->mediaFiles as $mediaFile) {
+            $mediaFileService->deleteMediaFile($mediaFile);
+        }
+
         $deleted = $designCard->delete();
 
         if ($deleted) {

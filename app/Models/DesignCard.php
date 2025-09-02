@@ -3,11 +3,14 @@
 namespace App\Models;
 
 use App\Casts\JsonArray;
+use App\Enums\UploadFolderName;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Attributes\Scope;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
+use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class DesignCard extends Model
@@ -54,5 +57,35 @@ class DesignCard extends Model
     public function store(): BelongsTo
     {
         return $this->belongsTo(Store::class);
+    }
+
+    /**
+     * Get photo.
+     *
+     * @return MorphOne
+     */
+    public function photo(): MorphOne
+    {
+        return $this->morphOne(MediaFile::class, 'mediable')->where('type', UploadFolderName::DESIGN_CARD_PHOTO->value);
+    }
+
+    /**
+     * Get photos.
+     *
+     * @return MorphMany
+     */
+    public function photos(): MorphMany
+    {
+        return $this->morphMany(MediaFile::class, 'mediable')->where('type', UploadFolderName::DESIGN_CARD_PHOTO->value);
+    }
+
+    /**
+     * Get media files (photos and other media file types).
+     *
+     * @return MorphMany
+     */
+    public function mediaFiles(): MorphMany
+    {
+        return $this->morphMany(MediaFile::class, 'mediable');
     }
 }

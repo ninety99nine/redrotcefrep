@@ -78,6 +78,17 @@ class DeliveryMethodPolicy extends BasePolicy
     }
 
     /**
+     * Determine whether the user can update any delivery methods.
+     *
+     * @param User $user
+     * @return bool
+     */
+    public function updateAny(User $user): bool
+    {
+        return $this->isStoreUserWithPermission($user, 'manage store');
+    }
+
+    /**
      * Determine whether the user can delete any delivery methods.
      *
      * @param User $user

@@ -181,3 +181,8 @@
 .markdown-content h3 {
   @apply text-xl font-bold text-black;
 }
+
+
+.markdown-content a {
+  @apply underline text-blue-500;
+}

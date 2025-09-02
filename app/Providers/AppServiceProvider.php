@@ -57,6 +57,7 @@ class AppServiceProvider extends ServiceProvider
             'product' => 'App\Models\Product',
             'customer' => 'App\Models\Customer',
             'category' => 'App\Models\Category',
+            'design card' => 'App\Models\DesignCard',
             'transaction' => 'App\Models\Transaction',
             'ai assistant' => 'App\Models\AiAssistant',
             'pricing plan' => 'App\Models\PricingPlan',

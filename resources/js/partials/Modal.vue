@@ -2,7 +2,9 @@
 
     <div>
 
-        <slot name="trigger" :showModal="showModal">
+        <slot
+            name="trigger"
+            :showModal="showModal">
 
             <Button
                 v-if="triggerText"
@@ -19,101 +21,106 @@
 
         </slot>
 
-        <div
-            :id="uniqueId"
-            :class="[
-                'hs-overlay hidden size-full fixed top-0 start-0 z-50 py-20 overflow-x-hidden overflow-y-auto pointer-events-none',
-                { '[--overlay-backdrop:static]' : !dismissable }
-            ]">
+        <Teleport :to="backdropTarget">
 
             <div
-                :class="[
-                    'hs-overlay-animation-target hs-overlay-open:scale-100 hs-overlay-open:opacity-100 scale-95 opacity-0 ease-in-out transition-all duration-200 min-h-[calc(100%-56px)] flex items-center',
-                    { 'sm:max-w-lg sm:w-full m-3 sm:mx-auto' : size == 'sm' },
-                    { 'md:max-w-2xl md:w-full m-3 md:mx-auto' : size == 'md' },
-                    { 'lg:max-w-4xl lg:w-full m-3 lg:mx-auto' : size == 'lg' },
-                ]">
+                v-if="isOpen"
+                @click.stop="dismissable ? hideModal() : null"
+                class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/75">
 
-                <div class="relative w-full flex flex-col bg-white border border-gray-200 shadow-2xs rounded-xl pointer-events-auto dark:bg-neutral-800 dark:border-neutral-700 dark:shadow-neutral-700/70">
+                <div
+                    @click.stop
+                    :class="[
+                        'transform transition-all duration-200',
+                        { 'scale-100 opacity-100': isOpen, 'scale-95 opacity-0': !isOpen },
+                        { 'w-full max-w-sm m-3': size === 'sm' },
+                        { 'w-full max-w-2xl m-3': size === 'md' },
+                        { 'w-full max-w-4xl m-3': size === 'lg' },
+                    ]">
 
-                    <button
-                        type="button"
-                        aria-label="Close"
-                        @click.prevent.stop="hideModal"
-                        class="absolute top-4 right-4 size-8 inline-flex justify-center items-center gap-x-2 rounded-full border border-transparent cursor-pointer bg-gray-100 text-gray-700 hover:bg-gray-200 focus:outline-hidden focus:bg-gray-200 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-700 dark:hover:bg-neutral-600 dark:text-neutral-400 dark:focus:bg-neutral-600">
-                        <span class="sr-only">Close</span>
-                        <X size="20"></X>
-                    </button>
+                    <div class="relative w-full flex flex-col bg-white border border-gray-200 shadow-lg rounded-xl dark:bg-neutral-800 dark:border-neutral-700 dark:shadow-neutral-700/70">
 
-                    <div
-                        v-if="header || $slots.header"
-                        class="p-4 border-b border-gray-200 dark:border-neutral-700">
-
-                        <slot name="header" :hideModal="hideModal">
-                            <h3 v-if="header" class="font-bold dark:text-white">
-                                {{ header }}
-                            </h3>
-                        </slot>
-
-                        <slot name="subheader" :hideModal="hideModal">
-                            <h3 v-if="subheader" class="text-sm text-gray-500 dark:text-white">
-                                {{ subheader }}
-                            </h3>
-                        </slot>
-
-                    </div>
-
-                    <div
-                        v-if="content || $slots.content"
-                        :class="[contentClass, { 'overflow-y-auto max-h-80' : scrollOnContent }]">
-                        <slot name="content" :hideModal="hideModal">
-                            <p class="text-sm text-gray-700 dark:text-neutral-400">
-                                {{ content }}
-                            </p>
-                        </slot>
-                    </div>
-
-                    <slot name="footer" :hideModal="hideModal">
+                        <button
+                            type="button"
+                            aria-label="Close"
+                            @click.stop="hideModal"
+                            class="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full border border-transparent bg-gray-100 text-gray-700 hover:bg-gray-200 focus:outline-none focus:bg-gray-200 dark:bg-neutral-700 dark:hover:bg-neutral-600 dark:text-neutral-400">
+                            <X size="20" />
+                        </button>
 
                         <div
-                            v-if="showFooter && (showDelineButton || showApproveButton)"
-                            class="flex justify-end items-center gap-x-2 py-3 px-4 border-t border-gray-200 dark:border-neutral-700 mt-6">
+                            v-if="header || $slots.header"
+                            class="p-4 border-b border-gray-200 dark:border-neutral-700">
 
-                            <Button
-                                :size="declineSize"
-                                :type="declineType"
-                                v-if="showDelineButton"
-                                :loading="declineLoading"
-                                :leftIcon="leftDeclineIcon"
-                                :disabled="declineDisabled"
-                                :rightIcon="rightDeclineIcon"
-                                :action="declineAction ? () => declineAction(hideModal) : hideModal">
-                                <slot name="declineIcon"></slot>
-                                <span>{{ declineText }}</span>
-                            </Button>
+                            <slot name="header" :hideModal="hideModal">
+                                <h3 v-if="header" class="font-bold dark:text-white">
+                                    {{ header }}
+                                </h3>
+                            </slot>
 
-                            <Button
-                                :size="approveSize"
-                                :type="approveType"
-                                v-if="showApproveButton"
-                                :loading="approveLoading"
-                                :leftIcon="leftApproveIcon"
-                                :disabled="approveDisabled"
-                                :rightIcon="rightApproveIcon"
-                                :action="approveAction ? () => approveAction(hideModal) : hideModal">
-                                <slot name="approveIcon"></slot>
-                                <span>{{ approveText }}</span>
-                            </Button>
+                            <slot name="subheader" :hideModal="hideModal">
+                                <h3 v-if="subheader" class="text-sm text-gray-500 dark:text-white">
+                                    {{ subheader }}
+                                </h3>
+                            </slot>
 
                         </div>
 
-                    </slot>
+                        <div
+                            v-if="content || $slots.content"
+                            :class="[contentClass, { 'overflow-y-auto max-h-80': scrollOnContent }]">
+
+                            <slot name="content" :hideModal="hideModal">
+                                <p class="text-sm text-gray-700 dark:text-neutral-400">
+                                    {{ content }}
+                                </p>
+                            </slot>
+
+                        </div>
+
+                        <slot name="footer" :hideModal="hideModal">
+
+                            <div
+                                v-if="showFooter && (showDelineButton || showApproveButton)"
+                                class="flex justify-end items-center gap-x-2 py-3 px-4 border-t border-gray-200 dark:border-neutral-700">
+
+                                <Button
+                                    :size="declineSize"
+                                    :type="declineType"
+                                    v-if="showDelineButton"
+                                    :loading="declineLoading"
+                                    :leftIcon="leftDeclineIcon"
+                                    :disabled="declineDisabled"
+                                    :rightIcon="rightDeclineIcon"
+                                    :action="declineAction ? () => declineAction(hideModal) : hideModal">
+                                    <slot name="declineIcon"></slot>
+                                    <span>{{ declineText }}</span>
+                                </Button>
+
+                                <Button
+                                    :size="approveSize"
+                                    :type="approveType"
+                                    v-if="showApproveButton"
+                                    :loading="approveLoading"
+                                    :leftIcon="leftApproveIcon"
+                                    :disabled="approveDisabled"
+                                    :rightIcon="rightApproveIcon"
+                                    :action="approveAction ? () => approveAction(hideModal) : hideModal">
+                                    <slot name="approveIcon"></slot>
+                                    <span>{{ approveText }}</span>
+                                </Button>
+
+                            </div>
+
+                        </slot>
+
+                    </div>
 
                 </div>
 
             </div>
 
-        </div>
+        </Teleport>
 
     </div>
 
@@ -273,35 +280,57 @@
                 type: [Function, null],
                 default: null
             },
+            targetClass: {
+                type: String,
+                default: 'body'
+            },
         },
         data() {
             return {
+                isOpen: false,
+                backdropTarget: 'body',
                 uniqueId: generateUniqueId('modal'),
-            }
+            };
         },
-        mounted() {
-            setTimeout(() => {
-                if (window.HSOverlay) {
-                    window.HSOverlay.autoInit();
-                }
-            }, 500);
+        watch: {
+            targetClass() {
+                // Recompute target if targetClass changes
+                this.updateBackdropTarget();
+            },
         },
         methods: {
-            showModal() {
-                const modal = document.querySelector(`#${this.uniqueId}`);
-                if (modal) {
-                    window.HSOverlay.open(modal);
-                    if(this.onShow) this.onShow();
+            updateBackdropTarget() {
+
+                if (!this.$el) {
+                    this.backdropTarget = 'body';
+                    return;
                 }
+
+                let parent = this.$el.parentElement;
+                const targetClasses = this.targetClass.split(',').map(cls => cls.trim());
+
+                while (parent && parent !== document.body) {
+                    if (targetClasses.some(cls => parent.classList.contains(cls))) {
+                        this.backdropTarget = parent;
+                        return;
+                    }
+                    parent = parent.parentElement;
+                }
+
+                this.backdropTarget = 'body';
+            },
+            showModal() {
+                this.isOpen = true;
+                if (this.onShow) this.onShow();
             },
             hideModal() {
-                const modal = document.querySelector(`#${this.uniqueId}`);
-                if (modal) {
-                    window.HSOverlay.close(modal);
-                    if(this.onHide) this.onHide();
-                }
-            }
-        }
+                this.isOpen = false;
+                if (this.onHide) this.onHide();
+            },
+        },
+        mounted() {
+            // Update backdrop target after component is mounted
+            this.updateBackdropTarget();
+        },
     };
-
 </script>

@@ -2,8 +2,10 @@
 
 namespace App\Http\Requests\DesignCard;
 
-use App\Enums\Association;
 use App\Models\DesignCard;
+use App\Enums\Association;
+use Illuminate\Support\Arr;
+use App\Enums\DesignCardType;
 use Illuminate\Validation\Rule;
 use Illuminate\Foundation\Http\FormRequest;
 
@@ -28,6 +30,7 @@ class ShowDesignCardsRequest extends FormRequest
     {
         return [
             'store_id' => ['sometimes', 'uuid'],
+            'type' => ['sometimes', Rule::enum(DesignCardType::class)],
             'association' => ['sometimes', Rule::enum(Association::class)->only([Association::SHOPPER])],
         ];
     }
@@ -42,6 +45,7 @@ class ShowDesignCardsRequest extends FormRequest
         return [
             'store_id.uuid' => 'The store ID must be a valid UUID.',
             'association.enum' => 'The association must be: shopper.',
+            'type.enum' => 'The design card type must be one of: ' . Arr::join(DesignCardType::values(), ', ', ' or '),
         ];
     }
 }
