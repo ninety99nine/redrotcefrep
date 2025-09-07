@@ -25,7 +25,7 @@
 
     <div v-else class="space-y-4">
 
-        <template v-if="hasCartProducts">
+        <div v-if="hasCartProducts">
 
             <CartProduct
                 :key="index"
@@ -34,7 +34,7 @@
                 v-for="(cartProduct, index) in cartProducts">
             </CartProduct>
 
-        </template>
+        </div>
 
         <div
             :class="['relative', { 'flex flex-col items-center justify-center p-8 bg-gray-50 rounded-lg space-y-4 my-4' : !hasCartProducts }]">

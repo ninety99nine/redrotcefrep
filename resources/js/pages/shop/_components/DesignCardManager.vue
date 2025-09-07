@@ -18,12 +18,13 @@
 
 <script>
 
+    import debounce from 'lodash/debounce';
     import NoDesignCards from '@Pages/shop/_components/_components/NoDesignCards.vue';
     import DesignCards from '@Pages/shop/_components/_components/design-cards/DesignCards.vue';
     import LoadingDesignCards from '@Pages/shop/_components/_components/LoadingDesignCards.vue';
 
     export default {
-        inject: ['formState', 'designState', 'storeState', 'notificationState'],
+        inject: ['formState', 'designState', 'orderState', 'storeState', 'changeHistoryState', 'notificationState'],
         components: {
             NoDesignCards, DesignCards, LoadingDesignCards
         },
@@ -33,6 +34,19 @@
                     this.setup();
                 }
             },
+            orderForm: {
+                handler(newVal) {
+                    if(newVal) {
+                        if(this.shoppingCartReady) {
+                            this.orderState.setIsInspectingShoppingCart(true);
+                            this.inspectShoppingCartDelayed();
+                        }else{
+                            this.shoppingCartReady = true;
+                        }
+                    }
+                },
+                deep: true
+            }
         },
         computed: {
             store() {
@@ -40,6 +54,9 @@
             },
             isLoadingStore() {
                 return this.storeState.isLoadingStore;
+            },
+            orderForm() {
+                return this.orderState.orderForm;
             },
             designForm() {
                 return this.designState.designForm;
@@ -102,6 +119,43 @@
                     this.designState.isLoadingDesignCards = false;
                     this.designState.hasLoadedInitialdesignCards = true;
                 }
+            },
+            inspectShoppingCartDelayed: debounce(function () {
+
+                if(this.changeHistoryState.hasChanges) {
+                    this.inspectShoppingCart();
+                }else{
+                    this.orderState.setShoppingCart(null);
+                    this.orderState.setIsInspectingShoppingCart(false);
+                }
+
+            }, 1000),
+            async inspectShoppingCart() {
+
+                try {
+
+                    this.orderState.setIsInspectingShoppingCart(true);
+
+                    const data = {
+                        inspect: true,
+                        ...this.orderForm,
+                        guest_id: this.guestId,
+                        store_id: this.store.id,
+                        association: 'team member'
+                    };
+
+                    const response = await axios.post(`/api/orders`, data);
+                    this.orderState.setShoppingCart(response.data);
+
+                } catch (error) {
+                    const message = error?.response?.data?.message || error?.message || 'Something went wrong while inspecting shopping cart';
+                    this.notificationState.showWarningNotification(message);
+                    this.formState.setServerFormErrors(error);
+                    console.error('Failed to inspect shopping cart:', error);
+                } finally {
+                    this.orderState.setIsInspectingShoppingCart(false);
+                }
+
             }
         },
         created() {

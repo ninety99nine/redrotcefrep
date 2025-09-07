@@ -155,7 +155,7 @@ export const useOrderStore = defineStore('order', {
 
             }
         },
-        addCartProductUsingProduct(product, parentProduct = null) {
+        addCartProductUsingProduct(product, parentProduct = null, saveState = true) {
 
             const photo = product.photo;
             const name = parentProduct ? parentProduct.name+' '+product.name : product.name;
@@ -183,6 +183,7 @@ export const useOrderStore = defineStore('order', {
                     'quantity': '1',
                     'id': product.id,
                     'is_free': product.is_free,
+                    'on_sale': product.on_sale,
                     'photo_path': photo ? photo.path : null,
                     'unit_weight': product.unit_weight.toString(),
                     'unit_sale_price': product.unit_sale_price.amount,
@@ -191,7 +192,7 @@ export const useOrderStore = defineStore('order', {
 
             }
 
-            this.saveState('Product added');
+            if(saveState) this.saveState('Product added');
         },
         addCartProduct() {
 
@@ -208,9 +209,21 @@ export const useOrderStore = defineStore('order', {
             this.saveState('Product added');
 
         },
-        removeCartProduct(index) {
+        removeCartProduct(index, saveState = true) {
             this.orderForm.cart_products.splice(index, 1);
-            this.saveState('Product removed');
+            if(saveState) this.saveState('Product removed');
+        },
+        increaseCartProductQuantity(index, saveState = true) {
+            this.orderForm.cart_products[index].quantity = (parseInt(this.orderForm.cart_products[index].quantity) + 1).toString();
+            if(saveState) this.saveState('Product quantity increased');
+        },
+        decreaseCartProductQuantity(index, saveState = true) {
+            if(this.orderForm.cart_products[index].quantity >= 2) {
+                this.orderForm.cart_products[index].quantity = (parseInt(this.orderForm.cart_products[index].quantity) - 1).toString();
+                if(saveState) this.saveState('Product quantity reduced');
+            }else{
+                this.removeCartProduct(index, saveState);
+            }
         },
 
         addCartPromotionUsingOrderPromotion(orderPromotion) {

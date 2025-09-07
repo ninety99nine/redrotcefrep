@@ -354,6 +354,22 @@ const routes = [
                 name: 'show-checkout',
                 component: () => import('@Pages/shop/checkout/Checkout.vue'),
             },
+            {
+                path: 'orders',
+                children: [
+                    {
+                        path: ':order_id',
+                        //  component: () => import('@Pages/orders/order/Order.vue'),
+                        children: [
+                            {
+                                path: '',
+                                name: 'show-order',
+                                component: () => import('@Pages/shop/checkout/Checkout.vue'),
+                            }
+                        ]
+                    }
+                ]
+            },
 
         ]
     },
