@@ -127,9 +127,6 @@
             Alert, Input, Switch, Skeleton, DeliveryDatePicker, DeliveryTimePicker
         },
         props: {
-            index: {
-                type: Number
-            },
             deliveryMethod: {
                 type: Object
             }

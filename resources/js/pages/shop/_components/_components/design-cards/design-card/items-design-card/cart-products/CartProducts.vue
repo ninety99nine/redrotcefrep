@@ -37,7 +37,7 @@
         </div>
 
         <div
-            :class="['relative', { 'flex flex-col items-center justify-center p-8 bg-gray-50 rounded-lg space-y-4 my-4' : !hasCartProducts }]">
+            :class="['relative', { 'flex flex-col items-center justify-center p-4 bg-gray-50 rounded-lg space-y-4 my-4' : !hasCartProducts }]">
 
             <template v-if="!hasCartProducts">
                 <svg class="w-10 h-10 text-gray-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">

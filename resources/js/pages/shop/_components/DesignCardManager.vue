@@ -28,11 +28,14 @@
         components: {
             NoDesignCards, DesignCards, LoadingDesignCards
         },
+        data() {
+            return {
+                shoppingCartReady: false
+            }
+        },
         watch: {
             store(newValue, oldValue) {
-                if(!oldValue && newValue) {
-                    this.setup();
-                }
+                this.setup();
             },
             orderForm: {
                 handler(newVal) {
@@ -82,11 +85,14 @@
                     return 'storefront';
                 }else if(['show-checkout', 'edit-checkout'].includes(this.$route.name)) {
                     return 'checkout';
+                }else if(['pay-order', 'edit-payment'].includes(this.$route.name)) {
+                    return 'payment';
                 }
             }
         },
         methods: {
             async setup() {
+
                 if(this.store && ['show-storefront', 'show-checkout'].includes(this.$route.name)) {
                     if(!this.hasLoadedInitialdesignCards && !this.isLoadingDesignCards) {
                         this.showDesignCards();
@@ -121,14 +127,7 @@
                 }
             },
             inspectShoppingCartDelayed: debounce(function () {
-
-                if(this.changeHistoryState.hasChanges) {
-                    this.inspectShoppingCart();
-                }else{
-                    this.orderState.setShoppingCart(null);
-                    this.orderState.setIsInspectingShoppingCart(false);
-                }
-
+                this.inspectShoppingCart();
             }, 1000),
             async inspectShoppingCart() {
 

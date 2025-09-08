@@ -3,7 +3,8 @@
     <Modal
         ref="modal"
         :showFooter="false"
-        :scrollOnContent="false">
+        :scrollOnContent="false"
+        :targetClass="targetClass">
 
         <template #content>
 
@@ -153,12 +154,11 @@
 
                 <template v-if="editable">
 
-                    <div v-if="localAddress" class="flex justify-between items-center space-x-20">
-                        <span class="text-sm">{{ localAddress.complete_address }}</span>
+                    <div v-if="localAddress" class="space-y-2 mb-4">
 
-                        <div
+                        <p class="text-sm">{{ localAddress.complete_address }}</p>
 
-                            class="flex justify-between items-center space-x-2">
+                        <div class="flex justify-end items-center space-x-2">
 
                             <Button
                                 size="xs"
@@ -170,10 +170,10 @@
 
                             <Button
                                 size="xs"
-                                type="danger"
+                                :leftIcon="Trash2"
+                                type="outlineDanger"
                                 :action="deleteAddress"
                                 :disabled="isSubmitting">
-                                <span>Delete</span>
                             </Button>
 
                         </div>
@@ -219,7 +219,7 @@
     import Button from '@Partials/Button.vue';
     import GoogleMaps from '@Partials/GoogleMaps.vue';
     import SelectCountry from '@Partials/SelectCountry.vue';
-    import { Plus, MoveLeft, SquarePen } from 'lucide-vue-next';
+    import { Plus, Trash2, MoveLeft, SquarePen } from 'lucide-vue-next';
 
     export default {
         inject: ['formState', 'notificationState'],
@@ -267,11 +267,16 @@
                 type: String,
                 default: 'space-y-4 p-4 border border-gray-300 rounded-lg shadow-lg bg-white'
             },
+            targetClass: {
+                type: String,
+                default: 'body'
+            },
         },
         emits: ['change', 'onValidated', 'onCreated', 'onUpdated', 'onDeleted'],
         data() {
             return {
                 Plus,
+                Trash2,
                 step: 1,
                 MoveLeft,
                 SquarePen,

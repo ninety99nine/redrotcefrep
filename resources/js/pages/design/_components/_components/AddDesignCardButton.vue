@@ -203,7 +203,7 @@
                     };
                 }else if(type == 'tips') {
                     metadata = {
-                        title: 'Tips',
+                        title: 'Tip',
                         tips: [],
                         show_tips: true,
                         show_specify_tip: true

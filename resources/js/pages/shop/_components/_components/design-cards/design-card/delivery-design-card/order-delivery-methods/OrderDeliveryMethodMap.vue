@@ -8,6 +8,7 @@
             :pinLocationOnMap="true"
             @onDeleted="unsetAddress"
             @onValidated="setAddress"
+            targetClass="mockup-phone"
             :address="orderForm.delivery_address">
         </AddressInput>
 
@@ -32,11 +33,9 @@
         methods: {
             setAddress(deliveryAddress) {
                 this.orderState.orderForm.delivery_address = deliveryAddress;
-                this.orderState.saveStateDebounced('Delivery address changed');
             },
             unsetAddress() {
                 this.orderState.orderForm.delivery_address = null;
-                this.orderState.saveStateDebounced('Delivery address removed');
             }
         }
     };

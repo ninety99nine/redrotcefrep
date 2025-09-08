@@ -4,7 +4,7 @@
         class="bg-white rounded-2xl p-4 space-y-4"
         v-if="designCard.metadata.type == 'customer' && (designCard.metadata.title || designCard.metadata.show_first_name || designCard.metadata.show_last_name || designCard.metadata.show_email)">
 
-        <h1 class="text-lg text-gray-700 font-semibold mb-4">{{ designCard.metadata.title }}</h1>
+        <h1 class="text-base text-gray-700 font-semibold mb-4">{{ designCard.metadata.title }}</h1>
 
         <div class="space-y-2">
 

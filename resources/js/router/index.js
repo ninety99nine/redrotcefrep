@@ -295,7 +295,6 @@ const routes = [
                             preview: () => import('@Pages/shop/checkout/Checkout.vue')
                         }
                     },
-                    /*
                     {
                         path: 'payment',
                         name: 'edit-payment',
@@ -304,6 +303,7 @@ const routes = [
                             preview: () => import('@Pages/shop/payment/Payment.vue')
                         }
                     },
+                    /*
                     {
                         path: 'appearance',
                         name: 'edit-appearance',
@@ -363,14 +363,34 @@ const routes = [
                         children: [
                             {
                                 path: '',
-                                name: 'show-order',
+                                name: 'show-shop-order',
+                                component: () => import('@Pages/shop/checkout/Checkout.vue'),
+                            },
+                            {
+                                path: 'pay',
+                                name: 'pay-shop-order',
                                 component: () => import('@Pages/shop/checkout/Checkout.vue'),
                             }
                         ]
                     }
                 ]
             },
-
+            {
+                path: 'products',
+                children: [
+                    {
+                        path: ':product_id',
+                        //  component: () => import('@Pages/orders/order/Order.vue'),
+                        children: [
+                            {
+                                path: '',
+                                name: 'show-shop-product',
+                                component: () => import('@Pages/shop/checkout/Checkout.vue'),
+                            }
+                        ]
+                    }
+                ]
+            }
         ]
     },
     {

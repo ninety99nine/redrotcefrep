@@ -14,7 +14,13 @@ export const useDesignStore = defineStore('design', {
     }),
     actions: {
         reset() {
+            this.type = null;
+            this.categories = [];
+            this.designCards = [];
+            this.categoryData = {};
             this.designForm = null;
+            this.isUpdatingDesign = false;
+            this.hasLoadedInitialdesignCards = false;
             changeHistoryState().reset();
         },
         saveState(actionName) {

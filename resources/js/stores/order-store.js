@@ -43,6 +43,9 @@ export const useOrderStore = defineStore('order', {
                 cart_products: [],
                 cart_promotions: [],
 
+                tip_flat_rate: null,
+                tip_percentage_rate: null,
+
                 remark: order?.remark ?? null,
                 adjustment: order?.adjustment_total?.amount_without_currency ?? null,
 

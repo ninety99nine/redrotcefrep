@@ -137,6 +137,9 @@
                     this.isLoadingDeliveryMethods = false;
                 }
             }
+        },
+        created() {
+            if(this.store) this.showDeliveryMethods();
         }
     };
 

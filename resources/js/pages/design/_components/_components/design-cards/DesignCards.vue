@@ -158,7 +158,7 @@
                 return !['customer', 'items', 'delivery', 'promo code', 'tips', 'order summary'].includes(designCard.metadata.type);
             },
             getDesignCardLabel(designCard) {
-                return this.designCardOptions.find(designCardOption => designCardOption.value == designCard.metadata.type).label;
+                return this.designCardOptions.find(designCardOption => designCardOption.value == designCard.metadata.type)?.label;
             },
             toggleVisible(index) {
                 this.designCards[index].visible = !this.designCards[index].visible;

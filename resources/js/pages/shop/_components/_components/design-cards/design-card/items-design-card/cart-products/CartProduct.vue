@@ -34,7 +34,7 @@
 
                 <!-- Remove Icon Button -->
                 <X
-                    @click.stop="() => orderState.removeCartProduct(index)"
+                    @click.stop="() => orderState.removeCartProduct(index, false)"
                     class="w-4 h-4 flex-shrink-0 text-gray-400 cursor-pointer hover:opacity-90 active:opacity-80 active:scale-90 transition-all">
                 </X>
 
@@ -47,7 +47,7 @@
             <div class="w-fit text-sm flex items-center border border-gray-300 rounded-full overflow-hidden">
 
                 <button
-                    @click.stop="() => orderState.decreaseCartProductQuantity(index)"
+                    @click.stop="() => orderState.decreaseCartProductQuantity(index, false)"
                     class="px-3 py-1 bg-gray-200 text-gray-700 hover:bg-gray-300 cursor-pointer">
                     -
                 </button>
@@ -59,7 +59,7 @@
                     class="w-12 text-center border-0 focus:outline-none">
 
                 <button
-                    @click.stop="() => orderState.increaseCartProductQuantity(index)"
+                    @click.stop="() => orderState.increaseCartProductQuantity(index, false)"
                     class="px-3 py-1 bg-gray-200 text-gray-700 hover:bg-gray-300 cursor-pointer">
                     +
                 </button>

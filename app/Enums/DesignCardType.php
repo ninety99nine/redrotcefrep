@@ -6,7 +6,7 @@ enum DesignCardType: string
 {
     case STOREFRONT = 'storefront';
     case CHECKOUT = 'checkout';
-    case PAYMENTS = 'payments';
+    case PAYMENT = 'payment';
 
     public static function values(): array
     {

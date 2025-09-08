@@ -73,6 +73,8 @@
                     return 'storefront';
                 }else if(['show-checkout', 'edit-checkout'].includes(this.$route.name)) {
                     return 'checkout';
+                }else if(['pay-order', 'edit-payment'].includes(this.$route.name)) {
+                    return 'payment';
                 }
             }
         },
@@ -334,16 +336,12 @@
                 this.designState.designForm = designForm;
             },
         },
-        unmounted() {
-            this.designState.reset();
-        },
         created() {
-
+            this.designState.reset();
             this.designState.type = this.type;
 
             this.setup();
             this.setActionButtons();
-
 
             const listeners = ['undo', 'redo', 'jumpToHistory', 'resetHistoryToCurrent', 'resetHistoryToOriginal'];
 
