@@ -13,7 +13,8 @@
                 :type="triggerType"
                 :action="toggleDropdown"
                 :skeleton="triggerLoading"
-                :leftIcon="triggerLeftIcon">
+                :leftIcon="triggerLeftIcon"
+                :leftIconSize="triggerLeftIconSize">
 
                 <div class="flex items-center space-x-1">
 
@@ -113,6 +114,10 @@
             triggerLeftIcon: {
                 type: [String, null],
                 default: null
+            },
+            triggerLeftIconSize: {
+                type: String,
+                default: '16',
             },
             options: {
                 type: Array,

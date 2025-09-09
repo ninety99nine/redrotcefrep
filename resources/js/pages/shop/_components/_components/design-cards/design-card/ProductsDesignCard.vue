@@ -26,6 +26,7 @@
 
                 <div
                     :key="product.id"
+                    @click.stop="() => onView(product)"
                     class="flex flex-col space-y-2 p-2 hover:bg-gray-100 cursor-pointer rounded-lg hover:scale-105 transition-all duration-300"
                     v-for="product in categoryData[designCard.metadata.category_id].category.products.slice(0, parseInt(designCard.metadata.feature))">
 
@@ -40,7 +41,7 @@
                             :src="(product ?? product.variant).photo?.path"
                             v-if="(product ?? product.variant).photo?.path">
 
-                        <Image v-else size="24" class="text-gray-400"></Image>
+                        <Image v-else size="40" class="text-gray-300"></Image>
 
                     </div>
 
@@ -113,6 +114,15 @@
             }
         },
         methods: {
+            async onView(product) {
+                await this.$router.push({
+                    name: 'show-shop-product',
+                    params: {
+                        alias: this.store.alias,
+                        product_id: product.id
+                    }
+                });
+            },
             async showCategory() {
                 try {
 
@@ -138,7 +148,7 @@
                     this.formState.setServerFormErrors(error);
                     this.categoryData[this.categoryId] = { loading: false, category: null };
                 }
-            }
+            },
         },
         created() {
             this.showCategory();

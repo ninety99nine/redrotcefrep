@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\AppController;
 use App\Http\Controllers\AuthController;
 
 Route::prefix('auth')->group(function () {
@@ -12,6 +13,4 @@ Route::prefix('auth')->group(function () {
     Route::get('/linkedin/callback', [AuthController::class, 'handleLinkedInCallback'])->name('social.auth.linkedin.callback');
 });
 
-Route::get('/{any}', function () {
-    return view('welcome');
-})->where('any', '.*');
+Route::get('/{any}', [AppController::class, 'render'])->where('any', '.*');

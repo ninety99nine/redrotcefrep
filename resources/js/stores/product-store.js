@@ -8,6 +8,7 @@ export const useProductStore = defineStore('product', {
         productForms: [],
         productForm: null,
         isUploading: false,
+        selectedVariantId: null,
         isLoadingProduct: false,
         isCreatingProduct: false,
         isUpdatingProduct: false,
@@ -21,6 +22,7 @@ export const useProductStore = defineStore('product', {
             this.productForms = [];
             this.productForm = null;
             this.isUploading = false;
+            this.selectedVariantId = null;
             this.isLoadingProduct = false;
             this.isCreatingProduct = false;
             this.isUpdatingProduct = false;

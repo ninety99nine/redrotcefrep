@@ -385,7 +385,7 @@ const routes = [
                             {
                                 path: '',
                                 name: 'show-shop-product',
-                                component: () => import('@Pages/shop/checkout/Checkout.vue'),
+                                component: () => import('@Pages/shop/product/Product.vue'),
                             }
                         ]
                     }
@@ -404,7 +404,11 @@ const router = createRouter({
     history: createWebHistory(),
     routes,
     scrollBehavior(to, from, savedPosition) {
-        return { top: 0 };
+        if (from.name === 'show-shop-product' && to.name === 'show-storefront') {
+            return savedPosition;
+        }else{
+            return { top: 0 };
+        }
     },
 });
 
