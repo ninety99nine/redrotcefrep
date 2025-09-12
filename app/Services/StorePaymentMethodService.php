@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Enums\Association;
 use Exception;
 use App\Models\Store;
 use App\Models\PaymentMethod;
@@ -23,13 +24,19 @@ class StorePaymentMethodService extends BaseService
     public function showStorePaymentMethods(array $data): StorePaymentMethodResources|array
     {
         $storeId = $data['store_id'] ?? null;
+        $association = isset($data['association']) ? Association::tryFrom($data['association']) : null;
 
-        if($storeId) {
-            $query = StorePaymentMethod::query()->where('store_id', $storeId)->when(!request()->has('_sort'), fn($query) => $query->orderBy('position'));
-        }else{
-            $query = StorePaymentMethod::query()->when(!request()->has('_sort'), fn($query) => $query->orderBy('position'));
+        if ($association == Association::SUPER_ADMIN || $association == Association::TEAM_MEMBER) {
+            $query = StorePaymentMethod::query();
+        }else {
+            $query = StorePaymentMethod::query()->where('active', '1');
         }
 
+        if ($storeId) {
+            $query = $query->where('store_id', $storeId);
+        }
+
+        $query = $query->when(!request()->has('_sort'), fn($query) => $query->orderBy('position'));
         return $this->setQuery($query)->getOutput();
     }
 

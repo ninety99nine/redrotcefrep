@@ -14,7 +14,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 
-class StopAutoBilling implements ShouldQueue, ShouldBeUnique
+class SendAutoBillingDisabledSms implements ShouldQueue, ShouldBeUnique
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
@@ -52,13 +52,7 @@ class StopAutoBilling implements ShouldQueue, ShouldBeUnique
     {
         try{
 
-            $autoBillingSchedule = AutoBillingSchedule::with(['store', 'pricingPlan'])->findOrFail($this->autoBillingScheduleId);
-
-            $autoBillingSchedule->update([
-                'active' => 0,
-                'attempt' => 0,
-                'next_attempt_date' => null
-            ]);
+            $autoBillingSchedule = AutoBillingSchedule::with(['user', 'store', 'pricingPlan'])->findOrFail($this->autoBillingScheduleId);
 
             $user = $autoBillingSchedule->user;
             $pricingPlan = $autoBillingSchedule->pricingPlan;

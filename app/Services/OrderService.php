@@ -283,7 +283,7 @@ class OrderService extends BaseService
         })->toArray();
 
         // Generate the PDF
-        $pdf = Pdf::loadView('pdfs.order.show.invoice', compact('store', 'orders'));
+        $pdf = Pdf::loadView('pdfs.order.show-invoice', compact('store', 'orders'));
 
         return response()->streamDownload(function () use ($pdf) {
             echo $pdf->stream();
@@ -590,7 +590,7 @@ class OrderService extends BaseService
      */
     private function createCustomerAddress(Customer $customer, DeliveryAddress $deliveryAddress): void
     {
-        if(!$customer->addresses()->exists()) {
+        if(!$customer->address()->exists()) {
             Address::create(array_merge($deliveryAddress->getAttributes(), [
                 'owner_id' => $customer->id,
                 'owner_type' => 'customer'

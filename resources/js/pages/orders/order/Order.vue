@@ -123,7 +123,6 @@
 
                     const data = {
                         ...this.orderForm,
-                        guest_id: this.guestId,
                         store_id: this.store.id,
                         association: 'team member'
                     };
@@ -153,7 +152,6 @@
 
                     const data = {
                         ...this.orderForm,
-                        guest_id: this.guestId,
                         store_id: this.store.id,
                         association: 'team member'
                     };

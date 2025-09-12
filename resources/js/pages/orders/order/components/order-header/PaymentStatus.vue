@@ -34,30 +34,33 @@
             _order() {
                 return this.order ?? this.orderState.order;
             },
+            paymentStatusName() {
+                return this._order.payment_status.toLowerCase();
+            },
             description() {
-                const paymentStatusName = this._order.payment_status.toLowerCase();
-
-                if(paymentStatusName === 'paid') {
+                if(this.paymentStatusName === 'paid') {
                     return 'This order has been fully paid';
-                } else if(paymentStatusName === 'unpaid') {
+                } else if(this.paymentStatusName === 'unpaid') {
                     return 'This order has not been paid';
-                } else if(paymentStatusName === 'partially paid') {
+                } else if(this.paymentStatusName === 'partially paid') {
                     return 'This order is partially paid';
-                } else if(paymentStatusName === 'pending payment') {
+                } else if(this.paymentStatusName === 'pending payment') {
                     return 'This order is pending payment';
+                }else if(this.paymentStatusName === 'confirming payment') {
+                    return 'This order payment is being confirmed';
                 }
             },
             type() {
-                const paymentpaymentStatusName = this._order.payment_status.toLowerCase();
-
-                if(paymentpaymentStatusName === 'paid') {
+                if(this.paymentStatusName === 'paid') {
                     return 'success';
-                }else if(paymentpaymentStatusName === 'unpaid') {
+                }else if(this.paymentStatusName === 'unpaid') {
                     return 'light';
-                } else if(paymentpaymentStatusName === 'partially paid') {
+                } else if(this.paymentStatusName === 'partially paid') {
                     return 'primary';
-                } else if(paymentpaymentStatusName === 'pending payment') {
+                } else if(this.paymentStatusName === 'pending payment') {
                     return 'warning';
+                }else if(this.paymentStatusName === 'confirming payment') {
+                    return 'success';
                 }
             }
         }

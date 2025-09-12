@@ -40,7 +40,6 @@
 
 <script>
 
-    import { v4 as uuidv4 } from 'uuid';
     import debounce from 'lodash/debounce';
     import OrderFees from '@Pages/orders/order/editable/components/order-fees/OrderFees.vue';
     import OrderBasics from '@Pages/orders/order/editable/components/order-basics/OrderBasics.vue';
@@ -59,7 +58,6 @@
         },
         data() {
             return {
-                guestId: uuidv4(),
                 shoppingCartReady: false
             }
         },
@@ -112,7 +110,6 @@
                     const data = {
                         inspect: true,
                         ...this.orderForm,
-                        guest_id: this.guestId,
                         store_id: this.store.id,
                         association: 'team member'
                     };

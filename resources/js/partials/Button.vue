@@ -7,7 +7,7 @@
             :class="[buttonClasses, buttonClass]">
 
             <!-- Spinning Loader -->
-            <Loader v-if="loading" type="light"></Loader>
+            <Loader v-if="loading" :type="loaderType"></Loader>
 
             <div v-else class="flex justify-center items-center space-x-1 whitespace-nowrap">
 
@@ -101,6 +101,10 @@
             copyContent: {
                 type: [String, null],
                 default: null
+            },
+            loaderType: {
+                type: String,
+                default: 'light'
             }
         },
         data() {

@@ -108,8 +108,8 @@
 
                     </div>
 
-
                 </div>
+
             </div>
 
         </div>
@@ -159,6 +159,16 @@
                 </button>
 
             </div>
+
+        </div>
+
+        <div
+            class="flex justify-center border-b border-gray-300 pb-4 mt-4"
+            v-if="orderProduct && (isInspectingShoppingCart || !shouldGoBack)">
+
+            <span class="text-lg font-semibold text-gray-900">
+                {{ estimatedPrice }}
+            </span>
 
         </div>
 
@@ -288,16 +298,44 @@
 
         </div>
 
+        <div
+            class="flex space-x-2"
+            v-if="orderProduct && (isInspectingShoppingCart || !shouldGoBack)">
+
+            <Button
+                size="md"
+                class="mt-8"
+                type="light"
+                :action="goBack"
+                :leftIcon="MoveLeft"
+                buttonClass="w-full"
+                :disabled="isInspectingShoppingCart">
+                <span>Shop</span>
+            </Button>
+
+            <Button
+                size="md"
+                class="mt-8"
+                type="danger"
+                buttonClass="w-full"
+                :action="removeFromCart"
+                :disabled="isInspectingShoppingCart">
+                <span>Remove Item</span>
+            </Button>
+
+        </div>
+
         <Button
             size="lg"
             class="mt-8"
             type="primary"
+            :action="addToCart"
             buttonClass="w-full"
-            :action="addToCart">
+            v-else-if="!orderProduct"
+            :disabled="isInspectingShoppingCart">
             <span>Add</span>
+            <span v-if="estimatedPrice">{{ estimatedPrice }}</span>
         </Button>
-
-        shoppingCart: {{ shoppingCart }}
 
     </div>
 
@@ -308,9 +346,11 @@
     import Pill from '@Partials/Pill.vue';
     import Input from '@Partials/Input.vue';
     import Button from '@Partials/Button.vue';
+    import { MoveLeft } from 'lucide-vue-next';
     import Dropdown from '@Partials/Dropdown.vue';
     import { Link, Share2 } from 'lucide-vue-next';
     import Datepicker from '@Partials/Datepicker.vue';
+    import { convertToMoneyWithSymbol } from '@Utils/numberUtils.js';
 
     export default {
         inject: ['formState', 'orderState', 'productState', 'storeState', 'notificationState'],
@@ -318,8 +358,10 @@
         data() {
             return {
                 Share2,
+                MoveLeft,
                 quantity: '1',
                 responses: [],
+                shouldGoBack: false,
                 options: [
                     {
                         label: 'Whatsapp',
@@ -352,6 +394,8 @@
             product(newValue, oldValue) {
                 if(!oldValue && newValue) {
 
+                    this.setInitialQuantity();
+
                     if(this.product.variants.length) {
                         this.productState.selectedVariantId = this.product.variants[0].id;
                     }
@@ -366,21 +410,49 @@
                         }
                     });
                 }
-                return this.productState.product;
+            },
+            quantity() {
+                if(this.orderProduct) {
+                    this.addToCart(false);
+                }
+            },
+            isInspectingShoppingCart(newValue, oldValue) {
+                if(oldValue && !newValue && this.shouldGoBack) {
+                    this.goBack();
+                }
             }
         },
         computed: {
             store() {
                 return this.storeState.store;
             },
+            isLoadingStore() {
+                return this.storeState.isLoadingStore;
+            },
+            isLoadingProduct() {
+                return this.productState.isLoadingProduct;
+            },
+            isInspectingShoppingCart() {
+                return this.orderState.isInspectingShoppingCart;
+            },
             product() {
                 return this.productState.product;
+            },
+            orderProduct() {
+                return this.shoppingCart && this.product ? this.shoppingCart.order_products.find(orderProduct => orderProduct.product_id == this.product.id) : null;
+            },
+            estimatedPrice() {
+                if(this.isLoadingStore || this.isLoadingProduct) return null;
+                return convertToMoneyWithSymbol(this.product.unit_price.amount * this.quantity, this.store.currency);
             },
             shoppingCart() {
                 return this.orderState.shoppingCart;
             },
             selectedVariantId() {
                 return this.productState.selectedVariantId;
+            },
+            selectedVariant() {
+                return this.product.variants.find(variant => variant.id == this.selectedVariantId);
             },
             dataCollectionFields() {
                 return this.product.data_collection_fields;
@@ -403,6 +475,14 @@
             },
         },
         methods: {
+            goBack() {
+                this.$router.back();
+            },
+            setInitialQuantity() {
+                if(this.orderProduct) {
+                    this.quantity = this.orderProduct.quantity;
+                }
+            },
             shareViaWhatsapp() {
                 if (!this.productLink) return;
                 const text = encodeURIComponent(`Check out ${this.product.name} at ${this.store.name}:\n\n${this.productLink}`);
@@ -425,8 +505,18 @@
                 const url = `https://x.com/intent/post?text=${text}`;
                 window.open(url, '_blank');
             },
-            addToCart() {
-
+            addToCart(goBack = true) {
+                if(this.selectedVariant) {
+                    this.orderState.addCartProductUsingProduct(this.selectedVariant, this.product, this.quantity, false);
+                }else{
+                    this.orderState.addCartProductUsingProduct(this.product, null, this.quantity, false);
+                }
+                this.shouldGoBack = goBack;
+            },
+            removeFromCart(goBack = true) {
+                const index = this.shoppingCart.order_products.findIndex(orderProduct => orderProduct.product_id == this.product.id);
+                this.orderState.removeCartProduct(index, false);
+                this.shouldGoBack = goBack;
             },
             async copyLink() {
                 try {

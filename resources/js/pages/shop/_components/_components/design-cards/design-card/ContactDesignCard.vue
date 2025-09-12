@@ -3,7 +3,7 @@
     <div
         @click="downloadVCard(designCard.metadata.title, designCard.metadata.mobile_number)"
         v-if="designCard.metadata.type === 'contact' && (designCard.metadata.title || designCard.metadata.mobile_number)"
-        class="bg-white rounded-2xl p-4 hover:bg-gray-50 hover:scale-95 transition-all duration-300 cursor-pointer">
+            class="bg-white border border-gray-200 rounded-2xl p-4 hover:bg-gray-50 hover:scale-95 transition-all duration-300 cursor-pointer">
 
         <div class="flex items-center justify-center space-x-4">
             <Phone size="20" class="text-gray-500"></Phone>

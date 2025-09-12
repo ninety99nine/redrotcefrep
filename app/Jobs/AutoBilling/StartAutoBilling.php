@@ -102,6 +102,13 @@ class StartAutoBilling implements ShouldQueue, ShouldBeUnique
              */
             $active = is_null($pricingPlan->max_auto_billing_attempts) || $attempt < $pricingPlan->max_auto_billing_attempts;
 
+            if($active) {
+                $nextAttemptDate = now()->addHour();
+            }else{
+                $attempt = 0;
+                $nextAttemptDate = null;
+            }
+
             $overallAttempts = $autoBillingSchedule->overall_attempts + 1;
             $overallFailedAttempts = $autoBillingSchedule->overall_failed_attempts + 1;
 
@@ -110,14 +117,14 @@ class StartAutoBilling implements ShouldQueue, ShouldBeUnique
                 'active' => $active,
                 'attempt' => $attempt,
                 'overall_attempts' => $overallAttempts,
-                'next_attempt_date' => now()->addHour(),
+                'next_attempt_date' => $nextAttemptDate,
                 'overall_failed_attempts' => $overallFailedAttempts
             ]);
 
             if(!$active) {
 
                 //  Deactivate the auto billing schedule since the maximum billing attempts have been reached
-                StopAutoBilling::dispatch($autoBillingSchedule->id);
+                SendAutoBillingDisabledSms::dispatch($autoBillingSchedule->id);
 
             }
 

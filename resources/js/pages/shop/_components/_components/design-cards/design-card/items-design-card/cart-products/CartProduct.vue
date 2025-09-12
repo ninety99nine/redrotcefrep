@@ -8,9 +8,7 @@
 
                 <img v-if="hasPhotoPath" class="w-10 object-contain rounded-lg flex-shrink-0" :src="photoPath">
 
-                <svg v-else class="w-6 h-6 text-gray-400 flex-shrink-0" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="m2.25 15.75 5.159-5.159a2.25 2.25 0 0 1 3.182 0l5.159 5.159m-1.5-1.5 1.409-1.409a2.25 2.25 0 0 1 3.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 0 0 1.5-1.5V6a1.5 1.5 0 0 0-1.5-1.5H3.75A1.5 1.5 0 0 0 2.25 6v12a1.5 1.5 0 0 0 1.5 1.5Zm10.5-11.25h.008v.008h-.008V8.25Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z" />
-                </svg>
+                <Image v-else size="16" class="text-gray-300"></Image>
 
             </div>
 
@@ -22,7 +20,7 @@
 
                     <Skeleton v-if="isInspectingShoppingCart" width="w-24" height="h-4" :shine="true" class="mt-2"></Skeleton>
 
-                    <template v-else>
+                    <template v-else-if="orderProduct">
                         <Pill v-if="orderProduct.is_free" type="success" size="xs" :showDot="false">free</Pill>
                         <p v-else class="text-xs space-x-2">
                             <span :class="{ 'line-through text-gray-500' : orderProduct.on_sale }">{{ orderProduct.subtotal.amount_with_currency }}</span>
@@ -55,8 +53,10 @@
                 <input
                     min="0"
                     value="2"
+                    type="number"
+                    @blur="checkQuantity"
                     v-model="cartProduct.quantity"
-                    class="w-12 text-center border-0 focus:outline-none">
+                    class="w-12 text-center border-0 focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none">
 
                 <button
                     @click.stop="() => orderState.increaseCartProductQuantity(index, false)"
@@ -68,21 +68,27 @@
 
         </div>
 
+        <span
+            v-if="errorText"
+            class="scroll-to-error font-medium text-red-500 text-xs mt-1 ml-1">
+            {{ errorText }}
+        </span>
+
     </div>
 
 </template>
 
 <script>
 
-    import { X } from 'lucide-vue-next';
     import Pill from '@Partials/Pill.vue';
     import Input from '@Partials/Input.vue';
     import Button from '@Partials/Button.vue';
+    import { X, Image } from 'lucide-vue-next';
     import Skeleton from '@Partials/Skeleton.vue';
 
     export default {
-        inject: ['storeState', 'orderState'],
-        components: { X, Pill, Input, Button, Skeleton },
+        inject: ['formState', 'storeState', 'orderState'],
+        components: { X, Image, Pill, Input, Button, Skeleton },
         props: {
             index: {
                 type: Number
@@ -112,6 +118,16 @@
             orderProduct() {
                 if(!this.orderState.shoppingCart) return null;
                 return this.orderState.shoppingCart.order_products.find(orderProduct => orderProduct.product_id === this.cartProduct.id);
+            },
+            errorText() {
+                return this.formState.getFormError(`cart_products.${this.index}`)
+            }
+        },
+        methods: {
+            checkQuantity() {
+                if (typeof this.cartProduct.quantity === 'undefined' || this.cartProduct.quantity === null || isNaN(parseInt(this.cartProduct.quantity)) || parseInt(this.cartProduct.quantity) < 1) {
+                    this.cartProduct.quantity = '1';
+                }
             }
         }
     };

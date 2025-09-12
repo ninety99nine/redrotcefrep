@@ -183,7 +183,7 @@ class ShoppingCartService
      */
     public function setAssociation(): void
     {
-        $this->association = request()->has('association') ? request()->input('association') : null;
+        $this->association = request()->filled('association') ? request()->input('association') : null;
     }
 
     /**
@@ -233,7 +233,7 @@ class ShoppingCartService
      */
     public function setPromotionCode(): void
     {
-        $this->promotionCode = request()->has('promotion_code') ? request()->input('promotion_code') : null;
+        $this->promotionCode = request()->filled('promotion_code') ? request()->input('promotion_code') : null;
     }
 
     /**
@@ -243,9 +243,9 @@ class ShoppingCartService
      */
     public function setCartTipRate(): void
     {
-        if(request()->has('tip_flat_rate')) {
+        if(request()->filled('tip_flat_rate')) {
             $this->tipFlatRate = request()->input('tip_flat_rate');
-        }else if(request()->has('tip_percentage_rate')) {
+        }else if(request()->filled('tip_percentage_rate')) {
             $this->tipPercentageRate = request()->input('tip_percentage_rate');
         }
     }
@@ -258,7 +258,7 @@ class ShoppingCartService
     private function setAdjustment(): void
     {
         if($this->isTeamMember) {
-            $this->adjustmentTotal = request()->has('adjustment') ? (float) request()->input('adjustment') : 0;
+            $this->adjustmentTotal = request()->filled('adjustment') ? (float) request()->input('adjustment') : 0;
         }
     }
 
@@ -269,7 +269,7 @@ class ShoppingCartService
      */
     public function setAddress(): void
     {
-        if(request()->has('delivery_address') && request()->filled('delivery_address')) {
+        if(request()->filled('delivery_address')) {
 
             $attributes = request()->input('delivery_address');
 
@@ -289,7 +289,7 @@ class ShoppingCartService
      */
     public function setDeliveryDate(): void
     {
-        $this->deliveryDate = request()->has('delivery_date') ? request()->input('delivery_date') : null;
+        $this->deliveryDate = request()->filled('delivery_date') ? request()->input('delivery_date') : null;
     }
 
     /**
@@ -299,7 +299,7 @@ class ShoppingCartService
      */
     public function setDeliveryTimeslot(): void
     {
-        $this->deliveryTimeslot = request()->has('delivery_timeslot') ? request()->input('delivery_timeslot') : null;
+        $this->deliveryTimeslot = request()->filled('delivery_timeslot') ? request()->input('delivery_timeslot') : null;
     }
 
     /**
@@ -309,7 +309,7 @@ class ShoppingCartService
      */
     public function setDeliveryMethod(): void
     {
-        $this->deliveryMethod = request()->has('delivery_method_id') ? $this->store->deliveryMethods()->active()->find(request()->input('delivery_method_id')) : null;
+        $this->deliveryMethod = request()->filled('delivery_method_id') ? $this->store->deliveryMethods()->active()->find(request()->input('delivery_method_id')) : null;
     }
 
     /**
@@ -543,12 +543,16 @@ class ShoppingCartService
     {
         $productId = $cartProduct['id'] ?? null;
         $productName = $cartProduct['name'] ?? null;
+        $productQuantity = $cartProduct['quantity'] ?? null;
 
         // If no ID or Name, ignore the product
         if(!$productId && !$productName) return null;
 
         // If no ID and not a team member, ignore the product
         if(!$productId && !$this->isTeamMember) return null;
+
+        // If no valid quantity, ignore the product
+        if($productQuantity == null || $productQuantity < 1) return null;
 
         // Retrieve the related product from the pre-fetched collection
         $relatedProduct = $productId ? $relatedProducts->get($productId) : null;
@@ -1798,7 +1802,8 @@ class ShoppingCartService
                 'free_delivery' => null,
                 'pin_location_on_map' => null,
                 'schedule_is_required' => null,
-                'schedule_is_complete' => null,
+                'schedule_date_complete' => null,
+                'schedule_time_complete' => null,
                 'delivery_address_is_required' => null,
                 'unavailability_reasons' => [],
                 'schedule_incomplete_reasons' => [],
@@ -1875,21 +1880,27 @@ class ShoppingCartService
     {
         if($deliveryMethodOption['schedule_is_required']) {
 
-            $deliveryMethodOption['schedule_is_complete'] = true;
+            $deliveryMethodOption['schedule_date_complete'] = true;
+            $deliveryMethodOption['schedule_time_complete'] = true;
 
-            $disqualify = function ($message) use (&$deliveryMethodOption) {
+            $disqualify = function ($message, $type) use (&$deliveryMethodOption) {
+                if($type == 'date') {
+                    $deliveryMethodOption['schedule_date_complete'] = false;
+                }
+                $deliveryMethodOption['schedule_time_complete'] = false;
+
                 $deliveryMethodOption['schedule_is_complete'] = false;
                 array_push($deliveryMethodOption['schedule_incomplete_reasons'], $message);
             };
 
             if(!$this->deliveryDate){
-                $disqualify('The delivery date is required');
+                $disqualify('The delivery date is required', 'date');
             }else if(!$this->isTeamMember && !$deliveryMethod->isValidDate($this->deliveryDate)){
-                $disqualify('The selected delivery date is unavailable');
+                $disqualify('The selected delivery date is unavailable', 'date');
             }else if($deliveryMethod->schedule_type == DeliveryMethodScheduleType::DATE_AND_TIME->value && !$this->deliveryTimeslot){
-                $disqualify('The delivery time is required');
+                $disqualify('The delivery time is required', 'time');
             }else if(!$this->isTeamMember && $deliveryMethod->schedule_type == DeliveryMethodScheduleType::DATE_AND_TIME->value && !$deliveryMethod->isValidTimeSlot($this->deliveryDate, $this->deliveryTimeslot)){
-                $disqualify('The selected delivery time is unavailable');
+                $disqualify('The selected delivery time is unavailable', 'time');
             }
 
         }
@@ -2799,7 +2810,7 @@ class ShoppingCartService
                 'has_met_maximum_order_quantity' => $orderProduct->has_met_maximum_order_quantity,
                 'has_met_minimum_order_quantity' => $orderProduct->has_met_minimum_order_quantity,
             ];
-        })->all();
+        })->values()->all();
 
     }
 
@@ -2819,6 +2830,6 @@ class ShoppingCartService
                 'detected_changes' => $orderPromotion->detected_changes,
                 'cancellation_reasons' => $orderPromotion->cancellation_reasons,
             ];
-        })->all();
+        })->values()->all();
     }
 }

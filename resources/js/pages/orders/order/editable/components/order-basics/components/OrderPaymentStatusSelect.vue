@@ -47,8 +47,11 @@
             orderForm() {
                 return this.orderState.orderForm;
             },
+            paymentStatusName() {
+                return this.orderForm.payment_status;
+            },
             paymentStatuses() {
-                const options = ['paid','unpaid','pending payment','partially paid'];
+                const options = ['paid','unpaid','pending payment','partially paid', 'confirming payment'];
 
                 return options.map((option) => {
                     return {
@@ -60,16 +63,16 @@
             getSelectClasses() {
                 let classes = ['w-full select-none rounded-md'];
 
-                const paymentStatusName = this.orderForm.payment_status;
-
-                if(paymentStatusName === 'paid') {
+                if(this.paymentStatusName === 'paid') {
                     classes.push('bg-green-100 border border-green-500');
-                } else if(paymentStatusName === 'unpaid') {
+                } else if(this.paymentStatusName === 'unpaid') {
                     classes.push('bg-gray-100 border border-gray-500');
-                } else if(paymentStatusName === 'partially paid') {
+                } else if(this.paymentStatusName === 'partially paid') {
                     classes.push('bg-blue-100 border border-blue-500');
-                } else if(paymentStatusName === 'pending payment') {
+                } else if(this.paymentStatusName === 'pending payment') {
                     classes.push('bg-yellow-100 border border-yellow-500');
+                }else if(this.paymentStatusName === 'confirming payment') {
+                    classes.push('bg-green-100 border border-green-500');
                 }
 
                 return classes;
@@ -77,16 +80,16 @@
             getSelectTextClasses() {
                 let classes = ['font-semibold text-sm truncate'];
 
-                const paymentStatusName = this.orderForm.payment_status;
-
-                if(paymentStatusName === 'paid') {
+                if(this.paymentStatusName === 'paid') {
                     classes.push('text-green-800');
-                } else if(paymentStatusName === 'unpaid') {
+                } else if(this.paymentStatusName === 'unpaid') {
                     classes.push('text-gray-800');
-                } else if(paymentStatusName === 'partially paid') {
+                } else if(this.paymentStatusName === 'partially paid') {
                     classes.push('text-blue-800');
-                } else if(paymentStatusName === 'pending payment') {
+                } else if(this.paymentStatusName === 'pending payment') {
                     classes.push('text-yellow-800');
+                }else if(this.paymentStatusName === 'confirming payment') {
+                    classes.push('text-green-800');
                 }
 
                 return classes;
@@ -104,6 +107,8 @@
                     classes.push('bg-blue-500');
                 } else if(paymentStatusName === 'pending payment') {
                     classes.push('bg-yellow-500');
+                }else if(paymentStatusName === 'confirming payment') {
+                    classes.push('bg-green-500');
                 }
 
                 return classes;

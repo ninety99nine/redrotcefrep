@@ -13,7 +13,7 @@
 
             <div
                 v-if="!designCard.hasOwnProperty('delete')"
-                class="w-full bg-gray-50 p-4 border border-gray-300 rounded-lg">
+                class="w-full bg-gray-50 p-4 border border-gray-300 rounded-lg relative">
 
                 <div class="flex items-center justify-between mb-4">
 
@@ -33,6 +33,7 @@
                         <HandCoins v-if="designCard.metadata.type == 'tips'" size="20"></HandCoins>
                         <UserRound v-if="designCard.metadata.type == 'customer'" size="20"></UserRound>
                         <ShoppingCart v-if="designCard.metadata.type == 'items'" size="20"></ShoppingCart>
+                        <CreditCard v-if="designCard.metadata.type == 'payment methods'" size="20"></CreditCard>
                         <ReceiptText v-if="designCard.metadata.type == 'order summary'" size="20"></ReceiptText>
                         <TicketPercent v-if="designCard.metadata.type == 'promo code'" size="20"></TicketPercent>
 
@@ -41,10 +42,31 @@
                     </div>
 
 
-                    <div class="flex justify-end space-x-4">
+                    <div class="flex items-center justify-end space-x-4">
+
+                        <div
+                            class="flex items-center space-x-0.5"
+                            v-if="isRequiredDesignCard(designCard)">
+
+                            <Pill
+                                size="xs"
+                                type="primary"
+                                tooltipContent="This design card is a standard design that cannot be hidden or removed">
+                                standard
+                            </Pill>
+
+                            <Tooltip
+                                trigger="hover"
+                                v-if="isRequiredDesignCard(designCard)"
+                                content="This design card is a standard design that cannot be hidden or removed.">x
+                            </Tooltip>
+
+                        </div>
 
                         <!-- Visible Toggle -->
-                        <div class="cursor-pointer hover:text-blue-500 transition-all duration-500">
+                        <div
+                            v-else
+                            class="cursor-pointer hover:text-blue-500 transition-all duration-500">
                             <Eye v-if="designCard.visible" size="16" @click.stop="() => toggleVisible(index)"></Eye>
                             <EyeOff v-else size="16" @click.stop="() => toggleVisible(index)"></EyeOff>
                         </div>
@@ -73,12 +95,14 @@
                 <OrderSummaryCard v-else-if="designCard.metadata.type == 'order summary'" :index="index" :designCard="designCard"></OrderSummaryCard>
                 <PromoCodeDesignCard v-else-if="designCard.metadata.type == 'promo code'" :index="index" :designCard="designCard"></PromoCodeDesignCard>
 
+                <PaymentMethodsCard v-else-if="designCard.metadata.type == 'payment methods'" :index="index" :designCard="designCard"></PaymentMethodsCard>
+
                 <div class="flex justify-end space-x-4 mt-4">
 
                     <Trash
                         size="16"
+                        v-if="!isRequiredDesignCard(designCard)"
                         @click.stop="() => removeDesignCard(index)"
-                        v-if="isDeletableDesignCardLabel(designCard)"
                         class="cursor-pointer text-red-500 hover:text-red-600 active:text-red-600 active:scale-95 transition-all">
                     </Trash>
 
@@ -96,6 +120,8 @@
 
 <script>
 
+    import Pill from '@Partials/Pill.vue';
+    import Tooltip from '@Partials/Tooltip.vue';
     import { VueDraggableNext } from 'vue-draggable-next';
     import MapDesignCard from '@Pages/design/_components/_components/design-cards/design-card/MapDesignCard.vue';
     import TipsDesignCard from '@Pages/design/_components/_components/design-cards/design-card/TipsDesignCard.vue';
@@ -109,17 +135,18 @@
     import SocialsDesignCard from '@Pages/design/_components/_components/design-cards/design-card/SocialsDesignCard.vue';
     import CustomerDesignCard from '@Pages/design/_components/_components/design-cards/design-card/CustomerDesignCard.vue';
     import DeliveryDesignCard from '@Pages/design/_components/_components/design-cards/design-card/DeliveryDesignCard.vue';
+    import PaymentMethodsCard from '@Pages/design/_components/_components/design-cards/design-card/PaymentMethodsCard.vue';
     import ProductsDesignCard from '@Pages/design/_components/_components/design-cards/design-card/ProductsDesignCard.vue';
     import PromoCodeDesignCard from '@Pages/design/_components/_components/design-cards/design-card/PromoCodeDesignCard.vue';
     import CountdownDesignCard from '@Pages/design/_components/_components/design-cards/design-card/CountdownDesignCard.vue';
-    import { Eye, EyeOff, Move, Trash, Map, Link, Type, Box, Image, Video, AtSign, Clock, Contact, Truck, HandCoins, UserRound, ShoppingCart, ReceiptText, TicketPercent } from 'lucide-vue-next';
+    import { Eye, EyeOff, Move, Trash, Map, Link, Type, Box, Image, Video, AtSign, Clock, Contact, Truck, HandCoins, UserRound, ShoppingCart, ReceiptText, CreditCard, TicketPercent } from 'lucide-vue-next';
 
     export default {
         inject: ['designState', 'storeState'],
         components: {
-            Eye, EyeOff, Move, Trash, Map, Link, Type, Box, Image, Video, AtSign, Clock, Contact, Truck, HandCoins, UserRound, ShoppingCart, ReceiptText, TicketPercent,
-            draggable: VueDraggableNext, MapDesignCard, TipsDesignCard, LinkDesignCard, TextDesignCard, ImageDesignCard, ItemsDesignCard, VideoDesignCard,
-            OrderSummaryCard, ContactDesignCard, SocialsDesignCard, CustomerDesignCard, DeliveryDesignCard, ProductsDesignCard,
+            Eye, EyeOff, Move, Trash, Map, Link, Type, Box, Image, Video, AtSign, Clock, Contact, Truck, HandCoins, UserRound, ShoppingCart, ReceiptText, CreditCard, TicketPercent,
+            Pill, Tooltip, draggable: VueDraggableNext, MapDesignCard, TipsDesignCard, LinkDesignCard, TextDesignCard, ImageDesignCard, ItemsDesignCard, VideoDesignCard,
+            OrderSummaryCard, ContactDesignCard, SocialsDesignCard, CustomerDesignCard, DeliveryDesignCard, PaymentMethodsCard, ProductsDesignCard,
             PromoCodeDesignCard, CountdownDesignCard
         },
         data() {
@@ -154,8 +181,8 @@
             },
         },
         methods: {
-            isDeletableDesignCardLabel(designCard) {
-                return !['customer', 'items', 'delivery', 'promo code', 'tips', 'order summary'].includes(designCard.metadata.type);
+            isRequiredDesignCard(designCard) {
+                return ['customer', 'items', 'delivery', 'promo code', 'tips', 'order summary', 'payment methods'].includes(designCard.metadata.type);
             },
             getDesignCardLabel(designCard) {
                 return this.designCardOptions.find(designCardOption => designCardOption.value == designCard.metadata.type)?.label;

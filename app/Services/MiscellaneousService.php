@@ -58,4 +58,20 @@ class MiscellaneousService
 
         return $sortingService->getSortingOptionsByResourceType($sortResourceType);
     }
+
+    /**
+     * Convert currency.
+     *
+     * @param array $data
+     * @return array
+     */
+    public function convertCurrency(array $data): array
+    {
+        $to = $data['to'];
+        $from = $data['from'];
+        $amount = $data['amount'];
+
+        $moneyService = new MoneyService;
+        return $moneyService->convertCurrency($amount, $from, $to);
+    }
 }

@@ -10,7 +10,7 @@
         :leftTriggerIcon="Printer"
         approveText="Print PDF"
         :approveAction="printOrder"
-        :approveLoading="isPrintingOrder"
+        :approveLoading="isDownloadingOrder"
         :triggerLoading="isLoadingStore || isLoadingOrder">
 
         <template #content>
@@ -42,7 +42,7 @@
         data() {
             return {
                 Printer,
-                isPrintingOrder: false
+                isDownloadingOrder: false
             }
         },
         computed: {
@@ -64,7 +64,7 @@
 
                 try {
 
-                    if(this.isPrintingOrder) return;
+                    if(this.isDownloadingOrder) return;
 
                     const data = {
                         store_id: this.store.id,
@@ -75,7 +75,7 @@
                         responseType: "blob"
                     };
 
-                    this.isPrintingOrder = true;
+                    this.isDownloadingOrder = true;
 
                     const response = await axios.post(`/api/orders/download`, data, config);
 
@@ -98,7 +98,7 @@
                     this.formState.setServerFormErrors(error);
                     console.error('Failed to print order:', error);
                 } finally {
-                    this.isPrintingOrder = false;
+                    this.isDownloadingOrder = false;
                 }
 
             }

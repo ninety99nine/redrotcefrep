@@ -29,7 +29,7 @@ class ShowCategoriesRequest extends FormRequest
     {
         return [
             'store_id' => ['sometimes', 'uuid'],
-            'association' => ['sometimes', Rule::enum(Association::class)->only([Association::SUPER_ADMIN, Association::TEAM_MEMBER])],
+            'association' => ['sometimes', Rule::enum(Association::class)->only([Association::SUPER_ADMIN, Association::TEAM_MEMBER, Association::SHOPPER->value])],
         ];
     }
 

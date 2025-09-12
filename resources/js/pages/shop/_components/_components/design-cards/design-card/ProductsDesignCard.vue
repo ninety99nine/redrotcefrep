@@ -27,8 +27,14 @@
                 <div
                     :key="product.id"
                     @click.stop="() => onView(product)"
-                    class="flex flex-col space-y-2 p-2 hover:bg-gray-100 cursor-pointer rounded-lg hover:scale-105 transition-all duration-300"
+                    class="relative flex flex-col space-y-2 p-2 hover:bg-gray-100 cursor-pointer rounded-lg hover:scale-105 transition-all duration-300"
                     v-for="product in categoryData[designCard.metadata.category_id].category.products.slice(0, parseInt(designCard.metadata.feature))">
+
+                    <div
+                        v-if="getSelectedQuantity(product)"
+                        class="absolute top-1 right-1 z-10 flex items-center justify-center min-w-6 w-fit h-6 p-1 bg-red-500 text-xs font-bold text-white rounded-full">
+                        <span>{{ getSelectedQuantity(product) }}</span>
+                    </div>
 
                     <div :class="[
                         'w-full aspect-square relative flex items-center justify-center bg-gray-100 rounded-lg overflow-hidden',
@@ -44,6 +50,7 @@
                         <Image v-else size="40" class="text-gray-300"></Image>
 
                     </div>
+
 
                     <h4 class="text-sm font-medium text-gray-900 truncate">{{ product.name }}</h4>
 
@@ -90,7 +97,7 @@
     import Loader from '@Partials/Loader.vue';
 
     export default {
-        inject: ['formState', 'designState', 'storeState', 'notificationState'],
+        inject: ['formState', 'designState', 'orderState', 'storeState', 'notificationState'],
         components: { Image, Pill, Loader },
         props: {
             designCard: {
@@ -105,6 +112,9 @@
         computed: {
             store() {
                 return this.storeState.store;
+            },
+            shoppingCart() {
+                return this.orderState.shoppingCart;
             },
             categoryData() {
                 return this.designState.categoryData;
@@ -122,6 +132,15 @@
                         product_id: product.id
                     }
                 });
+            },
+            getSelectedQuantity(product) {
+                if(this.shoppingCart && product) {
+                    const orderProduct = this.shoppingCart.order_products.find(orderProduct => orderProduct.product_id == product.id);
+                    if(orderProduct) {
+                        return orderProduct.quantity;
+                    }
+                }
+                return null;
             },
             async showCategory() {
                 try {

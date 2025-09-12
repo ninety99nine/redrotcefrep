@@ -1,4 +1,5 @@
 import { defineStore } from 'pinia';
+import { v4 as uuidv4 } from 'uuid';
 import { formattedDate } from '@Utils/dateUtils.js';
 import { useStoreStore as storeState } from '@Stores/store-store.js';
 import { useChangeHistoryStore as changeHistoryState } from '@Stores/change-history-store.js';
@@ -8,7 +9,11 @@ export const useOrderStore = defineStore('order', {
         order: null,
         orderForm: null,
         shoppingCart: null,
+        deliveryMethods: [],
         isLoadingOrder: false,
+        isCreatingOrder: false,
+        canInspectShoppingCart: false,
+        isLoadingDeliveryMethods: false,
         isInspectingShoppingCart: false
     }),
     actions: {
@@ -16,9 +21,51 @@ export const useOrderStore = defineStore('order', {
             this.order = null;
             this.orderForm = null;
             this.shoppingCart = null;
+            this.deliveryMethods = [];
             this.isLoadingOrder = false;
+            this.isCreatingOrder = false;
+            this.canInspectShoppingCart = false;
+            this.isLoadingDeliveryMethods = false;
             this.isInspectingShoppingCart = false;
+            this.removeStateOnLocalStorage();
             changeHistoryState().reset();
+        },
+        resetOrderForm() {
+            this.reset();
+            this.setOrderForm(null, false);
+            setTimeout(() => { this.canInspectShoppingCart = true }, 1000);
+        },
+        async hasStateFromLocalStorage() {
+            return (await this.getStateFromLocalStorage()) !== null;
+        },
+        async getStateFromLocalStorage() {
+            const orderState = localStorage.getItem('orderState');
+            if (!orderState) return null;
+            try {
+                const parsedState = JSON.parse(orderState);
+                if (parsedState && typeof parsedState === 'object' && parsedState.timestamp) {
+                    const ageInHours = (Date.now() - parsedState.timestamp) / (1000 * 60 * 60);
+                    if (ageInHours <= 1) {
+                        return parsedState.data;
+                    }
+                }
+            } catch (error) {
+                console.error('Invalid orderState in localStorage:', error);
+            }
+            return null;
+        },
+        async setStateFromLocalStorage() {
+            const parsedState = await this.getStateFromLocalStorage();
+            if (parsedState) this.$patch(parsedState);
+        },
+        setStateOnLocalStorage() {
+            localStorage.setItem('orderState', JSON.stringify({
+                timestamp: Date.now(),
+                data: this.$state
+            }));
+        },
+        removeStateOnLocalStorage() {
+            localStorage.removeItem('orderState');
         },
         setOrder(order) {
             this.order = order;
@@ -35,9 +82,11 @@ export const useOrderStore = defineStore('order', {
         saveOriginalState(actionName) {
             changeHistoryState().saveOriginalState(actionName, this.orderForm);
         },
-        setOrderForm(order = null) {
+        setOrderForm(order = null, saveState = true) {
 
             this.orderForm = {
+
+                guestId: uuidv4(),
 
                 cart_fees: [],
                 cart_products: [],
@@ -102,7 +151,7 @@ export const useOrderStore = defineStore('order', {
 
             }
 
-            this.saveOriginalState('Original order');
+            if(saveState) this.saveOriginalState('Original order');
 
         },
         setShoppingCart(shoppingCart) {
@@ -158,7 +207,7 @@ export const useOrderStore = defineStore('order', {
 
             }
         },
-        addCartProductUsingProduct(product, parentProduct = null, saveState = true) {
+        addCartProductUsingProduct(product, parentProduct = null, overrideQuantity = null, saveState = true) {
 
             const photo = product.photo;
             const name = parentProduct ? parentProduct.name+' '+product.name : product.name;
@@ -175,18 +224,21 @@ export const useOrderStore = defineStore('order', {
 
             if (existingProduct) {
 
-                // Increase quantity if product already exists
-                existingProduct.quantity = (parseInt(existingProduct.quantity) + 1).toString();
+                if(overrideQuantity) {
+                    existingProduct.quantity = overrideQuantity.toString();
+                }else{
+                    existingProduct.quantity = (parseInt(existingProduct.quantity) + 1).toString();
+                }
 
             } else {
 
                 // Add as a new product
                 this.orderForm.cart_products.push({
                     'name': name,
-                    'quantity': '1',
                     'id': product.id,
                     'is_free': product.is_free,
                     'on_sale': product.on_sale,
+                    'quantity': overrideQuantity ?? '1',
                     'photo_path': photo ? photo.path : null,
                     'unit_weight': product.unit_weight.toString(),
                     'unit_sale_price': product.unit_sale_price.amount,
@@ -215,6 +267,9 @@ export const useOrderStore = defineStore('order', {
         removeCartProduct(index, saveState = true) {
             this.orderForm.cart_products.splice(index, 1);
             if(saveState) this.saveState('Product removed');
+            if(this.orderForm.cart_products == 0) {
+                this.shoppingCart = null;
+            }
         },
         increaseCartProductQuantity(index, saveState = true) {
             this.orderForm.cart_products[index].quantity = (parseInt(this.orderForm.cart_products[index].quantity) + 1).toString();
@@ -224,8 +279,6 @@ export const useOrderStore = defineStore('order', {
             if(this.orderForm.cart_products[index].quantity >= 2) {
                 this.orderForm.cart_products[index].quantity = (parseInt(this.orderForm.cart_products[index].quantity) - 1).toString();
                 if(saveState) this.saveState('Product quantity reduced');
-            }else{
-                this.removeCartProduct(index, saveState);
             }
         },
 
@@ -354,10 +407,19 @@ export const useOrderStore = defineStore('order', {
                 this.saveState('Customer added');
             }
         },
+        getShoppingCartDeliveryMethodOption(deliveryMethod) {
+            return ((this.shoppingCart || {}).delivery_method_options || []).find((shoppingCartDeliveryMethodOption) => shoppingCartDeliveryMethodOption.id == deliveryMethod.id);
+        }
     },
     getters: {
         hasOrder() {
             return this.order != null;
+        },
+        selectedDeliveryMethod() {
+            return this.deliveryMethods.find((deliveryMethod) => deliveryMethod.id == this.orderForm.delivery_method_id);
+        },
+        hasDeliveryMethods() {
+            return this.deliveryMethods.length > 0;
         },
         hasCustomerDetails() {
             return this.orderForm.customer_email?.trim() ||

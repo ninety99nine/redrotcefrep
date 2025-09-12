@@ -73,7 +73,7 @@
                     return 'storefront';
                 }else if(['show-checkout', 'edit-checkout'].includes(this.$route.name)) {
                     return 'checkout';
-                }else if(['pay-order', 'edit-payment'].includes(this.$route.name)) {
+                }else if(['show-shop-payment-methods', 'edit-payment'].includes(this.$route.name)) {
                     return 'payment';
                 }
             }

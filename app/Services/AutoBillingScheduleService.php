@@ -8,7 +8,7 @@ use App\Models\AutoBillingSchedule;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Resources\AutoBillingScheduleResource;
 use App\Http\Resources\AutoBillingScheduleResources;
-use App\Jobs\AutoBilling\StopAutoBilling;
+use App\Jobs\AutoBilling\SendAutoBillingDisabledSms;
 
 class AutoBillingScheduleService extends BaseService
 {
@@ -96,13 +96,14 @@ class AutoBillingScheduleService extends BaseService
     {
         if (isset($data['active']) && !$data['active']) {
             $data['attempt'] = 0;
+            $data['active'] = false;
             $data['next_attempt_date'] = null;
         }
 
         $autoBillingSchedule->update($data);
 
         if (!$autoBillingSchedule->active) {
-            StopAutoBilling::dispatch($autoBillingSchedule->id);
+            SendAutoBillingDisabledSms::dispatch($autoBillingSchedule->id);
         }
 
         return $this->showUpdatedResource($autoBillingSchedule);

@@ -6,6 +6,16 @@
 
         <template v-else>
 
+            <Button
+                size="xs"
+                type="light"
+                class="mt-8 m-4"
+                v-if="isCheckout"
+                :leftIcon="MoveLeft"
+                :action="navigateToStorefront">
+                <span>Shop</span>
+            </Button>
+
             <DesignCards v-if="hasDesignCards"></DesignCards>
 
             <NoDesignCards v-else></NoDesignCards>
@@ -18,37 +28,25 @@
 
 <script>
 
-    import debounce from 'lodash/debounce';
+    import Button from '@Partials/Button.vue';
+    import { MoveLeft } from 'lucide-vue-next';
     import NoDesignCards from '@Pages/shop/_components/_components/NoDesignCards.vue';
     import DesignCards from '@Pages/shop/_components/_components/design-cards/DesignCards.vue';
     import LoadingDesignCards from '@Pages/shop/_components/_components/LoadingDesignCards.vue';
 
     export default {
-        inject: ['formState', 'designState', 'orderState', 'storeState', 'changeHistoryState', 'notificationState'],
+        inject: ['formState', 'designState', 'storeState', 'notificationState'],
         components: {
-            NoDesignCards, DesignCards, LoadingDesignCards
+            Button, NoDesignCards, DesignCards, LoadingDesignCards
         },
         data() {
             return {
-                shoppingCartReady: false
+                MoveLeft
             }
         },
         watch: {
-            store(newValue, oldValue) {
+            store() {
                 this.setup();
-            },
-            orderForm: {
-                handler(newVal) {
-                    if(newVal) {
-                        if(this.shoppingCartReady) {
-                            this.orderState.setIsInspectingShoppingCart(true);
-                            this.inspectShoppingCartDelayed();
-                        }else{
-                            this.shoppingCartReady = true;
-                        }
-                    }
-                },
-                deep: true
             }
         },
         computed: {
@@ -58,14 +56,14 @@
             isLoadingStore() {
                 return this.storeState.isLoadingStore;
             },
-            orderForm() {
-                return this.orderState.orderForm;
+            isCheckout() {
+                return this.designState.type == 'checkout';
             },
             designForm() {
                 return this.designState.designForm;
             },
             designCards() {
-                if(this.$route.name.startsWith('edit-')) {
+                if(['edit-storefront', 'edit-checkout', 'edit-payment'].includes(this.$route.name)) {
                     return this.designForm?.design_cards ?? [];
                 }else{
                     return this.designState.designCards;
@@ -85,19 +83,26 @@
                     return 'storefront';
                 }else if(['show-checkout', 'edit-checkout'].includes(this.$route.name)) {
                     return 'checkout';
-                }else if(['pay-order', 'edit-payment'].includes(this.$route.name)) {
+                }else if(['show-shop-payment-methods', 'edit-payment'].includes(this.$route.name)) {
                     return 'payment';
                 }
             }
         },
         methods: {
             async setup() {
-
-                if(this.store && ['show-storefront', 'show-checkout'].includes(this.$route.name)) {
+                if(this.store && ['show-storefront', 'show-checkout', 'show-shop-payment-methods'].includes(this.$route.name)) {
                     if(!this.hasLoadedInitialdesignCards && !this.isLoadingDesignCards) {
                         this.showDesignCards();
                     }
                 }
+            },
+            async navigateToStorefront() {
+                await this.$router.push({
+                    name: 'show-storefront',
+                    params: {
+                        alias: this.store.alias
+                    }
+                });
             },
             async showDesignCards() {
                 try {
@@ -125,40 +130,14 @@
                     this.designState.isLoadingDesignCards = false;
                     this.designState.hasLoadedInitialdesignCards = true;
                 }
-            },
-            inspectShoppingCartDelayed: debounce(function () {
-                this.inspectShoppingCart();
-            }, 1000),
-            async inspectShoppingCart() {
-
-                try {
-
-                    this.orderState.setIsInspectingShoppingCart(true);
-
-                    const data = {
-                        inspect: true,
-                        ...this.orderForm,
-                        guest_id: this.guestId,
-                        store_id: this.store.id,
-                        association: 'team member'
-                    };
-
-                    const response = await axios.post(`/api/orders`, data);
-                    this.orderState.setShoppingCart(response.data);
-
-                } catch (error) {
-                    const message = error?.response?.data?.message || error?.message || 'Something went wrong while inspecting shopping cart';
-                    this.notificationState.showWarningNotification(message);
-                    this.formState.setServerFormErrors(error);
-                    console.error('Failed to inspect shopping cart:', error);
-                } finally {
-                    this.orderState.setIsInspectingShoppingCart(false);
-                }
-
             }
+        },
+        beforeUnmount() {
+            this.designState.reset();
         },
         created() {
             this.setup();
+            this.designState.type = this.type;
         }
     }
 </script>

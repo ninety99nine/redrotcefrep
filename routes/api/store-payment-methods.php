@@ -14,7 +14,7 @@ Route::prefix('store-payment-methods')
 
         // Explicit route model binding applied: AppServiceProvider.php
         Route::prefix('{storePaymentMethod}')->group(function () {
-            Route::get('/', 'showStorePaymentMethod')->name('show.store.payment.method');
+            Route::get('/', 'showStorePaymentMethod')->withoutMiddleware('store.permission')->name('show.store.payment.method');
             Route::put('/', 'updateStorePaymentMethod')->name('update.store.payment.method');
             Route::delete('/', 'deleteStorePaymentMethod')->name('delete.store.payment.method');
     });

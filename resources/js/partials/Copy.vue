@@ -32,8 +32,10 @@
 
         </template>
 
-        <!-- Copy Icon -->
-        <Copy size="16" class="shrink-0"></Copy>
+        <slot name="trigger" :loading="loading" :copyToClipboardNotReady="copyToClipboardNotReady" :copyToClipboard="copyToClipboard">
+            <!-- Copy Icon -->
+            <Copy size="16" class="shrink-0"></Copy>
+        </slot>
 
     </div>
 

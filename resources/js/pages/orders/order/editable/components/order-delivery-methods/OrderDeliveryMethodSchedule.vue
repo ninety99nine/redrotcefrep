@@ -1,6 +1,6 @@
 <template>
 
-    <div v-if="shoppingCartDeliveryMethodRequiresSchedule" class="space-y-4 pt-4 px-4">
+    <div v-if="scheduleIsRequired" class="space-y-4 pt-4 px-4">
 
         <div class="space-y-2">
             <p class="font-bold text-md">Schedule</p>
@@ -51,6 +51,12 @@
 
         <template v-if="!originalDeliveryDate || (originalDeliveryDate && orderForm.schedule.change_delivery_schedule)">
 
+            <span
+                v-if="errorText"
+                class="scroll-to-error font-medium text-red-500 text-xs mt-1 ml-1">
+                {{ errorText }}
+            </span>
+
             <!-- Date Picker -->
             <DeliveryDatePicker
                 :deliveryMethod="deliveryMethod"
@@ -76,7 +82,7 @@
             <!-- Schedule Incomplete Reasons -->
             <div
                 :key="index"
-                v-for="(shoppingCartDeliveryMethodScheduleIncompleteReason, index) in shoppingCartDeliveryMethodScheduleIncompleteReasons">
+                v-for="(shoppingCartDeliveryMethodScheduleIncompleteReason, index) in scheduleIncompleteReasons">
 
                 <Skeleton v-if="isInspectingShoppingCart" width="w-1/3" :shine="true"></Skeleton>
                 <div v-else class="flex items-center space-x-1 md:space-x-2">
@@ -122,11 +128,14 @@
     import DeliveryTimePicker from '@Pages/orders/order/editable/components/order-delivery-methods/DeliveryTimePicker.vue';
 
     export default {
-        inject: ['orderState'],
+        inject: ['formState', 'orderState'],
         components: {
             Alert, Input, Switch, Skeleton, DeliveryDatePicker, DeliveryTimePicker
         },
         props: {
+            index: {
+                type: Number
+            },
             deliveryMethod: {
                 type: Object
             }
@@ -178,15 +187,18 @@
             deliveryDateIsPast() {
                 return this.orderForm.delivery_date && isPastDate(this.orderForm.delivery_date);
             },
-            shoppingCartDeliveryMethodOption() {
-                return ((this.shoppingCart || {}).delivery_method_options || []).find((shoppingCartDeliveryMethodOption) => shoppingCartDeliveryMethodOption.id == this.deliveryMethod.id);
-            },
-            shoppingCartDeliveryMethodRequiresSchedule() {
+            scheduleIsRequired() {
                 return ((this.shoppingCartDeliveryMethodOption || {}).schedule_is_required || false);
             },
-            shoppingCartDeliveryMethodScheduleIncompleteReasons() {
+            scheduleIncompleteReasons() {
                 return ((this.shoppingCartDeliveryMethodOption || {}).schedule_incomplete_reasons || []);
             },
+            shoppingCartDeliveryMethodOption() {
+                return this.orderState.getShoppingCartDeliveryMethodOption(this.deliveryMethod);
+            },
+            errorText() {
+                return this.formState.getFormError(`delivery_methods.${this.index}.schedule`);
+            }
         },
         methods: {
             formattedShortWeekday: formattedShortWeekday,

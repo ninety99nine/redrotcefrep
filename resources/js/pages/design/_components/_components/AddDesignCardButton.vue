@@ -43,6 +43,7 @@
                         <UserRound v-if="designCardOption.value == 'customer'" size="20"></UserRound>
                         <ShoppingCart v-if="designCardOption.value == 'items'" size="20"></ShoppingCart>
                         <ReceiptText v-if="designCardOption.value == 'order summary'" size="20"></ReceiptText>
+                        <CreditCard v-if="designCardOption.value == 'payment methods'" size="20"></CreditCard>
                         <TicketPercent v-if="designCardOption.value == 'promo code'" size="20"></TicketPercent>
 
                         <span class="text-xs whitespace-nowrap">{{ designCardOption.label }}</span>
@@ -61,13 +62,13 @@
 
     import Button from '@Partials/Button.vue';
     import Dropdown from '@Partials/Dropdown.vue';
-    import { Plus, Map, Link, Type, Box, Image, Video, AtSign, Clock, Contact, Truck, HandCoins, UserRound, ShoppingCart, ReceiptText, TicketPercent } from 'lucide-vue-next';
+    import { Plus, Map, Link, Type, Box, Image, Video, AtSign, Clock, Contact, Truck, HandCoins, UserRound, ShoppingCart, ReceiptText, CreditCard, TicketPercent } from 'lucide-vue-next';
 
     export default {
         inject: ['designState'],
         components: {
             Button, Dropdown, Map, Link, Type, Box, Image, Video, AtSign, Clock, Contact,
-            Truck, HandCoins, UserRound, ShoppingCart, ReceiptText, TicketPercent
+            Truck, HandCoins, UserRound, ShoppingCart, ReceiptText, CreditCard, TicketPercent
         },
         data() {
             return {
@@ -214,6 +215,10 @@
                         checkout_fees: [],
                         combine_fees: false,
                         combine_discounts: false,
+                    };
+                }else if(type == 'payment methods') {
+                    metadata = {
+                        title: 'Amount to pay'
                     };
                 }
 

@@ -31,14 +31,18 @@
 
             <template v-if="hasDeliveryMethods">
 
-                <OrderNoneDeliveryMethod></OrderNoneDeliveryMethod>
-
                 <OrderDeliveryMethod
                     :key="index"
                     :index="index"
                     :deliveryMethod="deliveryMethod"
                     v-for="(deliveryMethod, index) in deliveryMethods">
                 </OrderDeliveryMethod>
+
+                <span
+                    v-if="errorText"
+                    class="scroll-to-error font-medium text-red-500 text-xs mt-1 ml-1">
+                    {{ errorText }}
+                </span>
 
             </template>
 
@@ -66,18 +70,10 @@
     import axios from 'axios';
     import Skeleton from '@Partials/Skeleton.vue';
     import OrderDeliveryMethod from '@Pages/orders/order/editable/components/order-delivery-methods/OrderDeliveryMethod.vue';
-    import OrderNoneDeliveryMethod from '@Pages/orders/order/editable/components/order-delivery-methods/OrderNoneDeliveryMethod.vue';
 
     export default {
         inject: ['formState', 'storeState', 'orderState', 'notificationState'],
-        components: { Skeleton, OrderDeliveryMethod, OrderNoneDeliveryMethod },
-        data() {
-            return {
-                pagination: null,
-                deliveryMethods: [],
-                isLoadingDeliveryMethods: false
-            }
-        },
+        components: { Skeleton, OrderDeliveryMethod },
         watch: {
             store(newValue, oldValue) {
                 if(!oldValue && newValue) {
@@ -104,29 +100,36 @@
             isEditting() {
                 return this.$route.name === 'edit-order';
             },
-            hasDeliveryMethods() {
-                return this.deliveryMethods.length > 0;
-            },
             deliveryMethod() {
-                return this.deliveryMethods.find((deliveryMethod) => deliveryMethod.id == this.orderForm.delivery_method_id);
+                return this.orderState.deliveryMethod;
+            },
+            deliveryMethods() {
+                return this.orderState.deliveryMethods;
+            },
+            hasDeliveryMethods() {
+                return this.orderState.hasDeliveryMethods;
+            },
+            errorText() {
+                return this.formState.getFormError(`delivery_methods`);
             }
         },
         methods: {
             async showDeliveryMethods() {
                 try {
 
-                    this.isLoadingDeliveryMethods = true;
+                    this.orderState.isLoadingDeliveryMethods = true;
 
                     let config = {
                         params: {
+                            per_page: 100,
                             store_id: this.store.id
                         }
                     };
 
                     const response = await axios.get('/api/delivery-methods', config);
 
-                    this.pagination = response.data;
-                    this.deliveryMethods = this.pagination.data;
+                    const pagination = response.data;
+                    this.orderState.deliveryMethods = pagination.data;
 
                 } catch (error) {
                     const message = error?.response?.data?.message || error?.message || 'Something went wrong while fetching delivery methods';
@@ -134,7 +137,7 @@
                     this.formState.setServerFormErrors(error);
                     console.error('Failed to fetch delivery methods:', error);
                 } finally {
-                    this.isLoadingDeliveryMethods = false;
+                    this.orderState.isLoadingDeliveryMethods = false;
                 }
             }
         },

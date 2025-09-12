@@ -205,7 +205,7 @@
                     this.selectedProduct = product;
                 }else{
                     this.$refs.modal.hideModal();
-                    this.orderState.addCartProductUsingProduct(product, parentProduct, false);
+                    this.orderState.addCartProductUsingProduct(product, parentProduct, null, false);
                 }
 
             },

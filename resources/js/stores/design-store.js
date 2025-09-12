@@ -57,6 +57,8 @@ export const useDesignStore = defineStore('design', {
                 promoCode:    { label: 'Promo code', value: 'promo code' },
                 tips:         { label: 'Tips', value: 'tips' },
                 orderSummary:  { label: 'Order summary', value: 'order summary' },
+
+                paymentMethods:  { label: 'Payment Methods', value: 'payment methods' },
             };
 
             if(this.type === 'storefront') {
@@ -92,6 +94,12 @@ export const useDesignStore = defineStore('design', {
                     DESIGN_CARD_LIBRARY.countdown,
                     DESIGN_CARD_LIBRARY.map,
                     DESIGN_CARD_LIBRARY.socials
+                ];
+
+            }else if (this.type === 'payment') {
+
+                return [
+                    DESIGN_CARD_LIBRARY.paymentMethods
                 ];
 
             }

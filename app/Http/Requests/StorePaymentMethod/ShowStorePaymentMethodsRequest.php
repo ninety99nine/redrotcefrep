@@ -2,6 +2,9 @@
 
 namespace App\Http\Requests\StorePaymentMethod;
 
+use App\Enums\Association;
+use Illuminate\Support\Arr;
+use Illuminate\Validation\Rule;
 use App\Models\StorePaymentMethod;
 use Illuminate\Foundation\Http\FormRequest;
 
@@ -18,12 +21,27 @@ class ShowStorePaymentMethodsRequest extends FormRequest
     /**
      * Get the validation rules that apply to the request.
      *
-     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
+     * @return array
      */
     public function rules(): array
     {
         return [
-            'store_id' => ['required', 'uuid']
+            'store_id' => ['sometimes', 'uuid'],
+            'association' => ['sometimes', Rule::enum(Association::class)->only([Association::SUPER_ADMIN, Association::TEAM_MEMBER, Association::SHOPPER])],
+        ];
+    }
+
+    /**
+     * Get custom messages for validation errors.
+     *
+     * @return array
+     */
+    public function messages(): array
+    {
+        return [
+            'category_id.uuid' => 'The category ID must be a valid UUID.',
+            'association.enum' => 'The association must be one of: ' . Arr::join([Association::SUPER_ADMIN->value, Association::TEAM_MEMBER->value, Association::SHOPPER->value], ', ', ' or '),
         ];
     }
 }
+

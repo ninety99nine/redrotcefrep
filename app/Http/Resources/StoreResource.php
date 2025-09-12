@@ -35,6 +35,7 @@ class StoreResource extends JsonResource
             'opening_hours' => $this->opening_hours,
             'checkout_fees' => $this->checkout_fees,
             'offer_rewards' => $this->offer_rewards,
+            'ussd_shortcode' => $this->ussd_shortcode,
             'tax_method' => $this->tax_method,
             'call_to_action' => $this->call_to_action,
             'offline_message' => $this->offline_message,

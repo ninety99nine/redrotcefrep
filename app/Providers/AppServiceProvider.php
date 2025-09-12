@@ -62,6 +62,7 @@ class AppServiceProvider extends ServiceProvider
             'ai assistant' => 'App\Models\AiAssistant',
             'pricing plan' => 'App\Models\PricingPlan',
             'order comment' => 'App\Models\OrderComment',
+            'store payment method' => 'App\Models\StorePaymentMethod'
         ]);
 
         JsonResource::withoutWrapping();

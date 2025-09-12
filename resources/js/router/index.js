@@ -300,7 +300,7 @@ const routes = [
                         name: 'edit-payment',
                         components: {
                             default: () => import('@Pages/design/payment/Payment.vue'),
-                            preview: () => import('@Pages/shop/payment/Payment.vue')
+                            component: () => import('@Pages/shop/payment/PaymentMethods.vue'),
                         }
                     },
                     /*
@@ -359,18 +359,37 @@ const routes = [
                 children: [
                     {
                         path: ':order_id',
-                        //  component: () => import('@Pages/orders/order/Order.vue'),
                         children: [
                             {
                                 path: '',
                                 name: 'show-shop-order',
-                                component: () => import('@Pages/shop/checkout/Checkout.vue'),
+                                component: () => import('@Pages/shop/order/Order.vue'),
                             },
                             {
                                 path: 'pay',
-                                name: 'pay-shop-order',
-                                component: () => import('@Pages/shop/checkout/Checkout.vue'),
-                            }
+                                children: [
+                                    {
+                                        path: '',
+                                        name: 'show-shop-payment-methods',
+                                        component: () => import('@Pages/shop/payment/PaymentMethods.vue'),
+                                    },
+                                    {
+                                        path: ':store_payment_method_id',
+                                        name: 'show-shop-payment-method',
+                                        component: () => import('@Pages/shop/payment/PaymentMethod.vue'),
+                                    },
+                                    {
+                                        path: 'pending',
+                                        name: 'show-shop-pending-payment',
+                                        component: () => import('@Pages/shop/payment/PendingPayment.vue'),
+                                    },
+                                    {
+                                        path: 'confirming',
+                                        name: 'show-shop-confirming-payment',
+                                        component: () => import('@Pages/shop/payment/ConfirmingPayment.vue'),
+                                    }
+                                ]
+                            },
                         ]
                     }
                 ]
@@ -380,7 +399,6 @@ const routes = [
                 children: [
                     {
                         path: ':product_id',
-                        //  component: () => import('@Pages/orders/order/Order.vue'),
                         children: [
                             {
                                 path: '',
@@ -405,6 +423,8 @@ const router = createRouter({
     routes,
     scrollBehavior(to, from, savedPosition) {
         if (from.name === 'show-shop-product' && to.name === 'show-storefront') {
+            console.log('savedPosition !!!!!!!');
+            console.log(savedPosition);
             return savedPosition;
         }else{
             return { top: 0 };

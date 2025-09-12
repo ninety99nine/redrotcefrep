@@ -431,7 +431,7 @@
     import capitalize from '@Directives/capitalize.js';
     import IntlTelInput from "intl-tel-input/vueWithUtils";
     import { generateUniqueId } from '@Utils/generalUtils.js';
-    import { convertToValidMoney } from '@Utils/numberUtils.js';
+    import { convertToMoney } from '@Utils/numberUtils.js';
     import { parsePhoneNumberFromString } from 'libphonenumber-js';
     import { X, Eye, Mail, Lock, Search, EyeOff, CircleAlert, CircleCheck, RefreshCcw } from 'lucide-vue-next';
 
@@ -764,7 +764,7 @@
                 if(this.disabled) return;
                 if(this.modelValue != this.focusedValue) {
                     if(this.type == 'money') {
-                        this.updateModalValue(convertToValidMoney(this.modelValue, this.currency, this.allowNegativeAmounts));
+                        this.updateModalValue(convertToMoney(this.modelValue, this.currency, this.allowNegativeAmounts));
                     };
                     this.$emit('blur', this.modelValue);
                 }

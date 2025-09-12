@@ -117,7 +117,7 @@
     import Input from '@Partials/Input.vue';
     import Button from '@Partials/Button.vue';
     import { Tag, Trash2 } from 'lucide-vue-next';
-    import { convertToValidMoney } from '@Utils/numberUtils.js';
+    import { convertToMoney } from '@Utils/numberUtils.js';
 
     export default {
         inject: ['storeState', 'orderState'],
@@ -152,9 +152,9 @@
                 const currency = this.store.currency.code;
 
                 if(unitSalePrice > 0 && unitSalePrice < unitRegularPrice) {
-                    return convertToValidMoney(unitSalePrice * quantity, currency);
+                    return convertToMoney(unitSalePrice * quantity, currency);
                 }else{
-                    return convertToValidMoney(unitRegularPrice * quantity, currency);
+                    return convertToMoney(unitRegularPrice * quantity, currency);
                 }
             }
         }

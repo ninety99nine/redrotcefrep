@@ -27,54 +27,54 @@
                     {{ deliveryMethod.description }}
                 </p>
 
-                <template v-if="deliveryMethod.charge_fee && (shoppingCartDeliveryMethodOffersFreeDelivery || shoppingCartDeliveryMethodAmount)">
+                <template v-if="deliveryMethod.charge_fee && (offersFreeDelivery || amount)">
 
                     <!-- Free Delivery -->
                     <p class="text-sm transition-colors text-green-500 font-bold"
-                        v-if="shoppingCartDeliveryMethodOffersFreeDelivery">
+                        v-if="offersFreeDelivery">
                         Free delivery
                     </p>
 
                     <!-- Flat Fee Rate -->
                     <p v-else-if="usesFlatFee"
                         class="text-sm transition-colors">
-                        Flat fee of {{ shoppingCartDeliveryMethodAmount.amount_with_currency }}
+                        Flat fee of {{ amount.amount_with_currency }}
                     </p>
 
                     <!-- Percentage Fee Rate -->
                     <p v-else-if="usesPercentageFee"
                         class="text-sm transition-colors">
-                        Percentage fee of {{ shoppingCartDeliveryMethodAmount.amount_with_currency }} ({{ deliveryMethod.percentage_fee_rate }}%)
+                        Percentage fee of {{ amount.amount_with_currency }} ({{ deliveryMethod.percentage_fee_rate }}%)
                     </p>
 
                     <!-- Fee by weight -->
                     <p v-else-if="usesFeeByWeight"
                         class="text-sm transition-colors">
-                        Weight fee of {{ shoppingCartDeliveryMethodAmount.amount_with_currency }} ({{ shoppingCartDeliveryMethodOption.weight.text }})
+                        Weight fee of {{ amount.amount_with_currency }} ({{ shoppingCartDeliveryMethodOption.weight.text }})
                     </p>
 
                     <!-- Fee by distance -->
                     <p v-else-if="usesFeeByDistance"
                         class="text-sm transition-colors">
-                        Distance fee of {{ shoppingCartDeliveryMethodAmount.amount_with_currency }} ({{ shoppingCartDeliveryMethodOption.distance.text }})
+                        Distance fee of {{ amount.amount_with_currency }} ({{ shoppingCartDeliveryMethodOption.distance.text }})
                     </p>
 
                     <!-- Fee by postal code -->
                     <p v-else-if="usesFeeByPostalCode"
                         class="text-sm transition-colors">
-                        Distance fee of {{ shoppingCartDeliveryMethodAmount.amount_with_currency }} ({{ shoppingCartDeliveryMethodOption.distance.text }})
+                        Distance fee of {{ amount.amount_with_currency }} ({{ shoppingCartDeliveryMethodOption.distance.text }})
                     </p>
 
                 </template>
 
                 <div
                     class="bg-red-50 mt-2 p-4"
-                    v-if="hasShoppingCartDeliveryMethodUnavailabilityReasons">
+                    v-if="hasUnavailabilityReasons">
 
                     <!-- Unavailability Reasons -->
                     <div
                         :key="index"
-                        v-for="(shoppingCartDeliveryMethodUnavailabilityReason, index) in shoppingCartDeliveryMethodUnavailabilityReasons">
+                        v-for="(shoppingCartDeliveryMethodUnavailabilityReason, index) in unavailabilityReasons">
 
                         <Skeleton v-if="isInspectingShoppingCart" width="w-1/3" :shine="true"></Skeleton>
                         <div v-else class="flex items-center space-x-1 md:space-x-2">
@@ -88,12 +88,12 @@
 
                 <div
                     class="bg-blue-50 mt-2 p-4"
-                    v-if="hasShoppingCartDeliveryMethodTips && !hasShoppingCartDeliveryMethodUnavailabilityReasons">
+                    v-if="hasTips && !hasUnavailabilityReasons">
 
                     <!-- Tips -->
                     <div
                         :key="index"
-                        v-for="(shoppingCartDeliveryMethodTip, index) in shoppingCartDeliveryMethodTips">
+                        v-for="(shoppingCartDeliveryMethodTip, index) in tips">
 
                         <Skeleton v-if="isInspectingShoppingCart" width="w-1/3" :shine="true"></Skeleton>
                         <div v-else class="flex items-center space-x-1 md:space-x-2">
@@ -111,9 +111,15 @@
 
         <template v-if="isSelectedDeliveryMethod">
 
-            <OrderDeliveryMethodSchedule :deliveryMethod="deliveryMethod"></OrderDeliveryMethodSchedule>
+            <span
+                v-if="errorText"
+                class="scroll-to-error font-medium text-red-500 text-xs mt-1 ml-1">
+                {{ errorText }}
+            </span>
 
-            <OrderDeliveryMethodMap></OrderDeliveryMethodMap>
+            <OrderDeliveryMethodSchedule :index="index" :deliveryMethod="deliveryMethod"></OrderDeliveryMethodSchedule>
+
+            <OrderDeliveryMethodMap :index="index" :deliveryMethod="deliveryMethod"></OrderDeliveryMethodMap>
 
         </template>
 
@@ -129,7 +135,7 @@
     import OrderDeliveryMethodSchedule from '@Pages/shop/_components/_components/design-cards/design-card/delivery-design-card/order-delivery-methods/OrderDeliveryMethodSchedule.vue';
 
     export default {
-        inject: ['orderState'],
+        inject: ['formState', 'orderState'],
         components: { Info, CircleAlert, Skeleton, OrderDeliveryMethodMap, OrderDeliveryMethodSchedule },
         props: {
             index: {
@@ -170,23 +176,26 @@
             shoppingCartDeliveryMethodOption() {
                 return ((this.shoppingCart || {}).delivery_method_options || []).find((shoppingCartDeliveryMethodOption) => shoppingCartDeliveryMethodOption.id == this.deliveryMethod.id);
             },
-            shoppingCartDeliveryMethodAmount() {
+            amount() {
                 return (this.shoppingCartDeliveryMethodOption || {}).amount;
             },
-            shoppingCartDeliveryMethodOffersFreeDelivery() {
-                return (this.shoppingCartDeliveryMethodOption || {}).free_delivery;
-            },
-            shoppingCartDeliveryMethodTips() {
+            tips() {
                 return ((this.shoppingCartDeliveryMethodOption || {}).tips || []);
             },
-            hasShoppingCartDeliveryMethodTips() {
-                return this.shoppingCartDeliveryMethodTips.length > 0;
-            },
-            shoppingCartDeliveryMethodUnavailabilityReasons() {
+            unavailabilityReasons() {
                 return ((this.shoppingCartDeliveryMethodOption || {}).unavailability_reasons || []);
             },
-            hasShoppingCartDeliveryMethodUnavailabilityReasons() {
-                return this.shoppingCartDeliveryMethodUnavailabilityReasons.length > 0;
+            offersFreeDelivery() {
+                return (this.shoppingCartDeliveryMethodOption || {}).free_delivery;
+            },
+            hasTips() {
+                return this.tips.length > 0;
+            },
+            hasUnavailabilityReasons() {
+                return this.unavailabilityReasons.length > 0;
+            },
+            errorText() {
+                return this.formState.getFormError(`delivery_methods.${this.index}`);
             }
         },
         methods: {

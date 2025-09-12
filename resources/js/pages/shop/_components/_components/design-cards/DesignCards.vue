@@ -27,48 +27,16 @@
                     <OrderSummaryCard v-else-if="designCard.metadata.type == 'order summary'" :designCard="designCard"></OrderSummaryCard>
                     <PromoCodeDesignCard v-else-if="designCard.metadata.type == 'promo code'" :designCard="designCard"></PromoCodeDesignCard>
 
+                    <PaymentMethodsDesignCard v-else-if="designCard.metadata.type == 'payment methods'" :designCard="designCard"></PaymentMethodsDesignCard>
+
                 </template>
 
             </template>
 
         </div>
 
-        <div
-            v-if="type == 'storefront'"
-            class="fixed left-0 right-0 bottom-0 p-4 bg-white shadow-sm border-t border-gray-200">
-
-            <div class="relative">
-
-                <Button
-                    size="lg"
-                    type="primary"
-                    cvlass="w-full"
-                    :action="viewCart"
-                    buttonClass="w-full">
-                    <span>View Cart</span>
-                </Button>
-
-                <div class="absolute -top-2 right-2 flex items-center justify-center rounded-full min-w-6 h-6 bg-red-500 text-white text-xs font-bold">
-                    <span class="p-2">3 items</span>
-                </div>
-
-            </div>
-
-        </div>
-
-        <div
-            v-if="type == 'checkout'"
-            class="p-4 bg-white shadow-sm border-t border-gray-200">
-
-            <Button
-                size="lg"
-                type="primary"
-                :action="checkout"
-                buttonClass="w-full">
-                <span>Place order</span>
-            </Button>
-
-        </div>
+        <MyCartButton v-if="type == 'storefront' && shoppingCart"></MyCartButton>
+        <PlaceOrderButton v-else-if="type == 'checkout' && shoppingCart"></PlaceOrderButton>
 
     </div>
 
@@ -78,6 +46,8 @@
 
     import Button from '@Partials/Button.vue';
     import { ShoppingCart } from 'lucide-vue-next';
+    import MyCartButton from '@Pages/shop/_components/_components/my-cart/MyCartButton.vue';
+    import PlaceOrderButton from '@Pages/shop/_components/_components/place-order/PlaceOrderButton.vue';
     import MapDesignCard from '@Pages/shop/_components/_components/design-cards/design-card/MapDesignCard.vue';
     import LinkDesignCard from '@Pages/shop/_components/_components/design-cards/design-card/LinkDesignCard.vue';
     import TextDesignCard from '@Pages/shop/_components/_components/design-cards/design-card/TextDesignCard.vue';
@@ -89,16 +59,17 @@
     import ProductsDesignCard from '@Pages/shop/_components/_components/design-cards/design-card/ProductsDesignCard.vue';
     import CountdownDesignCard from '@Pages/shop/_components/_components/design-cards/design-card/CountdownDesignCard.vue';
     import TipsDesignCard from '@Pages/shop/_components/_components/design-cards/design-card/tips-design-card/TipsDesignCard.vue';
+    import PaymentMethodsDesignCard from '@Pages/shop/_components/_components/design-cards/design-card/PaymentMethodsDesignCard.vue';
     import ItemsDesignCard from '@Pages/shop/_components/_components/design-cards/design-card/items-design-card/ItemsDesignCard.vue';
     import DeliveryDesignCard from '@Pages/shop/_components/_components/design-cards/design-card/delivery-design-card/DeliveryDesignCard.vue';
     import OrderSummaryCard from '@Pages/shop/_components/_components/design-cards/design-card/order-summary-design-card/OrderSummaryCard.vue';
     import PromoCodeDesignCard from '@Pages/shop/_components/_components/design-cards/design-card/promo-code-design-card/PromoCodeDesignCard.vue';
 
     export default {
-        inject: ['designState', 'storeState'],
+        inject: ['designState', 'orderState', 'storeState'],
         components: {
-            ShoppingCart, Button, MapDesignCard, TipsDesignCard, LinkDesignCard, TextDesignCard, ImageDesignCard, VideoDesignCard, ContactDesignCard,
-            SocialsDesignCard, CustomerDesignCard, ProductsDesignCard, CountdownDesignCard, TipsDesignCard, ItemsDesignCard,
+            ShoppingCart, Button, MyCartButton, PlaceOrderButton, MapDesignCard, LinkDesignCard, TextDesignCard, ImageDesignCard, VideoDesignCard, ContactDesignCard,
+            SocialsDesignCard, CustomerDesignCard, ProductsDesignCard, CountdownDesignCard, TipsDesignCard, PaymentMethodsDesignCard, ItemsDesignCard,
             DeliveryDesignCard, OrderSummaryCard, PromoCodeDesignCard
         },
         computed: {
@@ -109,17 +80,23 @@
                 return this.designState.designForm;
             },
             designCards() {
-                if(this.$route.name.startsWith('edit-')) {
+                if(['edit-storefront', 'edit-checkout', 'edit-payment'].includes(this.$route.name)) {
                     return this.designForm?.design_cards ?? [];
                 }else{
                     return this.designState.designCards;
                 }
-            }
+            },
+            shoppingCart() {
+                return this.orderState.shoppingCart;
+            },
+            grandTotal() {
+                return this.shoppingCart ? this.shoppingCart.totals.grand_total.amount_with_currency : null;
+            },
+            totalUncancelledProductQuantities() {
+                return this.shoppingCart ? this.shoppingCart.totals_summary.order_products.total_uncancelled_product_quantities : null;
+            },
         },
         methods: {
-            viewCart() {
-
-            },
             checkout() {
 
             }
