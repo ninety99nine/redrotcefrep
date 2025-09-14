@@ -4,9 +4,10 @@ namespace App\Http\Requests\DesignCard;
 
 use App\Models\DesignCard;
 use Illuminate\Support\Arr;
-use App\Enums\DesignCardType;
 use Illuminate\Validation\Rule;
+use App\Enums\DesignCardPlacement;
 use Illuminate\Foundation\Http\FormRequest;
+use App\Http\Requests\Address\CreateAddressRequest;
 
 class CreateDesignCardRequest extends FormRequest
 {
@@ -29,11 +30,20 @@ class CreateDesignCardRequest extends FormRequest
     {
         return [
             'visible' => ['nullable', 'boolean'],
-            'type' => ['required', Rule::enum(DesignCardType::class)],
+            'type' => ['required', 'string'],
+            'placement' => ['required', Rule::enum(DesignCardPlacement::class)],
             'metadata' => ['required', 'array'],
             'position' => ['nullable', 'integer', 'min:0', 'max:255'],
             'store_id' => ['required', 'uuid'],
             'photo' => ['nullable', 'file', 'mimes:jpeg,png,jpg,gif,webp,svg', 'max:5120'],
+
+            'address' => ['nullable', 'array'],
+            ...collect((new CreateAddressRequest())->rules(
+                'address',
+                [
+                    'address_line' => ['required_with:address', 'string', 'max:255']
+                ]
+            ))->except(['address.owner_id', 'address.owner_type'])->toArray()
         ];
     }
 
@@ -46,7 +56,7 @@ class CreateDesignCardRequest extends FormRequest
     {
         return [
             'type.required' => 'The type is required.',
-            'type.enum' => 'The type must be one of: ' . Arr::join(DesignCardType::values(), ', ', ' or '),
+            'type.enum' => 'The type must be one of: ' . Arr::join(DesignCardPlacement::values(), ', ', ' or '),
             'metadata.required' => 'The metadata is required.',
             'metadata.array' => 'The metadata must be an array.',
             'position.integer' => 'The position must be an integer.',
@@ -57,6 +67,9 @@ class CreateDesignCardRequest extends FormRequest
             'photo.file' => 'The photo must be a valid file.',
             'photo.mimes' => 'The photo must be a JPEG, PNG, JPG, GIF, or SVG.',
             'photo.max' => 'The photo size must not exceed 5MB.',
+
+            'address.array' => 'The address must be an array.',
+            ...(new CreateAddressRequest())->messages('address', ['address_line.required_with' => 'The address line is required when an address is provided.'])
         ];
     }
 }

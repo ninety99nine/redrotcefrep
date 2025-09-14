@@ -62,7 +62,8 @@
 
                         <div class="flex items-center space-x-2">
 
-                            <Type v-if="dataCollectionField.type == 'text'" size="20"></Type>
+                            <Type v-if="dataCollectionField.type == 'short text'" size="20"></Type>
+                            <Type v-if="dataCollectionField.type == 'long text'" size="20"></Type>
                             <Hash v-if="dataCollectionField.type == 'number'" size="20"></Hash>
                             <Calendar v-if="dataCollectionField.type == 'date'" size="20"></Calendar>
                             <SquareCheck v-if="dataCollectionField.type == 'checkbox'" size="20"></SquareCheck>
@@ -86,7 +87,7 @@
                             <!-- Name Text Input -->
                             <Input
                                 class="w-full"
-                                placeholder="Name"
+                                placeholder="Say something"
                                 v-model="productForm.data_collection_fields[index].name"
                                 @input="productState.saveStateDebounced('Option name changed')"
                                 :errorText="formState.getFormError('data_collection_fields'+index+'name')">
@@ -235,7 +236,8 @@
                         <div class="flex items-center space-x-2 text-sm text-gray-500">
 
                             <!-- Icon -->
-                            <Type v-if="dataCollectionField.type == 'text'" size="20"></Type>
+                            <Type v-if="dataCollectionField.type == 'short text'" size="20"></Type>
+                            <Type v-if="dataCollectionField.type == 'long text'" size="20"></Type>
                             <Hash v-if="dataCollectionField.type == 'number'" size="20"></Hash>
                             <Calendar v-if="dataCollectionField.type == 'date'" size="20"></Calendar>
                             <SquareCheck v-if="dataCollectionField.type == 'checkbox'" size="20"></SquareCheck>
@@ -300,7 +302,8 @@
                 <div v-if="deletableDataCollectionField.name" class="flex items-start space-x-2 border border-gray-300 rounded-lg p-2 mb-4">
 
                     <!-- Icon -->
-                    <Type v-if="deletableDataCollectionField.type == 'text'" size="20"></Type>
+                    <Type v-if="deletableDataCollectionField.type == 'short text'" size="20"></Type>
+                    <Type v-if="deletableDataCollectionField.type == 'long text'" size="20"></Type>
                     <Hash v-if="deletableDataCollectionField.type == 'number'" size="20"></Hash>
                     <Calendar v-if="deletableDataCollectionField.type == 'date'" size="20"></Calendar>
                     <SquareCheck v-if="deletableDataCollectionField.type == 'checkbox'" size="20"></SquareCheck>
@@ -345,7 +348,8 @@
                 originalFields: [],
                 deletableDataCollectionField: null,
                 typeOptions: [
-                    { label: 'Text', value: 'text'},
+                    { label: 'Short text', value: 'short text'},
+                    { label: 'Long text', value: 'long text'},
                     { label: 'Number', value: 'number'},
                     { label: 'Date', value: 'date'},
                     { label: 'Checkbox', value: 'checkbox'},

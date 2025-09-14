@@ -39,8 +39,6 @@ class OrderResource extends JsonResource
             'payment_status' => $this->payment_status,
             'paid_total' => $this->paid_total,
             'paid_percentage' => $this->paid_percentage,
-            'pending_total' => $this->pending_total,
-            'pending_percentage' => $this->pending_percentage,
             'outstanding_total' => $this->outstanding_total,
             'outstanding_percentage' => $this->outstanding_percentage,
             'total_products' => $this->total_products,

@@ -24,21 +24,21 @@
         <Teleport :to="backdropTarget">
 
             <div
-                v-if="isOpen"
+                v-if="visible"
                 @click.stop="dismissable ? hideModal() : null"
-                class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/75">
+                :class="['fixed inset-0 z-50 flex justify-center transition-all duration-250', isOpen ? 'bg-slate-900/75' : 'bg-transparent', scrollOnContent ? 'items-center' : 'overflow-y-auto']">
 
                 <div
                     @click.stop
                     :class="[
-                        'transform transition-all duration-200',
+                        'transform transition-all duration-250',
                         { 'scale-100 opacity-100': isOpen, 'scale-95 opacity-0': !isOpen },
                         { 'w-full max-w-sm m-3': size === 'sm' },
-                        { 'w-full max-w-2xl m-3': size === 'md' },
-                        { 'w-full max-w-4xl m-3': size === 'lg' },
+                        { 'w-full max-w-xl m-3': size === 'md' },
+                        { 'w-full max-w-4xl m-3': size === 'lg' }
                     ]">
 
-                    <div class="relative w-full flex flex-col bg-white border border-gray-200 shadow-lg rounded-xl dark:bg-neutral-800 dark:border-neutral-700 dark:shadow-neutral-700/70">
+                    <div class="relative bg-white border border-gray-200 shadow-lg rounded-xl dark:bg-neutral-800 dark:border-neutral-700 dark:shadow-neutral-700/70">
 
                         <button
                             type="button"
@@ -288,6 +288,7 @@
         data() {
             return {
                 isOpen: false,
+                visible: false,
                 backdropTarget: 'body',
                 uniqueId: generateUniqueId('modal'),
             };
@@ -320,11 +321,18 @@
                 this.backdropTarget = 'body';
             },
             showModal() {
-                this.isOpen = true;
+                this.visible = true;
+                setTimeout(() => {
+                    this.isOpen = true;
+                }, 100);
                 if (this.onShow) this.onShow();
             },
             hideModal() {
                 this.isOpen = false;
+                setTimeout(() => {
+                    this.visible = false;
+                }, 250);
+
                 if (this.onHide) this.onHide();
             },
         },

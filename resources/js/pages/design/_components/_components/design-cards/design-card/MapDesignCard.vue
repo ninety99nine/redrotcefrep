@@ -20,7 +20,7 @@
                 :pinLocationOnMap="true"
                 triggerClass="space-y-4"
                 @onDeleted="unsetAddress"
-                :address="designCard.metadata.address"
+                :address="designCard.address"
                 @onValidated="(address) => setAddress(address)">
             </AddressInput>
 

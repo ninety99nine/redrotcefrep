@@ -1,14 +1,14 @@
 <template>
 
     <Button
-        size="sm"
+        size="md"
         type="light"
         class="w-full"
         :action="orderAgain"
         buttonClass="w-full"
         :leftIcon="RotateCcw"
         :skeleton="isLoadingStore || isLoadingOrder">
-        <span>Order Again</span>
+        <span class="ml-1">Order Again</span>
     </Button>
 
 </template>
@@ -42,7 +42,9 @@
         },
         methods: {
             async orderAgain() {
-                this.orderState.setOrderForm(this.order, false);
+                //  Refer to resources/js/layouts/shop/Shop.vue to see what happens
+                //  on the orderId wacher after order_id is unset on the route and
+                //  then how we set the orderForm to allow for reorder.
                 await this.$router.push({
                     name: 'show-checkout',
                     params: {

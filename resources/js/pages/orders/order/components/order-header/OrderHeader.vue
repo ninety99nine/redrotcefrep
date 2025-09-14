@@ -50,17 +50,11 @@
 
                 <div class="flex space-x-2 items-center">
 
+                    <!-- Invoice Button -->
+                    <InvoiceButton></InvoiceButton>
+
                     <!-- Whatsapp Button -->
                     <WhatsappButton></WhatsappButton>
-
-                    <!-- Edit Button -->
-                    <EditButton></EditButton>
-
-                    <!-- Print Button -->
-                    <PrintButton></PrintButton>
-
-                    <!-- Download Button -->
-                    <DownloadButton></DownloadButton>
 
                     <!-- More Dropdown -->
                     <MoreDropdown></MoreDropdown>
@@ -84,19 +78,17 @@
     import Skeleton from '@Partials/Skeleton.vue';
     import Status from '@Pages/orders/order/components/order-header/Status.vue';
     import BackButton from '@Pages/orders/order/components/order-header/BackButton.vue';
-    import EditButton from '@Pages/orders/order/components/order-header/EditButton.vue';
-    import PrintButton from '@Pages/orders/order/components/order-header/PrintButton.vue';
     import MoreDropdown from '@Pages/orders/order/components/order-header/MoreDropdown.vue';
+    import InvoiceButton from '@Pages/orders/order/components/order-header/InvoiceButton.vue';
     import PaymentStatus from '@Pages/orders/order/components/order-header/PaymentStatus.vue';
-    import DownloadButton from '@Pages/orders/order/components/order-header/DownloadButton.vue';
     import WhatsappButton from '@Pages/orders/order/components/order-header/WhatsappButton.vue';
     import NavigationArrows from '@Pages/orders/order/components/order-header/NavigationArrows.vue';
 
     export default {
         inject: ['storeState', 'orderState'],
         components: {
-            Button, Skeleton, Status, BackButton, EditButton, PrintButton, MoreDropdown,
-            PaymentStatus, DownloadButton, WhatsappButton, NavigationArrows
+            Button, Skeleton, Status, BackButton, MoreDropdown,
+            InvoiceButton, PaymentStatus, WhatsappButton, NavigationArrows
         },
         computed: {
             order() {

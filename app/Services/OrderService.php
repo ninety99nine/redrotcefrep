@@ -104,8 +104,8 @@ class OrderService extends BaseService
             CAST(SUM(CASE WHEN status = ? THEN 1 ELSE 0 END) AS UNSIGNED) as ready_for_pickup_count,
             CAST(SUM(CASE WHEN payment_status = ? THEN 1 ELSE 0 END) AS UNSIGNED) as paid_count,
             CAST(SUM(CASE WHEN payment_status = ? THEN 1 ELSE 0 END) AS UNSIGNED) as unpaid_count,
-            CAST(SUM(CASE WHEN payment_status = ? THEN 1 ELSE 0 END) AS UNSIGNED) as pending_count,
-            CAST(SUM(CASE WHEN payment_status = ? THEN 1 ELSE 0 END) AS UNSIGNED) as partially_paid_count
+            CAST(SUM(CASE WHEN payment_status = ? THEN 1 ELSE 0 END) AS UNSIGNED) as partially_paid_count,
+            CAST(SUM(CASE WHEN payment_status = ? THEN 1 ELSE 0 END) AS UNSIGNED) as confirming_payment_count
         ', [
             OrderStatus::WAITING->value,
             OrderStatus::CANCELLED->value,
@@ -114,8 +114,8 @@ class OrderService extends BaseService
             OrderStatus::READY_FOR_PICKUP->value,
             OrderPaymentStatus::PAID->value,
             OrderPaymentStatus::UNPAID->value,
-            OrderPaymentStatus::PENDING_PAYMENT->value,
             OrderPaymentStatus::PARTIALLY_PAID->value,
+            OrderPaymentStatus::CONFIRMING_PAYMENT->value,
         ]);
 
         if($store) $query->where('store_id', $storeId);
@@ -135,8 +135,8 @@ class OrderService extends BaseService
             'payment_status_counts' => [
                 'paid' => $result->paid_count,
                 'unpaid' => $result->unpaid_count,
-                'pending' => $result->pending_count,
                 'partially_paid' => $result->partially_paid_count,
+                'confirming_payment' => $result->confirming_payment_count,
             ]
         ];
 
@@ -656,8 +656,6 @@ class OrderService extends BaseService
             'payment_status' => OrderPaymentStatus::UNPAID->value,
             'paid_total' => 0,
             'paid_percentage' => 0,
-            'pending_total' => 0,
-            'pending_percentage' => 0,
             'outstanding_total' => $isc['totals']['grand_total']->amount,
             'outstanding_percentage' => 100,
 
@@ -969,17 +967,11 @@ class OrderService extends BaseService
         $paidTotal = collect($transactions)->filter(fn(Transaction $transaction) => $transaction->isPaid())->map(fn(Transaction $transaction) => $transaction->amount->amount)->sum();
         $paidPercentage = (int) ($grandTotal > 0 ? ($paidTotal / $grandTotal * 100) : 0);
 
-        //  Calculate the order balance pending payment
-        $pendingTotal = collect($transactions)->filter(fn(Transaction $transaction) => $transaction->isPendingPayment())->map(fn(Transaction $transaction) => $transaction->amount->amount)->sum();
-        $pendingPercentage = (int) ($grandTotal > 0 ? ($pendingTotal / $grandTotal * 100) : 0);
-
         //  Calculate the order balance outstanding payment
         $outstandingTotal = $grandTotal - $paidTotal < 0 ? 0 : $grandTotal - $paidTotal;
         $outstandingPercentage = (int) ($grandTotal > 0 ? ($outstandingTotal / $grandTotal * 100) : 0);
 
-        if( $pendingPercentage != 0 ) {
-            $paymentStatus = OrderPaymentStatus::PENDING_PAYMENT;
-        }elseif( $paidPercentage == 0 ) {
+        if( $paidPercentage == 0 ) {
             $paymentStatus = OrderPaymentStatus::UNPAID;
         }elseif( $paidPercentage == 100 ) {
             $paymentStatus = OrderPaymentStatus::PAID;
@@ -992,9 +984,6 @@ class OrderService extends BaseService
 
             'paid_total' => $paidTotal,
             'paid_percentage' => $paidPercentage,
-
-            'pending_total' => $pendingTotal,
-            'pending_percentage' => $pendingPercentage,
 
             'outstanding_total' => $outstandingTotal,
             'outstanding_percentage' => $outstandingPercentage,

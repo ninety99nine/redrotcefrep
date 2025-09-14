@@ -59,21 +59,18 @@
             isLoadingDesignCards() {
                 return this.designState.isLoadingDesignCards;
             },
-            hasLoadedInitialdesignCards() {
-                return this.designState.hasLoadedInitialdesignCards;
-            },
             designCards() {
                 return this.designForm?.design_cards ?? [];
             },
             hasDesignCards() {
                 return this.designCards.filter(designCard => !designCard.hasOwnProperty('delete')).length > 0;
             },
-            type() {
-                if(['show-storefront', 'edit-storefront'].includes(this.$route.name)) {
+            placement() {
+                if(this.$route.name == 'edit-storefront') {
                     return 'storefront';
-                }else if(['show-checkout', 'edit-checkout'].includes(this.$route.name)) {
+                }else if(this.$route.name == 'edit-checkout') {
                     return 'checkout';
-                }else if(['show-shop-payment-methods', 'edit-payment'].includes(this.$route.name)) {
+                }else if(this.$route.name == 'edit-payment') {
                     return 'payment';
                 }
             }
@@ -82,6 +79,8 @@
             async setup() {
                 if(this.store) {
 
+                    this.designState.placement = this.placement;
+
                     this.designState.categories = this.store.categories.map((category) => {
                         return {
                             label: category.name,
@@ -89,9 +88,7 @@
                         }
                     });
 
-                    if(!this.hasLoadedInitialdesignCards && !this.isLoadingDesignCards) {
-                        this.showDesignCards();
-                    }
+                    this.showDesignCards();
 
                 }
             },
@@ -103,9 +100,9 @@
                     let config = {
                         params: {
                             per_page: 100,
-                            type: this.type,
                             store_id: this.store.id,
-                            _relationships: ['photos'].join(',')
+                            placement: this.placement,
+                            _relationships: ['address', 'photos'].join(',')
                         }
                     };
 
@@ -123,7 +120,6 @@
                     console.error('Failed to fetch design cards:', error);
                 } finally {
                     this.designState.isLoadingDesignCards = false;
-                    this.designState.hasLoadedInitialdesignCards = true;
                 }
             },
             async updateDesignCards() {
@@ -151,11 +147,11 @@
                             }
 
                             let designCardData = {
-                                type: this.type,
+                                ...designCard,
                                 position: index + 1,
                                 store_id: this.store.id,
-                                visible: designCard.visible,
-                                metadata: designCard.metadata
+                                placement: this.placement,
+                                visible: designCard.visible
                             };
 
                             let response;
@@ -336,9 +332,10 @@
                 this.designState.designForm = designForm;
             },
         },
-        created() {
+        beforeUnmount() {
             this.designState.reset();
-            this.designState.type = this.type;
+        },
+        created() {
 
             this.setup();
             this.setActionButtons();

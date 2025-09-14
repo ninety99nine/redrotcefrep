@@ -152,12 +152,6 @@ class FilterService
                 'options' => self::getNumberOperatorOptions()
             ],
             [
-                'label' => 'Pending total',
-                'target' => 'pending_total',
-                'type' => 'money',
-                'options' => self::getNumberOperatorOptions()
-            ],
-            [
                 'label' => 'Outstanding total',
                 'target' => 'outstanding_total',
                 'type' => 'money',

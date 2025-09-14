@@ -45,6 +45,7 @@
                         <ReceiptText v-if="designCardOption.value == 'order summary'" size="20"></ReceiptText>
                         <CreditCard v-if="designCardOption.value == 'payment methods'" size="20"></CreditCard>
                         <TicketPercent v-if="designCardOption.value == 'promo code'" size="20"></TicketPercent>
+                        <Pencil v-if="designCardOption.value == 'data collection field'" size="20"></Pencil>
 
                         <span class="text-xs whitespace-nowrap">{{ designCardOption.label }}</span>
 
@@ -60,15 +61,16 @@
 
 <script>
 
+    import { v4 as uuidv4 } from 'uuid';
     import Button from '@Partials/Button.vue';
     import Dropdown from '@Partials/Dropdown.vue';
-    import { Plus, Map, Link, Type, Box, Image, Video, AtSign, Clock, Contact, Truck, HandCoins, UserRound, ShoppingCart, ReceiptText, CreditCard, TicketPercent } from 'lucide-vue-next';
+    import { Plus, Map, Link, Type, Box, Image, Video, AtSign, Clock, Contact, Truck, Pencil, HandCoins, UserRound, ShoppingCart, ReceiptText, CreditCard, TicketPercent } from 'lucide-vue-next';
 
     export default {
         inject: ['designState'],
         components: {
             Button, Dropdown, Map, Link, Type, Box, Image, Video, AtSign, Clock, Contact,
-            Truck, HandCoins, UserRound, ShoppingCart, ReceiptText, CreditCard, TicketPercent
+            Truck, Pencil, HandCoins, UserRound, ShoppingCart, ReceiptText, CreditCard, TicketPercent
         },
         data() {
             return {
@@ -173,9 +175,20 @@
                         })),
                         mode: 'content'
                     };
+                }else if(type == 'data collection field') {
+                    metadata = {
+                        validation: 'not applicable',
+                        type: 'short text',
+                        required: false,
+                        options: [],
+                        name: '',
+                        min: '1',
+                        max: '2'
+                    };
                 }else if(type == 'customer') {
                     metadata = {
                         title: 'Customer',
+                        description: '',
                         show_first_name: true,
                         first_name_required: true,
                         show_last_name: false,
@@ -188,11 +201,13 @@
                 }else if(type == 'items') {
                     metadata = {
                         title: 'Items',
+                        description: '',
                         show_items: true
                     };
                 }else if(type == 'delivery') {
                     metadata = {
                         title: 'Delivery Methods',
+                        description: '',
                         show_delivery_methods: true,
                         schedule_title: 'Schedule',
                         address_title: 'Address',
@@ -200,11 +215,13 @@
                 }else if(type == 'promo code') {
                     metadata = {
                         title: 'Promo code',
+                        description: '',
                         show_promo_code: true
                     };
                 }else if(type == 'tips') {
                     metadata = {
                         title: 'Tip',
+                        description: '',
                         tips: [],
                         show_tips: true,
                         show_specify_tip: true
@@ -212,23 +229,28 @@
                 }else if(type == 'order summary') {
                     metadata = {
                         title: 'Order Summary',
+                        description: '',
                         checkout_fees: [],
                         combine_fees: false,
                         combine_discounts: false,
                     };
                 }else if(type == 'payment methods') {
                     metadata = {
-                        title: 'Amount to pay'
+                        title: 'Complete Your Payment',
+                        subtitle: 'Amount to pay',
                     };
                 }
 
-                metadata.type = type;
-
                 let designCard = {
+                    type: type,
                     visible: true,
-                    type: this.type,
                     metadata: metadata,
+                    temporary_id: uuidv4()
                 };
+
+                if(['map'].includes(type)) {
+                    designCard.address = null;
+                }
 
                 if(['image', 'countdown'].includes(type)) {
                     designCard.photos = [];

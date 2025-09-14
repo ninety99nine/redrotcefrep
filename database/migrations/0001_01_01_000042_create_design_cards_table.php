@@ -1,6 +1,6 @@
 <?php
 
-use App\Enums\DesignCardType;
+use App\Enums\DesignCardPlacement;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
@@ -15,7 +15,8 @@ return new class extends Migration
         Schema::create('design_cards', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->boolean('visible')->default(0);
-            $table->enum('type', DesignCardType::values());
+            $table->string('type');
+            $table->enum('placement', DesignCardPlacement::values());
             $table->unsignedTinyInteger('position')->nullable();
             $table->json('metadata');
             $table->uuid('store_id');

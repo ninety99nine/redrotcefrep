@@ -104,7 +104,7 @@
                 });
             },
             paymentStatuses() {
-                const options = ['paid','unpaid','pending payment','partially paid'];
+                const options = ['paid','unpaid','partially paid','confirming payment'];
 
                 return options.map((option) => {
                     return {

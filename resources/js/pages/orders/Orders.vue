@@ -228,18 +228,6 @@
                                     </div>
                                 </td>
 
-                                <!-- Pending -->
-                                <td v-else-if="column.name == 'Pending'" class="whitespace-nowrap align-top pr-4 py-4 text-sm">
-                                    <div class="flex space-x-1 items-center">
-                                        <span>{{ order.pending_total.amount_with_currency }}</span>
-                                        <Popover
-                                            placement="top"
-                                            :content="`Pending: ${order.pending_percentage}%`"
-                                            wrapperClasses="opacity-0 group-hover:opacity-100">
-                                        </Popover>
-                                    </div>
-                                </td>
-
                                 <!-- Outstanding -->
                                 <td v-else-if="column.name == 'Outstanding'" class="whitespace-nowrap align-top pr-4 py-4 text-sm">
                                     <div class="flex space-x-1 items-center">
@@ -738,7 +726,7 @@
                     { label: 'Paid', value: 'Paid'},
                     { label: 'Unpaid', value: 'unpaid'},
                     { label: 'Partially paid', value: 'partially paid'},
-                    { label: 'Pending payment', value: 'pending payment'},
+                    { label: 'Confirming payment', value: 'confirming payment'},
                 ],
                 exportLimits: [
                     { label: '100', value: '100'},
@@ -761,8 +749,8 @@
                     { label: 'No change', value: 'no change'},
                     { label: 'Paid', value: 'paid'},
                     { label: 'Unpaid', value: 'unpaid'},
-                    { label: 'Pending Payment', value: 'pending payment'},
                     { label: 'Partially Paid', value: 'partially paid'},
+                    { label: 'Confirming payment', value: 'confirming payment'},
                 ],
                 exportModes: [
                     {
@@ -857,7 +845,7 @@
             formattedDatetime: formattedDatetime,
             formattedRelativeDate: formattedRelativeDate,
             prepareColumns() {
-                const columnNames = ['Number', 'Customer', 'Summary', 'Status', 'Payment Status', 'Collection Status', 'Grand Total', 'Paid', 'Pending', 'Outstanding', 'Customer Note', 'Created Date'];
+                const columnNames = ['Number', 'Customer', 'Summary', 'Status', 'Payment Status', 'Collection Status', 'Grand Total', 'Paid', 'Outstanding', 'Customer Note', 'Created Date'];
                 const defaultColumnNames  = ['Number', 'Customer', 'Summary', 'Status', 'Grand Total', 'Created Date'];
 
                 return columnNames.map(name => ({
@@ -867,7 +855,7 @@
                 }));
             },
             prepareWhatsappFields() {
-                const whatsappFieldNames = ['Number', 'Customer', 'Summary', 'Status', 'Payment Status', 'Collection Status', 'Grand Total', 'Paid', 'Pending', 'Outstanding', 'Customer Note', 'Created Date', 'Order Link'];
+                const whatsappFieldNames = ['Number', 'Customer', 'Summary', 'Status', 'Payment Status', 'Collection Status', 'Grand Total', 'Paid', 'Outstanding', 'Customer Note', 'Created Date', 'Order Link'];
                 const defaultWhatsappFieldNames  = ['Number', 'Customer', 'Summary', 'Status', 'Grand Total', 'Created Date', 'Order Link'];
 
                 return whatsappFieldNames.map(name => ({
@@ -1401,9 +1389,6 @@
                                     break;
                                 case "Paid":
                                     orderMessage += `${checkedOrders[i].paid_total.amount_with_currency}\n`;
-                                    break;
-                                case "Pending":
-                                    orderMessage += `${checkedOrders[i].pending_total.amount_with_currency}\n`;
                                     break;
                                 case "Outstanding":
                                     orderMessage += `${checkedOrders[i].outstanding_total.amount_with_currency}\n`;

@@ -3,24 +3,22 @@ import { useChangeHistoryStore as changeHistoryState } from '@Stores/change-hist
 
 export const useDesignStore = defineStore('design', {
     state: () => ({
-        type: null,
         categories: [],
+        placement: null,
         designCards: [],
         categoryData: {},
         designForm: null,
         isUpdatingDesign: false,
         isLoadingDesignCards: false,
-        hasLoadedInitialdesignCards: false
     }),
     actions: {
         reset() {
-            this.type = null;
             this.categories = [];
+            this.placement = null;
             this.designCards = [];
             this.categoryData = {};
             this.designForm = null;
             this.isUpdatingDesign = false;
-            this.hasLoadedInitialdesignCards = false;
             changeHistoryState().reset();
         },
         saveState(actionName) {
@@ -33,7 +31,29 @@ export const useDesignStore = defineStore('design', {
             changeHistoryState().saveOriginalState(actionName, this.designForm);
         },
         setDesignForm(designForm) {
+
+            designForm.design_cards = designForm.design_cards.map((designCard) => {
+
+                /**
+                 *  Some metadata fields must never be null, but instead of null must
+                 *  be an empty string. This is because these fields are used by
+                 *  the <vue-easymde> components which expects non-null values.
+                 */
+                const properties = ['body', 'upper_text', 'lower_text'];
+
+                for (let index = 0; index < properties.length; index++) {
+                    const property = properties[index];
+                    if(designCard['metadata'].hasOwnProperty(property) && designCard['metadata'][property] == null) {
+                        designCard['metadata'][property] = '';
+                    }
+                }
+
+                return designCard;
+
+            });
+
             this.designForm = designForm;
+
             this.saveOriginalState('Original design');
         },
     },
@@ -51,6 +71,7 @@ export const useDesignStore = defineStore('design', {
                 map:        { label: 'Map', value: 'map' },
                 socials:    { label: 'Socials', value: 'socials' },
 
+                dataCollectionField: { label: 'Field', value: 'data collection field' },
                 customer: { label: 'Customer', value: 'customer' },
                 items:    { label: 'Items', value: 'items' },
                 delivery:     { label: 'Delivery', value: 'delivery' },
@@ -61,7 +82,7 @@ export const useDesignStore = defineStore('design', {
                 paymentMethods:  { label: 'Payment Methods', value: 'payment methods' },
             };
 
-            if(this.type === 'storefront') {
+            if(this.placement === 'storefront') {
 
                 return [
                     DESIGN_CARD_LIBRARY.products,
@@ -75,9 +96,10 @@ export const useDesignStore = defineStore('design', {
                     DESIGN_CARD_LIBRARY.socials
                 ];
 
-            }else if (this.type === 'checkout') {
+            }else if (this.placement === 'checkout') {
 
                 return [
+                    DESIGN_CARD_LIBRARY.dataCollectionField,
                     DESIGN_CARD_LIBRARY.customer,
                     DESIGN_CARD_LIBRARY.items,
                     DESIGN_CARD_LIBRARY.delivery,
@@ -96,7 +118,7 @@ export const useDesignStore = defineStore('design', {
                     DESIGN_CARD_LIBRARY.socials
                 ];
 
-            }else if (this.type === 'payment') {
+            }else if (this.placement === 'payment') {
 
                 return [
                     DESIGN_CARD_LIBRARY.paymentMethods

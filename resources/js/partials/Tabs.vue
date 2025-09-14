@@ -21,7 +21,7 @@
                 <component v-if="tab.leftIcon" :is="tab.leftIcon" :size="tab.leftIconSize ?? 16" />
 
                 <!-- Label -->
-                <span>{{ tab.label }}</span>
+                <span class="whitespace-nowrap">{{ tab.label }}</span>
 
                 <!-- Right Icon -->
                 <component v-if="tab.rightIcon" :is="tab.rightIcon" :size="tab.rightIconSize ?? 16" />

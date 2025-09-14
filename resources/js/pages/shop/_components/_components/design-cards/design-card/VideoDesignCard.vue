@@ -1,7 +1,7 @@
 <template>
 
     <div class="bg-white rounded-2xl p-4"
-        v-if="designCard.metadata.type == 'video' && (designCard.metadata.title || designCard.metadata.link)">
+        v-if="designCard.type == 'video' && (designCard.metadata.title || designCard.metadata.link)">
         <div class="space-y-2">
             <div
                 v-if="designCard.metadata.title"

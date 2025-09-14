@@ -7,10 +7,10 @@
             <StoreLogo v-if="store.logo" size="w-20 h-20" :showButton="false" class="mb-4"></StoreLogo>
 
             <!-- Heading -->
-            <h2 class="text-xl font-semibold text-center mb-4">Complete Your Payment</h2>
+            <h2 class="text-xl font-semibold text-center mb-4">{{ designCard.metadata.title }}</h2>
 
             <!-- Sub Heading -->
-            <p v-if="designCard.metadata.title" class="text-gray-500 text-center">{{ designCard.metadata.title }}</p>
+            <p v-if="designCard.metadata.title" class="text-gray-500 text-center">{{ designCard.metadata.subtitle }}</p>
 
             <!-- Amount -->
             <Skeleton v-if="isLoadingOrder" width="w-40" height="h-8" :shine="true" class="my-4"></Skeleton>
@@ -124,10 +124,17 @@
             },
             fakeOutstandingTotal() {
                 return convertToMoneyWithSymbol('100.00', this.store.currency);
+            },
+            isDesigning() {
+                return ['edit-storefront', 'edit-checkout', 'edit-payment'].includes(this.$route.name);
             }
         },
         methods: {
             navigateToStorePaymentMethod(storePaymentMethod) {
+                if(this.isDesigning) {
+                    this.notificationState.showSuccessNotification(`Only opens on the actual store`);
+                    return;
+                }
                 this.$router.push({
                     name: 'show-shop-payment-method',
                     params: {

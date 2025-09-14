@@ -107,7 +107,7 @@ export const useOrderStore = defineStore('order', {
                 delivery_address: order?.delivery_address ?? null,
                 delivery_timeslot: order?.delivery_timeslot ?? null,
                 delivery_method_id: order?.delivery_method_id ?? null,
-                delivery_date: order?.delivery_date ? formattedDate(order.delivery_date) : null,
+                delivery_date: order?.delivery_date ? order.delivery_date : null,
 
                 schedule: {
                     show_all_dates: true,
@@ -198,8 +198,8 @@ export const useOrderStore = defineStore('order', {
                     'name': orderProduct.name,
                     'id': orderProduct.product_id,
                     'is_free': orderProduct.is_free,
-                    'quantity': orderProduct.quantity.toString(),
                     'photo_path': photo ? photo.path : null,
+                    'quantity': orderProduct.quantity.toString(),
                     'unit_weight': orderProduct.unit_weight.toString(),
                     'unit_sale_price': orderProduct.unit_sale_price.amount,
                     'unit_regular_price': orderProduct.unit_regular_price.amount
@@ -209,7 +209,15 @@ export const useOrderStore = defineStore('order', {
         },
         addCartProductUsingProduct(product, parentProduct = null, overrideQuantity = null, saveState = true) {
 
-            const photo = product.photo;
+            let photo = null;
+
+            if(product.hasOwnProperty('photos')) {
+                photo = product.photos.length ? product.photos[0] : null;
+            }else{
+                photo = product.photo;
+            }
+
+
             const name = parentProduct ? parentProduct.name+' '+product.name : product.name;
 
             // Convert numeric values to numbers for consistent comparison

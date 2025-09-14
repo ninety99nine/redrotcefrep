@@ -40,7 +40,7 @@ class CreateAddressRequest extends FormRequest
             'longitude' => ['nullable', 'numeric', 'min:-180', 'max:180'],
             'description' => ['nullable', 'string'],
             'owner_id' => ['required', 'uuid'],
-            'owner_type' => ['required', 'string', Rule::in(['store', 'customer'])], // Adjust based on allowed owner types
+            'owner_type' => ['required', 'string', Rule::in(['store', 'customer'])]
         ];
 
         $rules = array_merge($rules, $overide);

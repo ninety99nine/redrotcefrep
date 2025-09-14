@@ -72,12 +72,6 @@ class SortingService
                 'options' => $this->getSortHighestAndLowestOptions()
             ],
             [
-                'label' => 'Pending Total',
-                'target' => 'pending_total',
-                'priority' => false,
-                'options' => $this->getSortHighestAndLowestOptions()
-            ],
-            [
                 'label' => 'Outstanding Total',
                 'target' => 'outstanding_total',
                 'priority' => false,

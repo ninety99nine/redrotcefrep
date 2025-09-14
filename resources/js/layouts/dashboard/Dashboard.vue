@@ -505,12 +505,7 @@
                         },
                         {
                             name: 'Design',
-                            children: [
-                                {
-                                    name: 'Storefront',
-                                    routeName: 'edit-storefront'
-                                }
-                            ]
+                            routeName: 'edit-storefront'
                         },
                         {
                             name: 'Promotions',

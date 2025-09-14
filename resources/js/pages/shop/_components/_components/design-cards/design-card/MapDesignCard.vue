@@ -2,13 +2,13 @@
 
     <div
         class="bg-white rounded-2xl p-4"
-        v-if="designCard.metadata.type === 'map' && ((designCard.metadata.upper_text) || (designCard.metadata.lower_text) || (designCard.address && designCard.address?.latitude && designCard.address?.longitude))">
+        v-if="designCard.type === 'map' && (designCard.metadata.upper_text || designCard.metadata.lower_text || designCard.address)">
 
         <div class="space-y-4">
 
             <Markdown
-                v-if="designCard.metadata.upper_text"
-                :text="designCard.metadata.upper_text">
+                :text="designCard.metadata.upper_text"
+                v-if="designCard.metadata.upper_text != null && designCard.metadata.upper_text?.trim() != ''">
             </Markdown>
 
             <AddressInput
@@ -24,8 +24,8 @@
             </p>
 
             <Markdown
-                v-if="designCard.metadata.lower_text"
-                :text="designCard.metadata.lower_text">
+                :text="designCard.metadata.lower_text"
+                v-if="designCard.metadata.lower_text != null && designCard.metadata.lower_text?.trim() != ''">
             </Markdown>
 
         </div>

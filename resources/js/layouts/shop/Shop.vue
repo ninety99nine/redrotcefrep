@@ -15,35 +15,59 @@
     export default {
         inject: ['formState', 'orderState', 'storeState', 'notificationState'],
         components: { Notifications },
+        data() {
+            return {
+                orderAgain: false
+            }
+        },
         watch: {
+            // !!!  IMPORTANT NOTE  !!!
+            // Watcher runs in sequence, so we want $route() to always run
+            // before orderId(), so we must place it above orderId(). We
+            // need to set orderAgain before we can get to processing
+            // the orderId() watcher.
+            $route(to, from) {
+                this.orderAgain = from.name == 'show-shop-order' && to.name == 'show-checkout';
+            },
             alias() {
                 this.showStoreByAlias();
             },
+            orderId(newVal) {
+                const orderToOrderAgain = this.orderAgain ? this.order : null;
+                this.orderState.resetOrderForm();
+
+                if(newVal) {
+                    //  Important after placing an order at checkout page
+                    this.showOrder();
+                }else{
+                    this.prepareStoreForShopping(orderToOrderAgain);
+                }
+            },
             orderForm: {
-                handler(newVal) {
-                    console.log('stage 1');
+                handler() {
                     if(this.canInspectShoppingCart) {
-                        console.log('stage 2');
-                        console.log('stage 3');
                         this.orderState.setIsInspectingShoppingCart(true);
                         this.inspectShoppingCartDelayed();
                     }
                 },
                 deep: true
-            },
-            orderId(newVal) {
-                if(newVal) {
-                    //  Important after placing an order at checkout page
-                    this.showOrder();
-                }
             }
         },
         computed: {
+            store() {
+                return this.storeState.store;
+            },
             alias() {
                 return this.$route.params.alias;
             },
-            store() {
-                return this.storeState.store;
+            orderId() {
+                return this.$route.params.order_id;
+            },
+            order() {
+                return this.orderState.order;
+            },
+            hasOrder() {
+                return this.order != null;
             },
             orderForm() {
                 return this.orderState.orderForm;
@@ -51,11 +75,23 @@
             canInspectShoppingCart() {
                 return this.orderState.canInspectShoppingCart;
             },
-            orderId() {
-                return this.$route.params.order_id;
-            },
         },
         methods: {
+            async prepareStoreForShopping(orderToOrderAgain = null) {
+                if(await this.orderState.hasStateFromLocalStorage()) {
+                    await this.orderState.setStateFromLocalStorage();
+                    await this.inspectShoppingCart();
+                }else{
+                    //  If we want to order again
+                    if(orderToOrderAgain) {
+                        this.orderState.setOrderForm(orderToOrderAgain, false);
+                        this.orderState.canInspectShoppingCart = true;
+                    }else{
+                        this.orderState.setOrderForm(null, false);
+                        setTimeout(() => { this.orderState.canInspectShoppingCart = true }, 1000);
+                    }
+                }
+            },
             async showStoreByAlias() {
                 try {
 
@@ -74,13 +110,7 @@
                     if(this.orderId) {
                         await this.showOrder();
                     }else{
-                        if(await this.orderState.hasStateFromLocalStorage()) {
-                            await this.orderState.setStateFromLocalStorage();
-                            await this.inspectShoppingCart();
-                        }else{
-                            this.orderState.setOrderForm(null, false);
-                            setTimeout(() => { this.orderState.canInspectShoppingCart = true }, 1000);
-                        }
+                        await this.prepareStoreForShopping();
                     }
 
                 } catch (error) {
@@ -163,8 +193,15 @@
             this.orderState.resetOrderForm();
         },
         created() {
-            this.showStoreByAlias();
-            this.orderState.runInspectShoppingCart = this.inspectShoppingCart;
+            if(this.store) {
+                if(this.orderId) {
+                    this.showOrder();
+                }else{
+                    this.prepareStoreForShopping();
+                }
+            }else{
+                this.showStoreByAlias();
+            }
         }
     };
 

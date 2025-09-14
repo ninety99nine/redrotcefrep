@@ -300,7 +300,7 @@ const routes = [
                         name: 'edit-payment',
                         components: {
                             default: () => import('@Pages/design/payment/Payment.vue'),
-                            component: () => import('@Pages/shop/payment/PaymentMethods.vue'),
+                            preview: () => import('@Pages/shop/payment/PaymentMethods.vue'),
                         }
                     },
                     /*
@@ -390,6 +390,31 @@ const routes = [
                                     }
                                 ]
                             },
+                        ]
+                    },
+                    {
+                        path: ':order_id/pay',
+                        children: [
+                            {
+                                path: '',
+                                name: 'show-shop-payment-methods',
+                                component: () => import('@Pages/shop/payment/PaymentMethods.vue'),
+                            },
+                            {
+                                path: ':store_payment_method_id',
+                                name: 'show-shop-payment-method',
+                                component: () => import('@Pages/shop/payment/PaymentMethod.vue'),
+                            },
+                            {
+                                path: 'pending',
+                                name: 'show-shop-pending-payment',
+                                component: () => import('@Pages/shop/payment/PendingPayment.vue'),
+                            },
+                            {
+                                path: 'confirming',
+                                name: 'show-shop-confirming-payment',
+                                component: () => import('@Pages/shop/payment/ConfirmingPayment.vue'),
+                            }
                         ]
                     }
                 ]

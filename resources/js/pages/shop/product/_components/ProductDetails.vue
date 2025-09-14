@@ -180,10 +180,23 @@
                 :key="index"
                 v-for="(dataCollectionField, index) in dataCollectionFields">
 
-                <template v-if="dataCollectionField.type == 'text'">
+                <template v-if="dataCollectionField.type == 'short text'">
 
                     <Input
                         type="text"
+                        v-model="responses[index]"
+                        :label="dataCollectionField.name"
+                        :showAsterisk="dataCollectionField.required"
+                        :secondaryLabel="dataCollectionField.required ? null : '(optional)'"
+                        :errorText="formState.getFormError(`data_collection_fields.${index}`)">
+                    </Input>
+
+                </template>
+
+                <template v-if="dataCollectionField.type == 'long text'">
+
+                    <Input
+                        type="textarea"
                         v-model="responses[index]"
                         :label="dataCollectionField.name"
                         :showAsterisk="dataCollectionField.required"
@@ -283,7 +296,7 @@
 
                 </template>
 
-                <template v-if="dataCollectionField.type == 'media2'">
+                <template v-if="dataCollectionField.type == 'media'">
                     <Input
                         type="file"
                         :mimeTypes="['image/*']"
@@ -405,6 +418,8 @@
                             return null;
                         }else if(dataCollectionField.type == 'checkbox') {
                             return new Array(dataCollectionField.options.length).fill(false);
+                        }else if(dataCollectionField.type == 'media') {
+                            return [];
                         }else{
                             return '';
                         }

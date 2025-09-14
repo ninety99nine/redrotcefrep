@@ -33,7 +33,7 @@ class DesignCard extends Model
      * @var array
      */
     protected $fillable = [
-        'visible', 'type', 'metadata', 'position', 'store_id'
+        'visible', 'type', 'placement', 'metadata', 'position', 'store_id'
     ];
 
     /**
@@ -87,5 +87,15 @@ class DesignCard extends Model
     public function mediaFiles(): MorphMany
     {
         return $this->morphMany(MediaFile::class, 'mediable');
+    }
+
+    /**
+     * Get address.
+     *
+     * @return MorphOne
+     */
+    public function address(): MorphOne
+    {
+        return $this->morphOne(Address::class, 'owner');
     }
 }

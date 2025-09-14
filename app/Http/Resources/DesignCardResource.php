@@ -23,11 +23,13 @@ class DesignCardResource extends JsonResource
             'position' => $this->position,
             'metadata' => $this->metadata,
             'store_id' => $this->store_id,
+            'placement' => $this->placement,
             'created_at' => $this->created_at->toDateTimeString(),
             'updated_at' => $this->updated_at->toDateTimeString(),
 
             'store' => StoreResource::make($this->whenLoaded('store')),
             'photo' => MediaFileResource::make($this->whenLoaded('photo')),
+            'address' => AddressResource::make($this->whenLoaded('address')),
             'photos' => MediaFileResource::collection($this->whenLoaded('photos')),
             'media_files' => MediaFileResource::collection($this->whenLoaded('mediaFiles')),
         ];

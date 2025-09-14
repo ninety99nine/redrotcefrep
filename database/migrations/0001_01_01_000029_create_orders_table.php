@@ -36,8 +36,6 @@ return new class extends Migration
             $table->enum('payment_status', OrderPaymentStatus::values())->default(OrderPaymentStatus::UNPAID->value);
             $table->decimal('paid_total', 12, 3)->default(0);
             $table->unsignedTinyInteger('paid_percentage')->default(0);
-            $table->decimal('pending_total', 12, 3)->default(0);
-            $table->unsignedTinyInteger('pending_percentage')->default(0);
             $table->decimal('outstanding_total', 12, 3)->default(0);
             $table->unsignedTinyInteger('outstanding_percentage')->default(100);
 

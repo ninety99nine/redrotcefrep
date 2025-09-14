@@ -11,6 +11,16 @@
             :errorText="formState.getFormError(`design_cards.${index}.metadata.title`)">
         </Input>
 
+        <Input
+            rows="2"
+            type="textarea"
+            class="w-full mb-4"
+            placeholder="Additional Information"
+            v-model="designCard.metadata.description"
+            @input="designState.saveStateDebounced('Description changed')"
+            :errorText="formState.getFormError(`design_cards.${index}.metadata.description`)">
+        </Input>
+
         <div class="grid grid-cols-2 h-8">
 
             <div class="col-span-1">

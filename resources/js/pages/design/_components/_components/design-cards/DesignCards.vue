@@ -19,23 +19,24 @@
 
                     <div class="flex items-center space-x-2 text-gray-500">
 
-                        <Map v-if="designCard.metadata.type == 'map'" size="16"></Map>
-                        <Link v-if="designCard.metadata.type == 'link'" size="16"></Link>
-                        <Type v-if="designCard.metadata.type == 'text'" size="16"></Type>
-                        <Box v-if="designCard.metadata.type == 'products'" size="16"></Box>
-                        <Image v-if="designCard.metadata.type == 'image'" size="16"></Image>
-                        <Video v-if="designCard.metadata.type == 'video'" size="16"></Video>
-                        <AtSign v-if="designCard.metadata.type == 'socials'" size="16"></AtSign>
-                        <Clock v-if="designCard.metadata.type == 'countdown'" size="16"></Clock>
-                        <Contact v-if="designCard.metadata.type == 'contact'" size="16"></Contact>
+                        <Map v-if="designCard.type == 'map'" size="16"></Map>
+                        <Link v-if="designCard.type == 'link'" size="16"></Link>
+                        <Type v-if="designCard.type == 'text'" size="16"></Type>
+                        <Box v-if="designCard.type == 'products'" size="16"></Box>
+                        <Image v-if="designCard.type == 'image'" size="16"></Image>
+                        <Video v-if="designCard.type == 'video'" size="16"></Video>
+                        <AtSign v-if="designCard.type == 'socials'" size="16"></AtSign>
+                        <Clock v-if="designCard.type == 'countdown'" size="16"></Clock>
+                        <Contact v-if="designCard.type == 'contact'" size="16"></Contact>
 
-                        <Truck v-if="designCard.metadata.type == 'delivery'" size="20"></Truck>
-                        <HandCoins v-if="designCard.metadata.type == 'tips'" size="20"></HandCoins>
-                        <UserRound v-if="designCard.metadata.type == 'customer'" size="20"></UserRound>
-                        <ShoppingCart v-if="designCard.metadata.type == 'items'" size="20"></ShoppingCart>
-                        <CreditCard v-if="designCard.metadata.type == 'payment methods'" size="20"></CreditCard>
-                        <ReceiptText v-if="designCard.metadata.type == 'order summary'" size="20"></ReceiptText>
-                        <TicketPercent v-if="designCard.metadata.type == 'promo code'" size="20"></TicketPercent>
+                        <Truck v-if="designCard.type == 'delivery'" size="20"></Truck>
+                        <HandCoins v-if="designCard.type == 'tips'" size="20"></HandCoins>
+                        <UserRound v-if="designCard.type == 'customer'" size="20"></UserRound>
+                        <ShoppingCart v-if="designCard.type == 'items'" size="20"></ShoppingCart>
+                        <Pencil v-if="designCard.type == 'data collection field'" size="20"></Pencil>
+                        <CreditCard v-if="designCard.type == 'payment methods'" size="20"></CreditCard>
+                        <ReceiptText v-if="designCard.type == 'order summary'" size="20"></ReceiptText>
+                        <TicketPercent v-if="designCard.type == 'promo code'" size="20"></TicketPercent>
 
                         <span class="text-xs whitespace-nowrap">{{ getDesignCardLabel(designCard) }}</span>
 
@@ -78,24 +79,25 @@
 
                 </div>
 
-                <LinkDesignCard v-if="designCard.metadata.type == 'link'" :index="index" :designCard="designCard"></LinkDesignCard>
-                <MapDesignCard v-else-if="designCard.metadata.type == 'map'" :index="index" :designCard="designCard"></MapDesignCard>
-                <VideoDesignCard v-else-if="designCard.metadata.type == 'video'" :index="index" :designCard="designCard"></VideoDesignCard>
-                <ContactDesignCard v-else-if="designCard.metadata.type == 'contact'" :index="index" :designCard="designCard"></ContactDesignCard>
-                <SocialsDesignCard v-else-if="designCard.metadata.type == 'socials'" :index="index" :designCard="designCard"></SocialsDesignCard>
-                <TextDesignCard v-else-if="designCard.metadata.type == 'text'" :index="index" :designCard="designCard" :editorOptions="editorOptions"></TextDesignCard>
-                <ImageDesignCard v-else-if="designCard.metadata.type == 'image'" :index="index" :designCard="designCard" :editorOptions="editorOptions"></ImageDesignCard>
-                <CountdownDesignCard v-else-if="designCard.metadata.type == 'countdown'" :index="index" :designCard="designCard" :editorOptions="editorOptions"></CountdownDesignCard>
+                <LinkDesignCard v-if="designCard.type == 'link'" :index="index" :designCard="designCard"></LinkDesignCard>
+                <MapDesignCard v-else-if="designCard.type == 'map'" :index="index" :designCard="designCard"></MapDesignCard>
+                <VideoDesignCard v-else-if="designCard.type == 'video'" :index="index" :designCard="designCard"></VideoDesignCard>
+                <ContactDesignCard v-else-if="designCard.type == 'contact'" :index="index" :designCard="designCard"></ContactDesignCard>
+                <SocialsDesignCard v-else-if="designCard.type == 'socials'" :index="index" :designCard="designCard"></SocialsDesignCard>
+                <TextDesignCard v-else-if="designCard.type == 'text'" :index="index" :designCard="designCard" :editorOptions="editorOptions"></TextDesignCard>
+                <ImageDesignCard v-else-if="designCard.type == 'image'" :index="index" :designCard="designCard" :editorOptions="editorOptions"></ImageDesignCard>
+                <CountdownDesignCard v-else-if="designCard.type == 'countdown'" :index="index" :designCard="designCard" :editorOptions="editorOptions"></CountdownDesignCard>
 
-                <TipsDesignCard v-else-if="designCard.metadata.type == 'tips'" :index="index" :designCard="designCard"></TipsDesignCard>
-                <ItemsDesignCard v-else-if="designCard.metadata.type == 'items'" :index="index" :designCard="designCard"></ItemsDesignCard>
-                <ProductsDesignCard v-else-if="designCard.metadata.type == 'products'" :index="index" :designCard="designCard"></ProductsDesignCard>
-                <CustomerDesignCard v-else-if="designCard.metadata.type == 'customer'" :index="index" :designCard="designCard"></CustomerDesignCard>
-                <DeliveryDesignCard v-else-if="designCard.metadata.type == 'delivery'" :index="index" :designCard="designCard"></DeliveryDesignCard>
-                <OrderSummaryCard v-else-if="designCard.metadata.type == 'order summary'" :index="index" :designCard="designCard"></OrderSummaryCard>
-                <PromoCodeDesignCard v-else-if="designCard.metadata.type == 'promo code'" :index="index" :designCard="designCard"></PromoCodeDesignCard>
+                <TipsDesignCard v-else-if="designCard.type == 'tips'" :index="index" :designCard="designCard"></TipsDesignCard>
+                <ItemsDesignCard v-else-if="designCard.type == 'items'" :index="index" :designCard="designCard"></ItemsDesignCard>
+                <ProductsDesignCard v-else-if="designCard.type == 'products'" :index="index" :designCard="designCard"></ProductsDesignCard>
+                <CustomerDesignCard v-else-if="designCard.type == 'customer'" :index="index" :designCard="designCard"></CustomerDesignCard>
+                <DeliveryDesignCard v-else-if="designCard.type == 'delivery'" :index="index" :designCard="designCard"></DeliveryDesignCard>
+                <OrderSummaryCard v-else-if="designCard.type == 'order summary'" :index="index" :designCard="designCard"></OrderSummaryCard>
+                <PromoCodeDesignCard v-else-if="designCard.type == 'promo code'" :index="index" :designCard="designCard"></PromoCodeDesignCard>
+                <DataCollectionDesignCard v-else-if="designCard.type == 'data collection field'" :index="index" :designCard="designCard"></DataCollectionDesignCard>
 
-                <PaymentMethodsCard v-else-if="designCard.metadata.type == 'payment methods'" :index="index" :designCard="designCard"></PaymentMethodsCard>
+                <PaymentMethodsCard v-else-if="designCard.type == 'payment methods'" :index="index" :designCard="designCard"></PaymentMethodsCard>
 
                 <div class="flex justify-end space-x-4 mt-4">
 
@@ -139,15 +141,16 @@
     import ProductsDesignCard from '@Pages/design/_components/_components/design-cards/design-card/ProductsDesignCard.vue';
     import PromoCodeDesignCard from '@Pages/design/_components/_components/design-cards/design-card/PromoCodeDesignCard.vue';
     import CountdownDesignCard from '@Pages/design/_components/_components/design-cards/design-card/CountdownDesignCard.vue';
-    import { Eye, EyeOff, Move, Trash, Map, Link, Type, Box, Image, Video, AtSign, Clock, Contact, Truck, HandCoins, UserRound, ShoppingCart, ReceiptText, CreditCard, TicketPercent } from 'lucide-vue-next';
+    import DataCollectionDesignCard from '@Pages/design/_components/_components/design-cards/design-card/DataCollectionDesignCard.vue';
+    import { Eye, EyeOff, Move, Trash, Map, Link, Type, Box, Image, Video, AtSign, Clock, Contact, Truck, Pencil, HandCoins, UserRound, ShoppingCart, ReceiptText, CreditCard, TicketPercent } from 'lucide-vue-next';
 
     export default {
         inject: ['designState', 'storeState'],
         components: {
-            Eye, EyeOff, Move, Trash, Map, Link, Type, Box, Image, Video, AtSign, Clock, Contact, Truck, HandCoins, UserRound, ShoppingCart, ReceiptText, CreditCard, TicketPercent,
+            Eye, EyeOff, Move, Trash, Map, Link, Type, Box, Image, Video, AtSign, Clock, Contact, Truck, Pencil, HandCoins, UserRound, ShoppingCart, ReceiptText, CreditCard, TicketPercent,
             Pill, Tooltip, draggable: VueDraggableNext, MapDesignCard, TipsDesignCard, LinkDesignCard, TextDesignCard, ImageDesignCard, ItemsDesignCard, VideoDesignCard,
             OrderSummaryCard, ContactDesignCard, SocialsDesignCard, CustomerDesignCard, DeliveryDesignCard, PaymentMethodsCard, ProductsDesignCard,
-            PromoCodeDesignCard, CountdownDesignCard
+            PromoCodeDesignCard, CountdownDesignCard, DataCollectionDesignCard
         },
         data() {
             return {
@@ -182,10 +185,10 @@
         },
         methods: {
             isRequiredDesignCard(designCard) {
-                return ['customer', 'items', 'delivery', 'promo code', 'tips', 'order summary', 'payment methods'].includes(designCard.metadata.type);
+                return ['customer', 'items', 'delivery', 'promo code', 'tips', 'order summary', 'payment methods'].includes(designCard.type);
             },
             getDesignCardLabel(designCard) {
-                return this.designCardOptions.find(designCardOption => designCardOption.value == designCard.metadata.type)?.label;
+                return this.designCardOptions.find(designCardOption => designCardOption.value == designCard.type)?.label;
             },
             toggleVisible(index) {
                 this.designCards[index].visible = !this.designCards[index].visible;

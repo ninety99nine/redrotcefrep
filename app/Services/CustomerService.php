@@ -15,6 +15,7 @@ use App\Http\Resources\CustomerResource;
 use App\Http\Resources\CustomerResources;
 use Illuminate\Database\Eloquent\Builder;
 use App\Http\Requests\Customer\CreateCustomerRequest;
+use App\Models\Address;
 use \Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class CustomerService extends BaseService
@@ -67,6 +68,7 @@ class CustomerService extends BaseService
     public function createCustomer(array $data): array
     {
         $storeId = $data['store_id'];
+        $address = $data['address'] ?? null;
         $store = Store::findOrFail($storeId);
 
         $data = array_merge($data, [
@@ -79,6 +81,17 @@ class CustomerService extends BaseService
 
         if(!is_null($tags)) {
             $this->createCustomerTags($customer, $tags);
+        }
+
+        if(!is_null($address)) {
+
+            $address = array_merge($address, [
+                'owner_type' => 'customer',
+                'owner_id' => $customer->id
+            ]);
+
+            Address::create($address);
+
         }
 
         return $this->showCreatedResource($customer);

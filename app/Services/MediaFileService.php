@@ -220,7 +220,7 @@ class MediaFileService extends BaseService
     {
         $limits = [
             UploadFolderName::PRODUCT_PHOTO->value => [5, 'this product'],
-            UploadFolderName::ORDER_COMMENT_PHOTO->value => [6, 'this order comment'],
+            UploadFolderName::ORDER_COMMENT_PHOTO->value => [5, 'this order comment'],
             // Add future types and their limits here, e.g. UploadFolderName::EXAMPLE->value => [10, 'example']
         ];
 

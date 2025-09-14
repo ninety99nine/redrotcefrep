@@ -3,9 +3,11 @@
     <Button
         size="xs"
         type="light"
-        :action="navigateToEditOrder"
+        leftIconSize="12"
+        :leftIcon="ReceiptText"
+        :action="navigateToShowShopOrder"
         :skeleton="isLoadingStore || isLoadingOrder">
-        <span>Edit</span>
+        <span>Invoice</span>
     </Button>
 
 </template>
@@ -13,10 +15,16 @@
 <script>
 
     import Button from '@Partials/Button.vue';
+    import { ReceiptText } from 'lucide-vue-next';
 
     export default {
         inject: ['storeState', 'orderState'],
-        components: { Button },
+        components: { ReceiptText, Button },
+        data() {
+            return {
+                ReceiptText
+            }
+        },
         computed: {
             order() {
                 return this.orderState.order;
@@ -32,17 +40,15 @@
             }
         },
         methods: {
-            navigateToEditOrder() {
-                this.$router.push({
-                    name: 'edit-order',
+            async navigateToShowShopOrder() {
+                await this.$router.push({
+                    name: 'show-shop-order',
                     params: {
-                        order_id: this.order.id
-                    },
-                    query: {
-                        store_id: this.store.id
+                        alias: this.store.alias,
+                        order_id: this.order.id,
                     }
                 });
-            }
+            },
         }
     };
 

@@ -43,7 +43,7 @@
             }
         },
         methods: {
-            async printOrder(hideModal) {
+            async printOrder() {
 
                 try {
 
@@ -72,8 +72,6 @@
                             printWindow.print();
                         };
                     }
-
-                    hideModal();
 
                 } catch (error) {
                     const message = error?.response?.data?.message || error?.message || 'Something went wrong while printing order';

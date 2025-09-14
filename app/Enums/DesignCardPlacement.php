@@ -2,7 +2,7 @@
 
 namespace App\Enums;
 
-enum DesignCardType: string
+enum DesignCardPlacement: string
 {
     case STOREFRONT = 'storefront';
     case CHECKOUT = 'checkout';

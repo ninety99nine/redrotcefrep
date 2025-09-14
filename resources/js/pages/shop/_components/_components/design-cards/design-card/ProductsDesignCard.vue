@@ -2,7 +2,7 @@
 
     <div
         class="bg-white rounded-2xl p-4"
-        v-if="designCard.metadata.type == 'products' && designCard.metadata.category_id && categoryData[designCard.metadata.category_id]?.category">
+        v-if="designCard.type == 'products' && designCard.metadata.category_id && categoryData[designCard.metadata.category_id]?.category">
 
         <div class="space-y-4">
 
@@ -121,10 +121,18 @@
             },
             categoryId() {
                 return this.designCard.metadata.category_id;
+            },
+            isDesigning() {
+                return ['edit-storefront', 'edit-checkout', 'edit-payment'].includes(this.$route.name);
             }
         },
         methods: {
             async onView(product) {
+                if(this.isDesigning) {
+                    this.notificationState.showSuccessNotification(`Only opens on the actual store`);
+                    return;
+                }
+
                 await this.$router.push({
                     name: 'show-shop-product',
                     params: {

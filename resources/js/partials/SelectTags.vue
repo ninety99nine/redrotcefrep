@@ -104,7 +104,7 @@
                     </div>
 
                     <!-- Dropdown Options -->
-                    <div v-if="isOpen" class="w-full absolute z-10 mt-1 select-none bg-white border border-gray-300 rounded-md shadow-lg overflow-hidden">
+                    <div v-if="isOpen && (hasSearchQuery || showOptions)" class="w-full absolute z-10 mt-1 select-none bg-white border border-gray-300 rounded-md shadow-lg overflow-hidden">
                         <!-- Scrollable Options List -->
                         <ul class="max-h-60 overflow-auto">
                             <template
@@ -226,6 +226,10 @@
             options: {
                 type: Array,
                 default: () => []
+            },
+            showOptions: {
+                type: Boolean,
+                default: true
             },
             search: {
                 type: Boolean,

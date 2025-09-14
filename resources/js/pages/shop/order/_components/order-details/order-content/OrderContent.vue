@@ -11,12 +11,7 @@
 
                     <!-- QR Code -->
                     <Skeleton v-if="isLoadingStore || isLoadingOrder" width="w-16" height="h-16" :shine="true"></Skeleton>
-                    <img
-                        alt="QR Code"
-                        class="w-16 h-16 rounded"
-                        :src="store.qr_code_file_path"
-                        v-else-if="store.qr_code_file_path"
-                    />
+                    <img v-else-if="qrCode" :src="qrCode" alt="QR Code" class="w-16 h-16 rounded" />
 
                 </div>
 
@@ -35,7 +30,7 @@
                     <p v-else class="text-xl font-bold">{{ store.name ?? 'Store' }}</p>
 
                     <Skeleton v-if="isLoadingStore || isLoadingOrder" width="w-1/3" :shine="true"></Skeleton>
-                    <a v-else :href="store.web_link" class="text-sm text-blue-500 hover:underline">
+                    <a v-else :href="store.web_link" class="text-sm text-blue-500 hover:underline cursor-pointer">
                         {{ store.web_link }}
                     </a>
                 </div>
@@ -48,12 +43,7 @@
 
                 <!-- QR Code -->
                 <Skeleton v-if="isLoadingStore || isLoadingOrder" width="w-16" height="h-16" :shine="true"></Skeleton>
-                <img
-                    alt="QR Code"
-                    class="w-16 h-16 rounded"
-                    :src="store.qr_code_file_path"
-                    v-else-if="store.qr_code_file_path"
-                />
+                <img v-else-if="qrCode" :src="qrCode" alt="QR Code" class="w-16 h-16 rounded" />
 
             </div>
 
@@ -111,7 +101,7 @@
                     v-if="isLoadingStore || isLoadingOrder || order.courier">
                     <span class="font-semibold whitespace-nowrap">Tracking No:</span>
                     <Skeleton v-if="isLoadingStore || isLoadingOrder" :shine="true"></Skeleton>
-                    <a v-else :href="order.courier.tracking_page" target="_blank" class="text-sm text-blue-500 hover:underline">
+                    <a v-else :href="order.courier.tracking_page" target="_blank" class="text-sm text-blue-500 hover:underline cursor-pointer">
                         {{ order.tracking_number }}
                     </a>
                 </div>
@@ -149,22 +139,23 @@
                     </tr>
                     <template v-else>
                         <tr
-                            :key="product.id"
-                            v-for="product in order.order_products">
+                            :key="orderProduct.id"
+                            v-for="orderProduct in order.order_products"
+                            class="hover:bg-blue-50 cursor-pointer"
+                            @click.stop="() => navigateToShowShopProduct(orderProduct)">
                             <td class="border border-gray-300 p-2">
-
                                 <div class="lg:flex lg:items-center lg:space-x-2 lg:space-y-0 space-y-2">
                                     <div
-                                        v-if="product.photo"
+                                        v-if="orderProduct.photo"
                                         class="flex items-center justify-center w-8 h-auto">
-                                        <img class="w-full max-h-full object-contain rounded-sm flex-shrink-0" :src="product.photo.path">
+                                        <img class="w-full max-h-full object-contain rounded-sm flex-shrink-0" :src="orderProduct.photo.path">
                                     </div>
-                                    <span class="text-xs">{{ product.name }}</span>
+                                    <span>{{ orderProduct.name }}</span>
                                 </div>
                             </td>
-                            <td class="whitespace-nowrap border border-gray-300 p-2 text-xs text-center">{{ product.quantity }}</td>
-                            <td class="whitespace-nowrap border border-gray-300 p-2 text-xs">{{ product.unit_price.amount_with_currency }}</td>
-                            <td class="whitespace-nowrap border border-gray-300 p-2 text-xs">{{ product.grand_total.amount_with_currency }}</td>
+                            <td class="whitespace-nowrap border border-gray-300 p-2 text-xs text-center">{{ orderProduct.quantity }}</td>
+                            <td class="whitespace-nowrap border border-gray-300 p-2 text-xs">{{ orderProduct.unit_price.amount_with_currency }}</td>
+                            <td class="whitespace-nowrap border border-gray-300 p-2 text-xs">{{ orderProduct.grand_total.amount_with_currency }}</td>
                         </tr>
                     </template>
                 </tbody>
@@ -247,6 +238,7 @@
 
   <script>
 
+    import QRCode from 'qrcode';
     import Popover from '@Partials/Popover.vue';
     import Skeleton from '@Partials/Skeleton.vue';
     import { formattedDatetime, formattedRelativeDate } from '@Utils/dateUtils.js';
@@ -254,6 +246,18 @@
     export default {
         inject: ['orderState', 'storeState'],
         components: { Popover, Skeleton },
+        data() {
+            return {
+                qrCode: null
+            }
+        },
+        watch: {
+            order(newValue, oldValue) {
+                if(!oldValue && newValue) {
+                    this.setup();
+                }
+            }
+        },
         computed: {
             order() {
                 return this.orderState.order;
@@ -283,6 +287,39 @@
         methods: {
             formattedDatetime: formattedDatetime,
             formattedRelativeDate: formattedRelativeDate,
+            setup() {
+                if(this.store && this.order) {
+                    this.generateQRCode();
+                }
+            },
+            async navigateToShowShopProduct(orderProduct) {
+                await this.$router.push({
+                    name: 'show-shop-product',
+                    params: {
+                        alias: this.store.alias,
+                        product_id: orderProduct.product_id
+                    }
+                });
+            },
+            async generateQRCode() {
+                try {
+
+                    this.qrCode = await QRCode.toDataURL(this.currentPageUrl, {
+                        margin: 2,
+                        width: 150,
+                        color: {
+                            dark: '#000000',   // Black QR dots
+                            light: '#ffffff'   // White background
+                        }
+                    })
+
+                } catch (err) {
+                    console.error('Failed to generate QR code:', err);
+                }
+            },
+        },
+        created() {
+            this.setup();
         }
     };
   </script>

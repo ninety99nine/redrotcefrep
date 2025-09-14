@@ -2,9 +2,9 @@
 
 namespace App\Http\Requests\Customer;
 
-use App\Http\Requests\Address\CreateAddressRequest;
 use App\Models\Customer;
 use Illuminate\Foundation\Http\FormRequest;
+use App\Http\Requests\Address\CreateAddressRequest;
 
 class CreateCustomerRequest extends FormRequest
 {
@@ -38,14 +38,12 @@ class CreateCustomerRequest extends FormRequest
             'store_id' => ['required', 'uuid'],
 
             'address' => ['nullable', 'array'],
-            ...(new CreateAddressRequest())->rules(
+            ...collect((new CreateAddressRequest())->rules(
                 'address',
                 [
-                    'address_line' => ['required_with:address', 'string', 'max:255'],
-                    'owner_type' => ['exclude'],
-                    'owner_id' => ['exclude']
+                    'address_line' => ['required_with:address', 'string', 'max:255']
                 ]
-            )
+            ))->except(['address.owner_id', 'address.owner_type'])->toArray()
         ];
     }
 

@@ -1,6 +1,6 @@
 <template>
 
-    <div v-if="isLoadingOrder || hasDeliveryAddress" class="bg-white rounded-lg p-4 mb-4">
+    <div v-if="isLoadingStore || isLoadingOrder || hasDeliveryAddress" class="bg-white rounded-lg">
 
         <div class="flex items-center space-x-2 mb-4">
 
@@ -14,36 +14,43 @@
         </div>
 
         <!-- Skeleton Loading -->
-        <div v-if="isLoadingOrder || !hasOrder" class="w-full border-b shadow-sm rounded-lg py-6 px-4 bg-gray-50 space-y-1">
-            <LineSkeleton width="w-4/5" :shine="true"></LineSkeleton>
-            <LineSkeleton width="w-1/3" :shine="true"></LineSkeleton>
+        <div v-if="isLoadingStore || isLoadingOrder" class="w-full border-b shadow-sm rounded-lg py-6 px-4 bg-gray-50 space-y-1">
+            <Skeleton width="w-4/5" :shine="true"></Skeleton>
+            <Skeleton width="w-1/3" :shine="true"></Skeleton>
         </div>
 
         <div v-else>
 
-            <p class="text-sm mb-4">{{ deliveryAddress._attributes.completeAddress }}</p>
+            <p class="text-sm mb-4">{{ deliveryAddress.complete_address }}</p>
 
-            <!-- Google Maps -->
-            <div class="rounded-lg overflow-hidden">
+            <template v-if="deliveryAddress.latitude && deliveryAddress.latitude">
 
-                <GoogleMaps
-                    height="350px"
-                    :gmpDraggable="false"
-                    :latitude="deliveryAddress.latitude"
-                    :longitude="deliveryAddress.longitude">
-                </GoogleMaps>
+                <!-- Google Maps -->
+                <div
+                    class="rounded-lg overflow-hidden">
 
-            </div>
+                    <GoogleMaps
+                        height="350px"
+                        :gmpDraggable="false"
+                        :latitude="deliveryAddress.latitude"
+                        :longitude="deliveryAddress.longitude">
+                    </GoogleMaps>
 
-            <div v-if="googleMapsUrl" class="flex justify-end mt-4">
+                </div>
 
-                <a :href="googleMapsUrl" target="_blank">
-                    <Button type="light" size="xs" icon="externalLink">
+                <div class="flex justify-end mt-4">
+
+                    <Button
+                        size="xs"
+                        type="light"
+                        :action="openGoogleMap"
+                        :rightIcon="ExternalLink">
                         <span>Google Maps</span>
                     </Button>
-                </a>
 
-            </div>
+                </div>
+
+            </template>
 
         </div>
 
@@ -53,39 +60,42 @@
 
 <script>
 
-    import Button from '@Partials/buttons/Button.vue';
-    import GoogleMaps from '@Partials/maps/GoogleMaps.vue';
-    import LineSkeleton from '@Partials/skeletons/LineSkeleton.vue';
+    import Button from '@Partials/Button.vue';
+    import Skeleton from '@Partials/Skeleton.vue';
+    import { ExternalLink } from 'lucide-vue-next';
+    import GoogleMaps from '@Partials/GoogleMaps.vue';
 
     export default {
         inject: ['storeState', 'orderState'],
-        components: { Button, GoogleMaps, LineSkeleton },
+        components: { Button, Skeleton, GoogleMaps, ExternalLink },
+        data() {
+            return {
+                ExternalLink
+            }
+        },
         computed: {
             order() {
                 return this.orderState.order;
             },
-            hasOrder() {
-                return this.orderState.hasOrder;
+            isLoadingStore() {
+                return this.storeState.isLoadingStore;
             },
             isLoadingOrder() {
                 return this.orderState.isLoadingOrder;
             },
             hasDeliveryAddress() {
-                return this.order._relationships.deliveryAddress != null;
+                return this.deliveryAddress != null;
             },
             deliveryAddress() {
-                const address = this.order._relationships.deliveryAddress || {};
-                return {
-                    ...address,
-                    latitude: address.latitude ? parseFloat(address.latitude) : null,
-                    longitude: address.longitude ? parseFloat(address.longitude) : null
-                };
+                return this.order.delivery_address;
             },
             googleMapsUrl() {
-                if (!this.isLoadingOrder && this.deliveryAddress.latitude && this.deliveryAddress.longitude) {
-                    return `https://www.google.com/maps?q=${this.deliveryAddress.latitude},${this.deliveryAddress.longitude}`;
-                }
-                return null;
+                return `https://www.google.com/maps?q=${this.deliveryAddress.latitude},${this.deliveryAddress.longitude}`;
+            }
+        },
+        methods: {
+            openGoogleMap() {
+                window.open(this.googleMapsUrl, '_blank');
             }
         }
     };

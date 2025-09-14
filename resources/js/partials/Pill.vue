@@ -95,7 +95,7 @@
 
                 const clickClasses = 'cursor-pointer hover:scale-95 active:scale-90';
 
-                const baseClasses = `select-none ${typeClassMap[this.type]} ${sizeClassMap[this.size]}`;
+                const baseClasses = `select-none whitespace-nowrap ${typeClassMap[this.type]} ${sizeClassMap[this.size]}`;
                 let classes = `${baseClasses}`;
 
                 if (this.action) {

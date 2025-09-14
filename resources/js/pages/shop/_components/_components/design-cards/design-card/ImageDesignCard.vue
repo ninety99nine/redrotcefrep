@@ -2,12 +2,12 @@
 
     <div
         class="bg-white rounded-2xl p-4"
-        v-if="designCard.metadata.type === 'image' && (designCard.photos?.[0]?.path || designCard.metadata.upper_text || designCard.metadata.lower_text)">
+        v-if="designCard.type === 'image' && (designCard.photos?.[0]?.path || designCard.metadata.upper_text || designCard.metadata.lower_text)">
 
         <div class="space-y-4">
 
             <Markdown
-                v-if="designCard.metadata.upper_text"
+                v-if="designCard.metadata.upper_text != null && designCard.metadata.upper_text?.trim() != ''"
                 :text="designCard.metadata.upper_text">
             </Markdown>
 
@@ -15,24 +15,24 @@
                 v-if="designCard.photos?.[0]?.path"
                 class="w-full aspect-square relative flex items-center justify-center bg-gray-100 rounded-lg overflow-hidden">
                 <a
-                    v-if="designCard.metadata.link"
-                    :href="designCard.metadata.link"
                     target="_blank"
-                    class="w-full h-full">
+                    class="w-full h-full"
+                    v-if="designCard.metadata.link"
+                    :href="designCard.metadata.link">
                     <img
-                        :alt="designCard.metadata.title || 'Image'"
                         :src="designCard.photos[0].path"
-                        class="w-full h-full object-cover" />
+                        class="w-full h-full object-cover"
+                        :alt="designCard.metadata.title || 'Image'" />
                 </a>
                 <img
                     v-else
-                    :alt="designCard.metadata.title || 'Image'"
                     :src="designCard.photos[0].path"
-                    class="w-full h-full object-cover" />
+                    class="w-full h-full object-cover"
+                    :alt="designCard.metadata.title || 'Image'" />
             </div>
 
             <Markdown
-                v-if="designCard.metadata.lower_text"
+                v-if="designCard.metadata.lower_text != null && designCard.metadata.lower_text?.trim() != ''"
                 :text="designCard.metadata.lower_text">
             </Markdown>
 

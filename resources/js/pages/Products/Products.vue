@@ -219,10 +219,8 @@
 
                                     <!-- Description -->
                                     <td v-else-if="column.name == 'Description'" class="whitespace-nowrap align-center pr-4 py-4 text-sm">
-                                        <div class="w-40">
-                                            <span v-if="product.description">{{ product.description }}</span>
-                                            <NoDataPlaceholder v-else></NoDataPlaceholder>
-                                        </div>
+                                        <div v-if="product.description" class="w-80 text-justify whitespace-normal">{{ product.description }}</div>
+                                        <NoDataPlaceholder v-else></NoDataPlaceholder>
                                     </td>
 
                                     <!-- Price -->
@@ -844,7 +842,7 @@
                 });
             },
             prepareColumns() {
-                const columnNames = ['Name', 'Description', 'Price', 'Visibility', 'Stock', 'Variants', 'Minimum Order Quantity', 'Maximum Order Quantity', 'Created Date'];
+                const columnNames = ['Name', 'Price', 'Visibility', 'Stock', 'Variants', 'Minimum Order Quantity', 'Maximum Order Quantity', 'Created Date'];
                 const defaultColumnNames  = ['Name', 'Description', 'Price', 'Visibility', 'Stock', 'Variants', 'Created Date'];
 
                 return columnNames.map(name => ({

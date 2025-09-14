@@ -2,12 +2,12 @@
 
     <div
         class="bg-white rounded-2xl p-4"
-        v-if="designCard.metadata.type === 'countdown' && (designCard.metadata.body || designCard.metadata.date || designCard.photos?.[0]?.path)">
+        v-if="designCard.type === 'countdown' && (designCard.metadata.body || designCard.metadata.date || designCard.photos?.[0]?.path)">
 
         <div class="space-y-4">
 
             <Markdown
-                v-if="designCard.metadata.upper_text"
+                v-if="designCard.metadata.upper_text != null && designCard.metadata.upper_text?.trim() != ''"
                 :text="designCard.metadata.upper_text">
             </Markdown>
 
@@ -32,7 +32,7 @@
             </Countdown>
 
             <Markdown
-                v-if="designCard.metadata.lower_text"
+                v-if="designCard.metadata.lower_text != null && designCard.metadata.lower_text?.trim() != ''"
                 :text="designCard.metadata.lower_text">
             </Markdown>
 

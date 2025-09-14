@@ -162,7 +162,7 @@
                                     Use your mobile camera to scan this <span class="font-bold">QR Code</span>
                                 </p>
 
-                                <img :src="qrCode" alt="QR Code" :class="['my-4 mx-auto', {'border border-gray-300 rounded-lg shadow max-w-60' : qrCode}]" />
+                                <img :src="qrCode" alt="QR Code" class="my-4 mx-auto border border-gray-300 rounded-lg shadow max-w-60" />
 
                             </template>
 
@@ -205,7 +205,7 @@
     import { ArrowLeft, ReceiptText, ChevronUp, ChevronDown, Copy as CopyIcon } from 'lucide-vue-next';
 
     export default {
-        inject: ['storeState', 'orderState'],
+        inject: ['formState', 'storeState', 'orderState', 'notificationState'],
         components: { Copy, Button, Skeleton, VueSlideUpDown, ReceiptText, ChevronUp, ChevronDown, StoreLogo, WhatsappIcon, WhatsappMessage },
         data() {
             return {
@@ -232,7 +232,7 @@
         watch: {
             order(newValue, oldValue) {
                 if(!oldValue && newValue) {
-                    this.generateQRCode();
+                    this.setup();
                 }
             }
         },
@@ -323,6 +323,12 @@
             }
         },
         methods: {
+            setup() {
+                if(this.store && this.order) {
+                    this.generateQRCode();
+                    if(!['paid', 'confirming payment'].includes(this.order.payment_status)) this.updateOrder();
+                }
+            },
             toggleAccordian(index) {
                 for (let i = 0; i < this.accordions.length; i++) {
                     if(i == index) {
@@ -369,10 +375,32 @@
                 const phone = this.store.whatsapp_mobile_number ? `phone=${this.store.whatsapp_mobile_number.international.replace('+', '')}&` : '';
                 window.open(`https://wa.me/?${phone}text=${encodeURIComponent(this.whatsappMessage)}`, "_blank");
                 this.clicked = true;
+            },
+            async updateOrder() {
+
+                try {
+
+                    const paymentStatus = 'confirming payment';
+
+                    const data = {
+                        payment_status: paymentStatus,
+                        store_id: this.store.id
+                    };
+
+                    await axios.put(`/api/orders/${this.order.id}`, data);
+                    this.orderState.order.payment_status = paymentStatus;
+
+                } catch (error) {
+                    const message = error?.response?.data?.message || error?.message || 'Something went wrong while updating order';
+                    this.notificationState.showWarningNotification(message);
+                    this.formState.setServerFormErrors(error);
+                    console.error('Failed to update order changes:', error);
+                }
+
             }
         },
         created() {
-            if(this.store && this.order) this.generateQRCode();
+            this.setup();
         }
     }
 </script>

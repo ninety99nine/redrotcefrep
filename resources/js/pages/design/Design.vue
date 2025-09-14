@@ -6,13 +6,26 @@
             <div class="flex-grow space">
 
                 <div class="border-b border-gray-300 rounded-l-md mb-4">
+
                     <h1 class="text-lg text-gray-700 font-semibold mb-4">Design</h1>
 
-                    <Tabs
-                        :tabs="tabs"
-                        v-model="tab"
-                        @change="onTabChange">
-                    </Tabs>
+                    <div class="flex items-center justify-between">
+
+                        <Tabs
+                            :tabs="tabs"
+                            v-model="tab"
+                            @change="onTabChange">
+                        </Tabs>
+
+                        <Button
+                            size="lg"
+                            type="light"
+                            :action="openWebLink"
+                            :leftIcon="ExternalLink">
+                        </Button>
+
+                    </div>
+
                 </div>
 
                 <!-- Content -->
@@ -34,12 +47,15 @@
 
 <script>
     import Tabs from '@Partials/Tabs.vue';
+    import Button from '@Partials/Button.vue';
+    import { ExternalLink } from 'lucide-vue-next';
 
     export default {
         inject: ['orderState', 'storeState'],
-        components: { Tabs },
+        components: { Tabs, Button },
         data() {
             return {
+                ExternalLink,
                 tab: this.$route.name,
                 tabs: [
                     { label: 'Storefront', value: 'edit-storefront'},
@@ -66,6 +82,11 @@
             }
         },
         methods: {
+            openWebLink() {
+                if (this.store.web_link) {
+                    window.open(`${this.store.web_link}?mode=preview`, '_blank');
+                }
+            },
             setOrderForm() {
                 this.orderState.setOrderForm(null);
             },

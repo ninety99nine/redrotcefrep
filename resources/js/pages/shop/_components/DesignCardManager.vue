@@ -57,7 +57,7 @@
                 return this.storeState.isLoadingStore;
             },
             isCheckout() {
-                return this.designState.type == 'checkout';
+                return this.designState.placement == 'checkout';
             },
             designForm() {
                 return this.designState.designForm;
@@ -75,15 +75,12 @@
             isLoadingDesignCards() {
                 return this.designState.isLoadingDesignCards;
             },
-            hasLoadedInitialdesignCards() {
-                return this.designState.hasLoadedInitialdesignCards;
-            },
-            type() {
-                if(['show-storefront', 'edit-storefront'].includes(this.$route.name)) {
+            placement() {
+                if(this.$route.name == 'show-storefront') {
                     return 'storefront';
-                }else if(['show-checkout', 'edit-checkout'].includes(this.$route.name)) {
+                }else if(this.$route.name == 'show-checkout') {
                     return 'checkout';
-                }else if(['show-shop-payment-methods', 'edit-payment'].includes(this.$route.name)) {
+                }else if(this.$route.name == 'show-shop-payment-methods') {
                     return 'payment';
                 }
             }
@@ -91,9 +88,8 @@
         methods: {
             async setup() {
                 if(this.store && ['show-storefront', 'show-checkout', 'show-shop-payment-methods'].includes(this.$route.name)) {
-                    if(!this.hasLoadedInitialdesignCards && !this.isLoadingDesignCards) {
-                        this.showDesignCards();
-                    }
+                    this.designState.placement = this.placement;
+                    this.showDesignCards();
                 }
             },
             async navigateToStorefront() {
@@ -112,9 +108,9 @@
                     let config = {
                         params: {
                             per_page: 100,
-                            type: this.type,
                             store_id: this.store.id,
-                            _relationships: ['photos'].join(',')
+                            placement: this.placement,
+                            _relationships: ['address', 'photos'].join(',')
                         }
                     };
 
@@ -128,16 +124,16 @@
                     console.error('Failed to fetch design cards:', error);
                 } finally {
                     this.designState.isLoadingDesignCards = false;
-                    this.designState.hasLoadedInitialdesignCards = true;
                 }
             }
         },
         beforeUnmount() {
-            this.designState.reset();
+            if(['show-storefront', 'show-checkout', 'show-shop-payment-methods'].includes(this.$route.name)) {
+                this.designState.reset();
+            }
         },
         created() {
             this.setup();
-            this.designState.type = this.type;
         }
     }
 </script>

@@ -2,7 +2,7 @@
 
     <div
         class="bg-white rounded-2xl p-4"
-        v-if="designCard.metadata.type == 'socials' && designCard.metadata.platforms?.some(platform => platform.link)">
+        v-if="designCard.type == 'socials' && designCard.metadata.platforms?.some(platform => platform.link)">
 
         <div class="space-y-2">
 

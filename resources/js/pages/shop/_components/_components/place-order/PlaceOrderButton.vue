@@ -22,7 +22,6 @@
         },
         data() {
             return {
-                reset: false,
                 creatingOrder: false
             }
         },
@@ -56,7 +55,7 @@
                 return this.orderState.selectedDeliveryMethod;
             },
             customerDesignCard() {
-                return this.designCards.find(designCard => designCard.metadata.type == 'customer');
+                return this.designCards.find(designCard => designCard.type == 'customer');
             }
         },
         methods: {
@@ -123,8 +122,6 @@
                     this.notificationState.showSuccessNotification(`Order created`);
 
                     const order = response.data.order;
-                    this.reset = true;
-
                     await this.navigateToOrder(order);
 
                 } catch (error) {
@@ -138,6 +135,9 @@
 
             },
             async navigateToOrder(order) {
+                //  Refer to resources/js/layouts/shop/Shop.vue to see what happens
+                //  on the orderId wacher after order_id is set on the route.
+
                 await this.$router.push({
                     name: 'show-shop-payment-methods',
                     params: {
@@ -146,11 +146,6 @@
                     }
                 });
             },
-        },
-        beforeUnmount() {
-            if(this.reset) {
-                this.orderState.resetOrderForm();
-            }
         }
     }
 </script>

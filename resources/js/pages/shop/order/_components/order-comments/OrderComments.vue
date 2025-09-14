@@ -1,12 +1,12 @@
 <template>
 
-    <div class="bg-white rounded-lg space-y-4 p-4 mb-4">
+    <div class="bg-white rounded-lg space-y-4 mb-4">
 
         <h1 class="text-gray-700 font-semibold mb-4">Comments</h1>
 
         <div class="flex justify-between items-center space-x-4">
 
-            <template v-if="!isLoadingStore && !isLoadingOrder && hasOrder">
+            <template v-if="!isLoadingStore && !isLoadingOrder">
 
                 <div class="w-full flex space-x-2">
 
@@ -74,7 +74,7 @@
         </div>
 
         <!-- Order Comments (Loading Placeholder) -->
-        <div v-if="isLoadingStore || isLoadingOrder || !hasOrder" class="space-y-2">
+        <div v-if="isLoadingStore || isLoadingOrder" class="space-y-2">
 
             <div
                 :key="index"
@@ -186,7 +186,7 @@
     import Button from '@Partials/Button.vue';
     import Skeleton from '@Partials/Skeleton.vue';
     import { Trash2, ArrowDownToLine } from 'lucide-vue-next';
-    import OrderComment from '@Pages/orders/order/viewable/components/order-comments/OrderComment.vue';
+    import OrderComment from '@Pages/shop/order/_components/order-comments/OrderComment.vue';
 
     export default {
         inject: ['authState' ,'formState', 'storeState', 'orderState', 'notificationState'],
@@ -230,9 +230,6 @@
             },
             orderId() {
                 return this.$route.params.order_id;
-            },
-            hasOrder() {
-                return this.orderState.hasOrder;
             },
             isLoadingStore() {
                 return this.storeState.isLoadingStore;

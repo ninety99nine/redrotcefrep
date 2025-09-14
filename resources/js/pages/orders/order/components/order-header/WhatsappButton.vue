@@ -120,6 +120,7 @@
 
         <!-- Send Using Whatsapp -->
         <Modal
+            size="md"
             approveText="Send"
             approveType="success"
             ref="sendToWhatsappModal"
@@ -406,9 +407,6 @@
                                     break;
                                 case "Paid":
                                     orderMessage += `${this.order.paid_total.amount_with_currency}\n`;
-                                    break;
-                                case "Pending":
-                                    orderMessage += `${this.order.pending_total.amount_with_currency}\n`;
                                     break;
                                 case "Outstanding":
                                     orderMessage += `${this.order.outstanding_total.amount_with_currency}\n`;

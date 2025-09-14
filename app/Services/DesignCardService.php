@@ -4,10 +4,11 @@ namespace App\Services;
 
 use Exception;
 use App\Models\Store;
+use App\Models\Address;
 use App\Models\DesignCard;
-use App\Enums\DesignCardType;
 use App\Enums\UploadFolderName;
 use Illuminate\Support\Facades\DB;
+use App\Enums\DesignCardPlacement;
 use App\Http\Resources\DesignCardResource;
 use App\Http\Resources\DesignCardResources;
 
@@ -22,12 +23,12 @@ class DesignCardService extends BaseService
     public function showDesignCards(array $data): DesignCardResources|array
     {
         $storeId = $data['store_id'] ?? null;
-        $type = isset($data['type']) ? DesignCardType::tryFrom($data['type']) : null;
+        $placement = isset($data['placement']) ? DesignCardPlacement::tryFrom($data['placement']) : null;
 
         $query = DesignCard::query();
 
-        if ($type) {
-            $query = $query->where('type', $type->value);
+        if ($placement) {
+            $query = $query->where('placement', $placement->value);
         }
 
         if ($storeId) {
@@ -47,6 +48,7 @@ class DesignCardService extends BaseService
     {
         $storeId = $data['store_id'];
         $store = Store::find($storeId);
+        $address = $data['address'] ?? null;
 
         $data = array_merge($data, [
             'currency' => $store->currency
@@ -54,7 +56,17 @@ class DesignCardService extends BaseService
 
         $designCard = DesignCard::create($data);
 
-        // Create transaction photo if provided
+        if(!is_null($address)) {
+
+            $address = array_merge($address, [
+                'owner_type' => 'design card',
+                'owner_id' => $designCard->id
+            ]);
+
+            Address::create($address);
+
+        }
+
         if (isset($data['photo']) && !empty($data['photo'])) {
 
             (new MediaFileService)->createMediaFile([

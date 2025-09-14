@@ -50,9 +50,7 @@
                     return 'This order has not been paid';
                 } else if(this.paymentStatusName === 'partially paid') {
                     return 'This order is partially paid';
-                } else if(this.paymentStatusName === 'pending payment') {
-                    return 'This order is pending payment';
-                }else if(this.paymentStatusName === 'confirming payment') {
+                } else if(this.paymentStatusName === 'confirming payment') {
                     return 'This order payment is being confirmed';
                 }
             },
@@ -63,9 +61,7 @@
                     return 'light';
                 } else if(this.paymentStatusName === 'partially paid') {
                     return 'primary';
-                } else if(this.paymentStatusName === 'pending payment') {
-                    return 'warning';
-                }else if(this.paymentStatusName === 'confirming payment') {
+                } else if(this.paymentStatusName === 'confirming payment') {
                     return 'success';
                 }
             }

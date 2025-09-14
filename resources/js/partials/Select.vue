@@ -292,8 +292,6 @@
                 },
                 set(value) {
                     this.$emit("update:modelValue", value);
-                    console.log('change')
-                    console.log(value)
                     this.$emit("change", value);
                 }
             },
