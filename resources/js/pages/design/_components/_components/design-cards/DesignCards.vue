@@ -23,18 +23,19 @@
                         <Link v-if="designCard.type == 'link'" size="16"></Link>
                         <Type v-if="designCard.type == 'text'" size="16"></Type>
                         <Box v-if="designCard.type == 'products'" size="16"></Box>
+                        <Clock v-if="designCard.type == 'time'" size="16"></Clock>
                         <Image v-if="designCard.type == 'image'" size="16"></Image>
                         <Video v-if="designCard.type == 'video'" size="16"></Video>
                         <Hexagon v-if="designCard.type == 'logo'" size="16"></Hexagon>
                         <AtSign v-if="designCard.type == 'socials'" size="16"></AtSign>
-                        <Clock v-if="designCard.type == 'countdown'" size="16"></Clock>
                         <MapPin v-if="designCard.type == 'location'" size="16"></MapPin>
                         <Contact v-if="designCard.type == 'contact'" size="16"></Contact>
                         <Megaphone v-if="designCard.type == 'banner'" size="16"></Megaphone>
+                        <Hourglass v-if="designCard.type == 'countdown'" size="16"></Hourglass>
                         <SeparatorHorizontal v-if="designCard.type == 'divider'" size="20"></SeparatorHorizontal>
 
-                        <Tally1 v-if="designCard.type == 'short text'" size="20" class="rotate-90 translate-y-2"></Tally1>
-                        <Tally2 v-if="designCard.type == 'long text'" size="20" class="rotate-90 translate-y-1"></Tally2>
+                        <Tally1 v-if="designCard.type == 'short answer'" size="20" class="rotate-90 translate-y-2"></Tally1>
+                        <Tally2 v-if="designCard.type == 'long answer'" size="20" class="rotate-90 translate-y-1"></Tally2>
                         <Binary v-if="designCard.type == 'number'" size="20"></Binary>
                         <Calendar v-if="designCard.type == 'date'" size="20"></Calendar>
                         <SquareCheck v-if="designCard.type == 'checkbox'" size="20"></SquareCheck>
@@ -173,12 +174,12 @@
     import PromoCodeDesignCard from '@Pages/design/_components/_components/design-cards/design-card/PromoCodeDesignCard.vue';
     import CountdownDesignCard from '@Pages/design/_components/_components/design-cards/design-card/CountdownDesignCard.vue';
     import DataCollectionDesignCard from '@Pages/design/_components/_components/design-cards/design-card/DataCollectionDesignCard.vue';
-    import { Eye, EyeOff, Move, Trash, Map, Link, Type, Box, Image, Video, AtSign, Clock, MapPin, Contact, Truck, Pencil, Hexagon, HandCoins, UserRound, ShoppingCart, ReceiptText, CreditCard, TicketPercent, SeparatorHorizontal, Tally1, Tally2, Binary, Calendar, SquareCheck, Megaphone, List, CloudUpload } from 'lucide-vue-next';
+    import { Eye, EyeOff, Move, Trash, Map, Link, Type, Box, Image, Video, AtSign, Clock, MapPin, Contact, Truck, Pencil, Hexagon, HandCoins, UserRound, Hourglass, ShoppingCart, ReceiptText, CreditCard, TicketPercent, SeparatorHorizontal, Tally1, Tally2, Binary, Calendar, SquareCheck, Megaphone, List, CloudUpload } from 'lucide-vue-next';
 
     export default {
         inject: ['designState', 'storeState'],
         components: {
-            Eye, EyeOff, Move, Trash, Map, Link, Type, Box, Image, Video, AtSign, Clock, MapPin, Contact, Truck, Pencil, Hexagon, HandCoins, UserRound, ShoppingCart, ReceiptText, CreditCard, TicketPercent,SeparatorHorizontal,
+            Eye, EyeOff, Move, Trash, Map, Link, Type, Box, Image, Video, AtSign, Clock, MapPin, Contact, Truck, Pencil, Hexagon, HandCoins, UserRound, Hourglass, ShoppingCart, ReceiptText, CreditCard, TicketPercent,SeparatorHorizontal,
             Tally1, Tally2, Binary, Calendar, SquareCheck, Megaphone, List, CloudUpload,
             Pill, Tooltip, draggable: VueDraggableNext, MapDesignCard, LogoDesignCard, TipsDesignCard, LinkDesignCard, TextDesignCard, ImageDesignCard, ItemsDesignCard, VideoDesignCard, BannerDesignCard,
             OrderSummaryCard, ContactDesignCard, SocialsDesignCard, CustomerDesignCard, DeliveryDesignCard, PaymentMethodsCard, ProductsDesignCard,
@@ -220,7 +221,7 @@
                 return ['customer', 'items', 'delivery', 'promo code', 'tips', 'order summary', 'payment methods'].includes(designCard.type);
             },
             isDataCollectionField(designCard) {
-                return ['short text', 'long text', 'number', 'date', 'checkbox', 'selection', 'location', 'media'].includes(designCard.type);
+                return ['short answer', 'long answer', 'number', 'date', 'time', 'checkbox', 'selection', 'location', 'media'].includes(designCard.type);
             },
             toggleVisible(index) {
                 this.designCards[index].visible = !this.designCards[index].visible;

@@ -106,7 +106,7 @@
         },
         methods: {
             isDataCollectionField(designCard) {
-                return ['short text', 'long text', 'number', 'date', 'checkbox', 'selection', 'location', 'media'].includes(designCard.type);
+                return ['short answer', 'long answer', 'number', 'date', 'time', 'checkbox', 'selection', 'location', 'media'].includes(designCard.type);
             }
         }
     }

@@ -25,12 +25,13 @@
             borderBottom: `${designCard.metadata.design.b_border ?? 0}px solid ${designCard.metadata.design.border_color ?? '#000000'}`,
         }">
 
-        <template v-if="designCard.type == 'short text'">
+        <template v-if="designCard.type == 'short answer'">
 
             <Input
                 type="text"
                 v-model="response"
                 :label="designCard.metadata.title"
+                :description="designCard.metadata.description"
                 :labelStyle="{ color: designCard.metadata.design.title_color }"
                 :errorText="formState.getFormError('design_cards'+index+'metadata.title')"
                 :secondaryLabelStyle="{ color: designCard.metadata.design.optional_text_color }"
@@ -40,13 +41,14 @@
 
         </template>
 
-        <template v-if="designCard.type == 'long text'">
+        <template v-if="designCard.type == 'long answer'">
 
             <Input
                 rows="2"
                 type="textarea"
                 v-model="response"
                 :label="designCard.metadata.title"
+                :description="designCard.metadata.description"
                 :labelStyle="{ color: designCard.metadata.design.title_color }"
                 :errorText="formState.getFormError('design_cards'+index+'metadata.title')"
                 :secondaryLabelStyle="{ color: designCard.metadata.design.optional_text_color }"
@@ -62,6 +64,7 @@
                 type="number"
                 v-model="response"
                 :label="designCard.metadata.title"
+                :description="designCard.metadata.description"
                 :labelStyle="{ color: designCard.metadata.design.title_color }"
                 :errorText="formState.getFormError('design_cards'+index+'metadata.title')"
                 :secondaryLabelStyle="{ color: designCard.metadata.design.optional_text_color }"
@@ -80,6 +83,7 @@
                 placeholder="Select a date"
                 modelType="yyyy-MM-dd HH:mm"
                 :label="designCard.metadata.title"
+                :description="designCard.metadata.description"
                 :labelStyle="{ color: designCard.metadata.design.title_color }"
                 :errorText="formState.getFormError('design_cards'+index+'metadata.title')"
                 :secondaryLabelStyle="{ color: designCard.metadata.design.optional_text_color }"
@@ -89,146 +93,134 @@
 
         </template>
 
-        <template v-if="designCard.type == 'checkbox'">
+        <template v-if="designCard.type == 'time'">
 
-            <div class="flex items-center text-sm leading-6 font-medium space-x-1 mb-2">
-
-                <span
-                    :style="{ color: designCard.metadata.design.title_color }">
-                    {{ designCard.metadata.title }}
-                </span>
-
-                <template v-if="!isEmpty(designCard.metadata.title)">
-                    <span
-                        class="text-red-500"
-                        v-if="designCard.metadata.required">
-                        *
-                    </span>
-                    <span v-else class="font-normal text-gray-400 ml-1"
-                        :style="{ color: designCard.metadata.design.optional_text_color }">
-                        (optional)
-                    </span>
-                </template>
-
-            </div>
-
-            <div class="space-y-2">
-
-                <div
-                    :key="optionIndex"
-                    class="flex items-center space-x-2"
-                    v-for="(option, optionIndex) in designCard.metadata.options">
-
-                    <input
-                        type="checkbox"
-                        v-model="response[optionIndex]"
-                        :id="`${inputKey}-${optionIndex}`"
-                        @change="(event) => response[optionIndex] = event.target.checked"
-                        :style="`accent-color:${designCard.metadata.design.checkbox_color};`">
-
-                    <label :for="`${inputKey}-${optionIndex}`">
-                        <span :style="{ color: designCard.metadata.design.title_color }">{{ option.name }}</span>
-
-                    </label>
-
-                </div>
-
-            </div>
+            <Input
+                type="time"
+                v-model="response"
+                :label="designCard.metadata.title"
+                :description="designCard.metadata.description"
+                :labelStyle="{ color: designCard.metadata.design.title_color }"
+                :errorText="formState.getFormError('design_cards'+index+'metadata.title')"
+                :secondaryLabelStyle="{ color: designCard.metadata.design.optional_text_color }"
+                :showAsterisk="!isEmpty(designCard.metadata.title) && designCard.metadata.required"
+                :secondaryLabel="!isEmpty(designCard.metadata.title) && !designCard.metadata.required ? '(optional)' : null">
+            </Input>
 
         </template>
 
-        <template v-if="designCard.type == 'selection'">
+        <template v-if="['checkbox', 'selection', 'location'].includes(designCard.type)">
 
-            <div class="flex items-center text-sm leading-6 font-medium space-x-1 mb-2">
+            <div class="mb-2"
+                v-if="!isEmpty(designCard.metadata.title) || !isEmpty(designCard.metadata.description)">
+                <div class="flex items-center text-sm leading-6 font-medium space-x-1">
+
+                    <span
+                        :style="{ color: designCard.metadata.design.title_color }">
+                        {{ designCard.metadata.title }}
+                    </span>
+
+                    <template v-if="!isEmpty(designCard.metadata.title)">
+                        <span
+                            class="text-red-500"
+                            v-if="designCard.metadata.required">
+                            *
+                        </span>
+                        <span v-else class="font-normal text-gray-400 ml-1"
+                            :style="{ color: designCard.metadata.design.optional_text_color }">
+                            (optional)
+                        </span>
+                    </template>
+
+                </div>
 
                 <span
-                    :style="{ color: designCard.metadata.design.title_color }">
-                    {{ designCard.metadata.title }}
+                    v-if="!isEmpty(designCard.metadata.description)"
+                    :style="{ color: designCard.metadata.design.description_color }"
+                    class="leading-4 text-xs text-gray-400">
+                    {{ designCard.metadata.description }}
                 </span>
-
-                <template v-if="!isEmpty(designCard.metadata.title)">
-                    <span
-                        class="text-red-500"
-                        v-if="designCard.metadata.required">
-                        *
-                    </span>
-                    <span v-else class="font-normal text-gray-400 ml-1"
-                        :style="{ color: designCard.metadata.design.optional_text_color }">
-                        (optional)
-                    </span>
-                </template>
-
             </div>
 
-            <div class="space-y-2">
+            <template v-if="designCard.type == 'checkbox'">
 
-                <div
-                    :key="optionIndex"
-                    class="flex items-center space-x-2"
-                    v-for="(option, optionIndex) in designCard.metadata.options">
+                <div class="space-y-2">
 
-                    <input
-                        type="radio"
-                        :name="inputKey"
-                        v-model="response"
-                        :value="option.name"
-                        :id="`${inputKey}-${optionIndex}`"
-                        @change="(event) => response = option.name"
-                        :style="`accent-color:${designCard.metadata.design.radio_color};`">
+                    <div
+                        :key="optionIndex"
+                        class="flex items-center space-x-2"
+                        v-for="(option, optionIndex) in designCard.metadata.options">
+
+                        <input
+                            type="checkbox"
+                            v-model="response[optionIndex]"
+                            :id="`${inputKey}-${optionIndex}`"
+                            @change="(event) => response[optionIndex] = event.target.checked"
+                            :style="`accent-color:${designCard.metadata.design.checkbox_color};`">
 
                         <label :for="`${inputKey}-${optionIndex}`">
-                        <span :style="{ color: designCard.metadata.design.title_color }">{{ option.name }}</span>
+                            <span :style="{ color: designCard.metadata.design.title_color }">{{ option.name }}</span>
 
-                    </label>
+                        </label>
+
+                    </div>
 
                 </div>
 
-            </div>
+            </template>
 
-            <Button
-                size="xs"
-                type="light"
-                class="mt-4"
-                :action="() => response = null"
-                v-if="!designCard.metadata.required && designCard.metadata.options >= 1">
-                <span>Clear selection</span>
-            </Button>
+            <template v-if="designCard.type == 'selection'">
 
-        </template>
+                <div class="space-y-2">
 
-        <template v-if="designCard.type == 'location'">
+                    <div
+                        :key="optionIndex"
+                        class="flex items-center space-x-2"
+                        v-for="(option, optionIndex) in designCard.metadata.options">
 
-            <div class="flex items-center text-sm leading-6 font-medium space-x-1 mb-2">
+                        <input
+                            type="radio"
+                            :name="inputKey"
+                            v-model="response"
+                            :value="option.name"
+                            :id="`${inputKey}-${optionIndex}`"
+                            @change="(event) => response = option.name"
+                            :style="`accent-color:${designCard.metadata.design.radio_color};`">
 
-                <span
-                    :style="{ color: designCard.metadata.design.title_color }">
-                    {{ designCard.metadata.title }}
-                </span>
+                            <label :for="`${inputKey}-${optionIndex}`">
+                            <span :style="{ color: designCard.metadata.design.title_color }">{{ option.name }}</span>
 
-                <template v-if="!isEmpty(designCard.metadata.title)">
-                    <span
-                        class="text-red-500"
-                        v-if="designCard.metadata.required">
-                        *
-                    </span>
-                    <span v-else class="font-normal text-gray-400 ml-1"
-                        :style="{ color: designCard.metadata.design.optional_text_color }">
-                        (optional)
-                    </span>
-                </template>
+                        </label>
 
-            </div>
+                    </div>
 
-            <AddressInput
-                height="250px"
-                :onlyValidate="true"
-                :pinLocationOnMap="true"
-                triggerClass="space-y-4"
-                @onDeleted="unsetAddress"
-                :address="designCard.address"
-                @onValidated="(address) => setAddress(address)"
-                :triggerText="designCard.metadata.trigger_text ?? 'Add Address'">
-            </AddressInput>
+                </div>
+
+                <Button
+                    size="xs"
+                    type="light"
+                    class="mt-4"
+                    :action="() => response = null"
+                    v-if="!designCard.metadata.required && designCard.metadata.options >= 1">
+                    <span>Clear selection</span>
+                </Button>
+
+            </template>
+
+            <template v-if="designCard.type == 'location'">
+
+                <AddressInput
+                    height="250px"
+                    :onlyValidate="true"
+                    :pinLocationOnMap="true"
+                    triggerClass="space-y-4"
+                    @onDeleted="unsetAddress"
+                    :address="designCard.address"
+                    @onValidated="(address) => setAddress(address)"
+                    :triggerText="designCard.metadata.trigger_text ?? 'Add Address'">
+                </AddressInput>
+
+            </template>
 
         </template>
 
@@ -241,6 +233,7 @@
                 :mimeTypes="['image/*']"
                 :imagePreviewGridCols="3"
                 :label="designCard.metadata.title"
+                :description="designCard.metadata.description"
                 :labelStyle="{ color: designCard.metadata.design.title_color }"
                 :fileTextStyle="{ color: designCard.metadata.design.media_text_color }"
                 :errorText="formState.getFormError('design_cards'+index+'metadata.photos')"

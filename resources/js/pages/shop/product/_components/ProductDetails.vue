@@ -180,7 +180,7 @@
                 :key="index"
                 v-for="(dataCollectionField, index) in dataCollectionFields">
 
-                <template v-if="dataCollectionField.type == 'short text'">
+                <template v-if="dataCollectionField.type == 'short answer'">
 
                     <Input
                         type="text"
@@ -193,7 +193,7 @@
 
                 </template>
 
-                <template v-if="dataCollectionField.type == 'long text'">
+                <template v-if="dataCollectionField.type == 'long answer'">
 
                     <Input
                         type="textarea"

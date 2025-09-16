@@ -30,7 +30,7 @@
                 borderRight: `${designCard.metadata.design.r_border ?? 0}px solid ${designCard.metadata.design.border_color ?? '#000000'}`,
                 borderBottom: `${designCard.metadata.design.b_border ?? 0}px solid ${designCard.metadata.design.border_color ?? '#000000'}`,
             }"
-            class="flex justify-center hover:py-6 hover:scale-105 transition-all duration-300 cursor-pointer">
+            :class="['select-none flex justify-center', { 'hover:py-6 hover:scale-105 transition-all duration-300 cursor-pointer' : designCard.metadata.link }]">
             <span>{{ designCard.metadata.title }}</span>
         </div>
     </a>

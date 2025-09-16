@@ -57,6 +57,7 @@
                                 <Link v-if="option == 'link'" size="20"></Link>
                                 <Type v-if="option == 'text'" size="20"></Type>
                                 <Box v-if="option == 'products'" size="20"></Box>
+                                <Clock v-if="option == 'time'" size="20"></Clock>
                                 <Image v-if="option == 'image'" size="20"></Image>
                                 <Video v-if="option == 'video'" size="20"></Video>
                                 <List v-if="option == 'selection'" size="20"></List>
@@ -64,7 +65,6 @@
                                 <Truck v-if="option == 'delivery'" size="20"></Truck>
                                 <Binary v-if="option == 'number'" size="20"></Binary>
                                 <AtSign v-if="option == 'socials'" size="20"></AtSign>
-                                <Clock v-if="option == 'countdown'" size="20"></Clock>
                                 <Calendar v-if="option == 'date'" size="20"></Calendar>
                                 <MapPin v-if="option == 'location'" size="20"></MapPin>
                                 <Contact v-if="option == 'contact'" size="20"></Contact>
@@ -72,13 +72,14 @@
                                 <Megaphone v-if="option == 'banner'" size="20"></Megaphone>
                                 <UserRound v-if="option == 'customer'" size="20"></UserRound>
                                 <CloudUpload v-if="option == 'media'" size="20"></CloudUpload>
+                                <Hourglass v-if="option == 'countdown'" size="20"></Hourglass>
                                 <ShoppingCart v-if="option == 'items'" size="20"></ShoppingCart>
                                 <SquareCheck v-if="option == 'checkbox'" size="20"></SquareCheck>
                                 <ReceiptText v-if="option == 'order summary'" size="20"></ReceiptText>
                                 <CreditCard v-if="option == 'payment methods'" size="20"></CreditCard>
                                 <TicketPercent v-if="option == 'promo code'" size="20"></TicketPercent>
-                                <Tally2 v-if="option == 'long text'" size="20" class="rotate-90"></Tally2>
-                                <Tally1 v-if="option == 'short text'" size="20" class="rotate-90"></Tally1>
+                                <Tally2 v-if="option == 'long answer'" size="20" class="rotate-90"></Tally2>
+                                <Tally1 v-if="option == 'short answer'" size="20" class="rotate-90"></Tally1>
                                 <SeparatorHorizontal v-if="option == 'divider'" size="20"></SeparatorHorizontal>
 
                                 <span class="text-xs whitespace-nowrap">
@@ -105,13 +106,13 @@
     import Button from '@Partials/Button.vue';
     import Dropdown from '@Partials/Dropdown.vue';
     import { capitalizeAll } from '@Utils/stringUtils.js';
-    import { Plus, Map, Link, Type, Box, Image, Video, AtSign, Clock, Tally1, Tally2, Binary, Calendar, SquareCheck, Megaphone, List, Hexagon, CloudUpload, Contact, Truck, Pencil, MapPin, HandCoins, UserRound, ShoppingCart, ReceiptText, CreditCard, TicketPercent, SeparatorHorizontal } from 'lucide-vue-next';
+    import { Plus, Map, Link, Type, Box, Image, Video, AtSign, Clock, Tally1, Tally2, Binary, Calendar, SquareCheck, Megaphone, List, Hexagon, CloudUpload, Contact, Truck, Pencil, MapPin, HandCoins, UserRound, Hourglass, ShoppingCart, ReceiptText, CreditCard, TicketPercent, SeparatorHorizontal } from 'lucide-vue-next';
 
     export default {
         inject: ['designState'],
         components: {
             Pill, Button, Dropdown, Map, Link, Type, Box, Image, Video, AtSign, Clock, Tally1, Tally2, Binary, Calendar, SquareCheck, Megaphone, List, Hexagon, CloudUpload, Contact,
-            Truck, Pencil, MapPin, HandCoins, UserRound, ShoppingCart, ReceiptText, CreditCard, TicketPercent, SeparatorHorizontal
+            Truck, Pencil, MapPin, HandCoins, UserRound, Hourglass, ShoppingCart, ReceiptText, CreditCard, TicketPercent, SeparatorHorizontal
         },
         data() {
             return {
@@ -149,7 +150,7 @@
                         {
                             title: 'Get Information',
                             description: 'Choose the information the shopper must give',
-                            options: ['short text', 'long text', 'number', 'date', 'checkbox', 'selection', 'location', 'media']
+                            options: ['short answer', 'long answer', 'number', 'date', 'time', 'checkbox', 'selection', 'location', 'media']
                         },
                         {
                             title: 'Show Content',
@@ -256,7 +257,7 @@
                     metadata = {
                         title: 'Our Blog',
                         link: 'https://www.example.com',
-                        mode: 'link',
+                        mode: 'content',
                         design: {
                             t_margin: '0',
                             b_margin: '8',
@@ -354,7 +355,7 @@
                     metadata = {
                         title: 'Our Video',
                         link: 'https://www.youtube.com/watch?v=eHJnEHyyN1Y',
-                        mode: 'video',
+                        mode: 'content',
                         design: {
                             t_margin: '0',
                             b_margin: '8',
@@ -386,7 +387,7 @@
                     metadata = {
                         title: 'Contact Us',
                         mobile_number: '+26772000001',
-                        mode: 'contact',
+                        mode: 'content',
                         design: {
                             t_margin: '0',
                             b_margin: '8',
@@ -494,7 +495,7 @@
                             name: platform,
                             link: ''
                         })),
-                        mode: 'socials',
+                        mode: 'content',
                         design: {
                             t_margin: '0',
                             b_margin: '8',
@@ -584,9 +585,10 @@
                             text_color: '#ffffff',
                         }
                     };
-                }else if(type == 'short text') {
+                }else if(type == 'short answer') {
                     metadata = {
                         title: 'Enter a short answer',
+                        description: '',
                         required: false,
                         mode: 'content',
                         design: {
@@ -613,12 +615,14 @@
 
                             bg_color: '#ffffff',
                             title_color: '#111827',
+                            description_color: '#9CA3AF',
                             optional_text_color: '#9CA3AF'
                         }
                     };
-                }else if(type == 'long text') {
+                }else if(type == 'long answer') {
                     metadata = {
                         title: 'Enter a long answer',
+                        description: '',
                         required: false,
                         mode: 'content',
                         design: {
@@ -645,12 +649,14 @@
 
                             bg_color: '#ffffff',
                             title_color: '#111827',
+                            description_color: '#9CA3AF',
                             optional_text_color: '#9CA3AF'
                         }
                     };
                 }else if(type == 'number') {
                     metadata = {
                         title: 'Enter a number',
+                        description: '',
                         required: false,
                         mode: 'content',
                         design: {
@@ -677,12 +683,14 @@
 
                             bg_color: '#ffffff',
                             title_color: '#111827',
+                            description_color: '#9CA3AF',
                             optional_text_color: '#9CA3AF'
                         }
                     };
                 }else if(type == 'date') {
                     metadata = {
                         title: 'Select a date',
+                        description: '',
                         required: false,
                         mode: 'content',
                         design: {
@@ -709,6 +717,41 @@
 
                             bg_color: '#ffffff',
                             title_color: '#111827',
+                            description_color: '#9CA3AF',
+                            optional_text_color: '#9CA3AF'
+                        }
+                    };
+                }else if(type == 'time') {
+                    metadata = {
+                        title: 'Select a time',
+                        description: '',
+                        required: false,
+                        mode: 'content',
+                        design: {
+                            t_margin: '0',
+                            b_margin: '8',
+                            l_margin: '4',
+                            r_margin: '4',
+
+                            t_padding: '16',
+                            b_padding: '16',
+                            l_padding: '16',
+                            r_padding: '16',
+
+                            tl_border_radius: '16',
+                            br_border_radius: '16',
+                            tr_border_radius: '16',
+                            bl_border_radius: '16',
+
+                            t_border: '0',
+                            b_border: '0',
+                            l_border: '0',
+                            r_border: '0',
+                            border_color: '#E5E7EB',
+
+                            bg_color: '#ffffff',
+                            title_color: '#111827',
+                            description_color: '#9CA3AF',
                             optional_text_color: '#9CA3AF'
                         }
                     };
@@ -717,6 +760,7 @@
                         min: '1',
                         max: '2',
                         title: 'Select an option',
+                        description: '',
                         options: [],
                         required: false,
                         validation: 'not applicable',
@@ -746,12 +790,14 @@
                             bg_color: '#ffffff',
                             title_color: '#111827',
                             checkbox_color: '#111827',
+                            description_color: '#9CA3AF',
                             optional_text_color: '#9CA3AF'
                         }
                     };
                 }else if(type == 'selection') {
                     metadata = {
                         title: 'Select an option',
+                        description: '',
                         options: [],
                         required: false,
                         mode: 'content',
@@ -780,12 +826,14 @@
                             bg_color: '#ffffff',
                             title_color: '#111827',
                             radio_color: '#111827',
+                            description_color: '#9CA3AF',
                             optional_text_color: '#9CA3AF'
                         }
                     };
                 }else if(type == 'media') {
                     metadata = {
                         title: 'Attach an image',
+                        description: '',
                         required: false,
                         mode: 'content',
                         design: {
@@ -814,12 +862,14 @@
                             media_bg_color: null,
                             title_color: '#111827',
                             media_text_color: '#111827',
+                            description_color: '#9CA3AF',
                             optional_text_color: '#9CA3AF'
                         }
                     };
                 }else if(type == 'location') {
                     metadata = {
                         title: 'Select location',
+                        description: '',
                         trigger_text: 'Add Address',
                         required: false,
                         mode: 'content',
@@ -847,6 +897,7 @@
 
                             bg_color: '#ffffff',
                             title_color: '#111827',
+                            description_color: '#9CA3AF',
                             optional_text_color: '#9CA3AF'
                         }
                     };

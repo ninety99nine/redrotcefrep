@@ -4,12 +4,12 @@
 
         <div class="flex items-center space-x-2 mb-4">
 
-            <Pill :type="designCard.metadata.mode == 'link' ? 'primary' : 'light'" size="sm" :action="() => designCard.metadata.mode = 'link'">Link</Pill>
+            <Pill :type="designCard.metadata.mode == 'content' ? 'primary' : 'light'" size="sm" :action="() => designCard.metadata.mode = 'content'">Content</Pill>
             <Pill :type="designCard.metadata.mode == 'design' ? 'primary' : 'light'" size="sm" :action="() => designCard.metadata.mode = 'design'">Design</Pill>
 
         </div>
 
-        <template v-if="designCard.metadata.mode == 'link'">
+        <template v-if="designCard.metadata.mode == 'content'">
 
             <Input
                 type="text"

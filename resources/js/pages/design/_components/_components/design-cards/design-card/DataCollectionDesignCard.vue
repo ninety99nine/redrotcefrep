@@ -13,16 +13,31 @@
 
             <div class="space-y-4">
 
-                <div class="flex items-center justify-between space-x-8">
+                <div class="flex items-start justify-between space-x-8">
 
-                    <!-- Name Text Input -->
-                    <Input
-                        class="w-full"
-                        placeholder="Say something"
-                        v-model="designCard.metadata.title"
-                        @input="designState.saveStateDebounced('Option title changed')"
-                        :errorText="formState.getFormError('design_cards'+index+'metadata.title')">
-                    </Input>
+                    <div class="w-full space-y-2">
+
+                        <!-- Title Input -->
+                        <Input
+                            type="text"
+                            class="w-full"
+                            placeholder="Title"
+                            v-model="designCard.metadata.title"
+                            @input="designState.saveStateDebounced('Option title changed')"
+                            :errorText="formState.getFormError('design_cards'+index+'metadata.title')">
+                        </Input>
+
+                        <!-- Description Input -->
+                        <Input
+                            type="text"
+                            class="w-full"
+                            v-model="designCard.metadata.description"
+                            placeholder="Short description (optional)"
+                            @input="designState.saveStateDebounced('Option description changed')"
+                            :errorText="formState.getFormError('design_cards'+index+'metadata.description')">
+                        </Input>
+
+                    </div>
 
                     <!-- Required Checkbox -->
                     <Input
@@ -202,7 +217,7 @@
         methods: {
             onAddOption() {
                 this.designCard.metadata.options.push({
-                    'name': '',
+                    'name': `Option ${this.designCard.metadata.options.length + 1}`,
                     'fee': '0.00'
                 });
                 this.designState.saveStateDebounced('Sub option added');
