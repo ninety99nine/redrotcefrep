@@ -1,20 +1,55 @@
 <template>
 
-    <div class="select-none pt-8 pb-40">
+    <div
+        :style="{
+            backgroundColor: designCard.metadata.design.bg_color,
+
+            marginTop: `${designCard.metadata.design.t_margin ?? 0}px`,
+            marginLeft: `${designCard.metadata.design.l_margin ?? 0}px`,
+            marginRight: `${designCard.metadata.design.r_margin ?? 0}px`,
+            marginBottom: `${designCard.metadata.design.b_margin ?? 0}px`,
+
+            paddingTop: `${designCard.metadata.design.t_padding ?? 0}px`,
+            paddingLeft: `${designCard.metadata.design.l_padding ?? 0}px`,
+            paddingRight: `${designCard.metadata.design.r_padding ?? 0}px`,
+            paddingBottom: `${designCard.metadata.design.b_padding ?? 0}px`,
+
+            borderTopLeftRadius: `${designCard.metadata.design.tl_border_radius ?? 0}px`,
+            borderTopRightRadius: `${designCard.metadata.design.tr_border_radius ?? 0}px`,
+            borderBottomLeftRadius: `${designCard.metadata.design.bl_border_radius ?? 0}px`,
+            borderBottomRightRadius: `${designCard.metadata.design.br_border_radius ?? 0}px`,
+
+            borderTop: `${designCard.metadata.design.t_border ?? 0}px solid ${designCard.metadata.design.border_color ?? '#000000'}`,
+            borderLeft: `${designCard.metadata.design.l_border ?? 0}px solid ${designCard.metadata.design.border_color ?? '#000000'}`,
+            borderRight: `${designCard.metadata.design.r_border ?? 0}px solid ${designCard.metadata.design.border_color ?? '#000000'}`,
+            borderBottom: `${designCard.metadata.design.b_border ?? 0}px solid ${designCard.metadata.design.border_color ?? '#000000'}`,
+        }">
 
         <div class="flex flex-col items-center">
 
-            <StoreLogo v-if="store.logo" size="w-20 h-20" :showButton="false" class="mb-4"></StoreLogo>
-
             <!-- Heading -->
-            <h2 class="text-xl font-semibold text-center mb-4">{{ designCard.metadata.title }}</h2>
+            <h2
+                v-if="designCard.metadata.title"
+                class="text-xl font-semibold text-center mb-4"
+                :style="{ color: designCard.metadata.design.title_color }">
+                {{ designCard.metadata.title }}
+            </h2>
 
             <!-- Sub Heading -->
-            <p v-if="designCard.metadata.title" class="text-gray-500 text-center">{{ designCard.metadata.subtitle }}</p>
+            <h2
+                class="text-center"
+                v-if="designCard.metadata.subtitle"
+                :style="{ color: designCard.metadata.design.subtitle_color }">
+                {{ designCard.metadata.subtitle }}
+            </h2>
 
             <!-- Amount -->
             <Skeleton v-if="isLoadingOrder" width="w-40" height="h-8" :shine="true" class="my-4"></Skeleton>
-            <h2 v-else class="text-4xl font-semibold text-center mb-8">{{ order?.outstanding_total?.amount_with_currency ?? fakeOutstandingTotal }}</h2>
+            <h2 v-else
+                :style="{ color: designCard.metadata.design.amount_color }"
+                class="text-4xl font-semibold text-center mb-8">
+                {{ order?.outstanding_total?.amount_with_currency ?? fakeOutstandingTotal }}
+            </h2>
 
         </div>
 
@@ -84,12 +119,11 @@
     import Loader from '@Partials/Loader.vue';
     import { ArrowRight } from 'lucide-vue-next';
     import Skeleton from '@Partials/Skeleton.vue';
-    import StoreLogo from '@Components/StoreLogo.vue';
     import { convertToMoneyWithSymbol } from '@Utils/numberUtils.js';
 
     export default {
         inject: ['formState', 'orderState', 'storeState', 'notificationState'],
-        components: { ArrowRight, Pill, Loader, Skeleton, StoreLogo },
+        components: { ArrowRight, Pill, Loader, Skeleton },
         props: {
             designCard: {
                 type: Object

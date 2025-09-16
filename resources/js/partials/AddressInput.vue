@@ -139,7 +139,7 @@
 
         <template #trigger>
 
-            <!-- Edit Address / Add Address Button - Triggers Modal -->
+            <!-- Change Address / Add Address Button - Triggers Modal -->
             <div :class="triggerClass">
 
                 <h1 v-if="title" class="flex items-center font-lg font-bold">
@@ -164,8 +164,8 @@
                                 size="xs"
                                 type="light"
                                 :action="showModal"
-                                :leftIcon="SquarePen">
-                                <span class="whitespace-nowrap ml-1">Edit Address</span>
+                                :leftIcon="RefreshCcw">
+                                <span class="whitespace-nowrap ml-1">Change</span>
                             </Button>
 
                             <Button
@@ -187,7 +187,7 @@
                         :leftIcon="Plus"
                         :action="showModal"
                         buttonClass="w-full">
-                        <span>Add Address</span>
+                        <span>{{ triggerText }}</span>
                     </Button>
 
                 </template>
@@ -219,7 +219,7 @@
     import Button from '@Partials/Button.vue';
     import GoogleMaps from '@Partials/GoogleMaps.vue';
     import SelectCountry from '@Partials/SelectCountry.vue';
-    import { Plus, Trash2, MoveLeft, SquarePen } from 'lucide-vue-next';
+    import { Plus, Trash2, MoveLeft, RefreshCcw } from 'lucide-vue-next';
 
     export default {
         inject: ['formState', 'notificationState'],
@@ -267,6 +267,10 @@
                 type: String,
                 default: 'space-y-4 p-4 border border-gray-300 rounded-lg shadow-lg bg-white'
             },
+            triggerText: {
+                type: String,
+                default: 'Add Address'
+            },
             targetClass: {
                 type: String,
                 default: 'body'
@@ -279,7 +283,7 @@
                 Trash2,
                 step: 1,
                 MoveLeft,
-                SquarePen,
+                RefreshCcw,
                 form: {
                     city: null,
                     state: null,

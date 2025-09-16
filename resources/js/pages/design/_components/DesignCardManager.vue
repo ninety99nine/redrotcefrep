@@ -6,7 +6,10 @@
 
         <template v-else>
 
-            <AddDesignCardButton></AddDesignCardButton>
+            <div class="space-y-4">
+                <AddDesignCardButton></AddDesignCardButton>
+                <ArrangeCardsToggle></ArrangeCardsToggle>
+            </div>
 
             <DesignCards v-if="hasDesignCards"></DesignCards>
 
@@ -24,13 +27,14 @@
     import cloneDeep from 'lodash/cloneDeep';
     import NoDesignCards from '@Pages/design/_components/_components/NoDesignCards.vue';
     import DesignCards from '@Pages/design/_components/_components/design-cards/DesignCards.vue';
+    import ArrangeCardsToggle from '@Pages/design/_components/_components/ArrangeCardsToggle.vue';
     import LoadingDesignCards from '@Pages/design/_components/_components/LoadingDesignCards.vue';
     import AddDesignCardButton from '@Pages/design/_components/_components/AddDesignCardButton.vue';
 
     export default {
         inject: ['formState', 'storeState', 'designState', 'notificationState', 'changeHistoryState'],
         components: {
-            NoDesignCards, DesignCards, LoadingDesignCards, AddDesignCardButton
+            NoDesignCards, DesignCards, ArrangeCardsToggle, LoadingDesignCards, AddDesignCardButton
         },
         data() {
             return {

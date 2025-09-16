@@ -4,12 +4,12 @@
 
         <div class="flex items-center space-x-2 mb-4">
 
-            <Pill :type="designCard.metadata.mode == 'video' ? 'primary' : 'light'" size="sm" :action="() => designCard.metadata.mode = 'video'">Video</Pill>
+            <Pill :type="designCard.metadata.mode == 'content' ? 'primary' : 'light'" size="sm" :action="() => designCard.metadata.mode = 'content'">Content</Pill>
             <Pill :type="designCard.metadata.mode == 'design' ? 'primary' : 'light'" size="sm" :action="() => designCard.metadata.mode = 'design'">Design</Pill>
 
         </div>
 
-        <template v-if="designCard.metadata.mode == 'video'">
+        <template v-if="designCard.metadata.mode == 'content'">
 
             <Input
                 type="text"
@@ -22,13 +22,13 @@
 
             <Input
                 type="text"
+                label="Link"
                 class="w-full"
-                label="Video link"
+                placeholder="https://"
                 v-model="designCard.metadata.link"
-                placeholder="Youtube or Tiktok video link"
-                @input="designState.saveStateDebounced('Video link changed')"
-                :errorText="formState.getFormError(`design_cards.${index}.metadata.link`)"
-                tooltipContent="Copy the link from the web browser (not from the app) to add a Tiktok video">
+                @input="designState.saveStateDebounced('Link changed')"
+                tooltipContent="Include https:// at the begining of your link"
+                :errorText="formState.getFormError(`design_cards.${index}.metadata.link`)">
             </Input>
 
         </template>
@@ -57,4 +57,5 @@
             }
         }
     }
+
 </script>

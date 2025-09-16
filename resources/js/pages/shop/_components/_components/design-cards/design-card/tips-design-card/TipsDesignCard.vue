@@ -1,8 +1,30 @@
 <template>
 
     <div
-        class="bg-white rounded-2xl p-4"
-        v-if="designCard.type == 'tips' && designCard.metadata.show_tips">
+        :style="{
+            backgroundColor: designCard.metadata.design.bg_color,
+
+            marginTop: `${designCard.metadata.design.t_margin ?? 0}px`,
+            marginLeft: `${designCard.metadata.design.l_margin ?? 0}px`,
+            marginRight: `${designCard.metadata.design.r_margin ?? 0}px`,
+            marginBottom: `${designCard.metadata.design.b_margin ?? 0}px`,
+
+            paddingTop: `${designCard.metadata.design.t_padding ?? 0}px`,
+            paddingLeft: `${designCard.metadata.design.l_padding ?? 0}px`,
+            paddingRight: `${designCard.metadata.design.r_padding ?? 0}px`,
+            paddingBottom: `${designCard.metadata.design.b_padding ?? 0}px`,
+
+            borderTopLeftRadius: `${designCard.metadata.design.tl_border_radius ?? 0}px`,
+            borderTopRightRadius: `${designCard.metadata.design.tr_border_radius ?? 0}px`,
+            borderBottomLeftRadius: `${designCard.metadata.design.bl_border_radius ?? 0}px`,
+            borderBottomRightRadius: `${designCard.metadata.design.br_border_radius ?? 0}px`,
+
+            borderTop: `${designCard.metadata.design.t_border ?? 0}px solid ${designCard.metadata.design.border_color ?? '#000000'}`,
+            borderLeft: `${designCard.metadata.design.l_border ?? 0}px solid ${designCard.metadata.design.border_color ?? '#000000'}`,
+            borderRight: `${designCard.metadata.design.r_border ?? 0}px solid ${designCard.metadata.design.border_color ?? '#000000'}`,
+            borderBottom: `${designCard.metadata.design.b_border ?? 0}px solid ${designCard.metadata.design.border_color ?? '#000000'}`,
+        }"
+        v-if="designCard.metadata.show_tips">
 
         <h1
             v-if="designCard.metadata.title"
@@ -20,17 +42,26 @@
 
             <div class="flex flex-wrap gap-2">
 
-                <Pill
-                    size="md"
+                <div
                     :key="index"
-                    :showDot="false"
-                    :action="() => setTip(tip)"
                     v-for="(tip, index) in tips"
-                    :type="isSelectedTip(tip) ? 'primary' : 'light'">
+                    @click.stop="() => setTip(tip)"
+                    :style="[
+                        isSelectedTip(tip) ? {
+                            border: `1px solid transparent`,
+                            color: designCard.metadata.design.pill_text_color,
+                            backgroundColor: designCard.metadata.design.pill_bg_color,
+                        } : {
+                            color: '#111827',
+                            backgroundColor: '#ffffff',
+                            border: `1px solid #d2d2d2`,
+                        }
+                    ]"
+                    class="select-none whitespace-nowrap inline-flex items-center rounded-full px-3 py-1.5 text-xs font-semibold transition-all cursor-pointer hover:scale-95 hover:opacity-80 active:scale-90">
                     <template v-if="tip == 'none'">None</template>
                     <template v-else-if="tip == 'specify'">Specify</template>
                     <template v-else>{{ tip }}%</template>
-                </Pill>
+                </div>
 
             </div>
 
@@ -44,6 +75,7 @@
                 </Input>
 
             </div>
+
         </div>
 
     </div>
@@ -52,12 +84,11 @@
 
 <script>
 
-    import Pill from '@Partials/Pill.vue';
     import Input from '@Partials/Input.vue';
 
     export default {
         inject: ['formState', 'orderState', 'storeState'],
-        components: { Pill, Input },
+        components: { Input },
         props: {
             designCard: {
                 type: Object

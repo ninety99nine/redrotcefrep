@@ -11,11 +11,14 @@
 
         <template v-if="designCard.metadata.mode == 'content'">
 
-            <vue-easymde
-                class="text-xs"
-                :options="editorOptions"
-                v-model="designCard.metadata.body"
-                @change="designState.saveStateDebounced('Text content changed')" />
+            <Tabs
+                size="sm"
+                class="w-full"
+                :tabs="alignmentTabs"
+                v-model="designCard.metadata.alignment"
+                @change="designState.saveStateDebounced('Alignment changed')"
+                :errorText="formState.getFormError(`design_cards.${index}.metadata.alignment`)">
+            </Tabs>
 
         </template>
 
@@ -28,11 +31,13 @@
 <script>
 
     import Pill from '@Partials/Pill.vue';
+    import Tabs from '@Partials/Tabs.vue';
+    import { ArrowLeftToLine, ArrowRightToLine } from 'lucide-vue-next';
     import Designer from '@Pages/design/_components/_components/design-cards/design-card/_components/Designer.vue';
 
     export default {
-        inject: ['designState'],
-        components: { Pill, Designer },
+        inject: ['formState', 'designState'],
+        components: { Pill, Tabs, Designer },
         props: {
             index: {
                 type: Number
@@ -42,6 +47,15 @@
             },
             editorOptions: {
                 type: Object
+            }
+        },
+        data() {
+            return {
+                alignmentTabs: [
+                    { label: 'Left', value: 'left', leftIcon: ArrowLeftToLine },
+                    { label: 'Center', value: 'center' },
+                    { label: 'Right', value: 'right', rightIcon: ArrowRightToLine },
+                ],
             }
         }
     }

@@ -2,39 +2,52 @@
 
     <div>
 
-        <div class="grid grid-cols-2 gap-4">
+        <div class="flex items-center space-x-2 mb-4">
 
-            <Select
-                class="mb-2"
-                width="w-full"
-                :search="true"
-                label="Category"
-                :options="categories"
-                v-model="designCard.metadata.category_id"
-                @change="designState.saveStateDebounced('Category changed')"
-                :errorText="formState.getFormError(`design_cards.${index}.metadata.category_id`)">
-            </Select>
-
-            <Select
-                :search="false"
-                label="Feature"
-                class="w-full mb-4"
-                :options="featureOptions"
-                v-model="designCard.metadata.feature"
-                @change="designState.saveStateDebounced('Feature number changed')"
-                :errorText="formState.getFormError(`design_cards.${index}.metadata.feature`)">
-            </Select>
+            <Pill :type="designCard.metadata.mode == 'content' ? 'primary' : 'light'" size="sm" :action="() => designCard.metadata.mode = 'content'">Content</Pill>
+            <Pill :type="designCard.metadata.mode == 'design' ? 'primary' : 'light'" size="sm" :action="() => designCard.metadata.mode = 'design'">Design</Pill>
 
         </div>
 
-        <Tabs
-            size="sm"
-            class="w-full"
-            :tabs="layoutTabs"
-            v-model="designCard.metadata.layout"
-            @change="designState.saveStateDebounced('Layout changed')"
-            :errorText="formState.getFormError(`design_cards.${index}.metadata.layout`)">
-        </Tabs>
+        <template v-if="designCard.metadata.mode == 'content'">
+
+            <div class="grid grid-cols-2 gap-4">
+
+                <Select
+                    class="mb-2"
+                    width="w-full"
+                    :search="true"
+                    label="Category"
+                    :options="categories"
+                    v-model="designCard.metadata.category_id"
+                    @change="designState.saveStateDebounced('Category changed')"
+                    :errorText="formState.getFormError(`design_cards.${index}.metadata.category_id`)">
+                </Select>
+
+                <Select
+                    :search="false"
+                    label="Feature"
+                    class="w-full mb-4"
+                    :options="featureOptions"
+                    v-model="designCard.metadata.feature"
+                    @change="designState.saveStateDebounced('Feature number changed')"
+                    :errorText="formState.getFormError(`design_cards.${index}.metadata.feature`)">
+                </Select>
+
+            </div>
+
+            <Tabs
+                size="sm"
+                class="w-full"
+                :tabs="layoutTabs"
+                v-model="designCard.metadata.layout"
+                @change="designState.saveStateDebounced('Layout changed')"
+                :errorText="formState.getFormError(`design_cards.${index}.metadata.layout`)">
+            </Tabs>
+
+        </template>
+
+        <Designer :designCard="designCard"></Designer>
 
     </div>
 
@@ -42,13 +55,15 @@
 
 <script>
 
+    import Pill from '@Partials/Pill.vue';
     import Tabs from '@Partials/Tabs.vue';
     import Select from '@Partials/Select.vue';
     import { List, LayoutGrid } from 'lucide-vue-next';
+    import Designer from '@Pages/design/_components/_components/design-cards/design-card/_components/Designer.vue';
 
     export default {
         inject: ['formState', 'designState'],
-        components: { Tabs, Select, List, LayoutGrid },
+        components: { Pill, Tabs, Select, List, LayoutGrid, Designer },
         props: {
             index: {
                 type: Number

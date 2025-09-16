@@ -10,7 +10,7 @@
                 :for="uniqueId"
                 v-if="prefixText"
                 :class="[
-                    'text-sm leading-6 font-medium',
+                    'whitespace-nowrap text-sm leading-6 font-medium',
                     disabled ? 'text-gray-900/50 cursor-not-allowed' : 'text-gray-900 cursor-pointer'
                 ]">
                 {{ prefixText }}
@@ -28,7 +28,7 @@
             ]">
             <input type="checkbox" v-model="localModelValue" :id="uniqueId" :disabled="disabled" class="peer sr-only">
             <span :class="[
-                'absolute inset-0 bg-gray-200 rounded-full transition-colors duration-200 ease-in-out dark:bg-neutral-700 dark:peer-checked:bg-blue-500 peer-disabled:opacity-50 peer-disabled:pointer-events-none',
+                'absolute inset-0 bg-gray-200 border border-gray-300 rounded-full transition-colors duration-200 ease-in-out dark:bg-neutral-700 dark:peer-checked:bg-blue-500 peer-disabled:opacity-50 peer-disabled:pointer-events-none',
                 { 'peer-checked:bg-blue-500' : type == 'primary' },
                 { 'peer-checked:bg-green-500' : type == 'success' },
                 { 'peer-checked:bg-yellow-500' : type == 'warning' },
@@ -48,7 +48,7 @@
                 :for="uniqueId"
                 v-if="suffixText"
                 :class="[
-                    'text-sm leading-6 font-medium',
+                    'whitespace-nowrap text-sm leading-6 font-medium',
                     disabled ? 'text-gray-900/50 cursor-not-allowed' : 'text-gray-900 cursor-pointer'
                 ]">
                 {{ suffixText }}

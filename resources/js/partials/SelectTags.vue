@@ -8,8 +8,13 @@
                     :class="{ 'text-sm leading-6 font-medium text-gray-900 space-x-1' : !$slots.label }">
                     <slot v-if="$slots.label" name="label"></slot>
                     <template v-else>
-                        <span v-capitalize>{{ label }}</span>
-                        <span v-if="secondaryLabel" class="font-normal text-gray-400 ml-1">{{ secondaryLabel }}</span>
+                        <span v-capitalize :style="labelStyle">{{ label }}</span>
+                        <span
+                            v-if="secondaryLabel"
+                            :style="secondaryLabelStyle"
+                            :class="{ 'font-normal text-gray-400 ml-1' : !secondaryLabelStyle }">
+                            {{ secondaryLabel }}
+                        </span>
                         <span v-if="showAsterisk" class="text-red-500">*</span>
                     </template>
                 </label>
@@ -187,8 +192,16 @@
                 type: [String, null],
                 default: null
             },
+            labelStyle: {
+                type: [Object, String, null],
+                default: null
+            },
             secondaryLabel: {
                 type: [String, null],
+                default: null
+            },
+            secondaryLabelStyle: {
+                type: [Object, String, null],
                 default: null
             },
             showAsterisk: {

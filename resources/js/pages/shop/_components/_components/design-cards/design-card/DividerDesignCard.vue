@@ -1,7 +1,6 @@
 <template>
 
     <div :style="{
-            color: designCard.metadata.design.text_color,
             backgroundColor: designCard.metadata.design.bg_color,
 
             marginTop: `${designCard.metadata.design.t_margin ?? 0}px`,
@@ -23,36 +22,9 @@
             borderLeft: `${designCard.metadata.design.l_border ?? 0}px solid ${designCard.metadata.design.border_color ?? '#000000'}`,
             borderRight: `${designCard.metadata.design.r_border ?? 0}px solid ${designCard.metadata.design.border_color ?? '#000000'}`,
             borderBottom: `${designCard.metadata.design.b_border ?? 0}px solid ${designCard.metadata.design.border_color ?? '#000000'}`,
-        }"
-        v-if="designCard.metadata.upper_text || designCard.metadata.lower_text || designCard.address">
+        }">
 
-        <div class="space-y-2">
-
-            <Markdown
-                :text="designCard.metadata.upper_text"
-                v-if="designCard.metadata.upper_text != null && designCard.metadata.upper_text?.trim() != ''">
-            </Markdown>
-
-            <AddressInput
-                height="250px"
-                triggerClass=""
-                :editable="false"
-                :address="designCard.address"
-                v-if="designCard.address?.latitude && designCard.address?.longitude">
-            </AddressInput>
-
-            <p
-                :style="{ color: designCard.metadata.design.address_color }"
-                v-if="designCard.metadata.show_address && designCard.address?.complete_address">
-                {{ designCard.address.complete_address }}
-            </p>
-
-            <Markdown
-                :text="designCard.metadata.lower_text"
-                v-if="designCard.metadata.lower_text != null && designCard.metadata.lower_text?.trim() != ''">
-            </Markdown>
-
-        </div>
+        <div :style="{ border: `${designCard.metadata.thickness ?? 1}px ${designCard.metadata.divider ?? 'solid'} ${designCard.metadata.design.divider_color}` }"></div>
 
     </div>
 
@@ -60,11 +32,7 @@
 
 <script>
 
-    import Markdown from '@Partials/Markdown.vue';
-    import AddressInput from '@Partials/AddressInput.vue';
-
     export default {
-        components: { Markdown, AddressInput },
         props: {
             designCard: {
                 type: Object

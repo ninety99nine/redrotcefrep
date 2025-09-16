@@ -2,146 +2,159 @@
 
     <div>
 
-        <Input
-            type="text"
-            class="w-full mb-4"
-            placeholder="Title"
-            v-model="designCard.metadata.title"
-            @input="designState.saveStateDebounced('Title changed')"
-            :errorText="formState.getFormError(`design_cards.${index}.metadata.title`)">
-        </Input>
+        <div class="flex items-center space-x-2 mb-4">
 
-        <Input
-            rows="2"
-            type="textarea"
-            class="w-full mb-4"
-            placeholder="Additional Information"
-            v-model="designCard.metadata.description"
-            @input="designState.saveStateDebounced('Description changed')"
-            :errorText="formState.getFormError(`design_cards.${index}.metadata.description`)">
-        </Input>
+            <Pill :type="designCard.metadata.mode == 'content' ? 'primary' : 'light'" size="sm" :action="() => designCard.metadata.mode = 'content'">Content</Pill>
+            <Pill :type="designCard.metadata.mode == 'design' ? 'primary' : 'light'" size="sm" :action="() => designCard.metadata.mode = 'design'">Design</Pill>
 
-        <div class="p-4 bg-gray-100 rounded-lg mb-4">
+        </div>
 
-            <div class="w-full flex justify-between items-end space-x-4">
+        <template v-if="designCard.metadata.mode == 'content'">
 
-                <div class="w-full">
+            <Input
+                type="text"
+                class="w-full mb-4"
+                placeholder="Title"
+                v-model="designCard.metadata.title"
+                @input="designState.saveStateDebounced('Title changed')"
+                :errorText="formState.getFormError(`design_cards.${index}.metadata.title`)">
+            </Input>
 
-                    <h1 class="text-sm font-bold mb-2">Apply Fees</h1>
+            <Input
+                rows="2"
+                type="textarea"
+                class="w-full mb-4"
+                placeholder="Additional Information"
+                v-model="designCard.metadata.description"
+                @input="designState.saveStateDebounced('Description changed')"
+                :errorText="formState.getFormError(`design_cards.${index}.metadata.description`)">
+            </Input>
 
-                    <p class="text-sm text-gray-500">These fees will be applied on every order e.g administration, packaging, etc.</p>
+            <div class="p-4 bg-gray-100 rounded-lg mb-4">
+
+                <div class="w-full flex justify-between items-end space-x-4">
+
+                    <div class="w-full">
+
+                        <h1 class="text-sm font-bold mb-2">Apply Fees</h1>
+
+                        <p class="text-sm text-gray-500">These fees will be applied on every order e.g administration, packaging, etc.</p>
+
+                    </div>
+
+                    <Button
+                        size="xs"
+                        type="light"
+                        :leftIcon="Plus"
+                        :action="addCheckoutFee">
+                        <span>Add Fee</span>
+                    </Button>
 
                 </div>
 
-                <Button
-                    size="xs"
-                    type="light"
-                    :leftIcon="Plus"
-                    :action="addCheckoutFee">
-                    <span>Add Fee</span>
-                </Button>
+                <!-- Draggable Fields -->
+                <draggable
+                    class="mt-4 space-y-2"
+                    ghost-class="bg-yellow-50"
+                    handle=".draggable-handle-3"
+                    v-model="designCard.metadata.checkout_fees"
+                    v-if="designCard.metadata.checkout_fees.length"
+                    @change="designState.saveStateDebounced('Fee moved')">
 
-            </div>
+                    <template
+                        :key="index"
+                        v-for="(checkoutFee, index) in designCard.metadata.checkout_fees">
 
-            <!-- Draggable Fields -->
-            <draggable
-                class="mt-4 space-y-2"
-                ghost-class="bg-yellow-50"
-                handle=".draggable-handle-3"
-                v-model="designCard.metadata.checkout_fees"
-                v-if="designCard.metadata.checkout_fees.length"
-                @change="designState.saveStateDebounced('Fee moved')">
+                        <div class="bg-white border border-gray-200 shadow rounded-lg space-y-2 p-2">
 
-                <template
-                    :key="index"
-                    v-for="(checkoutFee, index) in designCard.metadata.checkout_fees">
-
-                    <div class="bg-white border border-gray-200 shadow rounded-lg space-y-2 p-2">
-
-                        <!-- Name Input -->
-                        <Input
-                            type="text"
-                            class="w-full"
-                            placeholder="Packaging"
-                            v-model="designCard.metadata.checkout_fees[index].name"
-                            @input="designState.saveStateDebounced('Checkout fee name changed')">
-                        </Input>
-
-                        <div class="flex items-center space-x-2">
-
-                            <Select
-                                class="w-60"
-                                :search="false"
-                                :options="feeTypes"
-                                placeholder="Select fee type"
-                                v-model="designCard.metadata.checkout_fees[index].rate_type"
-                                @change="designState.saveStateDebounced('Checkout fee type changed')">
-                            </Select>
-
+                            <!-- Name Input -->
                             <Input
-                                type="money"
-                                class="w-60"
-                                :currency="store.currency.code"
-                                v-model="designCard.metadata.checkout_fees[index].flat_rate"
-                                v-if="designCard.metadata.checkout_fees[index].rate_type == RATE_TYPES.FLAT"
-                                @input="designState.saveStateDebounced('Checkout fee amount changed')">
+                                type="text"
+                                class="w-full"
+                                placeholder="Packaging"
+                                v-model="designCard.metadata.checkout_fees[index].name"
+                                @input="designState.saveStateDebounced('Checkout fee name changed')">
                             </Input>
 
-                            <Input
-                                v-else
-                                class="w-60"
-                                type="percentage"
-                                v-model="designCard.metadata.checkout_fees[index].percentage_rate"
-                                @input="designState.saveStateDebounced('Checkout fee amount changed')">
-                            </Input>
+                            <div class="flex items-center space-x-2">
 
-                            <!-- Remove Button -->
-                            <div class="w-full space-x-4 flex items-center justify-end">
+                                <Select
+                                    class="w-60"
+                                    :search="false"
+                                    :options="feeTypes"
+                                    placeholder="Select fee type"
+                                    v-model="designCard.metadata.checkout_fees[index].rate_type"
+                                    @change="designState.saveStateDebounced('Checkout fee type changed')">
+                                </Select>
 
-                                <Trash
-                                    size="16"
-                                    @click.stop="() => removeCheckoutFee(index)"
-                                    class="cursor-pointer text-red-500 hover:text-red-600 active:text-red-600 active:scale-95 transition-all">
-                                </Trash>
+                                <Input
+                                    type="money"
+                                    class="w-60"
+                                    :currency="store.currency.code"
+                                    v-model="designCard.metadata.checkout_fees[index].flat_rate"
+                                    v-if="designCard.metadata.checkout_fees[index].rate_type == RATE_TYPES.FLAT"
+                                    @input="designState.saveStateDebounced('Checkout fee amount changed')">
+                                </Input>
 
-                                <!-- Drag & Drop Handle -->
-                                <Move @click.stop size="16" class="draggable-handle-3 cursor-grab active:cursor-grabbing text-gray-500 hover:text-yellow-500"></Move>
+                                <Input
+                                    v-else
+                                    class="w-60"
+                                    type="percentage"
+                                    v-model="designCard.metadata.checkout_fees[index].percentage_rate"
+                                    @input="designState.saveStateDebounced('Checkout fee amount changed')">
+                                </Input>
+
+                                <!-- Remove Button -->
+                                <div class="w-full space-x-4 flex items-center justify-end">
+
+                                    <Trash
+                                        size="16"
+                                        @click.stop="() => removeCheckoutFee(index)"
+                                        class="cursor-pointer text-red-500 hover:text-red-600 active:text-red-600 active:scale-95 transition-all">
+                                    </Trash>
+
+                                    <!-- Drag & Drop Handle -->
+                                    <Move @click.stop size="16" class="draggable-handle-3 cursor-grab active:cursor-grabbing text-gray-500 hover:text-yellow-500"></Move>
+
+                                </div>
 
                             </div>
 
                         </div>
 
-                    </div>
+                    </template>
 
-                </template>
+                </draggable>
 
-            </draggable>
+            </div>
 
-        </div>
+            <Input
+                class="mb-4"
+                type="checkbox"
+                inputLabel="Combine fees"
+                v-model="designCard.metadata.combine_fees"
+                @change="designState.saveStateDebounced('Combine fees status changed')">
+            </Input>
 
-        <Input
-            class="mb-4"
-            type="checkbox"
-            inputLabel="Combine fees"
-            v-model="designCard.metadata.combine_fees"
-            @change="designState.saveStateDebounced('Combine fees status changed')">
-        </Input>
+            <Input
+                class="mb-4"
+                type="checkbox"
+                inputLabel="Combine discounts"
+                v-model="designCard.metadata.combine_discounts"
+                @change="designState.saveStateDebounced('Combine discounts status changed')">
+            </Input>
 
-        <Input
-            class="mb-4"
-            type="checkbox"
-            inputLabel="Combine discounts"
-            v-model="designCard.metadata.combine_discounts"
-            @change="designState.saveStateDebounced('Combine discounts status changed')">
-        </Input>
+        </template>
+
+        <Designer :designCard="designCard"></Designer>
 
     </div>
-
 
 </template>
 
 <script>
 
+    import Pill from '@Partials/Pill.vue';
     import Input from '@Partials/Input.vue';
     import Button from '@Partials/Button.vue';
     import Select from '@Partials/Select.vue';
@@ -149,10 +162,11 @@
     import { capitalize } from '@Utils/stringUtils.js';
     import { Move, Trash, Plus } from 'lucide-vue-next';
     import { VueDraggableNext } from 'vue-draggable-next';
+    import Designer from '@Pages/design/_components/_components/design-cards/design-card/_components/Designer.vue';
 
     export default {
         inject: ['formState', 'storeState', 'designState'],
-        components: { Move, Trash, Input, Button, Select, draggable: VueDraggableNext },
+        components: { Pill, Move, Trash, Input, Button, Select, draggable: VueDraggableNext, Designer },
         props: {
             index: {
                 type: Number

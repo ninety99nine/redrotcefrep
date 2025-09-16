@@ -18,9 +18,14 @@
 
                         <template v-else>
 
-                            <span v-capitalize>{{ label }}</span>
+                            <span v-capitalize :style="labelStyle">{{ label }}</span>
 
-                            <span v-if="secondaryLabel" class="font-normal text-gray-400 ml-1">{{ secondaryLabel }}</span>
+                            <span
+                                v-if="secondaryLabel"
+                                :style="secondaryLabelStyle"
+                                :class="{ 'font-normal text-gray-400 ml-1' : !secondaryLabelStyle }">
+                                {{ secondaryLabel }}
+                            </span>
 
                             <Popover
                                 trigger="hover"
@@ -77,6 +82,7 @@
                     @drop="handleDrop"
                     @click="handleClick"
                     v-else-if="type != 'file' || type == 'file' && filesLeftToUpload"
+                    :style="wrapperStyle"
                     :class="wrapperClass ? wrapperClass : [
                         'flex',
                         wrapperAlignItems,
@@ -248,14 +254,33 @@
                             :filesLeftToUpload="filesLeftToUpload"
                             :singleFileUploadMessage="singleFileUploadMessage">
 
-                            <svg :class="['w-6 h-6 mb-2', { 'text-gray-400' : !filesLeftToUpload }]" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                            <svg
+                                :style="fileTextStyle"
+                                :class="['w-6 h-6 mb-2', { 'text-gray-400' : !filesLeftToUpload && !fileTextStyle }]" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M12 9.75v6.75m0 0-3-3m3 3 3-3m-8.25 6a4.5 4.5 0 0 1-1.41-8.775 5.25 5.25 0 0 1 10.233-2.33 3 3 0 0 1 3.758 3.848A3.752 3.752 0 0 1 18 19.5H6.75Z" />
                             </svg>
-                            <p v-if="disabled" class="text-gray-400 cursor-not-allowed">File upload is disabled</p>
-                            <p v-else-if="maxFiles == 1 && !filesLeftToUpload" class="text-gray-400 cursor-not-allowed">{{ singleFileUploadMessage || 'File attached' }}</p>
-                            <p v-else-if="!filesLeftToUpload" class="text-gray-400 cursor-not-allowed">Upload limit reached</p>
-                            <p v-else-if="!currentFileCount">{{ placeholder ?? (maxFiles == 1 ? 'Click or Drag & Drop Image' : 'Click or Drag & Drop Images') }}</p>
-                            <p v-else>Upload More Images</p>
+
+                            <p v-if="disabled"
+                                :style="fileTextStyle"
+                                :class="['cursor-not-allowed', { 'text-gray-400' : !fileTextStyle }]">File upload is disabled</p>
+
+                            <p :style="fileTextStyle"
+                                v-else-if="maxFiles == 1 && !filesLeftToUpload"
+                                :class="['cursor-not-allowed', { 'text-gray-400' : !fileTextStyle }]">{{ singleFileUploadMessage || 'File attached' }}</p>
+
+                            <p
+                                :style="fileTextStyle"
+                                v-else-if="!filesLeftToUpload"
+                                :class="['cursor-not-allowed', { 'text-gray-400' : !fileTextStyle }]">Upload limit reached</p>
+
+                            <p
+                                :style="fileTextStyle"
+                                v-else-if="!currentFileCount">{{ placeholder ?? (maxFiles == 1 ? 'Click or Drag & Drop Image' : 'Click or Drag & Drop Images') }}</p>
+
+                            <p
+                                v-else
+                                :style="fileTextStyle"
+                                :class="[{ 'text-gray-400' : !fileTextStyle }]">Upload More Images</p>
 
                         </slot>
 
@@ -457,8 +482,16 @@
                 type: [String, null],
                 default: null
             },
+            labelStyle: {
+                type: [Object, String, null],
+                default: null
+            },
             secondaryLabel: {
                 type: [String, null],
+                default: null
+            },
+            secondaryLabelStyle: {
+                type: [Object, String, null],
                 default: null
             },
             popoverContent: {
@@ -499,6 +532,10 @@
             },
             alignItems: {
                 type: [String, null]
+            },
+            wrapperStyle: {
+                type: [String, Object, Array, null],
+                default: null
             },
             wrapperClass: {
                 type: [String, Object, Array, null],
@@ -586,6 +623,10 @@
             },
 
             //  File
+            fileTextStyle: {
+                type: [String, Object, Array, null],
+                default: null
+            },
             height: {
                 type: [String, null],
                 default: 'h-20'

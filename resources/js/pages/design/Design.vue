@@ -3,13 +3,13 @@
 
         <div class="flex space-x-8">
 
-            <div class="flex-grow space">
+            <div class="w-2xl">
 
                 <div class="border-b border-gray-300 rounded-l-md mb-4">
 
                     <h1 class="text-lg text-gray-700 font-semibold mb-4">Design</h1>
 
-                    <div class="flex items-center justify-between">
+                    <div class="flex items-center justify-between space-x-8">
 
                         <Tabs
                             :tabs="tabs"
@@ -18,10 +18,11 @@
                         </Tabs>
 
                         <Button
-                            size="lg"
+                            size="xs"
                             type="light"
                             :action="openWebLink"
                             :leftIcon="ExternalLink">
+                            <span class="ml-1">Preview</span>
                         </Button>
 
                     </div>
@@ -33,9 +34,9 @@
 
             </div>
 
-            <div class="w-96">
+            <div class="flex-grow">
                 <div class="mockup-phone scale-75 overflow-hidden border-8 border-slate-900 rounded-4xl fixed top-8 right-8 shadow-lg shadow-gray-500">
-                    <div class="w-[360px] h-[800px] overflow-y-auto rounded-4xl text-gray-700">
+                    <div class="w-[360px] h-[800px] overflow-y-auto text-gray-700">
                         <router-view name="preview"></router-view>
                     </div>
                 </div>

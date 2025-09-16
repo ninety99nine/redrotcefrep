@@ -1,15 +1,44 @@
 <template>
 
-    <div
-        class="bg-white rounded-2xl p-4"
-        v-if="designCard.type == 'products' && designCard.metadata.category_id && categoryData[designCard.metadata.category_id]?.category">
+    <div :style="{
+            backgroundColor: designCard.metadata.design.bg_color,
+
+            marginTop: `${designCard.metadata.design.t_margin ?? 0}px`,
+            marginLeft: `${designCard.metadata.design.l_margin ?? 0}px`,
+            marginRight: `${designCard.metadata.design.r_margin ?? 0}px`,
+            marginBottom: `${designCard.metadata.design.b_margin ?? 0}px`,
+
+            paddingTop: `${designCard.metadata.design.t_padding ?? 0}px`,
+            paddingLeft: `${designCard.metadata.design.l_padding ?? 0}px`,
+            paddingRight: `${designCard.metadata.design.r_padding ?? 0}px`,
+            paddingBottom: `${designCard.metadata.design.b_padding ?? 0}px`,
+
+            borderTopLeftRadius: `${designCard.metadata.design.tl_border_radius ?? 0}px`,
+            borderTopRightRadius: `${designCard.metadata.design.tr_border_radius ?? 0}px`,
+            borderBottomLeftRadius: `${designCard.metadata.design.bl_border_radius ?? 0}px`,
+            borderBottomRightRadius: `${designCard.metadata.design.br_border_radius ?? 0}px`,
+
+            borderTop: `${designCard.metadata.design.t_border ?? 0}px solid ${designCard.metadata.design.border_color ?? '#000000'}`,
+            borderLeft: `${designCard.metadata.design.l_border ?? 0}px solid ${designCard.metadata.design.border_color ?? '#000000'}`,
+            borderRight: `${designCard.metadata.design.r_border ?? 0}px solid ${designCard.metadata.design.border_color ?? '#000000'}`,
+            borderBottom: `${designCard.metadata.design.b_border ?? 0}px solid ${designCard.metadata.design.border_color ?? '#000000'}`,
+         }"
+        v-if="designCard.metadata.category_id && categoryData[designCard.metadata.category_id]?.category">
 
         <div class="space-y-4">
 
             <!-- Category Name and Description -->
             <div>
-                <h3 class="text-lg font-semibold text-gray-900 mb-0">{{ categoryData[designCard.metadata.category_id].category.name }}</h3>
-                <p v-if="categoryData[designCard.metadata.category_id].category.description" class="text-gray-600">{{ categoryData[designCard.metadata.category_id].category.description }}</p>
+                <h3
+                    class="text-lg font-semibold mb-0"
+                    :style="{ color: designCard.metadata.design.title_color }">
+                    {{ categoryData[designCard.metadata.category_id].category.name }}
+                </h3>
+                <p
+                    :style="{ color: designCard.metadata.design.description_color }"
+                    v-if="categoryData[designCard.metadata.category_id].category.description">
+                    {{ categoryData[designCard.metadata.category_id].category.description }}
+                </p>
             </div>
 
             <!-- Loader -->
@@ -27,7 +56,8 @@
                 <div
                     :key="product.id"
                     @click.stop="() => onView(product)"
-                    class="relative flex flex-col space-y-2 p-2 hover:bg-gray-100 cursor-pointer rounded-lg hover:scale-105 transition-all duration-300"
+                    :style="{ color: designCard.metadata.design.title_color }"
+                    class="relative flex flex-col space-y-2 p-2 cursor-pointer rounded-lg hover:scale-105 transition-all duration-300"
                     v-for="product in categoryData[designCard.metadata.category_id].category.products.slice(0, parseInt(designCard.metadata.feature))">
 
                     <div
@@ -52,7 +82,11 @@
                     </div>
 
 
-                    <h4 class="text-sm font-medium text-gray-900 truncate">{{ product.name }}</h4>
+                    <h4
+                        class="text-sm font-medium truncate"
+                        :style="{ color: designCard.metadata.design.product_name_color }">
+                        {{ product.name }}
+                    </h4>
 
                     <div class="flex items-center space-x-2 flex-wrap gap-2">
 
@@ -60,11 +94,16 @@
 
                         <template v-else>
 
-                            <span v-if="(product.variant ?? product).on_sale" class="text-sm font-semibold text-gray-900">
+                            <span
+                                class="text-sm font-semibold"
+                                v-if="(product.variant ?? product).on_sale"
+                                :style="{ color: designCard.metadata.design.product_price_color }">
                                 {{ (product.variant ?? product).unit_sale_price.amount_with_currency }}
                             </span>
 
-                            <span :class="['text-sm', { 'line-through text-gray-400': (product.variant ?? product).on_sale, 'text-gray-900 font-semibold': !(product.variant ?? product).on_sale }]">
+                            <span
+                                :style="{ color: (product.variant ?? product).on_sale ? designCard.metadata.design.product_cancelled_price_color : designCard.metadata.design.product_price_color }"
+                                :class="['text-sm', { 'line-through': (product.variant ?? product).on_sale, 'font-semibold': !(product.variant ?? product).on_sale }]">
                                 {{ (product.variant ?? product).unit_regular_price.amount_with_currency }}
                             </span>
 

@@ -1,6 +1,6 @@
 <template>
 
-    <div class="w-full bg-gradient-to-b from-blue-100 to-white-100 min-h-screen overflow-x-hidden">
+    <div class="w-full bg-gradient-to-b from-blue-100 to-blue-50 min-h-screen overflow-x-hidden">
 
         <!-- Notifications -->
         <Notifications></Notifications>
@@ -32,7 +32,13 @@
 
                                 <!-- Visit Store Icon -->
                                 <Skeleton v-if="isLoadingStore" width="w-8" :shine="true"></Skeleton>
-                                <Button v-else type="light" :leftIcon="ExternalLink" :action="openWebLink"></Button>
+                                <Button
+                                    size="xs"
+                                    type="light"
+                                    :action="openWebLink"
+                                    :leftIcon="ExternalLink">
+                                    <span class="ml-1">visit</span>
+                                </Button>
 
                             </template>
 

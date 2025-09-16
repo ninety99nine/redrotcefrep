@@ -16,9 +16,14 @@
 
                     <template v-else>
 
-                        <span v-capitalize>{{ label }}</span>
+                        <span v-capitalize :style="labelStyle">{{ label }}</span>
 
-                        <span v-if="secondaryLabel" class="font-normal text-gray-400 ml-1">{{ secondaryLabel }}</span>
+                        <span
+                            v-if="secondaryLabel"
+                            :style="secondaryLabelStyle"
+                            :class="{ 'font-normal text-gray-400 ml-1' : !secondaryLabelStyle }">
+                            {{ secondaryLabel }}
+                        </span>
 
                         <Popover
                             trigger="hover"
@@ -191,8 +196,16 @@
                 type: [String, null],
                 default: null
             },
+            labelStyle: {
+                type: [Object, String, null],
+                default: null
+            },
             secondaryLabel: {
                 type: [String, null],
+                default: null
+            },
+            secondaryLabelStyle: {
+                type: [Object, String, null],
                 default: null
             },
             popoverContent: {

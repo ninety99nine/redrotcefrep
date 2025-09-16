@@ -3,13 +3,10 @@
     <a
         class="block"
         target="_blank"
-        @click.stop="handleLink"
-        rel="noopener noreferrer"
-        :href="designCard.metadata.link"
-        :aria-label="designCard.metadata.title || 'Link to content'"
-        :class="[hasLink ? 'cursor-pointer hover:scale-105 transition-all duration-300' : 'cursor-default']">
-
-        <div :style="{
+        :href="designCard.metadata.link">
+        <div
+            v-if="designCard.metadata.title"
+            :style="{
                 color: designCard.metadata.design.text_color,
                 backgroundColor: designCard.metadata.design.bg_color,
 
@@ -33,60 +30,18 @@
                 borderRight: `${designCard.metadata.design.r_border ?? 0}px solid ${designCard.metadata.design.border_color ?? '#000000'}`,
                 borderBottom: `${designCard.metadata.design.b_border ?? 0}px solid ${designCard.metadata.design.border_color ?? '#000000'}`,
             }"
-            v-if="designCard.photos?.[0]?.path || designCard.metadata.upper_text || designCard.metadata.lower_text">
-
-            <div class="space-y-4">
-
-                <Markdown
-                    :text="designCard.metadata.upper_text"
-                    v-if="designCard.metadata.upper_text?.trim()">
-                </Markdown>
-
-                <div
-                    v-if="designCard.photos?.[0]?.path"
-                    class="w-full aspect-square relative flex items-center justify-center rounded-lg overflow-hidden">
-
-                    <img
-                        :src="designCard.photos[0].path"
-                        class="w-full h-full object-cover"
-                        :alt="designCard.metadata.title || 'Image'" />
-
-                </div>
-
-                <Markdown
-                    :text="designCard.metadata.lower_text"
-                    v-if="designCard.metadata.lower_text?.trim()">
-                </Markdown>
-
-            </div>
-
+            class="flex justify-center hover:py-6 hover:scale-105 transition-all duration-300 cursor-pointer">
+            <span>{{ designCard.metadata.title }}</span>
         </div>
-
     </a>
 
 </template>
 
 <script>
-
-    import Markdown from '@Partials/Markdown.vue';
-
     export default {
-        components: { Markdown },
         props: {
             designCard: {
                 type: Object
-            }
-        },
-        computed: {
-            hasLink() {
-                return !(this.designCard.metadata.link == null || this.designCard.metadata.link.trim() == '');
-            }
-        },
-        methods: {
-            handleLink(e) {
-                if(!this.hasLink) {
-                    e.preventDefault();
-                }
             }
         }
     }

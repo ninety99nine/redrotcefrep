@@ -49,6 +49,8 @@
             v-else-if="designCard.metadata.mode == 'lower_text'"
             @change="designState.saveStateDebounced('Text content changed')" />
 
+        <Designer :designCard="designCard"></Designer>
+
     </div>
 
 </template>
@@ -58,10 +60,11 @@
     import Pill from '@Partials/Pill.vue';
     import Input from '@Partials/Input.vue';
     import Datepicker from '@Partials/Datepicker.vue';
+    import Designer from '@Pages/design/_components/_components/design-cards/design-card/_components/Designer.vue';
 
     export default {
         inject: ['formState', 'designState'],
-        components: { Pill, Input, Datepicker },
+        components: { Pill, Input, Datepicker, Designer },
         props: {
             index: {
                 type: Number
