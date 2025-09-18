@@ -1,12 +1,16 @@
 <template>
 
-    <DesignCardManager></DesignCardManager>
+    <div class="max-w-xl mx-auto">
+
+        <DesignCardManager placement="checkout"></DesignCardManager>
+
+    </div>
 
 </template>
 
 <script>
 
-    import DesignCardManager from '@Pages/shop/_components/DesignCardManager.vue';
+    import DesignCardManager from '@Pages/shop/_components/design-card-manager/DesignCardManager.vue';
 
     export default {
         components: {

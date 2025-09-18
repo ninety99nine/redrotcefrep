@@ -4,19 +4,14 @@ import { useChangeHistoryStore as changeHistoryState } from '@Stores/change-hist
 export const useDesignStore = defineStore('design', {
     state: () => ({
         categories: [],
-        placement: null,
-        designCards: [],
         categoryData: {},
         designForm: null,
         isUpdatingDesign: false,
-        isLoadingDesignCards: false,
         wantsToArrangeDesignCards: false,
     }),
     actions: {
         reset() {
             this.categories = [];
-            this.placement = null;
-            this.designCards = [];
             this.categoryData = {};
             this.designForm = null;
             this.isUpdatingDesign = false;
@@ -49,6 +44,8 @@ export const useDesignStore = defineStore('design', {
                         designCard['metadata'][property] = '';
                     }
                 }
+
+                designCard['expanded'] = false;
 
                 return designCard;
 

@@ -7,6 +7,7 @@ enum DesignCardPlacement: string
     case STOREFRONT = 'storefront';
     case CHECKOUT = 'checkout';
     case PAYMENT = 'payment';
+    case MENU = 'menu';
 
     public static function values(): array
     {

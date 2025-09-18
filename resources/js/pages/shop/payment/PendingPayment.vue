@@ -1,4 +1,5 @@
 <template>
+
     <div class="select-none max-w-xl mx-auto pt-16">
 
         <div class="w-full bg-white border border-gray-100 shadow-sm rounded-xl mb-4">

@@ -114,6 +114,11 @@
             Pill, Button, Dropdown, Map, Link, Type, Box, Image, Video, AtSign, Clock, Tally1, Tally2, Binary, Calendar, SquareCheck, Megaphone, List, Hexagon, CloudUpload, Contact,
             Truck, Pencil, MapPin, HandCoins, UserRound, Hourglass, ShoppingCart, ReceiptText, CreditCard, TicketPercent, SeparatorHorizontal
         },
+        props: {
+            placement: {
+                type: String
+            }
+        },
         data() {
             return {
                 Plus,
@@ -121,9 +126,6 @@
             }
         },
         computed: {
-            placement() {
-                return this.designState.placement;
-            },
             categories() {
                 return this.designState.categories;
             },
@@ -171,6 +173,15 @@
                                 'logo', 'products', 'text', 'image', 'video', 'link', 'contact', 'countdown', 'map', 'socials', 'divider',
                                 'payment methods'
                             ]
+                        }
+                    ];
+
+                }else if(this.placement === 'menu') {
+
+                    return [
+                        {
+                            description: 'Choose the content shopper must see',
+                            options: ['logo', 'text', 'image', 'video', 'link', 'contact', 'socials', 'divider', 'banner']
                         }
                     ];
 
@@ -1153,6 +1164,7 @@
                 let designCard = {
                     type: type,
                     visible: true,
+                    expanded: true,
                     metadata: metadata,
                     temporary_id: uuidv4()
                 };
@@ -1166,6 +1178,15 @@
                 }
 
                 this.designCards.unshift(designCard);
+
+                for (let i = 0; i < this.designCards.length; i++) {
+                    if(i === 0) {
+                        this.designCards[i].expanded = true;
+                    }else{
+                        this.designCards[i].expanded = false;
+                    }
+                }
+
                 this.designState.saveStateDebounced('Design card added');
                 toggleDropdown(e);
             }

@@ -1,6 +1,6 @@
 <template>
 
-    <DesignCardManager></DesignCardManager>
+    <DesignCardManager placement="storefront"></DesignCardManager>
 
 </template>
 

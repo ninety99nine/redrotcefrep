@@ -51,6 +51,11 @@ class Category extends Model
         $query->where('name', 'like', '%' . $searchTerm . '%');
     }
 
+    public function scopeVisible($query)
+    {
+        return $query->where('visible', '1');
+    }
+
     /**
      * Get store.
      *

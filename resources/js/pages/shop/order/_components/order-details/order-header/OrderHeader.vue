@@ -9,7 +9,7 @@
                 <EditButton></EditButton>
                 <PrintButton></PrintButton>
                 <DownloadButton></DownloadButton>
-                <VisitButton></VisitButton>
+                <HomeButton></HomeButton>
 
         </div>
 
@@ -20,13 +20,13 @@
 <script>
 
     import EditButton from  '@Pages/shop/order/_components/order-details/order-header/components/EditButton.vue';
-    import VisitButton from  '@Pages/shop/order/_components/order-details/order-header/components/VisitButton.vue';
+    import HomeButton from  '@Pages/shop/order/_components/order-details/order-header/components/HomeButton.vue';
     import PrintButton from  '@Pages/shop/order/_components/order-details/order-header/components/PrintButton.vue';
     import PaymentStatus from  '@Pages/shop/order/_components/order-details/order-header/components/PaymentStatus.vue';
     import DownloadButton from  '@Pages/shop/order/_components/order-details/order-header/components/DownloadButton.vue';
 
     export default {
-        components: { EditButton, VisitButton, PrintButton, PaymentStatus, DownloadButton }
+        components: { EditButton, HomeButton, PrintButton, PaymentStatus, DownloadButton }
     };
 
 </script>

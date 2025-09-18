@@ -11,7 +11,7 @@
         </Button>
 
         <Drawer
-            placement="right"
+            position="right"
             ref="columnsDrawer"
             :showFooter="false"
             :scrollOnContent="false">

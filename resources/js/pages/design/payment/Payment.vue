@@ -1,6 +1,6 @@
 <template>
 
-    <DesignCardManager></DesignCardManager>
+    <DesignCardManager placement="payment"></DesignCardManager>
 
 </template>
 

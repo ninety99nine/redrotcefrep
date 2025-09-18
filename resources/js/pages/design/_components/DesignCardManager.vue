@@ -6,14 +6,11 @@
 
         <template v-else>
 
-            <div class="space-y-4">
-                <AddDesignCardButton></AddDesignCardButton>
-                <ArrangeCardsToggle></ArrangeCardsToggle>
-            </div>
+            <AddDesignCardButton :placement="placement"></AddDesignCardButton>
 
             <DesignCards v-if="hasDesignCards"></DesignCards>
 
-            <NoDesignCards v-else></NoDesignCards>
+            <NoDesignCards v-else :placement="placement"></NoDesignCards>
 
         </template>
 
@@ -27,18 +24,23 @@
     import cloneDeep from 'lodash/cloneDeep';
     import NoDesignCards from '@Pages/design/_components/_components/NoDesignCards.vue';
     import DesignCards from '@Pages/design/_components/_components/design-cards/DesignCards.vue';
-    import ArrangeCardsToggle from '@Pages/design/_components/_components/ArrangeCardsToggle.vue';
     import LoadingDesignCards from '@Pages/design/_components/_components/LoadingDesignCards.vue';
     import AddDesignCardButton from '@Pages/design/_components/_components/AddDesignCardButton.vue';
 
     export default {
         inject: ['formState', 'storeState', 'designState', 'notificationState', 'changeHistoryState'],
+        props: {
+            placement: {
+                type: String
+            }
+        },
         components: {
-            NoDesignCards, DesignCards, ArrangeCardsToggle, LoadingDesignCards, AddDesignCardButton
+            NoDesignCards, DesignCards, LoadingDesignCards, AddDesignCardButton
         },
         data() {
             return {
                 isUploading: false,
+                isLoadingDesignCards: false,
                 isChangingDesignCardArrangement: false,
             }
         },
@@ -60,30 +62,16 @@
             designForm() {
                 return this.designState.designForm;
             },
-            isLoadingDesignCards() {
-                return this.designState.isLoadingDesignCards;
-            },
             designCards() {
                 return this.designForm?.design_cards ?? [];
             },
             hasDesignCards() {
                 return this.designCards.filter(designCard => !designCard.hasOwnProperty('delete')).length > 0;
-            },
-            placement() {
-                if(this.$route.name == 'edit-storefront') {
-                    return 'storefront';
-                }else if(this.$route.name == 'edit-checkout') {
-                    return 'checkout';
-                }else if(this.$route.name == 'edit-payment') {
-                    return 'payment';
-                }
             }
         },
         methods: {
             async setup() {
                 if(this.store) {
-
-                    this.designState.placement = this.placement;
 
                     this.designState.categories = this.store.categories.map((category) => {
                         return {
@@ -99,7 +87,7 @@
             async showDesignCards() {
                 try {
 
-                    this.designState.isLoadingDesignCards = true;
+                    this.isLoadingDesignCards = true;
 
                     let config = {
                         params: {
@@ -123,7 +111,7 @@
                     this.formState.setServerFormErrors(error);
                     console.error('Failed to fetch design cards:', error);
                 } finally {
-                    this.designState.isLoadingDesignCards = false;
+                    this.isLoadingDesignCards = false;
                 }
             },
             async updateDesignCards() {

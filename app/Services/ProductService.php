@@ -35,6 +35,7 @@ class ProductService extends BaseService
     {
         $tagId = $data['tag_id'] ?? null;
         $storeId = $data['store_id'] ?? null;
+        $categoryIds = $data['category_ids'] ?? null;
         $association = isset($data['association']) ? Association::tryFrom($data['association']) : null;
 
         if($association == Association::SUPER_ADMIN) {
@@ -48,6 +49,10 @@ class ProductService extends BaseService
         }else {
             $query = Product::isNotVariant()->where('store_id', $storeId)->visible();
         }
+
+        if($categoryIds) $query = $query->whereHas('categories', function (Builder $query) use ($categoryIds) {
+            $query->whereIn('id', $categoryIds);
+        });
 
         if($storeId) $query = $query->where('store_id', $storeId);
 

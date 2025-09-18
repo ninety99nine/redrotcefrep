@@ -12,7 +12,7 @@
 
         <Drawer
             ref="sortDrawer"
-            placement="right"
+            position="right"
             :showFooter="false"
             :scrollOnContent="false">
 

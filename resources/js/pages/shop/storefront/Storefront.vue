@@ -1,16 +1,22 @@
 <template>
 
-    <DesignCardManager></DesignCardManager>
+    <div class="max-w-4xl mx-auto">
+
+        <Menu menuClass="max-w-4xl mx-auto"></Menu>
+        <DesignCardManager placement="storefront"></DesignCardManager>
+
+    </div>
 
 </template>
 
 <script>
 
-    import DesignCardManager from '@Pages/shop/_components/DesignCardManager.vue';
+    import Menu from '@Pages/shop/_components/menu/Menu.vue';
+    import DesignCardManager from '@Pages/shop/_components/design-card-manager/DesignCardManager.vue';
 
     export default {
         components: {
-            DesignCardManager
+            Menu, DesignCardManager
         }
     }
 </script>

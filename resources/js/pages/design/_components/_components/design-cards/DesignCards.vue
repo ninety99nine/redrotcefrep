@@ -13,9 +13,11 @@
 
             <div
                 v-if="!designCard.hasOwnProperty('delete')"
-                class="w-full bg-gray-50 p-4 border border-gray-300 rounded-lg relative">
+                class="group w-full bg-gray-50 border border-gray-300 rounded-lg overflow-hidden relative">
 
-                <div :class="['flex items-center justify-between', { 'mb-4' : !wantsToArrangeDesignCards }]">
+                <div
+                    @click.stop="() => onToggleExpansion(index)"
+                    :class="['flex items-center justify-between cursor-pointer shadow p-4', { 'bg-gray-100 mb-4' : designCard.expanded && !wantsToArrangeDesignCards }]">
 
                     <div class="flex items-center space-x-2 text-gray-500">
 
@@ -50,7 +52,13 @@
                         <ReceiptText v-if="designCard.type == 'order summary'" size="20"></ReceiptText>
                         <TicketPercent v-if="designCard.type == 'promo code'" size="20"></TicketPercent>
 
-                        <span class="text-xs whitespace-nowrap">{{ designCard.type }}</span>
+                        <span
+                            class="text-xs whitespace-nowrap"
+                            v-if="['link'].includes(designCard.type) && !empty(designCard.metadata.title)">
+                            {{ designCard.metadata.title }}
+                        </span>
+
+                        <span v-else class="text-xs whitespace-nowrap">{{ designCard.type }}</span>
 
                     </div>
 
@@ -77,19 +85,45 @@
 
                         <template v-else>
 
+                            <Pill
+                                size="xs"
+                                type="primary"
+                                :action="() => copyStyles(index)"
+                                class="opacity-0 group-hover:opacity-100"
+                                tooltipContent="Copy the styles of this design card">
+                                copy styles
+                            </Pill>
+
+                            <Pill
+                                size="xs"
+                                type="success"
+                                v-if="copiedStyles"
+                                :action="() => pasteStyles(index)"
+                                class="opacity-0 group-hover:opacity-100"
+                                tooltipContent="Paste the copied styles to this design card">
+                                paste styles
+                            </Pill>
+
                             <!-- Delete Icon -->
                             <Trash
                                 size="16"
-                                v-if="wantsToArrangeDesignCards"
                                 @click.stop="() => removeDesignCard(index)"
-                                class="cursor-pointer text-gray-500 hover:text-red-600 active:text-red-600 active:scale-95 transition-all">
+                                class="cursor-pointer text-gray-500 hover:text-red-500 active:text-red-600 active:scale-95 transition-all duration-300">
                             </Trash>
+
+                            <!-- Duplicate Icon -->
+                            <Copy
+                                size="16"
+                                @click.stop="() => duplicateDesignCard(index)"
+                                class="cursor-pointer text-gray-500 hover:text-blue-500 active:text-blue-600 active:scale-95 transition-all duration-300">
+                            </Copy>
 
                             <!-- Visibility Icon -->
                             <div
-                                :class="[designCard.visible ? 'opacity-100': 'opacity-30', 'cursor-pointer text-gray-500 hover:text-blue-500 transition-all duration-500']">
-                                <Eye v-if="designCard.visible" size="16" @click.stop="() => toggleVisible(index)"></Eye>
-                                <EyeOff v-else size="16" @click.stop="() => toggleVisible(index)"></EyeOff>
+                                @click.stop="() => toggleVisible(index)"
+                                :class="[designCard.visible ? 'opacity-100': 'opacity-30', 'cursor-pointer text-gray-500 hover:text-blue-500 active:text-blue-600 active:scale-95 transition-all duration-300']">
+                                <Eye v-if="designCard.visible" size="16"></Eye>
+                                <EyeOff v-else size="16"></EyeOff>
                             </div>
 
                         </template>
@@ -101,45 +135,36 @@
 
                 </div>
 
-                <template v-if="!wantsToArrangeDesignCards">
+                <vue-slide-up-down :active="designCard.expanded">
 
-                    <LogoDesignCard v-if="designCard.type == 'logo'" :index="index" :designCard="designCard"></LogoDesignCard>
-                    <LinkDesignCard v-if="designCard.type == 'link'" :index="index" :designCard="designCard"></LinkDesignCard>
-                    <MapDesignCard v-else-if="designCard.type == 'map'" :index="index" :designCard="designCard"></MapDesignCard>
-                    <BannerDesignCard v-if="designCard.type == 'banner'" :index="index" :designCard="designCard"></BannerDesignCard>
-                    <VideoDesignCard v-else-if="designCard.type == 'video'" :index="index" :designCard="designCard"></VideoDesignCard>
-                    <ContactDesignCard v-else-if="designCard.type == 'contact'" :index="index" :designCard="designCard"></ContactDesignCard>
-                    <SocialsDesignCard v-else-if="designCard.type == 'socials'" :index="index" :designCard="designCard"></SocialsDesignCard>
-                    <DividerDesignCard v-else-if="designCard.type == 'divider'" :index="index" :designCard="designCard"></DividerDesignCard>
-                    <TextDesignCard v-else-if="designCard.type == 'text'" :index="index" :designCard="designCard" :editorOptions="editorOptions"></TextDesignCard>
-                    <ImageDesignCard v-else-if="designCard.type == 'image'" :index="index" :designCard="designCard" :editorOptions="editorOptions"></ImageDesignCard>
-                    <CountdownDesignCard v-else-if="designCard.type == 'countdown'" :index="index" :designCard="designCard" :editorOptions="editorOptions"></CountdownDesignCard>
+                    <div v-if="designCard.expanded && !wantsToArrangeDesignCards" class="px-4 pb-4">
 
-                    <TipsDesignCard v-else-if="designCard.type == 'tips'" :index="index" :designCard="designCard"></TipsDesignCard>
-                    <ItemsDesignCard v-else-if="designCard.type == 'items'" :index="index" :designCard="designCard"></ItemsDesignCard>
-                    <ProductsDesignCard v-else-if="designCard.type == 'products'" :index="index" :designCard="designCard"></ProductsDesignCard>
-                    <CustomerDesignCard v-else-if="designCard.type == 'customer'" :index="index" :designCard="designCard"></CustomerDesignCard>
-                    <DeliveryDesignCard v-else-if="designCard.type == 'delivery'" :index="index" :designCard="designCard"></DeliveryDesignCard>
-                    <OrderSummaryCard v-else-if="designCard.type == 'order summary'" :index="index" :designCard="designCard"></OrderSummaryCard>
-                    <PromoCodeDesignCard v-else-if="designCard.type == 'promo code'" :index="index" :designCard="designCard"></PromoCodeDesignCard>
-                    <DataCollectionDesignCard v-else-if="isDataCollectionField(designCard)" :index="index" :designCard="designCard"></DataCollectionDesignCard>
+                        <LogoDesignCard v-if="designCard.type == 'logo'" :index="index" :designCard="designCard"></LogoDesignCard>
+                        <LinkDesignCard v-if="designCard.type == 'link'" :index="index" :designCard="designCard"></LinkDesignCard>
+                        <MapDesignCard v-else-if="designCard.type == 'map'" :index="index" :designCard="designCard"></MapDesignCard>
+                        <BannerDesignCard v-if="designCard.type == 'banner'" :index="index" :designCard="designCard"></BannerDesignCard>
+                        <VideoDesignCard v-else-if="designCard.type == 'video'" :index="index" :designCard="designCard"></VideoDesignCard>
+                        <ContactDesignCard v-else-if="designCard.type == 'contact'" :index="index" :designCard="designCard"></ContactDesignCard>
+                        <SocialsDesignCard v-else-if="designCard.type == 'socials'" :index="index" :designCard="designCard"></SocialsDesignCard>
+                        <DividerDesignCard v-else-if="designCard.type == 'divider'" :index="index" :designCard="designCard"></DividerDesignCard>
+                        <TextDesignCard v-else-if="designCard.type == 'text'" :index="index" :designCard="designCard" :editorOptions="editorOptions"></TextDesignCard>
+                        <ImageDesignCard v-else-if="designCard.type == 'image'" :index="index" :designCard="designCard" :editorOptions="editorOptions"></ImageDesignCard>
+                        <CountdownDesignCard v-else-if="designCard.type == 'countdown'" :index="index" :designCard="designCard" :editorOptions="editorOptions"></CountdownDesignCard>
 
-                    <PaymentMethodsCard v-else-if="designCard.type == 'payment methods'" :index="index" :designCard="designCard"></PaymentMethodsCard>
+                        <TipsDesignCard v-else-if="designCard.type == 'tips'" :index="index" :designCard="designCard"></TipsDesignCard>
+                        <ItemsDesignCard v-else-if="designCard.type == 'items'" :index="index" :designCard="designCard"></ItemsDesignCard>
+                        <ProductsDesignCard v-else-if="designCard.type == 'products'" :index="index" :designCard="designCard"></ProductsDesignCard>
+                        <CustomerDesignCard v-else-if="designCard.type == 'customer'" :index="index" :designCard="designCard"></CustomerDesignCard>
+                        <DeliveryDesignCard v-else-if="designCard.type == 'delivery'" :index="index" :designCard="designCard"></DeliveryDesignCard>
+                        <OrderSummaryCard v-else-if="designCard.type == 'order summary'" :index="index" :designCard="designCard"></OrderSummaryCard>
+                        <PromoCodeDesignCard v-else-if="designCard.type == 'promo code'" :index="index" :designCard="designCard"></PromoCodeDesignCard>
+                        <DataCollectionDesignCard v-else-if="isDataCollectionField(designCard)" :index="index" :designCard="designCard"></DataCollectionDesignCard>
 
-                    <div class="flex justify-end space-x-4 mt-4">
-
-                        <Trash
-                            size="16"
-                            v-if="!isRequiredDesignCard(designCard)"
-                            @click.stop="() => removeDesignCard(index)"
-                            class="cursor-pointer text-red-500 hover:text-red-600 active:text-red-600 active:scale-95 transition-all">
-                        </Trash>
-
-                        <span v-else class="text-xs text-gray-400">not removable</span>
+                        <PaymentMethodsCard v-else-if="designCard.type == 'payment methods'" :index="index" :designCard="designCard"></PaymentMethodsCard>
 
                     </div>
 
-                </template>
+                </vue-slide-up-down>
 
             </div>
 
@@ -151,8 +176,11 @@
 
 <script>
 
+    import { v4 as uuidv4 } from 'uuid';
     import Pill from '@Partials/Pill.vue';
+    import cloneDeep from 'lodash/cloneDeep';
     import Tooltip from '@Partials/Tooltip.vue';
+    import VueSlideUpDown from 'vue-slide-up-down';
     import { VueDraggableNext } from 'vue-draggable-next';
     import MapDesignCard from '@Pages/design/_components/_components/design-cards/design-card/MapDesignCard.vue';
     import LogoDesignCard from '@Pages/design/_components/_components/design-cards/design-card/LogoDesignCard.vue';
@@ -174,19 +202,20 @@
     import PromoCodeDesignCard from '@Pages/design/_components/_components/design-cards/design-card/PromoCodeDesignCard.vue';
     import CountdownDesignCard from '@Pages/design/_components/_components/design-cards/design-card/CountdownDesignCard.vue';
     import DataCollectionDesignCard from '@Pages/design/_components/_components/design-cards/design-card/DataCollectionDesignCard.vue';
-    import { Eye, EyeOff, Move, Trash, Map, Link, Type, Box, Image, Video, AtSign, Clock, MapPin, Contact, Truck, Pencil, Hexagon, HandCoins, UserRound, Hourglass, ShoppingCart, ReceiptText, CreditCard, TicketPercent, SeparatorHorizontal, Tally1, Tally2, Binary, Calendar, SquareCheck, Megaphone, List, CloudUpload } from 'lucide-vue-next';
+    import { Eye, EyeOff, Move, Trash, Map, Link, Copy, Type, Box, Image, Video, AtSign, Clock, MapPin, Contact, Truck, Pencil, Hexagon, HandCoins, UserRound, Hourglass, ShoppingCart, ReceiptText, CreditCard, TicketPercent, SeparatorHorizontal, Tally1, Tally2, Binary, Calendar, SquareCheck, Megaphone, List, CloudUpload } from 'lucide-vue-next';
 
     export default {
         inject: ['designState', 'storeState'],
         components: {
-            Eye, EyeOff, Move, Trash, Map, Link, Type, Box, Image, Video, AtSign, Clock, MapPin, Contact, Truck, Pencil, Hexagon, HandCoins, UserRound, Hourglass, ShoppingCart, ReceiptText, CreditCard, TicketPercent,SeparatorHorizontal,
+            Eye, EyeOff, Move, Trash, Map, Link, Copy, Type, Box, Image, Video, AtSign, Clock, MapPin, Contact, Truck, Pencil, Hexagon, HandCoins, UserRound, Hourglass, ShoppingCart, ReceiptText, CreditCard, TicketPercent,SeparatorHorizontal,
             Tally1, Tally2, Binary, Calendar, SquareCheck, Megaphone, List, CloudUpload,
-            Pill, Tooltip, draggable: VueDraggableNext, MapDesignCard, LogoDesignCard, TipsDesignCard, LinkDesignCard, TextDesignCard, ImageDesignCard, ItemsDesignCard, VideoDesignCard, BannerDesignCard,
+            Pill, Tooltip, VueSlideUpDown, draggable: VueDraggableNext, MapDesignCard, LogoDesignCard, TipsDesignCard, LinkDesignCard, TextDesignCard, ImageDesignCard, ItemsDesignCard, VideoDesignCard, BannerDesignCard,
             OrderSummaryCard, ContactDesignCard, SocialsDesignCard, CustomerDesignCard, DeliveryDesignCard, PaymentMethodsCard, ProductsDesignCard,
             DividerDesignCard, PromoCodeDesignCard, CountdownDesignCard, DataCollectionDesignCard
         },
         data() {
             return {
+                copiedStyles: null,
                 editorOptions: {
                     toolbar: [
                         'bold', 'italic', 'strikethrough', '|',
@@ -217,6 +246,60 @@
             },
         },
         methods: {
+            empty(value) {
+                return value == null || value.trim() == '';
+            },
+            onToggleExpansion(index) {
+                for (let i = 0; i < this.designCards.length; i++) {
+                    if(i === index) {
+                        this.designCards[i].expanded = !this.designCards[i].expanded;
+                    }else{
+                        this.designCards[i].expanded = false;
+                    }
+                }
+            },
+            duplicateDesignCard(index) {
+                let duplicateDesignCard = cloneDeep(this.designCards[index]);
+                duplicateDesignCard.temporary_id = uuidv4();
+                delete duplicateDesignCard.id;
+                const newIndex = index + 1;
+
+                this.designCards.splice(newIndex, 0, duplicateDesignCard);
+
+                for (let i = 0; i < this.designCards.length; i++) {
+                    if(i === newIndex) {
+                        this.designCards[i].expanded = true;
+                    }else{
+                        this.designCards[i].expanded = false;
+                    }
+                }
+            },
+            copyStyles(index) {
+                if (index >= 0 && index < this.designCards.length) {
+                    this.copiedStyles = cloneDeep(this.designCards[index].metadata.design);
+                    const storageData = {
+                        styles: this.copiedStyles,
+                        timestamp: Date.now()
+                    };
+                    localStorage.setItem('copiedDesignCardStyles', JSON.stringify(storageData));
+                }
+            },
+            pasteStyles(index) {
+                const newDesign = {};
+                const design = this.designCards[index].metadata.design;
+
+                // Only copy properties that exist in the design
+                for (const key in design) {
+                    if (Object.prototype.hasOwnProperty.call(this.copiedStyles, key)) {
+                        newDesign[key] = this.copiedStyles[key];
+                    } else {
+                        newDesign[key] = design[key];
+                    }
+                }
+
+                this.designCards[index].metadata.design = newDesign;
+                this.designState.saveStateDebounced('Pasted styles');
+            },
             isRequiredDesignCard(designCard) {
                 return ['customer', 'items', 'delivery', 'promo code', 'tips', 'order summary', 'payment methods'].includes(designCard.type);
             },
@@ -237,6 +320,25 @@
                 }
                 this.designState.saveStateDebounced('Design card removed');
             },
+        },
+        created() {
+            const copiedDesignCardStyles = localStorage.getItem('copiedDesignCardStyles');
+
+            if (copiedDesignCardStyles) {
+
+                const { styles, timestamp } = JSON.parse(copiedDesignCardStyles);
+                const fiveMinutes = 5 * 60 * 1000; // 5 minutes in milliseconds
+
+                if (Date.now() - timestamp <= fiveMinutes) {
+                    this.copiedStyles = styles;
+                } else {
+                    this.copiedStyles = null;
+                    localStorage.removeItem('copiedDesignCardStyles');
+                }
+
+            } else {
+                this.copiedStyles = null;
+            }
         }
     }
 </script>

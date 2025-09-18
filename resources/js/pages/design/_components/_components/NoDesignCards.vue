@@ -16,11 +16,11 @@
     export default {
         inject: ['designState'],
         components: { Store },
-        computed: {
-            placement() {
-                return this.designState.placement;
+        props: {
+            placement: {
+                type: String
             }
-        },
+        }
     }
 
 </script>

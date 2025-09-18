@@ -303,6 +303,14 @@ const routes = [
                             preview: () => import('@Pages/shop/payment/PaymentMethods.vue'),
                         }
                     },
+                    {
+                        path: 'menu',
+                        name: 'edit-menu',
+                        components: {
+                            default: () => import('@Pages/design/menu/Menu.vue'),
+                            preview: () => import('@Pages/shop/storefront/Storefront.vue')
+                        }
+                    },
                     /*
                     {
                         path: 'appearance',
@@ -310,14 +318,6 @@ const routes = [
                         components: {
                             default: () => import('@Pages/design/appearance/Appearance.vue'),
                             preview: () => import('@Pages/shop/appearance/Appearance.vue')
-                        }
-                    },
-                    {
-                        path: 'menus',
-                        name: 'edit-menus',
-                        components: {
-                            default: () => import('@Pages/design/menus/Menus.vue'),
-                            preview: () => import('@Pages/shop/menus/Menus.vue')
                         }
                     }
                     */
@@ -348,6 +348,11 @@ const routes = [
                 path: '',
                 name: 'show-storefront',
                 component: () => import('@Pages/shop/storefront/Storefront.vue'),
+            },
+            {
+                path: 'search',
+                name: 'show-search',
+                component: () => import('@Pages/shop/search/Search.vue'),
             },
             {
                 path: 'checkout',

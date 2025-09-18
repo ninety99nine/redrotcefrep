@@ -62,8 +62,8 @@
                     { label: 'Storefront', value: 'edit-storefront'},
                     { label: 'Checkout', value: 'edit-checkout'},
                     { label: 'Payment', value: 'edit-payment'},
+                    { label: 'Menu', value: 'edit-menu'},
                     { label: 'Appearance', value: 'edit-appearance'},
-                    { label: 'Menus', value: 'edit-menus'},
                 ]
             }
         },
