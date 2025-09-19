@@ -2,7 +2,7 @@
 
     <div>
 
-        <LoadingDesignCards v-if="isLoadingStore || isLoadingDesignCards"></LoadingDesignCards>
+        <LoadingDesignCards v-if="isLoadingStore || isLoadingDesignCards || designState.isLoadingDesignCards" :placement="placement"></LoadingDesignCards>
 
         <template v-else>
 
@@ -10,8 +10,8 @@
                 size="xs"
                 type="light"
                 class="mt-8 m-4"
-                v-if="isCheckout"
                 :leftIcon="MoveLeft"
+                v-if="placement == 'checkout'"
                 :action="navigateToStorefront">
                 <span>Shop</span>
             </Button>
@@ -58,7 +58,10 @@
         watch: {
             store() {
                 this.setup();
-            }
+            },
+            loadFromApi() {
+                this.setup();
+            },
         },
         computed: {
             store() {
@@ -67,21 +70,26 @@
             isLoadingStore() {
                 return this.storeState.isLoadingStore;
             },
-            isCheckout() {
-                return this.placement == 'checkout';
-            },
             designForm() {
                 return this.designState.designForm;
             },
             isDesigning() {
                 return ['edit-storefront', 'edit-checkout', 'edit-payment', 'edit-menu'].includes(this.$route.name);
             },
+            loadFromApi() {
+                return (this.$route.name == 'edit-storefront' && this.placement == 'menu') ||
+                       (this.$route.name == 'edit-menu' && this.placement == 'storefront') ||
+                        !this.isDesigning;
+            },
             designCards() {
-                if(this.isDesigning) {
-                    return this.designForm?.design_cards ?? [];
-                }else{
+                if(this.loadFromApi) {
                     return this.apiDesignCards;
+                }else{
+                    return this.designForm?.design_cards ?? [];
                 }
+            },
+            hasApiDesignCards() {
+                return this.apiDesignCards.length > 0;
             },
             hasDesignCards() {
                 return this.designCards.filter(designCard => !designCard.hasOwnProperty('delete')).length > 0;
@@ -89,7 +97,7 @@
         },
         methods: {
             async setup() {
-                if(this.store && ['show-storefront', 'show-checkout', 'show-shop-payment-methods'].includes(this.$route.name)) {
+                if(this.store && this.loadFromApi && !this.hasApiDesignCards) {
                     this.showDesignCards();
                 }
             },
@@ -129,7 +137,8 @@
             }
         },
         beforeUnmount() {
-            if(['show-storefront', 'show-checkout', 'show-shop-payment-methods'].includes(this.$route.name)) {
+            if(!this.isDesigning && this.placement != 'menu') {
+                console.log('this.designState.reset() 1');
                 this.designState.reset();
             }
         },

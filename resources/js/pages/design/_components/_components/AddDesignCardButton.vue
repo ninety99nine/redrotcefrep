@@ -202,7 +202,6 @@
                 if(type == 'logo') {
                     metadata = {
                         alignment: 'center',
-                        mode: 'content',
                         design: {
                             t_margin: '0',
                             b_margin: '8',
@@ -233,7 +232,6 @@
                         category_id: this.categories.length ? this.categories[0].value : null,
                         layout: 'grid',
                         feature: '4',
-                        mode: 'content',
                         design: {
                             t_margin: '0',
                             b_margin: '8',
@@ -268,7 +266,6 @@
                     metadata = {
                         title: 'Our Blog',
                         link: 'https://www.example.com',
-                        mode: 'content',
                         design: {
                             t_margin: '0',
                             b_margin: '8',
@@ -302,7 +299,6 @@
 
                     metadata = {
                         body: markdown,
-                        mode: 'content',
                         design: {
                             t_margin: '0',
                             b_margin: '8',
@@ -335,7 +331,6 @@
                         link: '',
                         upper_text: '',
                         lower_text: '',
-                        mode: 'image',
                         design: {
                             t_margin: '0',
                             b_margin: '8',
@@ -366,7 +361,6 @@
                     metadata = {
                         title: 'Our Video',
                         link: 'https://www.youtube.com/watch?v=eHJnEHyyN1Y',
-                        mode: 'content',
                         design: {
                             t_margin: '0',
                             b_margin: '8',
@@ -398,7 +392,6 @@
                     metadata = {
                         title: 'Contact Us',
                         mobile_number: '+26772000001',
-                        mode: 'content',
                         design: {
                             t_margin: '0',
                             b_margin: '8',
@@ -431,7 +424,6 @@
                         date: '',
                         upper_text: '',
                         lower_text: '',
-                        mode: 'countdown',
                         design: {
                             t_margin: '0',
                             b_margin: '8',
@@ -465,7 +457,6 @@
                         upper_text: '',
                         lower_text: '',
                         show_address: true,
-                        mode: 'map',
                         design: {
                             t_margin: '0',
                             b_margin: '8',
@@ -506,7 +497,6 @@
                             name: platform,
                             link: ''
                         })),
-                        mode: 'content',
                         design: {
                             t_margin: '0',
                             b_margin: '8',
@@ -538,7 +528,6 @@
                     metadata = {
                         divider: 'solid',
                         thickness: '1',
-                        mode: 'divider',
                         design: {
                             t_margin: '0',
                             b_margin: '8',
@@ -569,7 +558,6 @@
                     metadata = {
                         title: 'Join Our Whatsapp Group',
                         link: 'https://wa.me',
-                        mode: 'content',
                         design: {
                             t_margin: '0',
                             b_margin: '8',
@@ -601,7 +589,6 @@
                         title: 'Enter a short answer',
                         description: '',
                         required: false,
-                        mode: 'content',
                         design: {
                             t_margin: '0',
                             b_margin: '8',
@@ -635,7 +622,6 @@
                         title: 'Enter a long answer',
                         description: '',
                         required: false,
-                        mode: 'content',
                         design: {
                             t_margin: '0',
                             b_margin: '8',
@@ -669,7 +655,6 @@
                         title: 'Enter a number',
                         description: '',
                         required: false,
-                        mode: 'content',
                         design: {
                             t_margin: '0',
                             b_margin: '8',
@@ -703,7 +688,6 @@
                         title: 'Select a date',
                         description: '',
                         required: false,
-                        mode: 'content',
                         design: {
                             t_margin: '0',
                             b_margin: '8',
@@ -737,7 +721,6 @@
                         title: 'Select a time',
                         description: '',
                         required: false,
-                        mode: 'content',
                         design: {
                             t_margin: '0',
                             b_margin: '8',
@@ -775,7 +758,6 @@
                         options: [],
                         required: false,
                         validation: 'not applicable',
-                        mode: 'content',
                         design: {
                             t_margin: '0',
                             b_margin: '8',
@@ -811,7 +793,6 @@
                         description: '',
                         options: [],
                         required: false,
-                        mode: 'content',
                         design: {
                             t_margin: '0',
                             b_margin: '8',
@@ -846,7 +827,6 @@
                         title: 'Attach an image',
                         description: '',
                         required: false,
-                        mode: 'content',
                         design: {
                             t_margin: '0',
                             b_margin: '8',
@@ -883,7 +863,6 @@
                         description: '',
                         trigger_text: 'Add Address',
                         required: false,
-                        mode: 'content',
                         design: {
                             t_margin: '0',
                             b_margin: '8',
@@ -924,7 +903,6 @@
                         email_required: false,
                         show_mobile_number: false,
                         mobile_number_required: false,
-                        mode: 'content',
                         design: {
                             t_margin: '0',
                             b_margin: '8',
@@ -958,7 +936,6 @@
                         title: 'Items',
                         description: '',
                         show_items: true,
-                        mode: 'content',
                         design: {
                             t_margin: '0',
                             b_margin: '8',
@@ -993,7 +970,6 @@
                         show_delivery_methods: true,
                         schedule_title: 'Schedule',
                         address_title: 'Address',
-                        mode: 'content',
                         design: {
                             t_margin: '0',
                             b_margin: '8',
@@ -1026,7 +1002,6 @@
                         title: 'Promo code',
                         description: '',
                         show_promo_code: true,
-                        mode: 'content',
                         design: {
                             t_margin: '0',
                             b_margin: '8',
@@ -1061,7 +1036,6 @@
                         tips: ['5', '10'],
                         show_tips: true,
                         show_specify_tip: true,
-                        mode: 'content',
                         design: {
                             t_margin: '0',
                             b_margin: '8',
@@ -1098,7 +1072,6 @@
                         checkout_fees: [],
                         combine_fees: false,
                         combine_discounts: false,
-                        mode: 'content',
                         design: {
                             t_margin: '0',
                             b_margin: '8',
@@ -1130,7 +1103,6 @@
                     metadata = {
                         title: 'Complete Your Payment',
                         subtitle: 'Amount to pay',
-                        mode: 'content',
                         design: {
                             t_margin: '0',
                             b_margin: '8',
@@ -1162,6 +1134,7 @@
                 }
 
                 let designCard = {
+                    mode: '1',
                     type: type,
                     visible: true,
                     expanded: true,

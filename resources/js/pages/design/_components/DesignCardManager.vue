@@ -40,7 +40,6 @@
         data() {
             return {
                 isUploading: false,
-                isLoadingDesignCards: false,
                 isChangingDesignCardArrangement: false,
             }
         },
@@ -65,6 +64,9 @@
             designCards() {
                 return this.designForm?.design_cards ?? [];
             },
+            isLoadingDesignCards() {
+                return this.designState.isLoadingDesignCards;
+            },
             hasDesignCards() {
                 return this.designCards.filter(designCard => !designCard.hasOwnProperty('delete')).length > 0;
             }
@@ -87,7 +89,7 @@
             async showDesignCards() {
                 try {
 
-                    this.isLoadingDesignCards = true;
+                    this.designState.isLoadingDesignCards = true;
 
                     let config = {
                         params: {
@@ -111,14 +113,14 @@
                     this.formState.setServerFormErrors(error);
                     console.error('Failed to fetch design cards:', error);
                 } finally {
-                    this.isLoadingDesignCards = false;
+                    this.designState.isLoadingDesignCards = false;
                 }
             },
             async updateDesignCards() {
                 try {
 
-                    if (this.designState.isUpdatingDesign) return;
-                    this.designState.isUpdatingDesign = true;
+                    if (this.designState.isUpdatingDesignCards) return;
+                    this.designState.isUpdatingDesignCards = true;
 
                     const originalState = this.changeHistoryState.getOriginalState();
                     let totalUpdated = 0;
@@ -202,7 +204,7 @@
                     this.notificationState.showWarningNotification('An unexpected error occurred while processing design cards.');
                     console.error(error);
                 } finally {
-                    this.designState.isUpdatingDesign = false;
+                    this.designState.isUpdatingDesignCards = false;
                 }
             },
             async uploadImages(designCardId, photoIndex = null, cardIndex = null) {

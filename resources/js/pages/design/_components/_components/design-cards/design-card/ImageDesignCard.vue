@@ -4,14 +4,14 @@
 
         <div class="flex items-center space-x-2 mb-4">
 
-            <Pill :type="designCard.metadata.mode == 'image' ? 'primary' : 'light'" size="sm" :action="() => designCard.metadata.mode = 'image'">Image</Pill>
-            <Pill :type="designCard.metadata.mode == 'upper_text' ? 'primary' : 'light'" size="sm" :action="() => designCard.metadata.mode = 'upper_text'">Upper text</Pill>
-            <Pill :type="designCard.metadata.mode == 'lower_text' ? 'primary' : 'light'" size="sm" :action="() => designCard.metadata.mode = 'lower_text'">Lower text</Pill>
-            <Pill :type="designCard.metadata.mode == 'design' ? 'primary' : 'light'" size="sm" :action="() => designCard.metadata.mode = 'design'">Design</Pill>
+            <Pill :type="designCard.mode == '1' ? 'primary' : 'light'" size="sm" :action="() => designCard.mode = '1'">Image</Pill>
+            <Pill :type="designCard.mode == '3' ? 'primary' : 'light'" size="sm" :action="() => designCard.mode = '3'">Upper text</Pill>
+            <Pill :type="designCard.mode == '4' ? 'primary' : 'light'" size="sm" :action="() => designCard.mode = '4'">Lower text</Pill>
+            <Pill :type="designCard.mode == '2' ? 'primary' : 'light'" size="sm" :action="() => designCard.mode = '2'">Design</Pill>
 
         </div>
 
-        <template v-if="designCard.metadata.mode == 'image'">
+        <template v-if="designCard.mode == '1'">
 
             <Input
                 type="file"
@@ -41,15 +41,15 @@
         <vue-easymde
             class="mb-4"
             :options="editorOptions"
+            v-if="designCard.mode == '3'"
             v-model="designCard.metadata.upper_text"
-            v-if="designCard.metadata.mode == 'upper_text'"
             @change="designState.saveStateDebounced('Text content changed')" />
 
         <vue-easymde
             class="mb-4"
             :options="editorOptions"
+            v-else-if="designCard.mode == '4'"
             v-model="designCard.metadata.lower_text"
-            v-else-if="designCard.metadata.mode == 'lower_text'"
             @change="designState.saveStateDebounced('Text content changed')" />
 
         <Designer :designCard="designCard"></Designer>

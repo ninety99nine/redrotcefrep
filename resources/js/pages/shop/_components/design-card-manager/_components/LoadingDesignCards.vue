@@ -2,7 +2,7 @@
 
     <div class="pt-8 flex items-center justify-center">
         <Loader>
-            <span class="text-sm ml-2">Loading store</span>
+            <span class="text-sm ml-2">Loading {{ placement == 'storefront' ? 'store' : placement }}</span>
         </Loader>
     </div>
 
@@ -13,6 +13,11 @@
     import Loader from '@Partials/Loader.vue';
 
     export default {
-        components: { Loader }
+        components: { Loader },
+        props: {
+            placement: {
+                type: String
+            }
+        },
     }
 </script>

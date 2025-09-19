@@ -4,18 +4,16 @@ import { useChangeHistoryStore as changeHistoryState } from '@Stores/change-hist
 export const useDesignStore = defineStore('design', {
     state: () => ({
         categories: [],
-        categoryData: {},
         designForm: null,
-        isUpdatingDesign: false,
-        wantsToArrangeDesignCards: false,
+        isLoadingDesignCards: false,
+        isUpdatingDesignCards: false
     }),
     actions: {
         reset() {
             this.categories = [];
-            this.categoryData = {};
             this.designForm = null;
-            this.isUpdatingDesign = false;
-            this.wantsToArrangeDesignCards = false;
+            this.isLoadingDesignCards = false;
+            this.isUpdatingDesignCards = false;
             changeHistoryState().reset();
         },
         saveState(actionName) {
@@ -45,6 +43,7 @@ export const useDesignStore = defineStore('design', {
                     }
                 }
 
+                designCard['mode'] = '1';
                 designCard['expanded'] = false;
 
                 return designCard;

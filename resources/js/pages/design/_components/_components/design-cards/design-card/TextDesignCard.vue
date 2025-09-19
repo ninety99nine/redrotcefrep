@@ -4,12 +4,12 @@
 
         <div class="flex items-center space-x-2 mb-4">
 
-            <Pill :type="designCard.metadata.mode == 'content' ? 'primary' : 'light'" size="sm" :action="() => designCard.metadata.mode = 'content'">Content</Pill>
-            <Pill :type="designCard.metadata.mode == 'design' ? 'primary' : 'light'" size="sm" :action="() => designCard.metadata.mode = 'design'">Design</Pill>
+            <Pill :type="designCard.mode == '1' ? 'primary' : 'light'" size="sm" :action="() => designCard.mode = '1'">Content</Pill>
+            <Pill :type="designCard.mode == '2' ? 'primary' : 'light'" size="sm" :action="() => designCard.mode = '2'">Design</Pill>
 
         </div>
 
-        <template v-if="designCard.metadata.mode == 'content'">
+        <template v-if="designCard.mode == '1'">
 
             <vue-easymde
                 class="text-xs"

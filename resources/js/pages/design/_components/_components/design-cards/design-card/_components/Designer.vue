@@ -1,6 +1,6 @@
 <template>
 
-    <template v-if="designCard.metadata.mode == 'design'">
+    <template v-if="designCard.mode == '2'">
 
         <div
             :key="index"

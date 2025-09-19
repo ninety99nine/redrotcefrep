@@ -26,6 +26,7 @@
                     :class="[
                         'h-full transform transition-all duration-300 ease-in-out',
                         position === 'right' ? 'ml-auto' : 'mr-auto',
+                        { 'w-full max-w-xs': size === 'xs' },
                         { 'w-full max-w-sm': size === 'sm' },
                         { 'w-full max-w-xl': size === 'md' },
                         { 'w-full max-w-4xl': size === 'lg' },
@@ -37,7 +38,7 @@
                         <button
                             type="button"
                             aria-label="Close"
-                            @click.stop="hideDrawer"
+                            @click.stop="closeOnX"
                             class="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full border border-transparent bg-gray-100 text-gray-700 hover:bg-gray-200 focus:outline-none focus:bg-gray-200 dark:bg-neutral-700 dark:hover:bg-neutral-600 dark:text-neutral-400">
                             <X size="20" />
                         </button>
@@ -251,8 +252,8 @@ export default {
         },
         size: {
             type: String,
-            default: "sm",
-            validator: (value) => ["sm", "md", "lg"].includes(value),
+            default: "xs",
+            validator: (value) => ["xs", "sm", "md", "lg"].includes(value),
         },
         onShow: {
             type: [Function, null],
@@ -261,6 +262,12 @@ export default {
         onHide: {
             type: [Function, null],
             default: null
+        },
+        closeOnX: {
+            type: Function,
+            default: () => {
+                this.hideDrawer();
+            }
         },
         targetClass: {
             type: String,

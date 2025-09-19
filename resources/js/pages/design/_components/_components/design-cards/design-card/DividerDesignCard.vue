@@ -4,12 +4,12 @@
 
         <div class="flex items-center space-x-2 mb-4">
 
-            <Pill :type="designCard.metadata.mode == 'divider' ? 'primary' : 'light'" size="sm" :action="() => designCard.metadata.mode = 'divider'">Divider</Pill>
-            <Pill :type="designCard.metadata.mode == 'design' ? 'primary' : 'light'" size="sm" :action="() => designCard.metadata.mode = 'design'">Design</Pill>
+            <Pill :type="designCard.mode == '1' ? 'primary' : 'light'" size="sm" :action="() => designCard.mode = '1'">Divider</Pill>
+            <Pill :type="designCard.mode == '2' ? 'primary' : 'light'" size="sm" :action="() => designCard.mode = '2'">Design</Pill>
 
         </div>
 
-        <template v-if="designCard.metadata.mode == 'divider'">
+        <template v-if="designCard.mode == '1'">
 
             <div class="grid grid-cols-2 gap-4">
 
