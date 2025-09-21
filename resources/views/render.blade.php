@@ -15,7 +15,14 @@
     <link rel="shortcut icon" href="favicon/favicon.ico" />
     <link rel="apple-touch-icon" sizes="180x180" href="favicon/apple-touch-icon.png" />
     <meta name="apple-mobile-web-app-title" content="Perfect Order" />
-    <link rel="manifest" href="/site.webmanifest" />
+
+    <!-- Dynamic Manifest Link - For Progressive Web App (PWA) -->
+    @if (isset($meta) && !empty($meta) && !empty($meta['alias']))
+        <link rel="manifest" href="/{{ $meta['alias'] }}/manifest.json" />
+    @else
+        <link rel="manifest" href="/favicon/site.webmanifest" />
+    @endif
+
     <!-- End: Favicon Generator Settings  -->
 
     <!-- Dynamic Meta Tags (only for product pages or crawlers) -->

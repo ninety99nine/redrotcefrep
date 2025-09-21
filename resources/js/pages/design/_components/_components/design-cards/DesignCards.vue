@@ -35,6 +35,7 @@
                             <Image v-if="designCard.type == 'image'" size="16"></Image>
                             <Video v-if="designCard.type == 'video'" size="16"></Video>
                             <Hexagon v-if="designCard.type == 'logo'" size="16"></Hexagon>
+                            <Download v-if="designCard.type == 'install_app'" size="16"></Download>
                             <AtSign v-if="designCard.type == 'socials'" size="16"></AtSign>
                             <MapPin v-if="designCard.type == 'location'" size="16"></MapPin>
                             <Contact v-if="designCard.type == 'contact'" size="16"></Contact>
@@ -64,7 +65,7 @@
                                 {{ designCard.metadata.title }}
                             </span>
 
-                            <span v-else class="text-xs whitespace-nowrap">{{ designCard.type }}</span>
+                            <span v-else class="text-xs whitespace-nowrap">{{ designCard.type.replace('_', ' ') }}</span>
 
                         </div>
 
@@ -153,6 +154,7 @@
                             <ContactDesignCard v-else-if="designCard.type == 'contact'" :index="index" :designCard="designCard"></ContactDesignCard>
                             <SocialsDesignCard v-else-if="designCard.type == 'socials'" :index="index" :designCard="designCard"></SocialsDesignCard>
                             <DividerDesignCard v-else-if="designCard.type == 'divider'" :index="index" :designCard="designCard"></DividerDesignCard>
+                            <InstallAppDesignCard v-if="designCard.type == 'install_app'" :index="index" :designCard="designCard"></InstallAppDesignCard>
                             <TextDesignCard v-else-if="designCard.type == 'text'" :index="index" :designCard="designCard" :editorOptions="editorOptions"></TextDesignCard>
                             <ImageDesignCard v-else-if="designCard.type == 'image'" :index="index" :designCard="designCard" :editorOptions="editorOptions"></ImageDesignCard>
                             <CountdownDesignCard v-else-if="designCard.type == 'countdown'" :index="index" :designCard="designCard" :editorOptions="editorOptions"></CountdownDesignCard>
@@ -201,23 +203,24 @@
     import BannerDesignCard from '@Pages/design/_components/_components/design-cards/design-card/BannerDesignCard.vue';
     import OrderSummaryCard from '@Pages/design/_components/_components/design-cards/design-card/OrderSummaryCard.vue';
     import ContactDesignCard from '@Pages/design/_components/_components/design-cards/design-card/ContactDesignCard.vue';
+    import DividerDesignCard from '@Pages/design/_components/_components/design-cards/design-card/DividerDesignCard.vue';
     import SocialsDesignCard from '@Pages/design/_components/_components/design-cards/design-card/SocialsDesignCard.vue';
     import CustomerDesignCard from '@Pages/design/_components/_components/design-cards/design-card/CustomerDesignCard.vue';
     import DeliveryDesignCard from '@Pages/design/_components/_components/design-cards/design-card/DeliveryDesignCard.vue';
     import PaymentMethodsCard from '@Pages/design/_components/_components/design-cards/design-card/PaymentMethodsCard.vue';
     import ProductsDesignCard from '@Pages/design/_components/_components/design-cards/design-card/ProductsDesignCard.vue';
-    import DividerDesignCard from '@Pages/design/_components/_components/design-cards/design-card/DividerDesignCard.vue';
     import PromoCodeDesignCard from '@Pages/design/_components/_components/design-cards/design-card/PromoCodeDesignCard.vue';
     import CountdownDesignCard from '@Pages/design/_components/_components/design-cards/design-card/CountdownDesignCard.vue';
+    import InstallAppDesignCard from '@Pages/design/_components/_components/design-cards/design-card/InstallAppDesignCard.vue';
     import DataCollectionDesignCard from '@Pages/design/_components/_components/design-cards/design-card/DataCollectionDesignCard.vue';
-    import { Eye, EyeOff, Move, Trash, Map, Link, Copy, Type, Box, Image, Video, AtSign, Clock, MapPin, Contact, Truck, Pencil, Hexagon, HandCoins, UserRound, Hourglass, ShoppingCart, ReceiptText, CreditCard, TicketPercent, SeparatorHorizontal, Tally1, Tally2, Binary, Calendar, SquareCheck, Megaphone, List, CloudUpload } from 'lucide-vue-next';
+    import { Eye, EyeOff, Move, Trash, Map, Link, Copy, Type, Box, Image, Video, AtSign, Clock, MapPin, Contact, Truck, Pencil, Download, Hexagon, HandCoins, UserRound, Hourglass, ShoppingCart, ReceiptText, CreditCard, TicketPercent, SeparatorHorizontal, Tally1, Tally2, Binary, Calendar, SquareCheck, Megaphone, List, CloudUpload } from 'lucide-vue-next';
 
     export default {
         inject: ['designState', 'storeState'],
         components: {
-            Eye, EyeOff, Move, Trash, Map, Link, Copy, Type, Box, Image, Video, AtSign, Clock, MapPin, Contact, Truck, Pencil, Hexagon, HandCoins, UserRound, Hourglass, ShoppingCart, ReceiptText, CreditCard, TicketPercent,SeparatorHorizontal,
+            Eye, EyeOff, Move, Trash, Map, Link, Copy, Type, Box, Image, Video, AtSign, Clock, MapPin, Contact, Truck, Pencil, Download, Hexagon, HandCoins, UserRound, Hourglass, ShoppingCart, ReceiptText, CreditCard, TicketPercent,SeparatorHorizontal,
             Tally1, Tally2, Binary, Calendar, SquareCheck, Megaphone, List, CloudUpload,
-            Pill, Tooltip, VueSlideUpDown, draggable: VueDraggableNext, MapDesignCard, LogoDesignCard, TipsDesignCard, LinkDesignCard, TextDesignCard, ImageDesignCard, ItemsDesignCard, VideoDesignCard, BannerDesignCard,
+            Pill, Tooltip, VueSlideUpDown, draggable: VueDraggableNext, InstallAppDesignCard, MapDesignCard, LogoDesignCard, TipsDesignCard, LinkDesignCard, TextDesignCard, ImageDesignCard, ItemsDesignCard, VideoDesignCard, BannerDesignCard,
             OrderSummaryCard, ContactDesignCard, SocialsDesignCard, CustomerDesignCard, DeliveryDesignCard, PaymentMethodsCard, ProductsDesignCard,
             DividerDesignCard, PromoCodeDesignCard, CountdownDesignCard, DataCollectionDesignCard
         },

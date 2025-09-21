@@ -21,6 +21,7 @@
                     <ContactDesignCard v-else-if="designCard.type == 'contact'" :designCard="designCard"></ContactDesignCard>
                     <SocialsDesignCard v-else-if="designCard.type == 'socials'" :designCard="designCard"></SocialsDesignCard>
                     <CountdownDesignCard v-else-if="designCard.type == 'countdown'" :designCard="designCard"></CountdownDesignCard>
+                    <InstallAppDesignCard v-if="designCard.type == 'install_app'" :designCard="designCard"></InstallAppDesignCard>
 
                     <TipsDesignCard v-else-if="designCard.type == 'tips'" :designCard="designCard"></TipsDesignCard>
                     <ItemsDesignCard v-else-if="designCard.type == 'items'" :designCard="designCard"></ItemsDesignCard>
@@ -72,6 +73,7 @@
     import CustomerDesignCard from '@Pages/shop/_components/design-card-manager/_components/design-cards/design-card/CustomerDesignCard.vue';
     import ProductsDesignCard from '@Pages/shop/_components/design-card-manager/_components/design-cards/design-card/ProductsDesignCard.vue';
     import CountdownDesignCard from '@Pages/shop/_components/design-card-manager/_components/design-cards/design-card/CountdownDesignCard.vue';
+    import InstallAppDesignCard from '@Pages/shop/_components/design-card-manager/_components/design-cards/design-card/InstallAppDesignCard.vue';
     import TipsDesignCard from '@Pages/shop/_components/design-card-manager/_components/design-cards/design-card/tips-design-card/TipsDesignCard.vue';
     import DataCollectionDesignCard from '@Pages/shop/_components/design-card-manager/_components/design-cards/design-card/DataCollectionDesignCard.vue';
     import PaymentMethodsDesignCard from '@Pages/shop/_components/design-card-manager/_components/design-cards/design-card/PaymentMethodsDesignCard.vue';
@@ -84,7 +86,7 @@
         inject: ['designState', 'orderState', 'storeState'],
         components: {
             ShoppingCart, Button, MyCartButton, PlaceOrderButton, MapDesignCard, LogoDesignCard, LinkDesignCard, TextDesignCard, ImageDesignCard, VideoDesignCard, ContactDesignCard,
-            BannerDesignCard, DividerDesignCard, SocialsDesignCard, CustomerDesignCard, ProductsDesignCard, CountdownDesignCard, TipsDesignCard, DataCollectionDesignCard,
+            BannerDesignCard, DividerDesignCard, SocialsDesignCard, CustomerDesignCard, ProductsDesignCard, CountdownDesignCard, InstallAppDesignCard, TipsDesignCard, DataCollectionDesignCard,
             PaymentMethodsDesignCard, ItemsDesignCard, DeliveryDesignCard, OrderSummaryCard, PromoCodeDesignCard
         },
         props: {

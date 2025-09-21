@@ -83,6 +83,18 @@
                         </div>
 
                         <div class="flex space-x-2 items-center justify-between"
+                            v-if="designCard.metadata.design.hasOwnProperty('button_color')">
+                            <span class="text-sm">Button BG Color</span>
+                            <Colorpicker v-model="designCard.metadata.design.button_color" shape="square" :disableHistory="true" :disableAlpha="true"></Colorpicker>
+                        </div>
+
+                        <div class="flex space-x-2 items-center justify-between"
+                            v-if="designCard.metadata.design.hasOwnProperty('button_text_color')">
+                            <span class="text-sm">Button Text Color</span>
+                            <Colorpicker v-model="designCard.metadata.design.button_text_color" shape="square" :disableHistory="true" :disableAlpha="true"></Colorpicker>
+                        </div>
+
+                        <div class="flex space-x-2 items-center justify-between"
                             v-if="designCard.metadata.design.hasOwnProperty('pill_text_color')">
                             <span class="text-sm">Pill Text Color</span>
                             <Colorpicker v-model="designCard.metadata.design.pill_text_color" shape="square" :disableHistory="true" :disableAlpha="true"></Colorpicker>

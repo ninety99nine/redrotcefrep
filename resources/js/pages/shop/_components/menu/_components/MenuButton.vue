@@ -73,7 +73,6 @@
         methods: {
             closeOnX() {
                 if(this.isDesigningMenu) {
-                    this.$refs.menuDrawer.hideDrawer();
                     this.notificationState.showSuccessNotification(`Only closes on the actual store`);
                 }else{
                     this.$refs.menuDrawer.hideDrawer();

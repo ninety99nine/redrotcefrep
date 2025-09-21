@@ -73,6 +73,7 @@
                                 <UserRound v-if="option == 'customer'" size="20"></UserRound>
                                 <CloudUpload v-if="option == 'media'" size="20"></CloudUpload>
                                 <Hourglass v-if="option == 'countdown'" size="20"></Hourglass>
+                                <Download v-if="option == 'install_app'" size="20"></Download>
                                 <ShoppingCart v-if="option == 'items'" size="20"></ShoppingCart>
                                 <SquareCheck v-if="option == 'checkbox'" size="20"></SquareCheck>
                                 <ReceiptText v-if="option == 'order summary'" size="20"></ReceiptText>
@@ -83,7 +84,7 @@
                                 <SeparatorHorizontal v-if="option == 'divider'" size="20"></SeparatorHorizontal>
 
                                 <span class="text-xs whitespace-nowrap">
-                                    {{ capitalizeAll(option) }}
+                                    {{ capitalizeAll(option.replace('_', ' ')) }}
                                 </span>
 
                             </div>
@@ -106,12 +107,12 @@
     import Button from '@Partials/Button.vue';
     import Dropdown from '@Partials/Dropdown.vue';
     import { capitalizeAll } from '@Utils/stringUtils.js';
-    import { Plus, Map, Link, Type, Box, Image, Video, AtSign, Clock, Tally1, Tally2, Binary, Calendar, SquareCheck, Megaphone, List, Hexagon, CloudUpload, Contact, Truck, Pencil, MapPin, HandCoins, UserRound, Hourglass, ShoppingCart, ReceiptText, CreditCard, TicketPercent, SeparatorHorizontal } from 'lucide-vue-next';
+    import { Plus, Map, Link, Type, Box, Image, Video, AtSign, Clock, Tally1, Tally2, Binary, Download, Calendar, SquareCheck, Megaphone, List, Hexagon, CloudUpload, Contact, Truck, Pencil, MapPin, HandCoins, UserRound, Hourglass, ShoppingCart, ReceiptText, CreditCard, TicketPercent, SeparatorHorizontal } from 'lucide-vue-next';
 
     export default {
         inject: ['designState'],
         components: {
-            Pill, Button, Dropdown, Map, Link, Type, Box, Image, Video, AtSign, Clock, Tally1, Tally2, Binary, Calendar, SquareCheck, Megaphone, List, Hexagon, CloudUpload, Contact,
+            Pill, Button, Dropdown, Map, Link, Type, Box, Image, Video, AtSign, Clock, Tally1, Tally2, Binary, Download, Calendar, SquareCheck, Megaphone, List, Hexagon, CloudUpload, Contact,
             Truck, Pencil, MapPin, HandCoins, UserRound, Hourglass, ShoppingCart, ReceiptText, CreditCard, TicketPercent, SeparatorHorizontal
         },
         props: {
@@ -142,7 +143,7 @@
                     return [
                         {
                             description: 'Choose the content shopper must see',
-                            options: ['logo', 'products', 'text', 'image', 'video', 'link', 'contact', 'countdown', 'map', 'socials', 'divider', 'banner']
+                            options: ['logo', 'products', 'text', 'image', 'video', 'link', 'contact', 'countdown', 'map', 'socials', 'divider', 'banner', 'install_app']
                         }
                     ];
 
@@ -181,7 +182,7 @@
                     return [
                         {
                             description: 'Choose the content shopper must see',
-                            options: ['logo', 'text', 'image', 'video', 'link', 'contact', 'socials', 'divider', 'banner']
+                            options: ['logo', 'text', 'image', 'video', 'link', 'contact', 'socials', 'divider', 'banner', 'install_app']
                         }
                     ];
 
@@ -529,13 +530,13 @@
                         divider: 'solid',
                         thickness: '1',
                         design: {
-                            t_margin: '0',
+                            t_margin: '8',
                             b_margin: '8',
                             l_margin: '0',
                             r_margin: '0',
 
-                            t_padding: '16',
-                            b_padding: '16',
+                            t_padding: '0',
+                            b_padding: '0',
                             l_padding: '0',
                             r_padding: '0',
 
@@ -584,7 +585,33 @@
                             text_color: '#ffffff',
                         }
                     };
-                }else if(type == 'short answer') {
+                }else if (type == 'install_app') {
+                    metadata = {
+                        button_text: 'Install Our App',
+                        design: {
+                            t_margin: '8',
+                            b_margin: '8',
+                            l_margin: '0',
+                            r_margin: '0',
+                            t_padding: '0',
+                            b_padding: '0',
+                            l_padding: '0',
+                            r_padding: '0',
+                            tl_border_radius: '0',
+                            br_border_radius: '0',
+                            tr_border_radius: '0',
+                            bl_border_radius: '0',
+                            t_border: '0',
+                            b_border: '0',
+                            l_border: '0',
+                            r_border: '0',
+                            border_color: '#E5E7EB',
+                            bg_color: '#ffffff',
+                            button_color: '#1E40AF',
+                            button_text_color: '#ffffff'
+                        }
+                    };
+                    }else if(type == 'short answer') {
                     metadata = {
                         title: 'Enter a short answer',
                         description: '',

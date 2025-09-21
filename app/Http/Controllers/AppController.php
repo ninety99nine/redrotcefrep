@@ -72,6 +72,7 @@ class AppController extends Controller
                 'type' => 'website',
                 'title' => $store->name,
                 'url' => "{$baseUrl}/{$store->alias}",
+                'alias' => $store->alias, // Manifest link - For Progressive Web App (PWA)
                 'description' => $store->description ?? "Welcome to {$store->name}",
                 'image' => $store->logo?->path ?? url('/images/logo-black-transparent.png'),
             ];

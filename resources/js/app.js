@@ -18,6 +18,34 @@ import { useCategoryStore } from "@Stores/category-store.js";
 import { useNotificationStore } from "@Stores/notification-store.js";
 import { useChangeHistoryStore } from "@Stores/change-history-store.js";
 
+// Store for PWA install prompt
+const pwaStore = {
+  deferredPrompt: null
+};
+
+// Register service worker
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('/service-worker.js')
+    .then((registration) => {
+      console.log('Service Worker registered with scope:', registration.scope);
+    })
+    .catch((error) => {
+      console.error('Service Worker registration failed:', error);
+    });
+
+  // Capture beforeinstallprompt globally
+  window.addEventListener('beforeinstallprompt', (e) => {
+    console.log('beforeinstallprompt fired', e);
+    e.preventDefault();
+    pwaStore.deferredPrompt = e; // Always update with latest event
+    console.log('pwaStore.deferredPrompt updated:', pwaStore.deferredPrompt);
+    // Debug: Log deferredPrompt state after 5 seconds
+    setTimeout(() => {
+      console.log('DeferredPrompt state after 5s:', pwaStore.deferredPrompt);
+    }, 5000);
+  });
+}
+
 const app = createApp({});
 const pinia = createPinia();
 
@@ -26,6 +54,9 @@ app.use(router);
 app.use(VueEasymde);
 
 app.mount('#app');
+
+// Provide pwaStore globally
+app.provide('pwaStore', pwaStore);
 
 // Make Pinia States globally available
 app.provide("uiState", useUiStore());
