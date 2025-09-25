@@ -2,10 +2,10 @@
 
     <div>
 
-        <div :class="['space-y-4', { 'mt-4' : productForm.data_collection_fields.length < 2 }]">
+        <div :class="['space-y-4', { 'mt-4' : deliveryMethodForm.data_collection_fields.length < 2 }]">
 
             <div
-                v-if="productForm.data_collection_fields.length >= 2"
+                v-if="deliveryMethodForm.data_collection_fields.length >= 2"
                 class="flex justify-end items-center space-x-2 px-2">
                 <span
                     v-if="!hasCollapsedAll"
@@ -26,25 +26,25 @@
                 class="space-y-2"
                 handle=".draggable-handle"
                 ghost-class="bg-yellow-50"
-                v-model="productForm.data_collection_fields">
+                v-model="deliveryMethodForm.data_collection_fields">
 
                 <div
                     :key="dataCollectionField.temporary_id"
-                    v-for="(dataCollectionField, index) in productForm.data_collection_fields"
-                    @click="productForm.data_collection_fields[index].is_editable ? null : productForm.data_collection_fields[index].is_editable = true"
-                    :class="['w-full relative bg-gray-50 p-4 border border-gray-300 rounded-lg hover:bg-gray-100 group', { 'cursor-pointer' : !productForm.data_collection_fields[index].is_editable }]">
+                    v-for="(dataCollectionField, index) in deliveryMethodForm.data_collection_fields"
+                    @click="deliveryMethodForm.data_collection_fields[index].is_editable ? null : deliveryMethodForm.data_collection_fields[index].is_editable = true"
+                    :class="['w-full relative bg-gray-50 p-4 border border-gray-300 rounded-lg hover:bg-gray-100 group', { 'cursor-pointer' : !deliveryMethodForm.data_collection_fields[index].is_editable }]">
 
                     <div class="absolute top-2 right-2 flex items-center space-x-2 opacity-20 group-hover:opacity-100">
 
                         <!-- Edit / Collapse Button -->
                         <span
-                            v-if="productForm.data_collection_fields[index].is_editable"
+                            v-if="deliveryMethodForm.data_collection_fields[index].is_editable"
                             class="text-sm text-gray-500 underline hover:text-black cursor-pointer"
-                            @click.stop="productForm.data_collection_fields[index].is_editable = false">
+                            @click.stop="deliveryMethodForm.data_collection_fields[index].is_editable = false">
                             collapse
                         </span>
-                        <svg v-else class="w-4 h-4 cursor-pointer hover:opacity-50" @click.stop="productForm.data_collection_fields[index].is_editable = true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                            <path v-if="productForm.data_collection_fields[index].is_editable" stroke-linecap="round" stroke-linejoin="round" d="M9 9V4.5M9 9H4.5M9 9 3.75 3.75M9 15v4.5M9 15H4.5M9 15l-5.25 5.25M15 9h4.5M15 9V4.5M15 9l5.25-5.25M15 15h4.5M15 15v4.5m0-4.5 5.25 5.25" />
+                        <svg v-else class="w-4 h-4 cursor-pointer hover:opacity-50" @click.stop="deliveryMethodForm.data_collection_fields[index].is_editable = true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                            <path v-if="deliveryMethodForm.data_collection_fields[index].is_editable" stroke-linecap="round" stroke-linejoin="round" d="M9 9V4.5M9 9H4.5M9 9 3.75 3.75M9 15v4.5M9 15H4.5M9 15l-5.25 5.25M15 9h4.5M15 9V4.5M15 9l5.25-5.25M15 15h4.5M15 15v4.5m0-4.5 5.25 5.25" />
                             <path v-else stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10" />
                         </svg>
 
@@ -58,7 +58,7 @@
 
                     </div>
 
-                    <div v-if="productForm.data_collection_fields[index].is_editable" class="space-y-4">
+                    <div v-if="deliveryMethodForm.data_collection_fields[index].is_editable" class="space-y-4">
 
                         <div class="flex items-center space-x-2">
 
@@ -77,8 +77,8 @@
                                 class="w-60"
                                 :search="false"
                                 :options="typeOptions"
-                                v-model="productForm.data_collection_fields[index].type"
-                                @change="productState.saveStateDebounced('Option type changed')"
+                                v-model="deliveryMethodForm.data_collection_fields[index].type"
+                                @change="deliveryMethodState.saveStateDebounced('Option type changed')"
                                 :errorText="formState.getFormError('data_collection_fields'+index+'type')">
                             </Select>
 
@@ -92,8 +92,8 @@
                                 <Input
                                     class="w-full"
                                     placeholder="Title"
-                                    v-model="productForm.data_collection_fields[index].title"
-                                    @input="productState.saveStateDebounced('Option title changed')"
+                                    v-model="deliveryMethodForm.data_collection_fields[index].title"
+                                    @input="deliveryMethodState.saveStateDebounced('Option title changed')"
                                     :errorText="formState.getFormError('data_collection_fields'+index+'title')">
                                 </Input>
 
@@ -103,8 +103,8 @@
                                     class="w-full"
                                     type="textarea"
                                     placeholder="Short description (optional)"
-                                    v-model="productForm.data_collection_fields[index].description"
-                                    @input="productState.saveStateDebounced('Option description changed')"
+                                    v-model="deliveryMethodForm.data_collection_fields[index].description"
+                                    @input="deliveryMethodState.saveStateDebounced('Option description changed')"
                                     :errorText="formState.getFormError('data_collection_fields'+index+'description')">
                                 </Input>
 
@@ -114,8 +114,8 @@
                             <Input
                                 type="checkbox"
                                 inputLabel="Required"
-                                v-model="productForm.data_collection_fields[index].required"
-                                @change="productState.saveStateDebounced('Required status changed')"
+                                v-model="deliveryMethodForm.data_collection_fields[index].required"
+                                @change="deliveryMethodState.saveStateDebounced('Required status changed')"
                                 :errorText="formState.getFormError('data_collection_fields'+index+'required')">
                             </Input>
 
@@ -128,10 +128,10 @@
                                 class="space-y-0"
                                 handle=".draggable-handle-2"
                                 ghost-class="bg-yellow-50"
-                                v-model="productForm.data_collection_fields[index].options">
+                                v-model="deliveryMethodForm.data_collection_fields[index].options">
                                 <div
                                     :key="index2"
-                                    v-for="(option, index2) in productForm.data_collection_fields[index].options"
+                                    v-for="(option, index2) in deliveryMethodForm.data_collection_fields[index].options"
                                     class="flex items-center justify-between space-x-4 rounded-lg py-2 px-2 hover:border-blue-200 hover:bg-gray-50 group">
 
                                     <div class="w-full flex items-center space-x-4">
@@ -140,8 +140,8 @@
                                         <Input
                                             class="w-full"
                                             :placeholder="`Option ${index2 + 1}`"
-                                            @input="productState.saveStateDebounced('Sub option name changed')"
-                                            v-model="productForm.data_collection_fields[index].options[index2].name"
+                                            @input="deliveryMethodState.saveStateDebounced('Sub option name changed')"
+                                            v-model="deliveryMethodForm.data_collection_fields[index].options[index2].name"
                                             :errorText="formState.getFormError('data_collection_fields'+index+'options'+index2+'name')">
                                         </Input>
 
@@ -149,8 +149,8 @@
                                         <Input
                                             type="money"
                                             :currency="store.currency"
-                                            v-model="productForm.data_collection_fields[index].options[index2].fee"
-                                            @input="productState.saveStateDebounced('Sub option amount changed')"
+                                            v-model="deliveryMethodForm.data_collection_fields[index].options[index2].fee"
+                                            @input="deliveryMethodState.saveStateDebounced('Sub option amount changed')"
                                             :errorText="formState.getFormError('data_collection_fields'+index+'options'+index2+'fee')">
                                         </Input>
 
@@ -184,8 +184,8 @@
                                     :search="false"
                                     label="Validation"
                                     :options="validationOptions"
-                                    v-model="productForm.data_collection_fields[index].validation"
-                                    @change="productState.saveStateDebounced('Validation changed')"
+                                    v-model="deliveryMethodForm.data_collection_fields[index].validation"
+                                    @change="deliveryMethodState.saveStateDebounced('Validation changed')"
                                     :errorText="formState.getFormError('data_collection_fields'+index+'validation')">
                                 </Select>
 
@@ -194,11 +194,11 @@
                                     min="0"
                                     class="w-24"
                                     type="number"
-                                    v-model="productForm.data_collection_fields[index].min"
-                                    @change="productState.saveStateDebounced('Validation changed')"
+                                    v-model="deliveryMethodForm.data_collection_fields[index].min"
+                                    @change="deliveryMethodState.saveStateDebounced('Validation changed')"
                                     :errorText="formState.getFormError('data_collection_fields'+index+'min')"
-                                    :label="productForm.data_collection_fields[index].validation == 'select at least' ? null : 'Min'"
-                                    v-if="productForm.data_collection_fields[index].validation == 'select at least' || productForm.data_collection_fields[index].validation == 'select between'">
+                                    :label="deliveryMethodForm.data_collection_fields[index].validation == 'select at least' ? null : 'Min'"
+                                    v-if="deliveryMethodForm.data_collection_fields[index].validation == 'select at least' || deliveryMethodForm.data_collection_fields[index].validation == 'select between'">
                                 </Input>
 
                                 <!-- Select At Least Input -->
@@ -206,11 +206,11 @@
                                     min="0"
                                     class="w-24"
                                     type="number"
-                                    v-model="productForm.data_collection_fields[index].max"
-                                    @change="productState.saveStateDebounced('Validation changed')"
+                                    v-model="deliveryMethodForm.data_collection_fields[index].max"
+                                    @change="deliveryMethodState.saveStateDebounced('Validation changed')"
                                     :errorText="formState.getFormError('data_collection_fields'+index+'max')"
-                                    :label="productForm.data_collection_fields[index].validation == 'select at most' ? null : 'Max'"
-                                    v-if="productForm.data_collection_fields[index].validation == 'select at most' || productForm.data_collection_fields[index].validation == 'select between'">
+                                    :label="deliveryMethodForm.data_collection_fields[index].validation == 'select at most' ? null : 'Max'"
+                                    v-if="deliveryMethodForm.data_collection_fields[index].validation == 'select at most' || deliveryMethodForm.data_collection_fields[index].validation == 'select between'">
                                 </Input>
 
                             </div>
@@ -233,7 +233,7 @@
 
                     </div>
 
-                    <div v-else class="space-y-2" @click="productForm.data_collection_fields[index].is_editable = true">
+                    <div v-else class="space-y-2" @click="deliveryMethodForm.data_collection_fields[index].is_editable = true">
 
                         <!-- Field Summary -->
                         <div class="flex items-center space-x-2 text-sm text-gray-500">
@@ -267,7 +267,7 @@
 
             <div :class="[{'flex space-x-2 justify-between' : !hasFields}]">
 
-                <p v-if="!hasFields" class="text-sm text-gray-700">Add questions if your product must capture additional information from the customer</p>
+                <p v-if="!hasFields" class="text-sm text-gray-700">Add questions if your delivery method must capture additional information from the customer</p>
 
                 <div class="flex justify-end space-x-2">
 
@@ -344,7 +344,7 @@
     import { Move, Plus, List, Clock, Tally1, Tally2, MapPin, Hash, Calendar, CloudUpload, SquareCheck } from 'lucide-vue-next';
 
     export default {
-        inject: ['formState', 'storeState', 'productState'],
+        inject: ['formState', 'storeState', 'deliveryMethodState'],
         components: {
             Move, List, Clock, Tally1, Tally2, MapPin, Hash, Calendar, CloudUpload, SquareCheck,
             Pill, Input, Modal, Button, Select, draggable: VueDraggableNext
@@ -377,24 +377,24 @@
             store() {
                 return this.storeState.store;
             },
-            productForm() {
-                return this.productState.productForm;
+            deliveryMethodForm() {
+                return this.deliveryMethodState.deliveryMethodForm;
             },
             hasFields() {
-                return this.productForm.data_collection_fields.length > 0;
+                return this.deliveryMethodForm.data_collection_fields.length > 0;
             },
             hasOriginalFields() {
                 return this.originalFields.length > 0;
             },
             hasCollapsedAll() {
-                return this.productForm.data_collection_fields.every(field => field.is_editable === false);
+                return this.deliveryMethodForm.data_collection_fields.every(field => field.is_editable === false);
             },
             hasExpandedAll() {
-                return this.productForm.data_collection_fields.every(field => field.is_editable === true);
+                return this.deliveryMethodForm.data_collection_fields.every(field => field.is_editable === true);
             },
             fieldsHaveChanged() {
                 // Clone the arrays to avoid modifying the original data
-                var a = cloneDeep(this.productForm.data_collection_fields);
+                var a = cloneDeep(this.deliveryMethodForm.data_collection_fields);
                 var b = cloneDeep(this.originalFields);
 
                 // Loop through each object in the array and delete the property
@@ -407,7 +407,7 @@
         },
         methods: {
             onAddField() {
-                this.productForm.data_collection_fields.push({
+                this.deliveryMethodForm.data_collection_fields.push({
                     validation: 'not applicable',
                     temporary_id: uuidv4(),
                     type: 'short answer',
@@ -419,36 +419,36 @@
                     min: '1',
                     max: '2'
                 });
-                this.productState.saveStateDebounced('Option added');
+                this.deliveryMethodState.saveStateDebounced('Option added');
             },
             onRemoveField(hideModal) {
-                const index = this.productForm.data_collection_fields.findIndex(dataCollectionField => dataCollectionField.temporary_id == this.deletableDataCollectionField.temporary_id);
-                this.productForm.data_collection_fields.splice(index, 1);
+                const index = this.deliveryMethodForm.data_collection_fields.findIndex(dataCollectionField => dataCollectionField.temporary_id == this.deletableDataCollectionField.temporary_id);
+                this.deliveryMethodForm.data_collection_fields.splice(index, 1);
                 hideModal();
-                this.productState.saveStateDebounced('Option removed');
+                this.deliveryMethodState.saveStateDebounced('Option removed');
             },
             onResetFields() {
-                this.productForm.data_collection_fields = cloneDeep(this.originalFields);
-                this.productState.saveStateDebounced('Options restored');
+                this.deliveryMethodForm.data_collection_fields = cloneDeep(this.originalFields);
+                this.deliveryMethodState.saveStateDebounced('Options restored');
             },
             onAddOption(index) {
-                this.productForm.data_collection_fields[index].options.push({
-                    'title': `Option ${this.productForm.data_collection_fields[index].options.length + 1}`,
+                this.deliveryMethodForm.data_collection_fields[index].options.push({
+                    'title': `Option ${this.deliveryMethodForm.data_collection_fields[index].options.length + 1}`,
                     'fee': '0.00'
                 });
-                this.productState.saveStateDebounced('Sub option added');
+                this.deliveryMethodState.saveStateDebounced('Sub option added');
             },
             onRemoveOption(index, index2) {
-                this.productForm.data_collection_fields[index].options.splice(index2, 1);
-                this.productState.saveStateDebounced('Sub option removed');
+                this.deliveryMethodForm.data_collection_fields[index].options.splice(index2, 1);
+                this.deliveryMethodState.saveStateDebounced('Sub option removed');
             },
             collapseAll() {
-                this.productForm.data_collection_fields.forEach(field => {
+                this.deliveryMethodForm.data_collection_fields.forEach(field => {
                     field.is_editable = false;
                 });
             },
             expandAll() {
-                this.productForm.data_collection_fields.forEach(field => {
+                this.deliveryMethodForm.data_collection_fields.forEach(field => {
                     field.is_editable = true;
                 });
             },
@@ -460,7 +460,7 @@
                 return dataCollectionField.type == 'checkbox' || dataCollectionField.type == 'selection';
             },
             hasOptions(index) {
-                return this.productForm.data_collection_fields[index].options.length > 0;
+                return this.deliveryMethodForm.data_collection_fields[index].options.length > 0;
             },
         }
     };

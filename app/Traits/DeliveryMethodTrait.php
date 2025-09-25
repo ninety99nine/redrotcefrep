@@ -123,7 +123,7 @@ trait DeliveryMethodTrait
         $dayOfWeek = $today->dayOfWeek;
 
         // Get operational hours for today
-        $operationalHours = $this->operational_hours[$dayOfWeek];
+        $operationalHours = $this->getReorderedOperationalHours()[$dayOfWeek];
 
         // If today is marked unavailable, disable it
         if (!$operationalHours['available']) {
@@ -159,7 +159,7 @@ trait DeliveryMethodTrait
      */
     public function daysOfWeekDisabled(): array
     {
-        return collect($this->operational_hours)
+        return collect($this->getReorderedOperationalHours())
             ->map(function ($day, $index) {
                 return !$day['available'] ? $index : null;
             })
@@ -181,7 +181,7 @@ trait DeliveryMethodTrait
         $now = Carbon::now();
         $selectedDate = Carbon::parse($date);
         $dayOfWeek = $selectedDate->dayOfWeek;
-        $operationalHours = $this->operational_hours[$dayOfWeek];
+        $operationalHours = $this->getReorderedOperationalHours()[$dayOfWeek];
 
         // Return an empty array if there are no operational hours
         if (!$operationalHours['available'] || count($operationalHours['hours']) === 0) {
@@ -267,7 +267,7 @@ trait DeliveryMethodTrait
     {
         $selectedDate = Carbon::parse($date);
         $dayOfWeek = $selectedDate->dayOfWeek;
-        $operationalHours = $this->operational_hours[$dayOfWeek];
+        $operationalHours = $this->getReorderedOperationalHours()[$dayOfWeek];
 
         // Return an empty array if there are no operational hours
         if (empty($operationalHours['hours'])) {
@@ -344,5 +344,101 @@ trait DeliveryMethodTrait
         $hours = str_pad(floor($minutes / 60), 2, '0', STR_PAD_LEFT);
         $mins = str_pad($minutes % 60, 2, '0', STR_PAD_LEFT);
         return "$hours:$mins";
+    }
+
+
+    /**
+     * Convert carbon day of week to the matching UI day of week.
+     *
+     * The issue is that carbon uses this syntax:
+     *
+     * 0 = Sunday
+     * 1 = Monday
+     * 2 = Tuesday
+     * 3 = Wednesday
+     * 4 = Thursday
+     * 5 = Friday
+     * 6 = Saturday
+     *
+     * Sunday is the first index.
+     *
+     * However we save the operational_hours as:
+     *
+     * 0 = Monday
+     * 1 = Tuesday
+     * 2 = Wednesday
+     * 3 = Thursday
+     * 4 = Friday
+     * 5 = Saturday
+     * 6 = Sunday
+     *
+     * Monday is the first index.
+     *
+     * This is because we prefer to show Monday first on the UI instead of Sunday.
+     * This means that we must always correctly map the carbon day of the week
+     * to the UI day of the week.
+     *
+     * @param int $dayOfWeek
+     * @return int
+     */
+    private function uiDayOfWeek(int $dayOfWeek): int
+    {
+        //  Carbon day of week to our day of week e.g Their Sunday (0) to our Sunday (6)
+        return [
+            0 => 6, // Sunday
+            6 => 5, // Monday
+            5 => 4, // Tuesday
+            4 => 3, // Wednesday
+            3 => 2, // Thursday
+            2 => 1, // Friday
+            1 => 0, // Saturday
+        ][$dayOfWeek];
+    }
+
+    /**
+     * Reorder operational hours to match Carbon's dayOfWeek.
+     *
+     * The issue is that carbon uses this syntax:
+     *
+     * 0 = Sunday
+     * 1 = Monday
+     * 2 = Tuesday
+     * 3 = Wednesday
+     * 4 = Thursday
+     * 5 = Friday
+     * 6 = Saturday
+     *
+     * Sunday is the first index.
+     *
+     * However we save the operational_hours as:
+     *
+     * 0 = Monday
+     * 1 = Tuesday
+     * 2 = Wednesday
+     * 3 = Thursday
+     * 4 = Friday
+     * 5 = Saturday
+     * 6 = Sunday
+     *
+     * Monday is the first index.
+     *
+     * This is because we prefer to show Monday first on the UI instead of Sunday.
+     * This means that we must reorder the operational hours to match Carbon's expectations.
+     *
+     * @return array
+     */
+    private function getReorderedOperationalHours(): array
+    {
+        $uiOperationalHours = $this->operational_hours;
+
+        return [
+            0 => $uiOperationalHours[6], // Sunday
+            1 => $uiOperationalHours[0], // Monday
+            2 => $uiOperationalHours[1], // Tuesday
+            3 => $uiOperationalHours[2], // Wednesday
+            4 => $uiOperationalHours[3], // Thursday
+            5 => $uiOperationalHours[4], // Friday
+            6 => $uiOperationalHours[5], // Saturday
+        ];
     }
 }

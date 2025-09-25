@@ -29,8 +29,9 @@
 
                         <!-- Description Input -->
                         <Input
-                            type="text"
+                            rows="2"
                             class="w-full"
+                            type="textarea"
                             v-model="designCard.metadata.description"
                             placeholder="Short description (optional)"
                             @input="designState.saveStateDebounced('Option description changed')"
@@ -77,6 +78,7 @@
                                 <!-- Option Fee Input -->
                                 <Input
                                     type="money"
+                                    :currency="store.currency"
                                     v-model="designCard.metadata.options[index2].fee"
                                     @input="designState.saveStateDebounced('Sub option amount changed')"
                                     :errorText="formState.getFormError('design_cards'+index+'metadata.options'+index2+'fee')">
@@ -180,7 +182,7 @@
     import Designer from '@Pages/design/_components/_components/design-cards/design-card/_components/Designer.vue';
 
     export default {
-        inject: ['formState', 'designState'],
+        inject: ['formState', 'storeState', 'designState'],
         components: {
             Move, Pill, Input, Button, Select, draggable: VueDraggableNext, Designer
         },
@@ -207,6 +209,9 @@
             }
         },
         computed: {
+            store() {
+                return this.storeState.store;
+            },
             hasOptions() {
                 return this.designCard.metadata.options.length > 0;
             },

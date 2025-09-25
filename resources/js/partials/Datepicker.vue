@@ -1,6 +1,6 @@
 <template>
 
-    <div>
+    <div class="space-y-2">
 
         <div
             v-if="$slots.label || label || secondaryLabel || showAsterisk || $slots.description || description || externalLinkName">
@@ -65,7 +65,7 @@
 
         </div>
 
-        <div :class="{ 'mt-2': label != '' }">
+        <div>
 
             <VueDatePicker
                 :is-24="is24"

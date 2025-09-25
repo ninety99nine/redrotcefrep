@@ -63,7 +63,7 @@
                                 <List v-if="option == 'selection'" size="20"></List>
                                 <Hexagon v-if="option == 'logo'" size="20"></Hexagon>
                                 <Truck v-if="option == 'delivery'" size="20"></Truck>
-                                <Binary v-if="option == 'number'" size="20"></Binary>
+                                <Hash v-if="option == 'number'" size="20"></Hash>
                                 <AtSign v-if="option == 'socials'" size="20"></AtSign>
                                 <Calendar v-if="option == 'date'" size="20"></Calendar>
                                 <MapPin v-if="option == 'location'" size="20"></MapPin>
@@ -108,12 +108,12 @@
     import Button from '@Partials/Button.vue';
     import Dropdown from '@Partials/Dropdown.vue';
     import { capitalizeAll } from '@Utils/stringUtils.js';
-    import { Plus, Map, Link, Type, Box, Image, Video, AtSign, Clock, Tally1, Tally2, Binary, Download, Calendar, SquareCheck, Ungroup, Megaphone, List, Hexagon, CloudUpload, Contact, Truck, Pencil, MapPin, HandCoins, UserRound, Hourglass, ShoppingCart, ReceiptText, CreditCard, TicketPercent, SeparatorHorizontal } from 'lucide-vue-next';
+    import { Plus, Map, Link, Type, Box, Image, Video, AtSign, Clock, Tally1, Tally2, Hash, Download, Calendar, SquareCheck, Ungroup, Megaphone, List, Hexagon, CloudUpload, Contact, Truck, Pencil, MapPin, HandCoins, UserRound, Hourglass, ShoppingCart, ReceiptText, CreditCard, TicketPercent, SeparatorHorizontal } from 'lucide-vue-next';
 
     export default {
         inject: ['designState'],
         components: {
-            Pill, Button, Dropdown, Map, Link, Type, Box, Image, Video, AtSign, Clock, Tally1, Tally2, Binary, Download, Calendar, SquareCheck, Ungroup, Megaphone, List, Hexagon, CloudUpload, Contact,
+            Pill, Button, Dropdown, Map, Link, Type, Box, Image, Video, AtSign, Clock, Tally1, Tally2, Hash, Download, Calendar, SquareCheck, Ungroup, Megaphone, List, Hexagon, CloudUpload, Contact,
             Truck, Pencil, MapPin, HandCoins, UserRound, Hourglass, ShoppingCart, ReceiptText, CreditCard, TicketPercent, SeparatorHorizontal
         },
         props: {

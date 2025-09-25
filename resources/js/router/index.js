@@ -366,7 +366,7 @@ const routes = [
                                 component: () => import('@Pages/settings/delivery-methods/DeliveryMethod.vue')
                             },
                             {
-                                path: ':store_delivery_method_id',
+                                path: ':delivery_method_id',
                                 name: 'edit-delivery-method',
                                 component: () => import('@Pages/settings/delivery-methods/DeliveryMethod.vue')
                             }

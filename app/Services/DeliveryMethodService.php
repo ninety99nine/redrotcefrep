@@ -6,6 +6,7 @@ use Exception;
 use Carbon\Carbon;
 use App\Models\Store;
 use App\Enums\Association;
+use App\Enums\DeliveryMethodFeeType;
 use App\Models\DeliveryMethod;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Collection;
@@ -146,8 +147,8 @@ class DeliveryMethodService extends BaseService
     {
         $data['set_schedule'] = true;
         $deliveryDate = $data['delivery_date'] ?? null;
-        $showAllDates = $data['show_all_dates'] ?? false;
-        $showAllTimeslots = $data['show_all_timeslots'] ?? false;
+        $showAllDates = $data['show_all_dates'] ?? null;
+        $showAllTimeslots = $data['show_all_timeslots'] ?? null;
 
         $deliveryMethod = new DeliveryMethod();
         $deliveryMethod->fill($data);
@@ -162,14 +163,9 @@ class DeliveryMethodService extends BaseService
             'days_of_week_disabled' => $showAllDates ? [] : $deliveryMethod->daysOfWeekDisabled(),
         ];
 
-        /*
-        dd($deliveryMethod->minDate(), $deliveryMethod->maxDate(), $deliveryMethod->datesDisabled(), $deliveryMethod->daysOfWeekDisabled());
-
-        if($deliveryDate) {
-            dd($scheduleOptions);
-
+        if ($deliveryMethod->same_day_delivery) {
+            $scheduleOptions['schedule_key_points'][] = 'Deliveries must be the same day';
         }
-        */
 
         $availableDays = collect($deliveryMethod->operational_hours)
             ->filter(fn($day) => $showAllDates ?? $day['available'])
@@ -178,16 +174,16 @@ class DeliveryMethodService extends BaseService
             ->toArray();
 
         if (empty($availableDays)) {
-            $scheduleOptions['schedule_key_points'][] = 'Orders are not allowed on any day of the week';
+            $scheduleOptions['schedule_key_points'][] = 'Deliveries are not allowed on any day of the week';
         } elseif (count($availableDays) == 7) {
-            $scheduleOptions['schedule_key_points'][] = 'Orders are allowed on all days of the week';
+            $scheduleOptions['schedule_key_points'][] = 'Deliveries are allowed on all days of the week';
         } else {
             $formattedDays = count($availableDays) > 1
                 ? implode(', ', array_slice($availableDays, 0, -1)) . ' and ' . end($availableDays)
                 : $availableDays[0];
 
             $scheduleOptions['schedule_key_points'][] = sprintf(
-                'Orders are allowed on %d %s of the week: %s',
+                'Deliveries are allowed on %d %s of the week: %s',
                 count($availableDays), count($availableDays) == 1 ? 'day' : 'days', $formattedDays
             );
         }

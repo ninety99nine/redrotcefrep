@@ -46,7 +46,7 @@
 
                             <Tally1 v-if="designCard.type == 'short answer'" size="20" class="rotate-90 translate-y-2"></Tally1>
                             <Tally2 v-if="designCard.type == 'long answer'" size="20" class="rotate-90 translate-y-1"></Tally2>
-                            <Binary v-if="designCard.type == 'number'" size="20"></Binary>
+                            <Hash v-if="designCard.type == 'number'" size="20"></Hash>
                             <Calendar v-if="designCard.type == 'date'" size="20"></Calendar>
                             <SquareCheck v-if="designCard.type == 'checkbox'" size="20"></SquareCheck>
                             <List v-if="designCard.type == 'selection'" size="20"></List>
@@ -216,13 +216,13 @@
     import InstallAppDesignCard from '@Pages/design/_components/_components/design-cards/design-card/InstallAppDesignCard.vue';
     import CategoriesDesignCard from '@Pages/design/_components/_components/design-cards/design-card/CategoriesDesignCard.vue';
     import DataCollectionDesignCard from '@Pages/design/_components/_components/design-cards/design-card/DataCollectionDesignCard.vue';
-    import { Eye, EyeOff, Move, Trash, Map, Link, Copy, Type, Box, Image, Video, AtSign, Clock, MapPin, Contact, Truck, Pencil, Download, Hexagon, HandCoins, UserRound, Hourglass, ShoppingCart, ReceiptText, CreditCard, TicketPercent, SeparatorHorizontal, Tally1, Tally2, Binary, Calendar, SquareCheck, Ungroup, Megaphone, List, CloudUpload } from 'lucide-vue-next';
+    import { Eye, EyeOff, Move, Trash, Map, Link, Copy, Type, Box, Image, Video, AtSign, Clock, MapPin, Contact, Truck, Pencil, Download, Hexagon, HandCoins, UserRound, Hourglass, ShoppingCart, ReceiptText, CreditCard, TicketPercent, SeparatorHorizontal, Tally1, Tally2, Hash, Calendar, SquareCheck, Ungroup, Megaphone, List, CloudUpload } from 'lucide-vue-next';
 
     export default {
         inject: ['designState', 'storeState'],
         components: {
             Eye, EyeOff, Move, Trash, Map, Link, Copy, Type, Box, Image, Video, AtSign, Clock, MapPin, Contact, Truck, Pencil, Download, Hexagon, HandCoins, UserRound, Hourglass, ShoppingCart, ReceiptText, CreditCard, TicketPercent,SeparatorHorizontal,
-            Tally1, Tally2, Binary, Calendar, SquareCheck, Ungroup, Megaphone, List, CloudUpload,
+            Tally1, Tally2, Hash, Calendar, SquareCheck, Ungroup, Megaphone, List, CloudUpload,
             Pill, Tooltip, VueSlideUpDown, draggable: VueDraggableNext, InstallAppDesignCard, CategoriesDesignCard, MapDesignCard, LogoDesignCard, TipsDesignCard, LinkDesignCard, TextDesignCard, ImageDesignCard, ItemsDesignCard, VideoDesignCard, BannerDesignCard,
             OrderSummaryCard, ContactDesignCard, SocialsDesignCard, CustomerDesignCard, DeliveryDesignCard, PaymentMethodsCard, ProductsDesignCard,
             DividerDesignCard, PromoCodeDesignCard, CountdownDesignCard, DataCollectionDesignCard

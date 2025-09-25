@@ -49,6 +49,47 @@
                 tooltipContent="A short and sweet description of how delivery/pickup will be accomplished">
             </Input>
 
+            <div :class="[{ 'border border-gray-300 border-dashed rounded-lg': deliveryMethodForm.set_daily_order_limit }]">
+
+                <div :class="['space-y-4 transition-all duration-500', { 'bg-blue-50 p-4 rounded-lg': deliveryMethodForm.set_daily_order_limit }]">
+
+                    <!-- Set Daily Order Limit Checkbox -->
+                    <Input
+                        type="checkbox"
+                        inputLabel="Set daily order limit"
+                        v-model="deliveryMethodForm.set_daily_order_limit"
+                        :skeleton="isLoadingStore || isLoadingDeliveryMethod"
+                        :errorText="formState.getFormError('set_daily_order_limit')"
+                        inputDescription="Orders placed must not exceed the daily limit specified"
+                        @change="deliveryMethodState.saveStateDebounced('Set daily order limit changed')">
+                    </Input>
+
+                    <div
+                        class="flex items-center space-x-2"
+                        v-if="deliveryMethodForm.set_daily_order_limit">
+
+                        <span class="text-sm">Accept no more than</span>
+
+                        <!-- Daily Order Limit Input -->
+                        <Input
+                            min="1"
+                            class="w-24"
+                            type="number"
+                            placeholder="10"
+                            v-model="deliveryMethodForm.daily_order_limit"
+                            :skeleton="isLoadingStore || isLoadingDeliveryMethod"
+                            :errorText="formState.getFormError('daily_order_limit')"
+                            @input="deliveryMethodState.saveStateDebounced('Daily order limit changed')">
+                        </Input>
+
+                        <span class="text-sm">orders per day</span>
+
+                    </div>
+
+                </div>
+
+            </div>
+
             <div :class="[{ 'border border-gray-300 border-dashed rounded-lg': deliveryMethodForm.qualify_on_minimum_grand_total }]">
 
                 <div :class="['space-y-4 transition-all duration-500', { 'bg-blue-50 p-4 rounded-lg': deliveryMethodForm.qualify_on_minimum_grand_total }]">
@@ -81,82 +122,11 @@
 
             </div>
 
-            <div :class="[{ 'border border-gray-300 border-dashed rounded-lg': deliveryMethodForm.offer_free_delivery_on_minimum_grand_total }]">
-
-                <div :class="['space-y-4 transition-all duration-500', { 'bg-blue-50 p-4 rounded-lg': deliveryMethodForm.offer_free_delivery_on_minimum_grand_total }]">
-
-                    <!-- Qualify On Minimum Grand Total Checkbox -->
-                    <Input
-                        type="checkbox"
-                        :skeleton="isLoadingStore || isLoadingDeliveryMethod"
-                        inputLabel="Offer free delivery on minimum grand total"
-                        v-model="deliveryMethodForm.offer_free_delivery_on_minimum_grand_total"
-                        :errorText="formState.getFormError('offer_free_delivery_on_minimum_grand_total')"
-                        inputDescription="Customer carts must qualify with a minimum grand total to claim free delivery"
-                        @change="deliveryMethodState.saveStateDebounced('Offer free delivery on minimum grand total changed')">
-                    </Input>
-
-                    <!-- Minimum Grand Total Input -->
-                    <Input
-                        type="money"
-                        placeholder="100"
-                        label="Minimum Grand Total"
-                        :currency="store?.currency"
-                        :skeleton="isLoadingStore || isLoadingDeliveryMethod"
-                        v-model="deliveryMethodForm.free_delivery_minimum_grand_total"
-                        v-if="deliveryMethodForm.offer_free_delivery_on_minimum_grand_total"
-                        :errorText="formState.getFormError('free_delivery_minimum_grand_total')"
-                        @input="deliveryMethodState.saveStateDebounced('Minimum grand total changed')">
-                    </Input>
-
-                </div>
-
-            </div>
-
-            <div :class="[{ 'border border-gray-300 border-dashed rounded-lg': deliveryMethodForm.set_daily_order_limit }]">
-
-                <div :class="['space-y-4 transition-all duration-500', { 'bg-blue-50 p-4 rounded-lg': deliveryMethodForm.set_daily_order_limit }]">
-
-                    <!-- Qualify On Minimum Grand Total Checkbox -->
-                    <Input
-                        type="checkbox"
-                        inputLabel="Set daily order limit"
-                        v-model="deliveryMethodForm.set_daily_order_limit"
-                        :skeleton="isLoadingStore || isLoadingDeliveryMethod"
-                        :errorText="formState.getFormError('set_daily_order_limit')"
-                        inputDescription="Orders placed must not exceed the daily limit specified"
-                        @change="deliveryMethodState.saveStateDebounced('Set daily order limit changed')">
-                    </Input>
-
-                    <div
-                        class="flex items-center space-x-2"
-                        v-if="deliveryMethodForm.set_daily_order_limit">
-
-                        <span class="text-sm">Accept no more than</span>
-
-                        <!-- Minimum Grand Total Input -->
-                        <Input
-                            min="1"
-                            class="w-24"
-                            type="number"
-                            placeholder="10"
-                            v-model="deliveryMethodForm.daily_order_limit"
-                            :skeleton="isLoadingStore || isLoadingDeliveryMethod"
-                            :errorText="formState.getFormError('daily_order_limit')"
-                            @input="deliveryMethodState.saveStateDebounced('Daily order limit changed')">
-                        </Input>
-
-                        <span class="text-sm">orders per day</span>
-
-                    </div>
-
-                </div>
-
-            </div>
-
         </div>
 
-        <div class="bg-gray-50 border border-gray-300 rounded-lg p-4 space-y-4">
+        <div class="bg-gray-50 border border-gray-300 rounded-lg p-4 space-y-4 mb-4">
+
+            <h1 class="text-md font-bold mb-4">Fee</h1>
 
             <!-- Charge Fee -->
             <Switch
@@ -169,16 +139,19 @@
 
             <template v-if="deliveryMethodForm.charge_fee">
 
-                <div class="grid grid-cols-2 gap-4">
+                <div class="border-b border-gray-300 border-dashed space-y-4 pb-4">
 
-                    <!-- Fee Type -->
-                    <Select
-                        width="w-full"
-                        :search="false"
-                        label="Fee type"
-                        :options="feeTypes"
-                        v-model="deliveryMethodForm.fee_type">
-                    </Select>
+                    <div class="grid grid-cols-2 gap-4">
+
+                        <!-- Fee Type -->
+                        <Select
+                            width="w-full"
+                            :search="false"
+                            label="Fee type"
+                            :options="feeTypes"
+                            v-model="deliveryMethodForm.fee_type"
+                            :errorText="formState.getFormError('fee_type')">
+                        </Select>
 
                         <Input
                             type="money"
@@ -205,13 +178,300 @@
                             tooltipContent="Set the percentage fee amount (This is the percentage fee that will be applied as a charge)">
                         </Input>
 
+                    </div>
+
+                    <FeeByWeight v-if="deliveryMethodForm.fee_type == 'fee by weight'"></FeeByWeight>
+                    <FeeByDistance v-if="deliveryMethodForm.fee_type == 'fee by distance'"></FeeByDistance>
+                    <FeeByPostalCode v-if="deliveryMethodForm.fee_type == 'fee by postal code'"></FeeByPostalCode>
+
                 </div>
 
-                <FeeByWeight v-if="deliveryMethodForm.fee_type == 'fee by weight'"></FeeByWeight>
-                <FeeByDistance v-if="deliveryMethodForm.fee_type == 'fee by distance'"></FeeByDistance>
-                <FeeByPostalCode v-if="deliveryMethodForm.fee_type == 'fee by postal code'"></FeeByPostalCode>
+                <div :class="[{ 'border border-gray-300 border-dashed rounded-lg': deliveryMethodForm.offer_free_delivery_on_minimum_grand_total }]">
+
+                    <div :class="['space-y-4 transition-all duration-500', { 'bg-blue-50 p-4 rounded-lg': deliveryMethodForm.offer_free_delivery_on_minimum_grand_total }]">
+
+                        <!-- Qualify On Minimum Grand Total Checkbox -->
+                        <Input
+                            type="checkbox"
+                            :skeleton="isLoadingStore || isLoadingDeliveryMethod"
+                            inputLabel="Offer free delivery on minimum grand total"
+                            v-model="deliveryMethodForm.offer_free_delivery_on_minimum_grand_total"
+                            :errorText="formState.getFormError('offer_free_delivery_on_minimum_grand_total')"
+                            inputDescription="Customer carts must qualify with a minimum grand total to claim free delivery"
+                            @change="deliveryMethodState.saveStateDebounced('Offer free delivery on minimum grand total changed')">
+                        </Input>
+
+                        <!-- Minimum Grand Total Input -->
+                        <Input
+                            type="money"
+                            placeholder="100"
+                            label="Minimum Grand Total"
+                            :currency="store?.currency"
+                            :skeleton="isLoadingStore || isLoadingDeliveryMethod"
+                            v-model="deliveryMethodForm.free_delivery_minimum_grand_total"
+                            v-if="deliveryMethodForm.offer_free_delivery_on_minimum_grand_total"
+                            :errorText="formState.getFormError('free_delivery_minimum_grand_total')"
+                            @input="deliveryMethodState.saveStateDebounced('Minimum grand total changed')">
+                        </Input>
+
+                    </div>
+
+                </div>
 
             </template>
+
+        </div>
+
+        <div class="bg-gray-50 border border-gray-300 rounded-lg p-4 space-y-4 mb-4">
+
+            <h1 class="text-md font-bold mb-4">Address</h1>
+
+            <!-- Capture Address Information Checkbox -->
+            <Input
+                type="checkbox"
+                inputLabel="Capture address information"
+                v-model="deliveryMethodForm.ask_for_an_address"
+                :skeleton="isLoadingStore || isLoadingDeliveryMethod"
+                :errorText="formState.getFormError('ask_for_an_address')"
+                @change="deliveryMethodState.saveStateDebounced('Capture address information changed')"
+                :disabled="['fee by distance', 'fee by postal code'].includes(deliveryMethodForm.fee_type)">
+                <template #inputDescription>
+                    <p
+                        class="text-xs text-green-600 mt-1"
+                        v-if="['fee by distance', 'fee by postal code'].includes(deliveryMethodForm.fee_type)">
+                        The address information will be captured to support delivery fee by
+                        <template v-if="deliveryMethodForm.fee_type == 'fee by distance'">distance</template>
+                        <template v-else-if="deliveryMethodForm.fee_type == 'fee by postal code'">postal code</template>
+                    </p>
+                    <p v-else class="text-xs text-gray-500 mt-1">Ask customers to provide their address information for delivery</p>
+                </template>
+            </Input>
+
+            <!-- Capture Address Location On Map Checkbox -->
+            <Input
+                type="checkbox"
+                inputLabel="Capture address location on map"
+                v-model="deliveryMethodForm.pin_location_on_map"
+                :skeleton="isLoadingStore || isLoadingDeliveryMethod"
+                :errorText="formState.getFormError('pin_location_on_map')"
+                @change="deliveryMethodState.saveStateDebounced('Capture address location on map changed')"
+                :disabled="['fee by distance', 'fee by postal code'].includes(deliveryMethodForm.fee_type)">
+                <template #inputDescription>
+                    <p
+                        class="text-xs text-green-600 mt-1"
+                        v-if="['fee by distance', 'fee by postal code'].includes(deliveryMethodForm.fee_type)">
+                        The address location will be captured to support delivery fee by
+                        <template v-if="deliveryMethodForm.fee_type == 'fee by distance'">distance</template>
+                        <template v-else-if="deliveryMethodForm.fee_type == 'fee by postal code'">postal code</template>
+                    </p>
+                    <p v-else class="text-xs text-gray-500 mt-1">Ask customers to show their address on the map for better accuracy</p>
+                </template>
+            </Input>
+
+        </div>
+
+        <div class="bg-gray-50 border border-gray-300 rounded-lg p-4 space-y-4 mb-4">
+
+            <h1 class="text-md font-bold mb-4">Schedule</h1>
+
+            <!-- Set schedule -->
+            <Switch
+                size="xs"
+                suffixText="Set schedule"
+                v-model="deliveryMethodForm.set_schedule"
+                :errorText="formState.getFormError('set_schedule')"
+                @change="deliveryMethodState.saveStateDebounced('Set schedule fee status changed')"
+            />
+
+            <template v-if="deliveryMethodForm.set_schedule">
+
+                <!-- Schedule Type -->
+                <Select
+                    width="w-full"
+                    :search="false"
+                    label="Schedule type"
+                    :options="scheduleTypes"
+                    v-model="deliveryMethodForm.schedule_type"
+                    :errorText="formState.getFormError('schedule_type')"
+                    tooltipContent="Select the schedule type e.g Whether customers should specify a delivery date or both delivery date and time">
+                </Select>
+
+                <div v-if="deliveryMethodForm.schedule_type == 'date and time'" class="space-y-4">
+
+                    <!-- Auto generate time slots Checkbox -->
+                    <Input
+                        type="checkbox"
+                        inputLabel="Auto generate time slots"
+                        v-model="deliveryMethodForm.auto_generate_time_slots"
+                        :skeleton="isLoadingStore || isLoadingDeliveryMethod"
+                        :errorText="formState.getFormError('auto_generate_time_slots')"
+                        inputDescription="Automatically generates time options for customers to choose from"
+                        @change="deliveryMethodState.saveStateDebounced('Auto generate time slots changed')">
+                    </Input>
+
+                    <div
+                        class="grid grid-cols-2 gap-4"
+                        v-if="deliveryMethodForm.auto_generate_time_slots">
+
+                        <!-- Time Slot Interval Value Input -->
+                        <Input
+                            min="1"
+                            type="number"
+                            placeholder="1"
+                            label="Interval"
+                            v-model="deliveryMethodForm.time_slot_interval_value"
+                            :skeleton="isLoadingStore || isLoadingDeliveryMethod"
+                            :errorText="formState.getFormError('time_slot_interval_value')"
+                            @input="deliveryMethodState.saveStateDebounced('Time slot interval value changed')"
+                            tooltipContent="Set the interval that should be used to auto generate the time slots">
+                        </Input>
+
+                        <!-- Time Slot Interval Unit Input -->
+                        <Select
+                            width="w-full"
+                            :search="false"
+                            label="Interval Unit"
+                            :options="timeSlotIntervalUnits"
+                            v-model="deliveryMethodForm.time_slot_interval_unit"
+                            :errorText="formState.getFormError('time_slot_interval_unit')"
+                            tooltipContent="Set the interval unit that should be used to auto generate the time slots">
+                        </Select>
+
+                    </div>
+
+                </div>
+
+                <OperationalHours></OperationalHours>
+
+                <div class="space-y-4">
+
+                    <!-- Same Day Delivery Checkbox -->
+                    <Input
+                        type="checkbox"
+                        inputLabel="Same day delivery"
+                        v-model="deliveryMethodForm.same_day_delivery"
+                        :skeleton="isLoadingStore || isLoadingDeliveryMethod"
+                        :errorText="formState.getFormError('same_day_delivery')"
+                        inputDescription="Customers must place orders for delivery on the same day"
+                        @change="deliveryMethodState.saveStateDebounced('Same day delivery changed')">
+                    </Input>
+
+                    <template v-if="!deliveryMethodForm.same_day_delivery">
+
+                        <!-- Require Minimum Notice For Orders Checkbox -->
+                        <Input
+                            type="checkbox"
+                            inputLabel="Require orders in advance"
+                            :skeleton="isLoadingStore || isLoadingDeliveryMethod"
+                            v-model="deliveryMethodForm.require_minimum_notice_for_orders"
+                            :errorText="formState.getFormError('require_minimum_notice_for_orders')"
+                            @change="deliveryMethodState.saveStateDebounced('Require minimum notice for orders changed')">
+                            <template #inputDescription>
+                                <p class="text-xs text-gray-500 mt-1">Customers can only place orders a few hours or days before the delivery date to allow time for processing</p>
+                            </template>
+                            <template #inputOuterDescription>
+
+                                <div :class="[deliveryMethodForm.require_minimum_notice_for_orders ? 'h-12 mt-2' : 'h-0 mt-0 overflow-hidden', 'flex items-center text-gray-500 space-x-2 transition-all duration-500']">
+
+                                    <span class="text-xs text-gray-500">
+                                        Allow delivery at least
+                                    </span>
+
+                                    <!-- Earliest Delivery Time Value Input -->
+                                    <Input
+                                        min="1"
+                                        @click.stop
+                                        class="w-28"
+                                        type="number"
+                                        placeholder="1"
+                                        :skeleton="isLoadingStore || isLoadingDeliveryMethod"
+                                        v-model="deliveryMethodForm.earliest_delivery_time_value"
+                                        :errorText="formState.getFormError('earliest_delivery_time_value')"
+                                        @input="deliveryMethodState.saveStateDebounced('Earliest delivery time value changed')">
+                                        <template v-if="deliveryMethodForm.schedule_type == 'date'" #suffix>
+                                            <span class="w-20 ml-2">{{ deliveryMethodForm.earliest_delivery_time_value == 1 ? 'Day' : 'Days' }}</span>
+                                        </template>
+                                    </Input>
+
+                                    <!-- Earliest Delivery Time Unit Select -->
+                                    <Select
+                                        class="w-28"
+                                        width="w-full"
+                                        :search="false"
+                                        :options="earliestDeliveryTimeUnits"
+                                        v-model="deliveryMethodForm.earliest_delivery_time_unit"
+                                        v-if="deliveryMethodForm.schedule_type == 'date and time'"
+                                        :errorText="formState.getFormError('earliest_delivery_time_unit')">
+                                    </Select>
+
+                                    <span class="text-xs text-gray-500">
+                                        after order date
+                                        <template v-if="deliveryMethodForm.schedule_type == 'date and time' && deliveryMethodForm.earliest_delivery_time_unit == 'hour'">({{ deliveryMethodForm.earliest_delivery_time_value }} {{ deliveryMethodForm.earliest_delivery_time_value == '1' ? 'hour' : 'hours'}} notice)</template>
+                                        <template v-else>({{ deliveryMethodForm.earliest_delivery_time_value }} {{ deliveryMethodForm.earliest_delivery_time_value == '1' ? 'day' : 'days'}} notice)</template>
+                                    </span>
+
+                                </div>
+                            </template>
+                        </Input>
+
+                        <!-- Restrict Maximum Notice For Orders Checkbox -->
+                        <Input
+                            type="checkbox"
+                            :skeleton="isLoadingStore || isLoadingDeliveryMethod"
+                            inputLabel="Limit how far in advance orders can be placed"
+                            v-model="deliveryMethodForm.restrict_maximum_notice_for_orders"
+                            :errorText="formState.getFormError('restrict_maximum_notice_for_orders')"
+                            @change="deliveryMethodState.saveStateDebounced('Restrict maximum notice for orders changed')">
+                            <template #inputDescription>
+                                <p class="text-xs text-gray-500 mt-1">Customers can only place orders if the delivery date is within a set number of days to avoid delivery days that are too far</p>
+                            </template>
+                            <template #inputOuterDescription>
+
+                                <div :class="[deliveryMethodForm.restrict_maximum_notice_for_orders ? 'h-12 mt-2' : 'h-0 mt-0 overflow-hidden', 'flex items-center text-gray-500 space-x-2 transition-all duration-500']">
+
+                                    <span class="text-xs text-gray-500">
+                                        Restrict orders more than
+                                    </span>
+
+                                    <!-- Latest Delivery Time Value Input -->
+                                    <Input
+                                        min="1"
+                                        @click.stop
+                                        class="w-28"
+                                        type="number"
+                                        placeholder="1"
+                                        :skeleton="isLoadingStore || isLoadingDeliveryMethod"
+                                        v-model="deliveryMethodForm.latest_delivery_time_value"
+                                        :errorText="formState.getFormError('latest_delivery_time_value')"
+                                        @input="deliveryMethodState.saveStateDebounced('Latest delivery time value changed')">
+                                        <template #suffix>
+                                            <span class="w-20 ml-2">{{ deliveryMethodForm.latest_delivery_time_value == 1 ? 'Day' : 'Days' }}</span>
+                                        </template>
+                                    </Input>
+
+                                    <span class="text-xs text-gray-500">
+                                        from the delivery date
+                                    </span>
+
+                                </div>
+                            </template>
+                        </Input>
+
+                    </template>
+
+                    <ScheduleSummary></ScheduleSummary>
+
+                </div>
+
+            </template>
+
+        </div>
+
+        <div class="bg-gray-50 border border-gray-300 rounded-lg p-4 space-y-4 mb-4">
+
+            <h1 class="text-md font-bold mb-4">Questions</h1>
+
+            <DataCollectionFields></DataCollectionFields>
 
         </div>
 
@@ -261,12 +521,16 @@
     import { Info, Trash2, MoveLeft } from 'lucide-vue-next';
     import FeeByWeight from '@Pages/settings/delivery-methods/_components/FeeByWeight.vue';
     import FeeByDistance from '@Pages/settings/delivery-methods/_components/FeeByDistance.vue';
+    import ScheduleSummary from '@Pages/settings/delivery-methods/_components/ScheduleSummary.vue';
     import FeeByPostalCode from '@Pages/settings/delivery-methods/_components/FeeByPostalCode.vue';
+    import OperationalHours from '@Pages/settings/delivery-methods/_components/OperationalHours.vue';
+    import DataCollectionFields from '@Pages/settings/delivery-methods/_components/DataCollectionFields.vue';
 
     export default {
         inject: ['formState', 'storeState', 'deliveryMethodState', 'changeHistoryState', 'notificationState'],
         components: {
-            Info, Modal, Input, Switch, Select, Button, Skeleton, FeeByWeight, FeeByDistance, FeeByPostalCode
+            Info, Modal, Input, Switch, Select, Button, Skeleton, FeeByWeight, FeeByDistance,
+            ScheduleSummary, FeeByPostalCode, OperationalHours, DataCollectionFields
         },
         data() {
             return {
@@ -278,13 +542,35 @@
                     { label: 'Fee by weight', value: 'fee by weight' },
                     { label: 'Fee by distance', value: 'fee by distance' },
                     { label: 'Fee by postal code', value: 'fee by postal code' },
-                ]
+                ],
+                scheduleTypes: [
+                    { label: 'Date', value: 'date' },
+                    { label: 'Date And Time', value: 'date and time' },
+                ],
+                lastAskForAnAddressValue: null,
+                lastPinLocationOnMapValue: null
             }
         },
         watch: {
             store(newValue, oldValue) {
                 if(!oldValue && newValue) {
                     this.setup();
+                }
+            },
+            'deliveryMethodForm.fee_type'(newValue) {
+                if(['fee by distance', 'fee by postal code'].includes(newValue)) {
+
+                    this.lastAskForAnAddressValue = this.deliveryMethodForm.ask_for_an_address;
+                    this.deliveryMethodForm.ask_for_an_address = true;
+
+                    this.lastPinLocationOnMapValue = this.deliveryMethodForm.pin_location_on_map;
+                    this.deliveryMethodForm.pin_location_on_map = true;
+
+                }else{
+
+                    this.deliveryMethodForm.ask_for_an_address = this.lastAskForAnAddressValue;
+                    this.deliveryMethodForm.pin_location_on_map = this.lastPinLocationOnMapValue;
+
                 }
             }
         },
@@ -312,6 +598,18 @@
             },
             isDeletingDeliveryMethod() {
                 return this.deliveryMethodState.isDeletingDeliveryMethod;
+            },
+            timeSlotIntervalUnits() {
+                return [
+                    { label: (this.deliveryMethodForm.time_slot_interval_value == '1' ? 'Minute' : 'Minutes'), value: 'minute' },
+                    { label: (this.deliveryMethodForm.time_slot_interval_value == '1' ? 'Hour' : 'Hours'), value: 'hour' },
+                ];
+            },
+            earliestDeliveryTimeUnits() {
+                return [
+                    { label: (this.deliveryMethodForm.earliest_delivery_time_unit == '1' ? 'Hour' : 'Hours'), value: 'hour' },
+                    { label: (this.deliveryMethodForm.earliest_delivery_time_unit == '1' ? 'Day' : 'Days'), value: 'day' },
+                ];
             }
         },
         methods: {

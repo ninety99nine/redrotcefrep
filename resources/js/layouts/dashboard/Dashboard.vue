@@ -278,29 +278,6 @@
 
                     </template>
 
-                    <template v-if="!isShowingSettings">
-
-                        <!-- Sign Out -->
-                        <div @click="logout" class="cursor-pointer">
-
-                            <div class="flex items-center py-3 px-4 text-gray-900 hover:bg-gray-100 group">
-
-                                <Skeleton v-if="isLoadingStore" width="w-5" height="h-5" :shine="false"></Skeleton>
-
-                                <Loader v-else-if="isLoggingOut"></Loader>
-                                <LogOut size="20"></LogOut>
-
-                                <Skeleton v-if="isLoadingStore" width="w-8" :shine="true" class="ms-3"></Skeleton>
-                                <span v-else class="text-sm ms-3 text-gray-500 group-hover:text-gray-900">
-                                    Sign Out
-                                </span>
-
-                            </div>
-
-                        </div>
-
-                    </template>
-
                 </div>
 
             </div>
@@ -439,6 +416,7 @@
                             routeName: 'show-delivery-methods',
                             associatedRouteNames: ['add-delivery-method', 'edit-delivery-method'],
                         },
+                        /*
                         {
                             name: 'Checkout',
                             routeName: 'show-store-checkout-settings'
@@ -452,6 +430,7 @@
                             name: 'Social Links',
                             routeName: 'show-store-social-settings'
                         },
+                        */
                     ];
 
                 }else{
@@ -517,6 +496,7 @@
                             name: 'Settings',
                             routeName: 'show-general-settings'
                         },
+                        /*
                         {
                             name: 'Promotions',
                             routeName: 'show-store-promotions',
@@ -548,6 +528,7 @@
                             routeName: 'show-store-subscriptions',
                             associatedRouteNames: ['show-store-subscription']
                         }
+                        */
                     ];
 
                 }

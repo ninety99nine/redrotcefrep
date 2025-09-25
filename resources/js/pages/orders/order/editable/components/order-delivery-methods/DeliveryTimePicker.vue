@@ -41,7 +41,7 @@
     import ShineEffect from '@Partials/ShineEffect.vue';
 
     export default {
-        inject: ['formState', 'storeState', 'notificationState'],
+        inject: ['formState', 'storeState', 'deliveryMethodState', 'notificationState'],
         components: {
             Select, Skeleton, ShineEffect
         },
@@ -96,7 +96,10 @@
         computed: {
             store() {
                 return this.storeState.store;
-            }
+            },
+            deliveryMethodForm() {
+                return this.deliveryMethodState.deliveryMethodForm;
+            },
         },
         methods: {
             setIsLoading(status) {
@@ -109,19 +112,19 @@
                     show_all_dates: this.showAllDates,
                     show_all_timeslots: this.showAllTimeslots,
                     delivery_date: dayjs(this.deliveryDate).format('YYYY-MM-DD'),
-                    schedule_type: this.form ? this.form.schedule_type : this.deliveryMethod.schedule_type,
-                    daily_order_limit: this.form ? this.form.daily_order_limit : this.deliveryMethod.daily_order_limit,
-                    same_day_delivery: this.form ? this.form.same_day_delivery : this.deliveryMethod.same_day_delivery,
-                    operational_hours: this.form ? this.form.operational_hours : this.deliveryMethod.operational_hours,
-                    set_daily_order_limit: this.form ? this.form.set_daily_order_limit : this.deliveryMethod.set_daily_order_limit,
-                    time_slot_interval_unit: this.form ? this.form.time_slot_interval_unit : this.deliveryMethod.time_slot_interval_unit,
-                    auto_generate_time_slots: this.form ? this.form.auto_generate_time_slots : this.deliveryMethod.auto_generate_time_slots,
-                    time_slot_interval_value: this.form ? this.form.time_slot_interval_value : this.deliveryMethod.time_slot_interval_value,
-                    latest_delivery_time_value: this.form ? this.form.latest_delivery_time_value : this.deliveryMethod.latest_delivery_time_value,
-                    earliest_delivery_time_unit: this.form ? this.form.earliest_delivery_time_unit : this.deliveryMethod.earliest_delivery_time_unit,
-                    earliest_delivery_time_value: this.form ? this.form.earliest_delivery_time_value : this.deliveryMethod.earliest_delivery_time_value,
-                    require_minimum_notice_for_orders: this.form ? this.form.require_minimum_notice_for_orders : this.deliveryMethod.require_minimum_notice_for_orders,
-                    restrict_maximum_notice_for_orders: this.form ? this.form.restrict_maximum_notice_for_orders : this.deliveryMethod.restrict_maximum_notice_for_orders
+                    schedule_type: this.deliveryMethod ? this.deliveryMethod.schedule_type : this.deliveryMethodForm.schedule_type,
+                    daily_order_limit: this.deliveryMethod ? this.deliveryMethod.daily_order_limit : this.deliveryMethodForm.daily_order_limit,
+                    same_day_delivery: this.deliveryMethod ? this.deliveryMethod.same_day_delivery : this.deliveryMethodForm.same_day_delivery,
+                    operational_hours: this.deliveryMethod ? this.deliveryMethod.operational_hours : this.deliveryMethodForm.operational_hours,
+                    set_daily_order_limit: this.deliveryMethod ? this.deliveryMethod.set_daily_order_limit : this.deliveryMethodForm.set_daily_order_limit,
+                    time_slot_interval_unit: this.deliveryMethod ? this.deliveryMethod.time_slot_interval_unit : this.deliveryMethodForm.time_slot_interval_unit,
+                    auto_generate_time_slots: this.deliveryMethod ? this.deliveryMethod.auto_generate_time_slots : this.deliveryMethodForm.auto_generate_time_slots,
+                    time_slot_interval_value: this.deliveryMethod ? this.deliveryMethod.time_slot_interval_value : this.deliveryMethodForm.time_slot_interval_value,
+                    latest_delivery_time_value: this.deliveryMethod ? this.deliveryMethod.latest_delivery_time_value : this.deliveryMethodForm.latest_delivery_time_value,
+                    earliest_delivery_time_unit: this.deliveryMethod ? this.deliveryMethod.earliest_delivery_time_unit : this.deliveryMethodForm.earliest_delivery_time_unit,
+                    earliest_delivery_time_value: this.deliveryMethod ? this.deliveryMethod.earliest_delivery_time_value : this.deliveryMethodForm.earliest_delivery_time_value,
+                    require_minimum_notice_for_orders: this.deliveryMethod ? this.deliveryMethod.require_minimum_notice_for_orders : this.deliveryMethodForm.require_minimum_notice_for_orders,
+                    restrict_maximum_notice_for_orders: this.deliveryMethod ? this.deliveryMethod.restrict_maximum_notice_for_orders : this.deliveryMethodForm.restrict_maximum_notice_for_orders
                 };
             },
             async showDeliveryMethodScheduleOptions() {

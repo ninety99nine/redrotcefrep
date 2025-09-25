@@ -32,6 +32,7 @@ use App\Models\AiAssistantTokenUsage;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\ServiceProvider;
+use App\Observers\DeliveryMethodObserver;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Database\Eloquent\Relations\Relation;
 
@@ -75,6 +76,7 @@ class AppServiceProvider extends ServiceProvider
         //  Observers
         Store::observe(StoreObserver::class);
         Product::observe(ProductObserver::class);
+        DeliveryMethod::observe(DeliveryMethodObserver::class);
     }
 
     /**

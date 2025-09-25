@@ -72,7 +72,7 @@
                                     v-model="hour[0]"
                                     :disabled="!openingHour.available"
                                     @change="storeState.saveStateDebounced('Opening hour changed')"
-                                    :errorText="formState.getFormError(`opening_hours.${index}.hours.${index2}`)">
+                                    :errorText="formState.getFormError(`opening_hours.${index}.hours.${index2}.0`)">
                                 </Input>
 
                                 <span>-</span>
@@ -83,20 +83,20 @@
                                     v-model="hour[1]"
                                     :disabled="!openingHour.available"
                                     @change="storeState.saveStateDebounced('Opening hour changed')"
-                                    :errorText="formState.getFormError(`opening_hours.${index}.hours.${index2}`)">>
+                                    :errorText="formState.getFormError(`opening_hours.${index}.hours.${index2}.1`)">>
                                 </Input>
 
                                 <div :class="[openingHour.available ? 'cursor-pointer' : 'opacity-0']">
 
                                     <!-- Add Icon -->
-                                    <div v-if="index2 == 0" @click="() => addOpeningHour(index)" class="flex-shrink-0 rounded-md border p-1 hover:bg-blue-50 transition-all">
+                                    <div v-if="index2 == 0" @click="() => addOpeningHour(index)" class="flex-shrink-0 rounded-md border border-gray-300 p-1 hover:bg-blue-50 transition-all">
                                         <svg class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
                                             <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
                                         </svg>
                                     </div>
 
                                     <!-- Remove Icon -->
-                                    <div v-else @click="() => removeOpeningHour(index, index2)" class="flex-shrink-0 rounded-md border p-1 bg-red-50 hover:bg-red-100 transition-all">
+                                    <div v-else @click="() => removeOpeningHour(index, index2)" class="flex-shrink-0 rounded-md border border-gray-300 p-1 bg-red-50 hover:bg-red-100 transition-all">
                                         <svg class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
                                             <path stroke-linecap="round" stroke-linejoin="round" d="M5 12h14" />
                                         </svg>
@@ -134,7 +134,7 @@
         },
         data() {
             return {
-                days: ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
+                days: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
             }
         },
         computed: {

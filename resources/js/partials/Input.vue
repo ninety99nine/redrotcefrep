@@ -226,21 +226,31 @@
                     />
 
                     <template v-if="['radio', 'checkbox'].includes(type)">
-                        <label :for="uniqueId" :class="['select-none text-sm ms-2 flex flex-col', { 'cursor-not-allowed' : disabled }]">
 
-                            <slot name="inputLabel">
-                                <span
-                                    v-if="inputLabel"
-                                    :class="['font-medium leading-4', modelValue ? 'text-gray-900' : 'text-gray-500']">
-                                    {{ inputLabel }}
-                                </span>
+                        <div :class="['select-none text-sm ms-2 flex flex-col', { 'cursor-not-allowed' : disabled }]">
+
+                            <label :for="uniqueId">
+
+                                <slot name="inputLabel">
+                                    <p
+                                        v-if="inputLabel"
+                                        :class="['font-medium leading-4', modelValue ? 'text-gray-900' : 'text-gray-500']">
+                                        {{ inputLabel }}
+                                </p>
+                                </slot>
+
+                                <slot name="inputDescription">
+                                    <p v-if="inputDescription" class="text-xs text-gray-500 mt-1">{{ inputDescription }}</p>
+                                </slot>
+
+                            </label>
+
+                            <slot name="inputOuterDescription">
+                                <p v-if="inputOuterDescription" class="text-xs text-gray-500 mt-1">{{ inputOuterDescription }}</p>
                             </slot>
 
-                            <slot name="inputDescription">
-                                <span v-if="inputDescription" class="text-xs text-gray-500 mt-1">{{ inputDescription }}</span>
-                            </slot>
+                        </div>
 
-                        </label>
                     </template>
 
                     <template v-if="type == 'file'">
@@ -608,6 +618,10 @@
                 default: null
             },
             inputDescription: {
+                type: [String, null],
+                default: null
+            },
+            inputOuterDescription: {
                 type: [String, null],
                 default: null
             },

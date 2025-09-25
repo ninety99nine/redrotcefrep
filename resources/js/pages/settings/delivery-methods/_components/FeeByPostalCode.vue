@@ -193,11 +193,6 @@
         components: {
             LocateFixed, Minimize, SquarePen, Pill, Input, Button, Skeleton, ErrorText, SelectTags
         },
-        props: {
-            form: {
-                type: Object
-            }
-        },
         data() {
             return {
                 Plus,
