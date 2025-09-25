@@ -2,7 +2,7 @@
 
     <div class="w-full space-y-4">
 
-        <h1 class="text-md font-bold m-2">Weight Management</h1>
+        <h1 class="text-md font-bold m-2">Weights</h1>
 
         <template v-if="isLoadingStore || isLoadingDeliveryMethod">
 

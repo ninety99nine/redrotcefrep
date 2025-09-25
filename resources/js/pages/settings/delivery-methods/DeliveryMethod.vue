@@ -167,47 +167,51 @@
                 @change="deliveryMethodState.saveStateDebounced('Charge fee status changed')"
             />
 
-            <div class="grid grid-cols-2 gap-4">
+            <template v-if="deliveryMethodForm.charge_fee">
 
-                <!-- Fee Type -->
-                <Select
-                    width="w-full"
-                    :search="false"
-                    label="Fee type"
-                    :options="feeTypes"
-                    v-model="deliveryMethodForm.fee_type">
-                </Select>
+                <div class="grid grid-cols-2 gap-4">
 
-                <Input
-                    type="money"
-                    label="Flat fee"
-                    placeholder="100.00"
-                    :currency="store?.currency"
-                    v-model="deliveryMethodForm.flat_fee_rate"
-                    v-if="deliveryMethodForm.fee_type == 'flat fee'"
-                    :errorText="formState.getFormError('flat_fee_rate')"
-                    :skeleton="isLoadingStore || isLoadingDeliveryMethod"
-                    @input="deliveryMethodState.saveStateDebounced('Flat fee rate changed')"
-                    tooltipContent="Set the flat fee amount (This is the flat fee that will be applied as a charge)">
-                </Input>
+                    <!-- Fee Type -->
+                    <Select
+                        width="w-full"
+                        :search="false"
+                        label="Fee type"
+                        :options="feeTypes"
+                        v-model="deliveryMethodForm.fee_type">
+                    </Select>
 
-                <Input
-                    placeholder="10"
-                    type="percentage"
-                    label="Percentage fee rate"
-                    v-model="deliveryMethodForm.percentage_fee_rate"
-                    :skeleton="isLoadingStore || isLoadingDeliveryMethod"
-                    v-if="deliveryMethodForm.fee_type == 'percentage fee'"
-                    :errorText="formState.getFormError('percentage_fee_rate')"
-                    @input="deliveryMethodState.saveStateDebounced('Percentage fee rate changed')"
-                    tooltipContent="Set the percentage fee amount (This is the percentage fee that will be applied as a charge)">
-                </Input>
+                        <Input
+                            type="money"
+                            label="Flat fee"
+                            placeholder="100.00"
+                            :currency="store?.currency"
+                            v-model="deliveryMethodForm.flat_fee_rate"
+                            v-if="deliveryMethodForm.fee_type == 'flat fee'"
+                            :errorText="formState.getFormError('flat_fee_rate')"
+                            :skeleton="isLoadingStore || isLoadingDeliveryMethod"
+                            @input="deliveryMethodState.saveStateDebounced('Flat fee rate changed')"
+                            tooltipContent="Set the flat fee amount (This is the flat fee that will be applied as a charge)">
+                        </Input>
 
-            </div>
+                        <Input
+                            placeholder="10"
+                            type="percentage"
+                            label="Percentage fee rate"
+                            v-model="deliveryMethodForm.percentage_fee_rate"
+                            :skeleton="isLoadingStore || isLoadingDeliveryMethod"
+                            v-if="deliveryMethodForm.fee_type == 'percentage fee'"
+                            :errorText="formState.getFormError('percentage_fee_rate')"
+                            @input="deliveryMethodState.saveStateDebounced('Percentage fee rate changed')"
+                            tooltipContent="Set the percentage fee amount (This is the percentage fee that will be applied as a charge)">
+                        </Input>
 
-            <FeeByWeight v-if="deliveryMethodForm.fee_type == 'fee by weight'"></FeeByWeight>
-            <FeeByDistance v-if="deliveryMethodForm.fee_type == 'fee by distance'"></FeeByDistance>
-            <FeeByPostalCode v-if="deliveryMethodForm.fee_type == 'fee by postal code'"></FeeByPostalCode>
+                </div>
+
+                <FeeByWeight v-if="deliveryMethodForm.fee_type == 'fee by weight'"></FeeByWeight>
+                <FeeByDistance v-if="deliveryMethodForm.fee_type == 'fee by distance'"></FeeByDistance>
+                <FeeByPostalCode v-if="deliveryMethodForm.fee_type == 'fee by postal code'"></FeeByPostalCode>
+
+            </template>
 
         </div>
 
