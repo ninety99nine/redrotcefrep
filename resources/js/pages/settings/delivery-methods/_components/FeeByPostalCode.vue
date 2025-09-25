@@ -56,7 +56,7 @@
                 <div v-if="expandedStates[index]" class="p-4 space-y-4">
 
                     <div class="flex items-center space-x-2 text-sm text-gray-500">
-                        <Scale size="16" class="text-gray-500"></Scale>
+                        <LocateFixed size="16" class="text-gray-500"></LocateFixed>
                         <span>Zone {{ index + 1 }}</span>
                     </div>
 
@@ -109,7 +109,7 @@
 
                         <div class="flex items-center space-x-2">
 
-                            <Scale size="16" class="text-gray-500"></Scale>
+                            <LocateFixed size="16" class="text-gray-500"></LocateFixed>
                             <span class="text-sm">Zone {{ index + 1 }}</span>
 
                         </div>
@@ -142,7 +142,7 @@
 
             <div v-if="!hasPostalCodeZones">
                 <div class="flex items-center space-x-4 px-4 py-4 border border-gray-300 rounded-lg bg-gray-50">
-                    <Scale size="20" class="text-gray-500"></Scale>
+                    <LocateFixed size="20" class="text-gray-500"></LocateFixed>
                     <div class="text-sm space-y-2">
                         <p><Pill type="primary" size="xs" :showDot="false" :action="onAddPostalCodeZone">+ Add Zone</Pill> to offer delivery to specific postal codes for a fee</p>
                     </div>
@@ -164,7 +164,7 @@
                     type="primary"
                     :leftIcon="Plus"
                     :action="onAddPostalCodeZone">
-                    <span>Add Zone</span>
+                    <span>{{ hasPostalCodeZones ? 'Add Another Zone' : 'Add Zone' }}</span>
                 </Button>
 
             </div>
@@ -186,12 +186,12 @@
     import ErrorText from '@Partials/ErrorText.vue';
     import SelectTags from '@Partials/SelectTags.vue';
     import { convertToMoneyWithSymbol } from '@Utils/numberUtils';
-    import { Plus, Scale, Minimize, SquarePen, Trash2 } from 'lucide-vue-next';
+    import { Plus, LocateFixed, Minimize, SquarePen, Trash2 } from 'lucide-vue-next';
 
     export default {
         inject: ['formState', 'storeState', 'deliveryMethodState'],
         components: {
-            Scale, Minimize, SquarePen, Pill, Input, Button, Skeleton, ErrorText, SelectTags
+            LocateFixed, Minimize, SquarePen, Pill, Input, Button, Skeleton, ErrorText, SelectTags
         },
         props: {
             form: {
