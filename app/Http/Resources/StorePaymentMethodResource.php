@@ -25,6 +25,9 @@ class StorePaymentMethodResource extends JsonResource
             'custom_name' => $this->custom_name,
             'instruction' => $this->instruction,
             'payment_method_id' => $this->payment_method_id,
+            'require_proof_of_payment' => $this->require_proof_of_payment,
+            'enable_contact_seller_before_payment' => $this->enable_contact_seller_before_payment,
+            'mark_as_paid_on_customer_confirmation' => $this->mark_as_paid_on_customer_confirmation,
 
             'logo' => MediaFileResource::make($this->whenLoaded('logo')),
             'photo' => MediaFileResource::make($this->whenLoaded('photo')),

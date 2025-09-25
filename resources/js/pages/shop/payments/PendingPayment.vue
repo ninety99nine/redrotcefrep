@@ -183,7 +183,7 @@
                     type="success"
                     :action="sendUsingWhatsapp">
                     <div class="flex items-center space-x-1">
-                        <WhatsappIcon color="#ffffff" class="mr-2"></WhatsappIcon>
+                        <WhatsappIcon color="#ffffff" class="mx-2"></WhatsappIcon>
                         <span class="text-xs">Send using Whatsapp</span>
                     </div>
                 </Button>

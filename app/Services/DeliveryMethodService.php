@@ -26,25 +26,20 @@ class DeliveryMethodService extends BaseService
     public function showDeliveryMethods(array $data): DeliveryMethodResources|array
     {
         $storeId = $data['store_id'] ?? null;
+        $association = isset($data['association']) ? Association::tryFrom($data['association']) : null;
 
-        if ($storeId) {
-
-            $store = Store::find($storeId);
-            $association = isset($data['association']) ? Association::tryFrom($data['association']) : null;
-
-            if ($association == Association::SHOPPER) {
-                $query = $store->deliveryMethods()->active();
-            } else {
-                $query = $store->deliveryMethods();
-            }
-
-        }else{
-
+        if ($association == Association::SUPER_ADMIN || $association == Association::TEAM_MEMBER) {
             $query = DeliveryMethod::query();
-
+        }else {
+            $query = DeliveryMethod::query()->where('active', '1');
         }
 
-        return $this->setQuery($query->when(!request()->has('_sort'), fn($query) => $query->orderBy('position')))->getOutput();
+        if ($storeId) {
+            $query = $query->where('store_id', $storeId);
+        }
+
+        $query = $query->when(!request()->has('_sort'), fn($query) => $query->orderBy('position'));
+        return $this->setQuery($query)->getOutput();
     }
 
     /**

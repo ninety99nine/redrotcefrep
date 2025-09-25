@@ -1,27 +1,53 @@
 <template>
     <div>
         <div class="space-y-2">
-            <div>
+            <div
+                v-if="$slots.label || label || secondaryLabel || showAsterisk || $slots.description || description || externalLinkName">
+
                 <label
                     :for="uniqueId"
                     v-if="$slots.label || label || secondaryLabel || showAsterisk"
-                    :class="{ 'text-sm leading-6 font-medium text-gray-900 space-x-1' : !$slots.label }">
+                    :class="{ 'flex items-center text-sm leading-6 font-medium text-gray-900 space-x-1' : !$slots.label }">
+
                     <slot v-if="$slots.label" name="label"></slot>
+
                     <template v-else>
+
                         <span v-capitalize :style="labelStyle">{{ label }}</span>
+
                         <span
                             v-if="secondaryLabel"
                             :style="secondaryLabelStyle"
-                            :class="{ 'font-normal text-gray-400 ml-1' : !secondaryLabelStyle }">
+                            :class="{ 'font-normal text-gray-400' : !secondaryLabelStyle }">
                             {{ secondaryLabel }}
                         </span>
+
+                        <Popover
+                            trigger="hover"
+                            :content="popoverContent"
+                            v-if="popoverContent || $slots.popoverContent">
+                            <slot name="popoverContent"></slot>
+                        </Popover>
+
+                        <Tooltip
+                            trigger="hover"
+                            :content="tooltipContent"
+                            v-if="tooltipContent || $slots.tooltip">
+                            <slot name="tooltipContent"></slot>
+                        </Tooltip>
+
                         <span v-if="showAsterisk" class="text-red-500">*</span>
+
                     </template>
+
                 </label>
 
                 <slot v-if="$slots.description" name="description"></slot>
+
                 <div v-else-if="description || externalLinkName" class="leading-4">
+
                     <span v-if="description" class="text-xs text-gray-400 mr-1">{{ description }}</span>
+
                     <a
                         target="_blank"
                         :href="externalLinkUrl"
@@ -33,7 +59,9 @@
                             <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 6H5.25A2.25 2.25 0 0 0 3 8.25v10.5A2.25 2.25 0 0 0 5.25 21h10.5A2.25 2.25 0 0 0 18 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25"></path>
                         </svg>
                     </a>
+
                 </div>
+
             </div>
 
             <div
@@ -175,6 +203,9 @@
 </template>
 
 <script>
+
+    import Popover from '@Partials/Popover.vue';
+    import Tooltip from '@Partials/Tooltip.vue';
     import capitalize from '@Directives/capitalize.js';
     import { VueDraggableNext } from 'vue-draggable-next';
     import { generateUniqueId } from '@Utils/generalUtils.js';
@@ -182,7 +213,7 @@
     export default {
         inject: ['notificationState'],
         directives: { capitalize },
-        components: { draggable: VueDraggableNext },
+        components: { Popover, Tooltip , draggable: VueDraggableNext },
         props: {
             modelValue: {
                 type: Array,
@@ -202,6 +233,14 @@
             },
             secondaryLabelStyle: {
                 type: [Object, String, null],
+                default: null
+            },
+            popoverContent: {
+                type: [String, null],
+                default: null
+            },
+            tooltipContent: {
+                type: [String, null],
                 default: null
             },
             showAsterisk: {
@@ -228,10 +267,15 @@
                 type: Boolean,
                 default: false
             },
+            skeleton: {
+                type: Boolean,
+                default: false
+            },
             alignItems: {
                 type: [String, null],
                 default: 'items-center'
             },
+
             errorText: {
                 type: [String, null],
                 default: null

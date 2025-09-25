@@ -480,7 +480,7 @@
                     await axios.delete(`/api/customers/${this.customer.id}`, config);
 
                     hideModal();
-                    await new Promise(resolve => setTimeout(resolve, 1000));    //  Wait for modal to close
+                    await new Promise(resolve => setTimeout(resolve, 500));    //  Wait for modal to close
 
                     this.notificationState.showSuccessNotification('Customer deleted');
 
@@ -500,7 +500,7 @@
             setActionButtons() {
                 if(this.isCreating || this.isEditing) {
                     this.changeHistoryState.removeButtons();
-                    this.changeHistoryState.addDiscardButton(this.onDiscard);
+                    this.changeHistoryState.addDiscardButton();
                     this.changeHistoryState.addActionButton(
                         this.isEditing ? 'Save Changes' : 'Create Customer',
                         this.isEditing ? this.updateCustomer : this.createCustomer,

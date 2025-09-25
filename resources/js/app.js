@@ -17,6 +17,8 @@ import { useCustomerStore } from "@Stores/customer-store.js";
 import { useCategoryStore } from "@Stores/category-store.js";
 import { useNotificationStore } from "@Stores/notification-store.js";
 import { useChangeHistoryStore } from "@Stores/change-history-store.js";
+import { useDeliveryMethodStore } from "@Stores/delivery-method-store.js";
+import { useStorePaymentMethodStore } from "@Stores/store-payment-method-store.js";
 
 // Store for PWA install prompt
 const pwaStore = {
@@ -71,3 +73,5 @@ app.provide("customerState", useCustomerStore());
 app.provide("categoryState", useCategoryStore());
 app.provide("notificationState", useNotificationStore());
 app.provide("changeHistoryState", useChangeHistoryStore());
+app.provide("deliveryMethodState", useDeliveryMethodStore());
+app.provide("storePaymentMethodState", useStorePaymentMethodStore());

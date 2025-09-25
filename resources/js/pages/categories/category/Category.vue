@@ -422,7 +422,7 @@
                     this.storeState.silentUpdate();
 
                     hideModal();
-                    await new Promise(resolve => setTimeout(resolve, 1000));    //  Wait for modal to close
+                    await new Promise(resolve => setTimeout(resolve, 500));    //  Wait for modal to close
 
                     this.notificationState.showSuccessNotification('Category deleted');
 
@@ -439,9 +439,9 @@
                 }
 
             },
-            async uploadImages(categoryId, photoIndex = null, variantIndex = null) {
+            async uploadImages(categoryId, photoIndex = null) {
 
-                let photos = variantIndex !== null ? this.categoryForm.variants[variantIndex].photos : this.categoryForm.photos;
+                let photos = this.categoryForm.photos;
 
                 let imageUploadPromises = [];
 
@@ -531,7 +531,7 @@
             setActionButtons() {
                 if(this.isCreating || this.isEditing) {
                     this.changeHistoryState.removeButtons();
-                    this.changeHistoryState.addDiscardButton(this.onDiscard);
+                    this.changeHistoryState.addDiscardButton();
                     this.changeHistoryState.addActionButton(
                         this.isEditing ? 'Save Changes' : 'Create Category',
                         this.isEditing ? this.updateCategory : this.createCategory,

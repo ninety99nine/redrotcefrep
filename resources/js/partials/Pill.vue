@@ -8,6 +8,23 @@
 
         <slot></slot>
 
+        <Popover
+            trigger="hover"
+            :content="popoverContent"
+            v-if="popoverContent || $slots.popoverContent">
+            <slot name="popoverContent"></slot>
+        </Popover>
+
+        <Tooltip
+            trigger="hover"
+            :content="tooltipContent"
+            :triggerClass="tooltipTriggerClass"
+            v-if="tooltipContent || $slots.tooltipContent">
+            <template v-slot:content>
+                <slot name="tooltipContent"></slot>
+            </template>
+        </Tooltip>
+
         <!-- Right Icon -->
         <component v-if="rightIcon" :is="rightIcon" :size="rightIconSize" :class="rightIconClass" />
 
@@ -22,8 +39,11 @@
 </template>
 
 <script>
+    import Popover from '@Partials/Popover.vue';
+    import Tooltip from '@Partials/Tooltip.vue';
     import StatusDot from '@Partials/StatusDot.vue';
     export default {
+        components: { Popover, Tooltip, StatusDot },
         props: {
             showDot: {
                 type: Boolean,
@@ -73,6 +93,18 @@
                 type: String,
                 default: null
             },
+            popoverContent: {
+                type: [String, null],
+                default: null
+            },
+            tooltipContent: {
+                type: [String, null],
+                default: null
+            },
+            tooltipTriggerClass: {
+                type: [String, Array, Object, null],
+                default: null
+            },
         },
         computed: {
             badgeClasses() {
@@ -107,7 +139,6 @@
             dotType() {
                 return this.type;
             }
-        },
-        components: { StatusDot }
+        }
     };
 </script>

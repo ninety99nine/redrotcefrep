@@ -19,12 +19,15 @@ return new class extends Migration
             $table->boolean('visible')->default(true);
             $table->string('description', 100)->nullable();
             $table->unsignedTinyInteger('position')->nullable();
+            $table->uuid('parent_category_id')->nullable();
             $table->foreignUuid('store_id');
             $table->timestamps();
 
             $table->index('position');
+            $table->index('parent_category_id');
 
             $table->foreign('store_id')->references('id')->on('stores')->cascadeOnDelete();
+            $table->foreign('parent_category_id')->references('id')->on('categories')->cascadeOnDelete();
         });
     }
 

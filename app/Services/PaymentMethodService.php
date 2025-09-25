@@ -21,6 +21,7 @@ class PaymentMethodService extends BaseService
     public function showPaymentMethods(array $data): PaymentMethodResources|array
     {
         $storeId = $data['store_id'] ?? null;
+        $automatedVerification = $data['automated_verification'] ?? null;
 
         if($storeId) {
 
@@ -43,6 +44,10 @@ class PaymentMethodService extends BaseService
 
                 $query = $store->paymentMethods();
 
+            }
+
+            if (!is_null($automatedVerification)) {
+                $query = $query->where('automated_verification', $automatedVerification);
             }
 
             return $this->setQuery($query->when(!request()->has('_sort'), fn($query) => $query->orderBy('position')))->getOutput();

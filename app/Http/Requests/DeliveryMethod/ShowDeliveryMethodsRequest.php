@@ -3,6 +3,7 @@
 namespace App\Http\Requests\DeliveryMethod;
 
 use App\Enums\Association;
+use Illuminate\Support\Arr;
 use App\Models\DeliveryMethod;
 use Illuminate\Validation\Rule;
 use Illuminate\Foundation\Http\FormRequest;
@@ -28,7 +29,7 @@ class ShowDeliveryMethodsRequest extends FormRequest
     {
         return [
             'store_id' => ['sometimes', 'uuid'],
-            'association' => ['sometimes', Rule::enum(Association::class)->only([Association::SHOPPER])],
+            'association' => ['sometimes', Rule::enum(Association::class)->only([Association::SUPER_ADMIN, Association::TEAM_MEMBER, Association::SHOPPER])],
         ];
     }
 
@@ -41,7 +42,7 @@ class ShowDeliveryMethodsRequest extends FormRequest
     {
         return [
             'store_id.uuid' => 'The store ID must be a valid UUID.',
-            'association.enum' => 'The association must be: shopper.',
+            'association.enum' => 'The association must be one of: ' . Arr::join([Association::SUPER_ADMIN->value, Association::TEAM_MEMBER->value, Association::SHOPPER->value], ', ', ' or '),
         ];
     }
 }

@@ -34,7 +34,7 @@
                 value: currency.code
             }));
 
-            if (this.allowedCurrencies && Array.isArray(this.allowedCurrencies)) {
+            if (this.allowedCurrencies && Array.isArray(this.allowedCurrencies) && this.allowedCurrencies.length > 0) {
                 this.currencyOptions = allCurrencies.filter(option =>
                     this.allowedCurrencies.includes(option.value)
                 );

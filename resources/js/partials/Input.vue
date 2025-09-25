@@ -23,7 +23,7 @@
                             <span
                                 v-if="secondaryLabel"
                                 :style="secondaryLabelStyle"
-                                :class="{ 'font-normal text-gray-400 ml-1' : !secondaryLabelStyle }">
+                                :class="{ 'font-normal text-gray-400' : !secondaryLabelStyle }">
                                 {{ secondaryLabel }}
                             </span>
 
@@ -37,7 +37,7 @@
                             <Tooltip
                                 trigger="hover"
                                 :content="tooltipContent"
-                                v-if="tooltipContent || $slots.tooltip">
+                                v-if="tooltipContent || $slots.tooltipContent">
                                 <slot name="tooltipContent"></slot>
                             </Tooltip>
 
@@ -231,13 +231,13 @@
                             <slot name="inputLabel">
                                 <span
                                     v-if="inputLabel"
-                                    :class="['font-medium', modelValue ? 'text-gray-900' : 'text-gray-500']">
+                                    :class="['font-medium leading-4', modelValue ? 'text-gray-900' : 'text-gray-500']">
                                     {{ inputLabel }}
                                 </span>
                             </slot>
 
                             <slot name="inputDescription">
-                                <span v-if="inputDescription" class="text-xs text-gray-500">{{ inputDescription }}</span>
+                                <span v-if="inputDescription" class="text-xs text-gray-500 mt-1">{{ inputDescription }}</span>
                             </slot>
 
                         </label>

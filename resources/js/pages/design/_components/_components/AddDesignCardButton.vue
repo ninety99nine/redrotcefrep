@@ -69,6 +69,7 @@
                                 <MapPin v-if="option == 'location'" size="20"></MapPin>
                                 <Contact v-if="option == 'contact'" size="20"></Contact>
                                 <HandCoins v-if="option == 'tips'" size="20"></HandCoins>
+                                <Ungroup v-if="option == 'categories'" size="20"></Ungroup>
                                 <Megaphone v-if="option == 'banner'" size="20"></Megaphone>
                                 <UserRound v-if="option == 'customer'" size="20"></UserRound>
                                 <CloudUpload v-if="option == 'media'" size="20"></CloudUpload>
@@ -107,12 +108,12 @@
     import Button from '@Partials/Button.vue';
     import Dropdown from '@Partials/Dropdown.vue';
     import { capitalizeAll } from '@Utils/stringUtils.js';
-    import { Plus, Map, Link, Type, Box, Image, Video, AtSign, Clock, Tally1, Tally2, Binary, Download, Calendar, SquareCheck, Megaphone, List, Hexagon, CloudUpload, Contact, Truck, Pencil, MapPin, HandCoins, UserRound, Hourglass, ShoppingCart, ReceiptText, CreditCard, TicketPercent, SeparatorHorizontal } from 'lucide-vue-next';
+    import { Plus, Map, Link, Type, Box, Image, Video, AtSign, Clock, Tally1, Tally2, Binary, Download, Calendar, SquareCheck, Ungroup, Megaphone, List, Hexagon, CloudUpload, Contact, Truck, Pencil, MapPin, HandCoins, UserRound, Hourglass, ShoppingCart, ReceiptText, CreditCard, TicketPercent, SeparatorHorizontal } from 'lucide-vue-next';
 
     export default {
         inject: ['designState'],
         components: {
-            Pill, Button, Dropdown, Map, Link, Type, Box, Image, Video, AtSign, Clock, Tally1, Tally2, Binary, Download, Calendar, SquareCheck, Megaphone, List, Hexagon, CloudUpload, Contact,
+            Pill, Button, Dropdown, Map, Link, Type, Box, Image, Video, AtSign, Clock, Tally1, Tally2, Binary, Download, Calendar, SquareCheck, Ungroup, Megaphone, List, Hexagon, CloudUpload, Contact,
             Truck, Pencil, MapPin, HandCoins, UserRound, Hourglass, ShoppingCart, ReceiptText, CreditCard, TicketPercent, SeparatorHorizontal
         },
         props: {
@@ -182,7 +183,7 @@
                     return [
                         {
                             description: 'Choose the content shopper must see',
-                            options: ['logo', 'text', 'image', 'video', 'link', 'contact', 'socials', 'divider', 'banner', 'install_app']
+                            options: ['logo', 'text', 'image', 'video', 'link', 'contact', 'socials', 'divider', 'banner', 'categories', 'install_app']
                         }
                     ];
 
@@ -583,6 +584,35 @@
 
                             bg_color: '#01a045',
                             text_color: '#ffffff',
+                        }
+                    };
+                }else if(type == 'categories') {
+                    metadata = {
+                        title: 'Categories',
+                        design: {
+                            t_margin: '8',
+                            b_margin: '8',
+                            l_margin: '0',
+                            r_margin: '0',
+
+                            t_padding: '0',
+                            b_padding: '0',
+                            l_padding: '0',
+                            r_padding: '0',
+
+                            tl_border_radius: '0',
+                            br_border_radius: '0',
+                            tr_border_radius: '0',
+                            bl_border_radius: '0',
+
+                            t_border: '0',
+                            b_border: '0',
+                            l_border: '0',
+                            r_border: '0',
+                            border_color: '#000000',
+
+                            bg_color: null,
+                            title_color: '#111827',
                         }
                     };
                 }else if (type == 'install_app') {

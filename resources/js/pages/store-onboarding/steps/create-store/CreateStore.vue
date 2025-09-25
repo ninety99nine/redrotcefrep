@@ -41,7 +41,7 @@
                     :errorText="formState.getFormError('whatsapp_mobile_number')"
                     description="Customers can send orders to this number after shopping">
                     <template #prefix>
-                        <WhatsappIcon class="mr-2"></WhatsappIcon>
+                        <WhatsappIcon class="mx-2"></WhatsappIcon>
                     </template>
                 </Input>
 

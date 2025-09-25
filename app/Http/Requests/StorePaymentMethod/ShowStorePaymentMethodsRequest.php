@@ -39,7 +39,7 @@ class ShowStorePaymentMethodsRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'category_id.uuid' => 'The category ID must be a valid UUID.',
+            'store_id.uuid' => 'The store ID must be a valid UUID.',
             'association.enum' => 'The association must be one of: ' . Arr::join([Association::SUPER_ADMIN->value, Association::TEAM_MEMBER->value, Association::SHOPPER->value], ', ', ' or '),
         ];
     }

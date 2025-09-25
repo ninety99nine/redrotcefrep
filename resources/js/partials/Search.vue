@@ -21,7 +21,7 @@
                         <span
                             v-if="secondaryLabel"
                             :style="secondaryLabelStyle"
-                            :class="{ 'font-normal text-gray-400 ml-1' : !secondaryLabelStyle }">
+                            :class="{ 'font-normal text-gray-400' : !secondaryLabelStyle }">
                             {{ secondaryLabel }}
                         </span>
 
@@ -35,7 +35,7 @@
                         <Tooltip
                             trigger="hover"
                             :content="tooltipContent"
-                            v-if="tooltipContent || $slots.tooltip">
+                            v-if="tooltipContent || $slots.tooltipContent">
                             <slot name="tooltipContent"></slot>
                         </Tooltip>
 

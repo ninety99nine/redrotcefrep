@@ -17,6 +17,9 @@ return new class extends Migration
             $table->string('custom_name', 20)->nullable();
             $table->string('instruction')->nullable();
             $table->json('configs')->nullable();
+            $table->boolean('require_proof_of_payment')->default(0);
+            $table->boolean('enable_contact_seller_before_payment')->default(1);
+            $table->boolean('mark_as_paid_on_customer_confirmation')->default(0);
             $table->unsignedTinyInteger('position')->nullable();
             $table->foreignUuid('store_id');
             $table->foreignUuid('payment_method_id');

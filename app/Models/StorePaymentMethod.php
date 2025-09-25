@@ -36,8 +36,9 @@ class StorePaymentMethod extends Model
      * @var array
      */
     protected $fillable = [
-        'id', 'active', 'custom_name', 'instruction', 'configs', 'position',
-        'store_id', 'payment_method_id', 'created_at', 'updated_at'
+        'id', 'active', 'custom_name', 'instruction', 'configs', 'require_proof_of_payment',
+        'enable_contact_seller_before_payment', 'mark_as_paid_on_customer_confirmation',
+        'position', 'store_id', 'payment_method_id', 'created_at', 'updated_at'
     ];
 
     /**

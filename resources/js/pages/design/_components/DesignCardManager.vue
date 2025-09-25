@@ -314,7 +314,7 @@
             },
             setActionButtons() {
                 this.changeHistoryState.removeButtons();
-                this.changeHistoryState.addDiscardButton(this.onDiscard);
+                this.changeHistoryState.addDiscardButton();
                 this.changeHistoryState.addActionButton(
                     'Save Changes',
                     this.updateDesignCards,

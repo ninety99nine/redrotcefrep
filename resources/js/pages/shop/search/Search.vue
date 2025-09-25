@@ -4,7 +4,7 @@
 
         <Menu menuClass="max-w-4xl mx-auto"></Menu>
 
-        <div class="max-w-4xl mx-auto pt-8">
+        <div class="max-w-4xl mx-auto pt-8 pb-40">
 
             <div
                 v-if="isLoadingStore"
@@ -18,11 +18,11 @@
 
                 <div class="select-none grid grid-cols-1 md:grid-cols-4 md:gap-8">
 
-                    <div
-                        class="col-span-1"
-                        v-if="hasCategories">
+                    <div class="col-span-1 space-y-4">
 
-                        <div class="w-full bg-gray-50 p-4 border border-gray-300 rounded-lg relative">
+                        <div
+                            v-if="hasCategories"
+                            class="w-full bg-gray-50 p-4 border border-gray-300 rounded-lg relative">
 
                             <h1 class="text-gray-900 font-medium mb-4">Categories</h1>
 
@@ -65,9 +65,9 @@
 
                     </div>
 
-                    <div :class="hasCategories ? 'col-span-3' : 'col-span-4'">
+                    <div class="col-span-3">
 
-                        <div v-if="hasLoadedInitialProducts" class="flex justify-center items-center space-x-4 my-2">
+                        <div v-if="hasLoadedInitialProducts" class="flex justify-center items-center space-x-4">
 
                             <Input
                                 type="search"
@@ -195,19 +195,18 @@
 <script>
 
     import Pill from '@Partials/Pill.vue';
-    import { Image } from 'lucide-vue-next';
     import Input from '@Partials/Input.vue';
+    import { Image } from 'lucide-vue-next';
     import Loader from '@Partials/Loader.vue';
     import Button from '@Partials/Button.vue';
     import Skeleton from '@Partials/Skeleton.vue';
     import Menu from '@Pages/shop/_components/menu/Menu.vue';
-    import DesignCardManager from '@Pages/shop/_components/design-card-manager/DesignCardManager.vue';
     import MyCartButton from '@Pages/shop/_components/design-card-manager/_components/my-cart/MyCartButton.vue';
 
     export default {
         inject: ['formState', 'orderState', 'storeState', 'notificationState'],
         components: {
-            Pill, Image, Input, Loader, Button, Skeleton, Menu, DesignCardManager, MyCartButton
+            Pill, Image, Input, Loader, Button, Skeleton, Menu, MyCartButton
         },
         data() {
             return {

@@ -27,6 +27,7 @@ class ShowPaymentMethodsRequest extends FormRequest
     {
         return [
             'store_id' => ['sometimes', 'uuid'],
+            'automated_verification' => ['sometimes', 'boolean'],
             'association' => ['sometimes', Rule::enum(Association::class)->only([Association::ASSOCIATED, Association::UNASSOCIATED])],
         ];
     }

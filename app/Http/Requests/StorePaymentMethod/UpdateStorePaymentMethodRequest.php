@@ -23,9 +23,12 @@ class UpdateStorePaymentMethodRequest extends FormRequest
     {
         return [
             'active' => ['sometimes', 'boolean'],
-            'custom_name' => ['sometimes', 'string', 'max:20'],
-            'instruction' => ['sometimes', 'string'],
+            'custom_name' => ['sometimes', 'string', 'max:40'],
+            'instruction' => ['nullable', 'string'],
             'configs' => ['sometimes', 'array'],
+            'require_proof_of_payment' => ['sometimes', 'boolean'],
+            'enable_contact_seller_before_payment' => ['sometimes', 'boolean'],
+            'mark_as_paid_on_customer_confirmation' => ['sometimes', 'boolean'],
             'position' => ['sometimes', 'integer', 'min:0', 'max:255'],
             'payment_method_id' => ['sometimes', 'uuid'],
         ];

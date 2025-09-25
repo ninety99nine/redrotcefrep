@@ -6,6 +6,7 @@ use App\Enums\UploadFolderName;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Attributes\Scope;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
@@ -35,7 +36,7 @@ class Category extends Model
      * @var array
      */
     protected $fillable = [
-        'name', 'visible', 'description', 'position', 'store_id'
+        'name', 'visible', 'description', 'position', 'parent_category_id', 'store_id'
     ];
 
     /**
@@ -64,6 +65,26 @@ class Category extends Model
     public function store(): BelongsTo
     {
         return $this->belongsTo(Store::class);
+    }
+
+    /**
+     * Get parent category.
+     *
+     * @return BelongsTo
+     */
+    public function parentCategory(): BelongsTo
+    {
+        return $this->belongsTo(Category::class, 'parent_category_id');
+    }
+
+    /**
+     * Get sub categories.
+     *
+     * @return HasMany
+     */
+    public function subCategories(): HasMany
+    {
+        return $this->hasMany(Category::class, 'parent_category_id')->orderBy('position');
     }
 
     /**

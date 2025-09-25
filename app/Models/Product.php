@@ -11,7 +11,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Attributes\Scope;
 use Illuminate\Database\Eloquent\Relations\hasOne;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
-use Illuminate\Database\Eloquent\Relations\hasMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -135,9 +135,9 @@ class Product extends Model
     /**
      * Get product variants.
      *
-     * @return hasMany
+     * @return HasMany
      */
-    public function variants(): hasMany
+    public function variants(): HasMany
     {
         return $this->hasMany(Product::class, 'parent_product_id')->orderBy('position');
     }

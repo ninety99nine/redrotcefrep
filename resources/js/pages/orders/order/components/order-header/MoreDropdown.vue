@@ -237,7 +237,7 @@
                     await axios.delete(`/api/orders/${this.order.id}`, config);
 
                     this.$refs.deleteOrderModal.hideModal();
-                    await new Promise(resolve => setTimeout(resolve, 1000));    //  Wait for modal to close
+                    await new Promise(resolve => setTimeout(resolve, 500));    //  Wait for modal to close
 
                     this.notificationState.showSuccessNotification('Order deleted');
 

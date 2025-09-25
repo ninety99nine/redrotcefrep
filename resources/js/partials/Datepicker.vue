@@ -19,7 +19,7 @@
                     <span
                         v-if="secondaryLabel"
                         :style="secondaryLabelStyle"
-                        :class="{ 'font-normal text-gray-400 ml-1' : !secondaryLabelStyle }">
+                        :class="{ 'font-normal text-gray-400' : !secondaryLabelStyle }">
                         {{ secondaryLabel }}
                     </span>
 

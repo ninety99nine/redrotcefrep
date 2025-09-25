@@ -58,4 +58,26 @@ class StorePaymentMethodPolicy extends BasePolicy
     {
         return $user->hasPermissionTo('manage store');
     }
+
+    /**
+     * Determine whether the user can update any categories.
+     *
+     * @param User $user
+     * @return bool
+     */
+    public function updateAny(User $user): bool
+    {
+        return $user->hasPermissionTo('manage store');
+    }
+
+    /**
+     * Determine whether the user can delete any categories.
+     *
+     * @param User $user
+     * @return bool
+     */
+    public function deleteAny(User $user): bool
+    {
+        return $user->hasPermissionTo('manage store');
+    }
 }

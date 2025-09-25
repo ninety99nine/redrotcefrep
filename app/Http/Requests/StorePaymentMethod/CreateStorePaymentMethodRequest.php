@@ -24,9 +24,12 @@ class CreateStorePaymentMethodRequest extends FormRequest
     {
         return [
             'active' => ['boolean'],
-            'custom_name' => ['required', 'string', 'max:20'],
+            'custom_name' => ['required', 'string', 'max:40'],
             'instruction' => ['nullable', 'string'],
             'configs' => ['nullable', 'array'],
+            'require_proof_of_payment' => ['sometimes', 'boolean'],
+            'enable_contact_seller_before_payment' => ['sometimes', 'boolean'],
+            'mark_as_paid_on_customer_confirmation' => ['sometimes', 'boolean'],
             'position' => ['nullable', 'integer', 'min:0', 'max:255'],
             'store_id' => ['required', 'uuid'],
             'payment_method_id' => ['required', 'uuid'],

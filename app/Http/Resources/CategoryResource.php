@@ -30,6 +30,10 @@ class CategoryResource extends JsonResource
             'photos' => MediaFileResource::collection($this->whenLoaded('photos')),
             'products' => ProductResource::collection($this->whenLoaded('products')),
             'media_files' => MediaFileResource::collection($this->whenLoaded('mediaFiles')),
+            'parent_category' => CategoryResource::make($this->whenLoaded('parentCategory')),
+            'sub_categories' => CategoryResource::collection($this->whenLoaded('subCategories')),
+
+
 
             'products_count' => $this->whenCounted('products'),
         ];

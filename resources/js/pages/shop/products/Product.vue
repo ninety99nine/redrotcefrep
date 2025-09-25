@@ -31,8 +31,8 @@
 
     import Button from '@Partials/Button.vue';
     import { MoveLeft } from 'lucide-vue-next';
-    import ImageCarousel from '@Pages/shop/product/_components/ImageCarousel.vue';
-    import ProductDetails from '@Pages/shop/product/_components/ProductDetails.vue';
+    import ImageCarousel from '@Pages/shop/products/_components/ImageCarousel.vue';
+    import ProductDetails from '@Pages/shop/products/_components/ProductDetails.vue';
 
     export default {
         inject: ['formState', 'productState', 'storeState', 'notificationState'],

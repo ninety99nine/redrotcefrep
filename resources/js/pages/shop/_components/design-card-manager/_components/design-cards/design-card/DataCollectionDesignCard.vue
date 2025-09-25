@@ -256,7 +256,6 @@
     import Button from '@Partials/Button.vue';
     import Datepicker from '@Partials/Datepicker.vue';
     import AddressInput from '@Partials/AddressInput.vue';
-    import { convertToMoneyWithSymbol } from '@Utils/numberUtils';
 
     export default {
         inject: ['formState', 'storeState'],
@@ -288,7 +287,6 @@
             }
         },
         methods: {
-            convertToMoneyWithSymbol: convertToMoneyWithSymbol,
             empty(value) {
                 return value == null || value.trim() == '';
             },

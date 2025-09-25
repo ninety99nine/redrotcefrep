@@ -315,6 +315,16 @@ class Store extends Model
     }
 
     /**
+     * Get store payment methods.
+     *
+     * @return HasMany
+     */
+    public function storePaymentMethods(): HasMany
+    {
+        return $this->hasMany(StorePaymentMethod::class);
+    }
+
+    /**
      * Get payment methods.
      *
      * @return BelongsToMany
@@ -323,8 +333,9 @@ class Store extends Model
     {
         return $this->belongsToMany(PaymentMethod::class, 'store_payment_method', 'store_id', 'payment_method_id')
                     ->withPivot([
-                        'id', 'active', 'custom_name', 'instruction', 'configs', 'position',
-                        'store_id', 'payment_method_id', 'created_at', 'updated_at'
+                        'id', 'active', 'custom_name', 'instruction', 'configs', 'require_proof_of_payment',
+                        'enable_contact_seller_before_payment', 'mark_as_paid_on_customer_confirmation',
+                        'position', 'store_id', 'payment_method_id', 'created_at', 'updated_at'
                     ])
                     ->using(StorePaymentMethod::class)
                     ->as('store_payment_method');

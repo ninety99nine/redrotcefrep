@@ -13,7 +13,7 @@ class UpdateStorePaymentMethodArrangementRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return $this->user()->can('update', StorePaymentMethod::class);
+        return $this->user()->can('updateAny', StorePaymentMethod::class);
     }
 
     /**

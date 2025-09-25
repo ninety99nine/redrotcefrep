@@ -311,7 +311,7 @@
 
             <!-- Page Loader -->
             <transition v-if="storeMode" name="fade-loader">
-                <div v-if="uiState.isLoading" class="absolute top-0 bottom-0 left-0 right-0 inset-0 bg-white bg-opacity-90 z-50">
+                <div v-if="uiState.isLoading" class="absolute top-0 bottom-0 left-0 right-0 inset-0 bg-white bg-opacity-90 z-20">
                     <div class="absolute w-full flex justify-center items-center h-screen">
                         <Loader size="custom" customSize="w-8 h-8 border-4"></Loader>
                     </div>
@@ -427,7 +427,17 @@
                     navMenus = [
                         {
                             name: 'General',
-                            routeName: 'show-store-general-settings'
+                            routeName: 'show-general-settings'
+                        },
+                        {
+                            name: 'Payment Methods',
+                            routeName: 'show-payment-methods',
+                            associatedRouteNames: ['add-payment-method', 'edit-payment-method'],
+                        },
+                        {
+                            name: 'Delivery Methods',
+                            routeName: 'show-delivery-methods',
+                            associatedRouteNames: ['add-delivery-method', 'edit-delivery-method'],
                         },
                         {
                             name: 'Checkout',
@@ -441,16 +451,6 @@
                         {
                             name: 'Social Links',
                             routeName: 'show-store-social-settings'
-                        },
-                        {
-                            name: 'Delivery / Pickup',
-                            routeName: 'show-store-delivery-methods',
-                            associatedRouteNames: ['show-store-delivery-method', 'create-store-delivery-method'],
-                        },
-                        {
-                            name: 'Payment Methods',
-                            routeName: 'show-store-payment-method-settings',
-                            associatedRouteNames: ['show-store-payment-method', 'create-store-payment-method'],
                         },
                     ];
 
@@ -514,6 +514,10 @@
                             routeName: 'edit-storefront'
                         },
                         {
+                            name: 'Settings',
+                            routeName: 'show-general-settings'
+                        },
+                        {
                             name: 'Promotions',
                             routeName: 'show-store-promotions',
                             associatedRouteNames: ['show-store-promotion', 'create-store-promotion'],
@@ -543,10 +547,6 @@
                             name: 'Subscriptions',
                             routeName: 'show-store-subscriptions',
                             associatedRouteNames: ['show-store-subscription']
-                        },
-                        {
-                            name: 'Settings',
-                            routeName: 'show-store-general-settings'
                         }
                     ];
 

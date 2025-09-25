@@ -409,7 +409,7 @@
                     this.storeState.silentUpdate();
 
                     hideModal();
-                    await new Promise(resolve => setTimeout(resolve, 1000));    //  Wait for modal to close
+                    await new Promise(resolve => setTimeout(resolve, 500));    //  Wait for modal to close
 
                     this.notificationState.showSuccessNotification('Tag deleted');
 
@@ -451,7 +451,7 @@
             setActionButtons() {
                 if(this.isCreating || this.isEditing) {
                     this.changeHistoryState.removeButtons();
-                    this.changeHistoryState.addDiscardButton(this.onDiscard);
+                    this.changeHistoryState.addDiscardButton();
                     this.changeHistoryState.addActionButton(
                         this.isEditing ? 'Save Changes' : 'Create Tag',
                         this.isEditing ? this.updateTag : this.createTag,

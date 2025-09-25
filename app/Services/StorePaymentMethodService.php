@@ -2,9 +2,9 @@
 
 namespace App\Services;
 
-use App\Enums\Association;
 use Exception;
 use App\Models\Store;
+use App\Enums\Association;
 use App\Models\PaymentMethod;
 use App\Enums\UploadFolderName;
 use App\Enums\PaymentMethodType;
@@ -134,7 +134,7 @@ class StorePaymentMethodService extends BaseService
         $store = Store::find($storeId);
         $storePaymentMethodIds = $data['store_payment_method_ids'];
 
-        $storePaymentMethods = $store->storePaymentMethods->get();
+        $storePaymentMethods = $store->storePaymentMethods()->get();
         $originalStorePaymentMethodPositions = $storePaymentMethods->pluck('position', 'id');
 
         $arrangement = collect($storePaymentMethodIds)->filter(function ($StorePaymentMethodId) use ($originalStorePaymentMethodPositions) {

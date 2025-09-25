@@ -24,6 +24,7 @@ class CategoryService extends BaseService
      */
     public function showCategories(array $data): CategoryResources|BinaryFileResponse|array
     {
+        $type = $data['type'] ?? null;
         $storeId = $data['store_id'] ?? null;
         $association = isset($data['association']) ? Association::tryFrom($data['association']) : null;
 
@@ -33,6 +34,10 @@ class CategoryService extends BaseService
             $query = Category::where('store_id', $storeId);
         }else {
             $query = Category::where('store_id', $storeId)->visible();
+        }
+
+        if($type == 'parent') {
+            $query = $query->whereNull('parent_category_id');
         }
 
         $query = $query->when(!request()->has('_sort'), fn($query) => $query->orderBy('position'));

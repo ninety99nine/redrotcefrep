@@ -3,6 +3,7 @@
     <div>
 
         <div class="space-y-2">
+
             <div
                 v-if="$slots.label || label || secondaryLabel || showAsterisk || $slots.description || description || externalLinkName">
 
@@ -20,7 +21,7 @@
                         <span
                             v-if="secondaryLabel"
                             :style="secondaryLabelStyle"
-                            :class="{ 'font-normal text-gray-400 ml-1' : !secondaryLabelStyle }">
+                            :class="{ 'font-normal text-gray-400' : !secondaryLabelStyle }">
                             {{ secondaryLabel }}
                         </span>
 
@@ -118,7 +119,7 @@
                     </div>
 
                     <!-- Dropdown Options -->
-                    <div v-if="isOpen" class="w-full absolute z-10 mt-1 select-none bg-white border border-gray-300 rounded-md shadow-lg overflow-hidden">
+                    <div v-if="isOpen" class="w-full absolute z-20 mt-1 select-none bg-white border border-gray-300 rounded-md shadow-lg overflow-hidden">
 
                         <!-- Search Input (Fixed) -->
                         <div v-if="search" class="px-3 py-2 border-b border-gray-200 bg-white">

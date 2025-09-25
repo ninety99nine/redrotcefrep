@@ -3,7 +3,7 @@
     <Button
         size="sm"
         type="outline"
-        :leftIcon="Store"
+        :leftIcon="House"
         leftIconSize="18"
         :action="navigateToStorefront">
         <span class="ml-1">Shop</span>
@@ -13,7 +13,7 @@
 
 <script>
 
-    import { Store } from 'lucide-vue-next';
+    import { House } from 'lucide-vue-next';
     import Button from '@Partials/Button.vue';
 
     export default {
@@ -21,7 +21,7 @@
         components: { Button },
         data() {
             return {
-                Store
+                House
             }
         },
         computed: {

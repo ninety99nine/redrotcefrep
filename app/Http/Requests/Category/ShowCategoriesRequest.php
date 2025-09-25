@@ -29,6 +29,7 @@ class ShowCategoriesRequest extends FormRequest
     {
         return [
             'store_id' => ['sometimes', 'uuid'],
+            'type' => ['sometimes', Rule::in(['parent'])],
             'association' => ['sometimes', Rule::enum(Association::class)->only([Association::SUPER_ADMIN, Association::TEAM_MEMBER, Association::SHOPPER->value])],
         ];
     }
@@ -42,6 +43,7 @@ class ShowCategoriesRequest extends FormRequest
     {
         return [
             'category_id.uuid' => 'The category ID must be a valid UUID.',
+            'type.in' => 'The type must be one of: ' . Arr::join(['parent'], ', ', ' or '),
             'association.enum' => 'The association must be one of: ' . Arr::join([Association::SUPER_ADMIN->value, Association::TEAM_MEMBER->value, Association::SHOPPER->value], ', ', ' or '),
         ];
     }
