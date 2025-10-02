@@ -470,7 +470,7 @@
 
                     <!-- Limit -->
                     <Select
-                        width="w-full"
+                        class="w-full"
                         :search="false"
                         v-model="exportLimit"
                         :options="exportLimits"
@@ -479,7 +479,7 @@
 
                     <!-- Arrangement -->
                     <Select
-                        width="w-full"
+                        class="w-full"
                         :search="false"
                         label="Arrangement"
                         v-model="exportMode"
@@ -488,7 +488,7 @@
 
                     <!-- Format -->
                     <Select
-                        width="w-full"
+                        class="w-full"
                         label="Format"
                         :search="false"
                         v-model="exportFormat"

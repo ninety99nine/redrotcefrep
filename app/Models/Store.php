@@ -2,10 +2,8 @@
 
 namespace App\Models;
 
-use App\Casts\Money;
 use App\Enums\TagType;
 use App\Casts\JsonArray;
-use App\Casts\CheckoutFees;
 use App\Services\UssdService;
 use App\Enums\UploadFolderName;
 use Illuminate\Support\Facades\Auth;
@@ -33,40 +31,52 @@ class Store extends Model
      * @var array
      */
     protected $casts = [
-
-        'deleted_at' => 'datetime',
-
-        'tips' => JsonArray::class,
-        'social_media_links' => JsonArray::class,
-        'opening_hours' => JsonArray::class,
-
-        'delivery_flat_fee' => Money::class,
-        'checkout_fees' => CheckoutFees::class,
-
-        'ussd_mobile_number' => E164PhoneNumberCast::class,
-        'contact_mobile_number' => E164PhoneNumberCast::class,
-        'whatsapp_mobile_number' => E164PhoneNumberCast::class,
-
-        'online' => 'boolean',
-        'show_tips' => 'boolean',
-        'show_items' => 'boolean',
-        'offer_rewards' => 'boolean',
-        'show_promotions' => 'boolean',
-        'show_specify_tip' => 'boolean',
-        'show_opening_hours' => 'boolean',
-        'show_customer_email' => 'boolean',
-        'show_delivery_methods' => 'boolean',
-        'customer_email_required' => 'boolean',
-        'show_customer_last_name' => 'boolean',
-        'show_customer_first_name' => 'boolean',
-        'customer_last_name_required' => 'boolean',
-        'customer_first_name_required' => 'boolean',
-        'combine_fees_into_one_amount' => 'boolean',
-        'allow_checkout_on_closed_hours' => 'boolean',
-        'combine_discounts_into_one_amount' => 'boolean',
+        'name' => 'string',
+        'alias' => 'string',
+        'email' => 'string',
+        'tax_id' => 'string',
+        'country' => 'string',
+        'currency' => 'string',
+        'language' => 'string',
+        'description' => 'string',
+        'message_footer' => 'string',
+        'call_to_action' => 'string',
+        'offline_message' => 'string',
+        'sms_sender_name' => 'string',
+        'qr_code_file_path' => 'string',
+        'order_number_prefix' => 'string',
+        'order_number_suffix' => 'string',
+        'line_channel_username' => 'string',
+        'telegram_channel_username' => 'string',
+        'messenger_channel_username' => 'string',
+        'invoice_header' => 'string',
+        'invoice_footer' => 'string',
+        'invoice_company_name' => 'string',
+        'invoice_company_email' => 'string',
+        'invoice_company_mobile_number' => E164PhoneNumberCast::class,
 
         'order_number_padding' => 'integer',
         'order_number_counter' => 'integer',
+
+        'tax_percentage_rate' => 'decimal:2',
+        'reward_percentage_rate' => 'decimal:2',
+
+        'online' => 'boolean',
+        'offer_rewards' => 'boolean',
+        'show_sms_channel' => 'boolean',
+        'show_line_channel' => 'boolean',
+        'show_opening_hours' => 'boolean',
+        'show_whatsapp_channel' => 'boolean',
+        'show_telegram_channel' => 'boolean',
+        'show_messenger_channel' => 'boolean',
+        'allow_checkout_on_closed_hours' => 'boolean',
+        'invoice_show_logo' => 'boolean',
+        'invoice_show_qr_code' => 'boolean',
+
+        'seo_keywords' => JsonArray::class,
+        'opening_hours' => JsonArray::class,
+        'ussd_mobile_number' => E164PhoneNumberCast::class,
+        'whatsapp_mobile_number' => E164PhoneNumberCast::class
     ];
 
     /**
@@ -75,18 +85,14 @@ class Store extends Model
      * @var array
      */
     protected $fillable = [
-        'name','alias','email','ussd_mobile_number','contact_mobile_number','whatsapp_mobile_number','call_to_action',
-        'description','qr_code_file_path','offer_rewards','reward_percentage_rate','social_media_links','country','currency',
-        'language','distance_unit','weight_unit','tax_method','tax_percentage_rate','tax_id','show_opening_hours',
-        'allow_checkout_on_closed_hours','opening_hours','online','offline_message','sms_sender_name','customer_section_heading',
-        'show_customer_email','show_customer_last_name','show_customer_first_name','customer_email_required',
-        'customer_last_name_required','customer_first_name_required','show_items','items_section_heading',
-        'show_delivery_methods','delivery_methods_section_heading','delivery_schedule_title',
-        'delivery_address_title','show_tips','tip_section_heading','tips','show_specify_tip',
-        'show_promotions','promotions_section_heading','cost_breakdown_section_heading',
-        'combine_fees_into_one_amount','combine_discounts_into_one_amount','checkout_fees',
-        'order_number_padding', 'order_number_counter','order_number_prefix',
-        'order_number_suffix'
+        'name','description','offline_message','alias','email','sms_sender_name','ussd_mobile_number','whatsapp_mobile_number',
+        'call_to_action','qr_code_file_path','offer_rewards','reward_percentage_rate','country','currency','language','weight_unit',
+        'distance_unit','tax_method','tax_percentage_rate','tax_id','show_opening_hours','allow_checkout_on_closed_hours','opening_hours',
+        'online','order_number_padding','order_number_counter','order_number_prefix','order_number_suffix','message_footer','show_sms_channel',
+        'show_line_channel','show_whatsapp_channel','show_telegram_channel','show_messenger_channel','line_channel_username',
+        'telegram_channel_username','messenger_channel_username','invoice_show_logo','invoice_show_qr_code','invoice_header',
+        'invoice_footer','invoice_company_name','invoice_company_email','invoice_company_mobile_number','seo_title',
+        'seo_description','seo_keywords','google_analytics_id','meta_pixel_id','tiktok_pixel_id'
     ];
 
     /**
@@ -182,6 +188,16 @@ class Store extends Model
     public function logo(): MorphOne
     {
         return $this->morphOne(MediaFile::class, 'mediable')->where('type', UploadFolderName::STORE_LOGO->value);
+    }
+
+    /**
+     * SEO image.
+     *
+     * @return MorphOne
+     */
+    public function seoImage(): MorphOne
+    {
+        return $this->morphOne(MediaFile::class, 'mediable')->where('type', UploadFolderName::STORE_SEO_IMAGE->value);
     }
 
     /**
@@ -302,6 +318,16 @@ class Store extends Model
     public function designCards(): HasMany
     {
         return $this->hasMany(DesignCard::class);
+    }
+
+    /**
+     * Get workflows.
+     *
+     * @return HasMany
+     */
+    public function workflows(): HasMany
+    {
+        return $this->hasMany(Workflow::class);
     }
 
     /**

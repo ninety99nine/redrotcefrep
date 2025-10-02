@@ -143,7 +143,7 @@
 
                     return [
                         {
-                            description: 'Choose the content shopper must see',
+                            description: 'Choose the content the shopper must see',
                             options: ['logo', 'products', 'text', 'image', 'video', 'link', 'contact', 'countdown', 'map', 'socials', 'divider', 'banner', 'install_app']
                         }
                     ];
@@ -158,7 +158,7 @@
                         },
                         {
                             title: 'Show Content',
-                            description: 'Choose the content shopper must see',
+                            description: 'Choose the content the shopper must see',
                             options: [
                                 'logo', 'products', 'text', 'image', 'video', 'link', 'contact', 'countdown', 'map', 'socials', 'divider', 'banner',
                                 /* 'customer', 'items', 'delivery', 'promo code', 'tips', 'order summary' */
@@ -182,7 +182,7 @@
 
                     return [
                         {
-                            description: 'Choose the content shopper must see',
+                            description: 'Choose the content the shopper must see',
                             options: ['logo', 'text', 'image', 'video', 'link', 'contact', 'socials', 'divider', 'banner', 'categories', 'install_app']
                         }
                     ];

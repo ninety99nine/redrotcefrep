@@ -2,7 +2,7 @@
 
     <div>
 
-        <div class="space-y-2">
+        <div class="w-full space-y-2">
 
             <div
                 v-if="$slots.label || label || secondaryLabel || showAsterisk || $slots.description || description || externalLinkName">
@@ -88,7 +88,7 @@
 
                 <div v-else class="w-full relative" ref="dropdown">
 
-                    <!-- Select Input -->
+                    <!-- Select -->
                     <div
                         @click="toggleDropdown"
                         :class="selectClasses ? selectClasses : [

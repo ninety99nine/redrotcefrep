@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Store;
 use App\Models\Product;
 use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
 
 class AppController extends Controller
 {
@@ -39,7 +40,7 @@ class AppController extends Controller
 
                     $baseUrl = config('app.url');
                     $productUrl = "{$baseUrl}/{$store->alias}/products/{$product->id}";
-                    $image = $product->photo?->path ?? ($store->logo?->path ?? url('/images/logo-black-transparent.png'));
+                    $image = $product->photo?->path ?? $store->seoImage?->path ?? $store->logo?->path ?? url('/images/logo-black-transparent.png');
 
                     $meta = [
                         'type' => 'product', // Specific type for product pages
@@ -62,19 +63,24 @@ class AppController extends Controller
 
             // Assume this is a storefront page (e.g., /<alias>)
             $alias = $segments[0];
-            $store = Store::where('alias', $alias)->with(['logo'])->firstOrFail();
+            $store = Store::where('alias', $alias)->with(['logo', 'seoImage'])->firstOrFail();
 
             $baseUrl = config('app.url');
             $storeUrl = "{$baseUrl}/{$store->alias}";
+            $keywords = $store->seo_keywords ? Arr::join($store->seo_keywords, ',') : '';
+            $image = $store->seoImage?->path ?? $store->logo?->path ?? url('/images/logo-black-transparent.png');
 
             $meta = [
+                'image' => $image,
                 'url' => $storeUrl,
                 'type' => 'website',
-                'title' => $store->name,
-                'url' => "{$baseUrl}/{$store->alias}",
+                'keywords' => $keywords,
+                'meta_pixel_id' => $store->meta_pixel_id,
+                'title' => $store->seo_title ?? $store->name,
+                'tiktok_pixel_id' => $store->tiktok_pixel_id,
+                'google_analytics_id' => $store->google_analytics_id,
                 'alias' => $store->alias, // Manifest link - For Progressive Web App (PWA)
-                'description' => $store->description ?? "Welcome to {$store->name}",
-                'image' => $store->logo?->path ?? url('/images/logo-black-transparent.png'),
+                'description' => $store->seo_description ?? ($store->description ?? "Welcome to {$store->name}"),
             ];
 
         }

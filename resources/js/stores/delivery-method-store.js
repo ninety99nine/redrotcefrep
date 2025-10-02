@@ -49,22 +49,22 @@ export const useDeliveryMethodStore = defineStore('deliveryMethod', {
                 weight_categories: deliveryMethod?.weight_categories ?? [],
                 postal_code_zones: deliveryMethod?.postal_code_zones ?? [],
                 same_day_delivery: deliveryMethod?.same_day_delivery ?? false,
-                daily_order_limit: deliveryMethod?.daily_order_limit ?? '100',
                 ask_for_an_address: deliveryMethod?.ask_for_an_address ?? false,
-                percentage_fee_rate: deliveryMethod?.percentage_fee_rate ?? '10',
                 pin_location_on_map: deliveryMethod?.pin_location_on_map ?? false,
                 data_collection_fields: deliveryMethod?.data_collection_fields ?? [],
                 set_daily_order_limit: deliveryMethod?.set_daily_order_limit ?? false,
-                time_slot_interval_value: deliveryMethod?.time_slot_interval_value ?? '1',
+                daily_order_limit: deliveryMethod?.daily_order_limit?.toString() ?? '100',
                 time_slot_interval_unit: deliveryMethod?.time_slot_interval_unit ?? 'hour',
                 show_distance_on_invoice: deliveryMethod?.show_distance_on_invoice ?? true,
                 auto_generate_time_slots: deliveryMethod?.auto_generate_time_slots ?? false,
-                latest_delivery_time_value: deliveryMethod?.latest_delivery_time_value ?? '1',
+                percentage_fee_rate: deliveryMethod?.percentage_fee_rate?.toString() ?? '10',
                 flat_fee_rate: deliveryMethod?.flat_fee_rate?.amount_without_currency ?? '0.00',
                 earliest_delivery_time_unit: deliveryMethod?.earliest_delivery_time_unit ?? 'day',
-                earliest_delivery_time_value: deliveryMethod?.earliest_delivery_time_value ?? '1',
+                time_slot_interval_value: deliveryMethod?.time_slot_interval_value?.toString() ?? '1',
                 qualify_on_minimum_grand_total: deliveryMethod?.qualify_on_minimum_grand_total ?? false,
+                latest_delivery_time_value: deliveryMethod?.latest_delivery_time_value?.toString() ?? '1',
                 minimum_grand_total: deliveryMethod?.minimum_grand_total?.amount_without_currency ?? '0.00',
+                earliest_delivery_time_value: deliveryMethod?.earliest_delivery_time_value?.toString() ?? '1',
                 require_minimum_notice_for_orders: deliveryMethod?.require_minimum_notice_for_orders ?? false,
                 restrict_maximum_notice_for_orders: deliveryMethod?.restrict_maximum_notice_for_orders ?? false,
                 offer_free_delivery_on_minimum_grand_total: deliveryMethod?.offer_free_delivery_on_minimum_grand_total ?? false,
@@ -85,7 +85,7 @@ export const useDeliveryMethodStore = defineStore('deliveryMethod', {
 
             }
             if(saveState) {
-                this.saveOriginalState('Original payment method');
+                this.saveOriginalState('Original workflow');
             }
 
         }

@@ -7,7 +7,7 @@
         buttonClass="w-full"
         :action="navigateToStorePaymentMethods"
         :skeleton="isLoadingStore || isLoadingOrder"
-        v-if="isLoadingStore || isLoadingOrder || !['paid', 'confirming payment'].includes(order.payment_status)">
+        v-if="isLoadingStore || isLoadingOrder || !['paid', 'waiting confirmation'].includes(order.payment_status)">
         <span>Pay</span>
     </Button>
 

@@ -14,10 +14,9 @@
             <div class="grid grid-cols-2 gap-4">
 
                 <Select
-                    class="mb-2"
-                    width="w-full"
                     :search="true"
                     label="Category"
+                    class="w-full mb-2"
                     :options="categories"
                     v-model="designCard.metadata.category_id"
                     @change="designState.saveStateDebounced('Category changed')"

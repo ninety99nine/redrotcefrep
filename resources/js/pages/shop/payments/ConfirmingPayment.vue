@@ -326,7 +326,7 @@
             setup() {
                 if(this.store && this.order) {
                     this.generateQRCode();
-                    if(!['paid', 'confirming payment'].includes(this.order.payment_status)) this.updateOrder();
+                    if(!['paid', 'waiting confirmation'].includes(this.order.payment_status)) this.updateOrder();
                 }
             },
             toggleAccordian(index) {
@@ -380,7 +380,7 @@
 
                 try {
 
-                    const paymentStatus = 'confirming payment';
+                    const paymentStatus = 'waiting confirmation';
 
                     const data = {
                         payment_status: paymentStatus,

@@ -1,6 +1,6 @@
 <template>
 
-    <!-- Currency Select Input -->
+    <!-- Currency Select -->
     <SelectCurrency
         :clearable="true"
         v-model="localModelValue"

@@ -340,7 +340,7 @@
 
                     <!-- Limit -->
                     <Select
-                        width="w-full"
+                        class="w-full"
                         :search="false"
                         v-model="exportLimit"
                         :options="exportLimits"
@@ -349,7 +349,7 @@
 
                     <!-- Arrangement -->
                     <Select
-                        width="w-full"
+                        class="w-full"
                         :search="false"
                         label="Arrangement"
                         v-model="exportMode"
@@ -358,7 +358,7 @@
 
                     <!-- Format -->
                     <Select
-                        width="w-full"
+                        class="w-full"
                         label="Format"
                         :search="false"
                         v-model="exportFormat"
@@ -407,10 +407,10 @@
                         <span class="text-sm text-gray-500">Preparing team members</span>
                     </div>
 
-                    <!-- Team Members Select Input -->
+                    <!-- Team Members Select -->
                     <Select
                         v-else
-                        width="w-full"
+                        class="w-full"
                         :search="false"
                         v-model="teamMemberId"
                         :options="teamMembers"
@@ -439,18 +439,18 @@
 
                 <div class="space-y-4 mb-8">
 
-                    <!-- Status Select Input -->
+                    <!-- Status Select -->
                     <Select
-                        width="w-full"
+                        class="w-full"
                         label="Status"
                         :search="false"
                         v-model="status"
                         :options="statuses">
                     </Select>
 
-                    <!-- Payment Status Select Input -->
+                    <!-- Payment Status Select -->
                     <Select
-                        width="w-full"
+                        class="w-full"
                         :search="false"
                         label="Payment Status"
                         v-model="paymentStatus"
@@ -726,7 +726,7 @@
                     { label: 'Paid', value: 'Paid'},
                     { label: 'Unpaid', value: 'unpaid'},
                     { label: 'Partially paid', value: 'partially paid'},
-                    { label: 'Confirming payment', value: 'confirming payment'},
+                    { label: 'Waiting confirmation', value: 'waiting confirmation'},
                 ],
                 exportLimits: [
                     { label: '100', value: '100'},
@@ -750,7 +750,7 @@
                     { label: 'Paid', value: 'paid'},
                     { label: 'Unpaid', value: 'unpaid'},
                     { label: 'Partially Paid', value: 'partially paid'},
-                    { label: 'Confirming payment', value: 'confirming payment'},
+                    { label: 'Waiting confirmation', value: 'waiting confirmation'},
                 ],
                 exportModes: [
                     {

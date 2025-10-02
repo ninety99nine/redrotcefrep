@@ -106,7 +106,7 @@
                     v-if="supportsOptions"
                     :class="['flex', designCard.type == 'checkbox' ? 'justify-between items-start' : 'justify-end']">
 
-                    <!-- Validation Select Input -->
+                    <!-- Validation Select -->
                     <div v-if="designCard.type == 'checkbox'" class="flex items-end space-x-2">
 
                         <Select

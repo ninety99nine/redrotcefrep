@@ -190,6 +190,7 @@ class MediaFileService extends BaseService
             UploadFolderName::STORE_LOGO->value,
             UploadFolderName::PROFILE_PHOTO->value,
             UploadFolderName::CATEGORY_PHOTO->value,
+            UploadFolderName::STORE_SEO_IMAGE->value,
             UploadFolderName::DESIGN_CARD_PHOTO->value,
             UploadFolderName::TRANSACTION_PHOTO->value,
             UploadFolderName::STORE_PAYMENT_METHOD_LOGO->value,

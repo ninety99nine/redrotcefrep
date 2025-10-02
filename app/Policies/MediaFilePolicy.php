@@ -113,6 +113,7 @@ class MediaFilePolicy extends BasePolicy
             $uploadFolderName,
             [
                 UploadFolderName::STORE_LOGO,
+                UploadFolderName::STORE_SEO_IMAGE,
                 UploadFolderName::DESIGN_CARD_PHOTO,
                 UploadFolderName::STORE_PAYMENT_METHOD_LOGO,
                 UploadFolderName::STORE_PAYMENT_METHOD_PHOTO,

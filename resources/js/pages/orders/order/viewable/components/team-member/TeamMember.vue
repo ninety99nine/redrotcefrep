@@ -10,7 +10,7 @@
 
         <div v-else class="space-y-4">
 
-            <!-- Team Members Select Input -->
+            <!-- Team Members Select -->
             <Select
                 :search="true"
                 label="Assigned To"

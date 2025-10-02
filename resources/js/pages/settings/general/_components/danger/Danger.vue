@@ -55,8 +55,7 @@
         data() {
             return {
                 Trash2,
-                confirmation: '',
-                isDeletingStore: false
+                confirmation: ''
             }
         },
         computed: {

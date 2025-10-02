@@ -65,7 +65,7 @@
 
                 <!-- Select Country Input -->
                 <SelectCountry
-                    width="w-full"
+                    class="w-full"
                     label="Country"
                     v-model="form.country"
                     labelPopoverTitle="What Is This?"
@@ -74,7 +74,7 @@
 
                 <!-- Select Currency Input -->
                 <SelectCurrency
-                    width="w-full"
+                    class="w-full"
                     label="Currency"
                     v-model="form.currency"
                     labelPopoverTitle="What Is This?"

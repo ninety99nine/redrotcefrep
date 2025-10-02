@@ -105,7 +105,7 @@ class OrderService extends BaseService
             CAST(SUM(CASE WHEN payment_status = ? THEN 1 ELSE 0 END) AS UNSIGNED) as paid_count,
             CAST(SUM(CASE WHEN payment_status = ? THEN 1 ELSE 0 END) AS UNSIGNED) as unpaid_count,
             CAST(SUM(CASE WHEN payment_status = ? THEN 1 ELSE 0 END) AS UNSIGNED) as partially_paid_count,
-            CAST(SUM(CASE WHEN payment_status = ? THEN 1 ELSE 0 END) AS UNSIGNED) as confirming_payment_count
+            CAST(SUM(CASE WHEN payment_status = ? THEN 1 ELSE 0 END) AS UNSIGNED) as WAITING_CONFIRMATION_count
         ', [
             OrderStatus::WAITING->value,
             OrderStatus::CANCELLED->value,
@@ -115,7 +115,7 @@ class OrderService extends BaseService
             OrderPaymentStatus::PAID->value,
             OrderPaymentStatus::UNPAID->value,
             OrderPaymentStatus::PARTIALLY_PAID->value,
-            OrderPaymentStatus::CONFIRMING_PAYMENT->value,
+            OrderPaymentStatus::WAITING_CONFIRMATION->value,
         ]);
 
         if($store) $query->where('store_id', $storeId);
@@ -136,7 +136,7 @@ class OrderService extends BaseService
                 'paid' => $result->paid_count,
                 'unpaid' => $result->unpaid_count,
                 'partially_paid' => $result->partially_paid_count,
-                'confirming_payment' => $result->confirming_payment_count,
+                'WAITING_CONFIRMATION' => $result->WAITING_CONFIRMATION_count,
             ]
         ];
 

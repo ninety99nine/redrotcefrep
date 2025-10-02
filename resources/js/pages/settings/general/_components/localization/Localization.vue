@@ -14,7 +14,7 @@
 
             <!-- Select Country -->
             <SelectCountry
-                width="w-full"
+                class="w-full"
                 label="Country"
                 v-model="storeForm.country"
                 :skeleton="isLoadingStore || !store"
@@ -25,7 +25,7 @@
 
             <!-- Select Currency -->
             <SelectCurrency
-                width="w-full"
+                class="w-full"
                 label="Currency"
                 v-model="storeForm.currency"
                 :skeleton="isLoadingStore || !store"
@@ -36,7 +36,7 @@
 
             <!-- Select Language -->
             <SelectLanguage
-                width="w-full"
+                class="w-full"
                 label="Language"
                 v-model="storeForm.language"
                 :skeleton="isLoadingStore || !store"
@@ -47,7 +47,7 @@
 
             <!-- Select Distance Unit -->
             <Select
-                width="w-full"
+                class="w-full"
                 :search="false"
                 label="Distance Unit"
                 :options="distanceOptions"
@@ -59,7 +59,7 @@
 
             <!-- Select Weight Unit -->
             <Select
-                width="w-full"
+                class="w-full"
                 :search="false"
                 label="Weight Unit"
                 :options="weightOptions"

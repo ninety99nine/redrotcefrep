@@ -342,7 +342,7 @@
 
                     <!-- Limit -->
                     <Select
-                        width="w-full"
+                        class="w-full"
                         :search="false"
                         v-model="exportLimit"
                         :options="exportLimits"
@@ -351,7 +351,7 @@
 
                     <!-- Format -->
                     <Select
-                        width="w-full"
+                        class="w-full"
                         label="Format"
                         :search="false"
                         v-model="exportFormat"

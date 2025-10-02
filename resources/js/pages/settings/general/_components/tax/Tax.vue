@@ -15,7 +15,7 @@
 
                 <!-- Select Tax Method Unit -->
                 <Select
-                    width="w-full"
+                    class="w-full"
                     :search="false"
                     label="Tax Method"
                     :options="taxOptions"

@@ -1,7 +1,7 @@
 <template>
 
     <Select
-        width="w-full"
+        class="w-full"
         v-model="localModelValue"
         :label="configSchemaEntity.label"
         :options="configSchemaEntity.options"

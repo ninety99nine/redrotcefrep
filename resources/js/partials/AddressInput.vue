@@ -68,10 +68,10 @@
                         </Input>
                     </div>
 
-                    <!-- Country Select Input -->
+                    <!-- Country Select -->
                     <div :class="countryWrapperClass">
                         <SelectCountry
-                            width="w-full"
+                            class="w-full"
                             v-model="form.country">
                         </SelectCountry>
                     </div>

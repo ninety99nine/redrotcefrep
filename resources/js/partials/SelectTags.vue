@@ -74,7 +74,7 @@
                 <slot v-if="$slots.prefix" name="prefix"></slot>
 
                 <div class="w-full relative" ref="dropdown">
-                    <!-- Select Input -->
+                    <!-- Select -->
                     <div
                         @click="toggleDropdown"
                         :class="[

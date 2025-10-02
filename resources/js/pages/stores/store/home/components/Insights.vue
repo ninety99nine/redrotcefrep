@@ -15,7 +15,7 @@
                 v-model="selectedCategories"
                 placeholder="Select insight" />
 
-            <!-- Insight Period Select Input -->
+            <!-- Insight Period Select -->
             <Select
                 class="w-40"
                 :search="false"

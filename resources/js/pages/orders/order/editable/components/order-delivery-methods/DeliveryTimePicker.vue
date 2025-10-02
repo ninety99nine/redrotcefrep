@@ -17,7 +17,7 @@
 
         </ShineEffect>
 
-        <!-- Timeslot Select Input -->
+        <!-- Timeslot Select -->
         <Select
             v-else
             class="w-full"

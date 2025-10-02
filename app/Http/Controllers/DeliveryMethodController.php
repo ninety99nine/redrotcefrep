@@ -6,12 +6,12 @@ use App\Models\DeliveryMethod;
 use App\Services\DeliveryMethodService;
 use App\Http\Resources\DeliveryMethodResource;
 use App\Http\Resources\DeliveryMethodResources;
+use App\Http\Requests\DeliveryMethod\ShowDeliveryMethodRequest;
 use App\Http\Requests\DeliveryMethod\ShowDeliveryMethodsRequest;
 use App\Http\Requests\DeliveryMethod\CreateDeliveryMethodRequest;
 use App\Http\Requests\DeliveryMethod\UpdateDeliveryMethodRequest;
-use App\Http\Requests\DeliveryMethod\DeleteDeliveryMethodsRequest;
-use App\Http\Requests\DeliveryMethod\ShowDeliveryMethodRequest;
 use App\Http\Requests\DeliveryMethod\DeleteDeliveryMethodRequest;
+use App\Http\Requests\DeliveryMethod\DeleteDeliveryMethodsRequest;
 use App\Http\Requests\DeliveryMethod\UpdateDeliveryMethodArrangementRequest;
 use App\Http\Requests\DeliveryMethod\ShowDeliveryMethodScheduleOptionsRequest;
 

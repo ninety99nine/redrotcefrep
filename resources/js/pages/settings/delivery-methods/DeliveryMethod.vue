@@ -8,7 +8,7 @@
             type="light"
             class="mb-4"
             :leftIcon="MoveLeft"
-            :action="navigateToshowDeliveryMethods">
+            :action="navigateToShowDeliveryMethods">
             <span>Back</span>
         </Button>
 
@@ -145,7 +145,7 @@
 
                         <!-- Fee Type -->
                         <Select
-                            width="w-full"
+                            class="w-full"
                             :search="false"
                             label="Fee type"
                             :options="feeTypes"
@@ -287,7 +287,7 @@
 
                 <!-- Schedule Type -->
                 <Select
-                    width="w-full"
+                    class="w-full"
                     :search="false"
                     label="Schedule type"
                     :options="scheduleTypes"
@@ -328,7 +328,7 @@
 
                         <!-- Time Slot Interval Unit Input -->
                         <Select
-                            width="w-full"
+                            class="w-full"
                             :search="false"
                             label="Interval Unit"
                             :options="timeSlotIntervalUnits"
@@ -396,7 +396,6 @@
                                     <!-- Earliest Delivery Time Unit Select -->
                                     <Select
                                         class="w-28"
-                                        width="w-full"
                                         :search="false"
                                         :options="earliestDeliveryTimeUnits"
                                         v-model="deliveryMethodForm.earliest_delivery_time_unit"
@@ -627,7 +626,7 @@
                     null,
                 );
             },
-            async navigateToshowDeliveryMethods() {
+            async navigateToShowDeliveryMethods() {
                 await this.$router.push({
                     name: 'show-delivery-methods',
                     query: {
@@ -693,7 +692,7 @@
                     this.notificationState.showSuccessNotification(`Delivery method created`);
                     this.deliveryMethodState.saveOriginalState('Original delivery method');
 
-                    this.navigateToshowDeliveryMethods();
+                    this.navigateToShowDeliveryMethods();
 
                 } catch (error) {
                     const message = error?.response?.data?.message || error?.message || 'Something went wrong while creating delivery method';
@@ -771,7 +770,7 @@
 
                     this.notificationState.showSuccessNotification('Delivery method deleted');
 
-                    await this.navigateToshowDeliveryMethods();
+                    await this.navigateToShowDeliveryMethods();
 
                 } catch (error) {
                     const message = error?.response?.data?.message || error?.message || 'Something went wrong while deleting delivery method';

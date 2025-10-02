@@ -45,7 +45,7 @@
 
             <div class="grid grid-cols-2 gap-4">
 
-                <!-- Courier Select Input -->
+                <!-- Courier Select -->
                 <div class="col-span-1">
 
                     <Select

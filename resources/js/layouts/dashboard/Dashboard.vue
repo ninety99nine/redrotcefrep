@@ -407,6 +407,15 @@
                             routeName: 'show-general-settings'
                         },
                         {
+                            name: 'Checkout',
+                            routeName: 'show-checkout-settings',
+                        },
+                        {
+                            name: 'Workflows',
+                            routeName: 'show-workflows',
+                            associatedRouteNames: ['add-workflow', 'edit-workflow'],
+                        },
+                        {
                             name: 'Payment Methods',
                             routeName: 'show-payment-methods',
                             associatedRouteNames: ['add-payment-method', 'edit-payment-method'],
@@ -416,15 +425,18 @@
                             routeName: 'show-delivery-methods',
                             associatedRouteNames: ['add-delivery-method', 'edit-delivery-method'],
                         },
+                        {
+                            name: 'Billing',
+                            routeName: 'show-billing-settings',
+                        },
+                        {
+                            name: 'SEO',
+                            routeName: 'show-seo-settings',
+                        },
                         /*
                         {
                             name: 'Checkout',
                             routeName: 'show-store-checkout-settings'
-                        },
-                        {
-                            name: 'Workflows',
-                            routeName: 'show-store-workflows',
-                            associatedRouteNames: ['show-store-workflow', 'create-store-workflow'],
                         },
                         {
                             name: 'Social Links',
@@ -585,7 +597,7 @@
 
                     let config = {
                         params: {
-                            _relationships: ['logo', 'productTags', 'customerTags', 'categories', 'activeSubscription.pricingPlan', /*  'storeRollingNumbers', 'userStoreAssociation'  */].join(',')
+                            _relationships: ['logo', 'seoImage', 'productTags', 'customerTags', 'categories', 'activeSubscription.pricingPlan', /*  'storeRollingNumbers', 'userStoreAssociation'  */].join(',')
                         }
                     };
 

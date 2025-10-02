@@ -14,7 +14,7 @@
             <div class="grid grid-cols-2 gap-4">
 
                 <Select
-                    width="w-full"
+                    class="w-full"
                     label="Divider"
                     :options="dividerOptions"
                     v-model="designCard.metadata.divider"

@@ -72,7 +72,7 @@
                             <Tally2 v-if="dataCollectionField.type == 'long answer'" size="20" class="rotate-90"></Tally2>
                             <Tally1 v-if="dataCollectionField.type == 'short answer'" size="20" class="rotate-90"></Tally1>
 
-                            <!-- Type Select Input -->
+                            <!-- Type Select -->
                             <Select
                                 class="w-60"
                                 :search="false"
@@ -176,7 +176,7 @@
                             v-if="supportsOptions(dataCollectionField)"
                             :class="['flex', dataCollectionField.type == 'checkbox' ? 'justify-between items-start' : 'justify-end']">
 
-                            <!-- Validation Select Input -->
+                            <!-- Validation Select -->
                             <div v-if="dataCollectionField.type == 'checkbox'" class="flex items-end space-x-2">
 
                                 <Select

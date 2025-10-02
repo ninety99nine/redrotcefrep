@@ -87,7 +87,7 @@
                         'flex',
                         wrapperAlignItems,
                         {
-                            'bg-slate-50 py-2.5 px-2.5 rounded-md outline-1 -outline-offset-1 outline-gray-300 has-[input:focus-within]:outline-2 has-[input:focus-within]:-outline-offset-2 has-[input:focus-within]:outline-blue-300':
+                            'py-2.5 px-2.5 rounded-md outline-1 -outline-offset-1 outline-gray-300 has-[input:focus-within]:outline-2 has-[input:focus-within]:-outline-offset-2 has-[input:focus-within]:outline-blue-300':
                             [
                                 'text', 'password', 'email', 'number', 'tel', 'url', 'search', 'date',
                                 'datetime-local', 'month', 'week', 'time', 'money', 'percentage', 'textarea'

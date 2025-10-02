@@ -51,7 +51,7 @@
                 return this.orderForm.payment_status;
             },
             paymentStatuses() {
-                const options = ['paid','unpaid','partially paid','confirming payment'];
+                const options = ['paid','unpaid','partially paid','waiting confirmation'];
 
                 return options.map((option) => {
                     return {
@@ -69,7 +69,7 @@
                     classes.push('bg-gray-100 border border-gray-500');
                 } else if(this.paymentStatusName === 'partially paid') {
                     classes.push('bg-blue-100 border border-blue-500');
-                }else if(this.paymentStatusName === 'confirming payment') {
+                }else if(this.paymentStatusName === 'waiting confirmation') {
                     classes.push('bg-green-100 border border-green-500');
                 }
 
@@ -84,7 +84,7 @@
                     classes.push('text-gray-800');
                 } else if(this.paymentStatusName === 'partially paid') {
                     classes.push('text-blue-800');
-                }else if(this.paymentStatusName === 'confirming payment') {
+                }else if(this.paymentStatusName === 'waiting confirmation') {
                     classes.push('text-green-800');
                 }
 
@@ -101,7 +101,7 @@
                     classes.push('bg-gray-300');
                 } else if(paymentStatusName === 'partially paid') {
                     classes.push('bg-blue-500');
-                } else if(paymentStatusName === 'confirming payment') {
+                } else if(paymentStatusName === 'waiting confirmation') {
                     classes.push('bg-green-500');
                 }
 

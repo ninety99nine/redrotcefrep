@@ -6,15 +6,11 @@ use Exception;
 use Carbon\Carbon;
 use App\Models\Store;
 use App\Enums\Association;
-use App\Enums\DeliveryMethodFeeType;
 use App\Models\DeliveryMethod;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Collection;
-use Illuminate\Database\Eloquent\Builder;
 use App\Enums\DeliveryMethodScheduleType;
 use App\Http\Resources\DeliveryMethodResource;
 use App\Http\Resources\DeliveryMethodResources;
-use Illuminate\Database\Eloquent\Relations\Relation;
 
 class DeliveryMethodService extends BaseService
 {

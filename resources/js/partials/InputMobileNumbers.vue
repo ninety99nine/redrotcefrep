@@ -3,7 +3,7 @@
     <Modal
         :onShow="onShow"
         :showFooter="false"
-        :scrollOnContent="false"
+        :scrollOnContent="true"
         :header="mobileNumber ? 'Edit Mobile Number' : 'Add Mobile Number'">
 
         <template #content="triggerProps">
@@ -15,6 +15,7 @@
                     type="text"
                     :key="InputKey"
                     label="Mobile Number"
+                    placeholder="+26772000001"
                     v-model="form.mobile_number"
                     :errorText="formState.getFormError('mobile_number')">
 
@@ -36,6 +37,7 @@
                     <Button
                         size="sm"
                         type="success"
+                        class="w-full"
                         buttonClass="w-full"
                         :disabled="!mustSaveChanges"
                         :action="() => mobileNumber ? _updateMobileNumber(triggerProps.hideModal) : _createMobileNumber(triggerProps.hideModal)">
@@ -95,8 +97,13 @@
 
                 </template>
 
-                <Button v-else type="light" size="xs" :action="() => showMobileNumber(triggerProps.showModal, null, null)" buttonClass="w-48">
-                    <span class="whitespace-nowrap ml-2">Add Mobile Number</span>
+                <Button
+                    v-else
+                    size="xs"
+                    type="light"
+                    :leftIcon="Plus"
+                    :action="() => showMobileNumber(triggerProps.showModal, null, null)" buttonClass="w-48">
+                    <span class="whitespace-nowrap">Add Mobile Number</span>
                 </Button>
 
             </div>

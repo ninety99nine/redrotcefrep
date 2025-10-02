@@ -9,6 +9,7 @@ enum UploadFolderName:string
     case PROFILE_PHOTO = 'profile_photo';
     case PRODUCT_PHOTO = 'product_photo';
     case CATEGORY_PHOTO = 'category_photo';
+    case STORE_SEO_IMAGE = 'store_seo_image';
     case TRANSACTION_PHOTO = 'transaction_photo';
     case DESIGN_CARD_PHOTO = 'design_card_photo';
     case ORDER_COMMENT_PHOTO = 'order_comment_photo';

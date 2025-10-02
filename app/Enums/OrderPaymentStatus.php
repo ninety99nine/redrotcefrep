@@ -6,7 +6,7 @@ enum OrderPaymentStatus:string {
     case PAID = 'paid';
     case UNPAID = 'unpaid';
     case PARTIALLY_PAID = 'partially paid';
-    case CONFIRMING_PAYMENT = 'confirming payment';
+    case WAITING_CONFIRMATION = 'waiting confirmation';
 
     public static function values(): array
     {

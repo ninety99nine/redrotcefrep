@@ -371,7 +371,42 @@ const routes = [
                                 component: () => import('@Pages/settings/delivery-methods/DeliveryMethod.vue')
                             }
                         ]
-                    }
+                    },
+                    {
+                        path: 'workflows',
+                        children: [
+                            {
+                                path: '',
+                                name: 'show-workflows',
+                                component: () => import('@Pages/settings/workflows/Workflows.vue')
+                            },
+                            {
+                                path: 'add',
+                                name: 'add-workflow',
+                                component: () => import('@Pages/settings/workflows/Workflow.vue')
+                            },
+                            {
+                                path: ':workflow_id',
+                                name: 'edit-workflow',
+                                component: () => import('@Pages/settings/workflows/Workflow.vue')
+                            }
+                        ]
+                    },
+                    {
+                        path: 'checkout',
+                        name: 'show-checkout-settings',
+                        component: () => import('@Pages/settings/checkout/Checkout.vue')
+                    },
+                    {
+                        path: 'seo',
+                        name: 'show-seo-settings',
+                        component: () => import('@Pages/settings/seo/SEO.vue')
+                    },
+                    {
+                        path: 'billing',
+                        name: 'show-billing-settings',
+                        component: () => import('@Pages/settings/billing/Billing.vue')
+                    },
                 ]
             },
             {
