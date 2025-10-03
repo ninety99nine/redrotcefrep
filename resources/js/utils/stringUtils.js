@@ -9,3 +9,11 @@ export function capitalizeAll(value) {
         return word.charAt(0).toUpperCase() + word.slice(1);
     }).join(' ');
 }
+
+export function isEmpty(value) {
+    return value == null || value.trim() == '';
+}
+
+export function isNotEmpty(value) {
+    return value != null && value.trim() != '';
+}

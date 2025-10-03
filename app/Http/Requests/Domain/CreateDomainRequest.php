@@ -1,0 +1,55 @@
+<?php
+
+namespace App\Http\Requests\Domain;
+
+use App\Models\Domain;
+use Illuminate\Validation\Rule;
+use Illuminate\Foundation\Http\FormRequest;
+
+class CreateDomainRequest extends FormRequest
+{
+    /**
+     * Determine if the user is authorized to make this request.
+     *
+     * @return bool
+     */
+    public function authorize(): bool
+    {
+        return $this->user()->can('create', Domain::class);
+    }
+
+    /**
+     * Get the validation rules that apply to the request.
+     *
+     * @return array
+     */
+    public function rules(): array
+    {
+        return [
+            'name' => [
+                'required',
+                'string',
+                'regex:/^([a-zA-Z0-9]([a-zA-Z0-9\-]{0,61}[a-zA-Z0-9])?\.)+[a-zA-Z]{2,}$/',
+                Rule::unique('domains')->where('store_id', $this->input('store_id')),
+            ],
+            'store_id' => ['required', 'uuid'],
+        ];
+    }
+
+    /**
+     * Get custom messages for validation errors.
+     *
+     * @return array
+     */
+    public function messages(): array
+    {
+        return [
+            'name.required' => 'The domain name is required.',
+            'name.string' => 'The domain name must be a string.',
+            'name.regex' => 'The domain name must be a valid domain (e.g., example.com).',
+            'name.unique' => 'This domain is already connected to the store.',
+            'store_id.required' => 'The store ID is required.',
+            'store_id.uuid' => 'The store ID must be a valid UUID.',
+        ];
+    }
+}

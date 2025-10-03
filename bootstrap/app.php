@@ -7,6 +7,7 @@ use App\Http\Middleware\StorePermission;
 use App\Http\Middleware\RecordStoreVisit;
 use App\Http\Middleware\SetResponseStatus;
 use Illuminate\Console\Scheduling\Schedule;
+use App\Http\Middleware\ResolveStoreByDomain;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use App\Jobs\AutoBilling\StartAutoBillingSchedules;
@@ -29,7 +30,8 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'set.ussd.user' => SetUssdUser::class,
             'store.permission' => StorePermission::class,
-            'record.store.visit' => RecordStoreVisit::class
+            'record.store.visit' => RecordStoreVisit::class,
+            'resolve.store.by.domain' => ResolveStoreByDomain::class
         ]);
 
         //  Reference: https://spatie.be/docs/laravel-permission/v6/basic-usage/teams-permissions

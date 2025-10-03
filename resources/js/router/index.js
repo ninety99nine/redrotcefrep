@@ -4,10 +4,6 @@ import { createRouter, createWebHistory } from 'vue-router';
 
 const routes = [
     {
-        path: '/',
-        redirect: '/auth/login',
-    },
-    {
         path: '/auth',
         component: () => import('@Layouts/auth/Auth.vue'),
         children: [
@@ -44,6 +40,97 @@ const routes = [
                 component: () => import('@Pages/auth/SocialLogin.vue'),
                 props: true
             },
+        ]
+    },
+    {
+        path: '/:alias?',   //  Responds to custom domain and alias: Handles { path: '/' } and { path: '/:alias' }
+        component: () => import('@Layouts/shop/Shop.vue'),
+        children: [
+            {
+                path: '',
+                name: 'show-storefront',
+                component: () => import('@Pages/shop/storefront/Storefront.vue'),
+            },
+            {
+                path: 'search',
+                name: 'show-search',
+                component: () => import('@Pages/shop/search/Search.vue'),
+            },
+            {
+                path: 'checkout',
+                name: 'show-checkout',
+                component: () => import('@Pages/shop/checkout/Checkout.vue'),
+            },
+            {
+                path: 'orders',
+                children: [
+                    {
+                        path: ':order_id',
+                        children: [
+                            {
+                                path: '',
+                                name: 'show-shop-order',
+                                component: () => import('@Pages/shop/orders/Order.vue'),
+                            },
+                            {
+                                path: 'pay',
+                                children: [
+                                    {
+                                        path: '',
+                                        name: 'show-shop-payment-methods',
+                                        component: () => import('@Pages/shop/payments/PaymentMethods.vue'),
+                                    },
+                                    {
+                                        path: ':store_payment_method_id',
+                                        name: 'show-shop-payment-method',
+                                        component: () => import('@Pages/shop/payments/PaymentMethod.vue'),
+                                    },
+                                    {
+                                        path: 'pending',
+                                        name: 'show-shop-pending-payment',
+                                        component: () => import('@Pages/shop/payments/PendingPayment.vue'),
+                                    },
+                                    {
+                                        path: 'confirming',
+                                        name: 'show-shop-confirming-payment',
+                                        component: () => import('@Pages/shop/payments/ConfirmingPayment.vue'),
+                                    }
+                                ]
+                            },
+                        ]
+                    }
+                ]
+            },
+            {
+                path: 'products',
+                children: [
+                    {
+                        path: ':product_id',
+                        children: [
+                            {
+                                path: '',
+                                name: 'show-shop-product',
+                                component: () => import('@Pages/shop/products/Product.vue'),
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                path: 'categories',
+                children: [
+                    {
+                        path: ':category_id',
+                        children: [
+                            {
+                                path: '',
+                                name: 'show-shop-category',
+                                component: () => import('@Pages/shop/categories/Category.vue'),
+                            }
+                        ]
+                    }
+                ]
+            }
         ]
     },
     {
@@ -407,6 +494,26 @@ const routes = [
                         name: 'show-billing-settings',
                         component: () => import('@Pages/settings/billing/Billing.vue')
                     },
+                    {
+                        path: 'domains',
+                        children: [
+                            {
+                                path: '',
+                                name: 'show-domains',
+                                component: () => import('@Pages/settings/domains/Domains.vue')
+                            },
+                            {
+                                path: 'add',
+                                name: 'add-domain',
+                                component: () => import('@Pages/settings/domains/Domain.vue')
+                            },
+                            {
+                                path: ':domain_id',
+                                name: 'edit-domain',
+                                component: () => import('@Pages/settings/domains/Domain.vue')
+                            }
+                        ]
+                    }
                 ]
             },
             {
@@ -422,97 +529,6 @@ const routes = [
                         name: 'verify-pricing-plan-payment',
                         component: () => import('@Pages/pricing-plans/verify-payment/VerifyPayment.vue')
                     },
-                ]
-            }
-        ]
-    },
-    {
-        path: '/:alias',
-        component: () => import('@Layouts/shop/Shop.vue'),
-        children: [
-            {
-                path: '',
-                name: 'show-storefront',
-                component: () => import('@Pages/shop/storefront/Storefront.vue'),
-            },
-            {
-                path: 'search',
-                name: 'show-search',
-                component: () => import('@Pages/shop/search/Search.vue'),
-            },
-            {
-                path: 'checkout',
-                name: 'show-checkout',
-                component: () => import('@Pages/shop/checkout/Checkout.vue'),
-            },
-            {
-                path: 'orders',
-                children: [
-                    {
-                        path: ':order_id',
-                        children: [
-                            {
-                                path: '',
-                                name: 'show-shop-order',
-                                component: () => import('@Pages/shop/orders/Order.vue'),
-                            },
-                            {
-                                path: 'pay',
-                                children: [
-                                    {
-                                        path: '',
-                                        name: 'show-shop-payment-methods',
-                                        component: () => import('@Pages/shop/payments/PaymentMethods.vue'),
-                                    },
-                                    {
-                                        path: ':store_payment_method_id',
-                                        name: 'show-shop-payment-method',
-                                        component: () => import('@Pages/shop/payments/PaymentMethod.vue'),
-                                    },
-                                    {
-                                        path: 'pending',
-                                        name: 'show-shop-pending-payment',
-                                        component: () => import('@Pages/shop/payments/PendingPayment.vue'),
-                                    },
-                                    {
-                                        path: 'confirming',
-                                        name: 'show-shop-confirming-payment',
-                                        component: () => import('@Pages/shop/payments/ConfirmingPayment.vue'),
-                                    }
-                                ]
-                            },
-                        ]
-                    }
-                ]
-            },
-            {
-                path: 'products',
-                children: [
-                    {
-                        path: ':product_id',
-                        children: [
-                            {
-                                path: '',
-                                name: 'show-shop-product',
-                                component: () => import('@Pages/shop/products/Product.vue'),
-                            }
-                        ]
-                    }
-                ]
-            },
-            {
-                path: 'categories',
-                children: [
-                    {
-                        path: ':category_id',
-                        children: [
-                            {
-                                path: '',
-                                name: 'show-shop-category',
-                                component: () => import('@Pages/shop/categories/Category.vue'),
-                            }
-                        ]
-                    }
                 ]
             }
         ]
@@ -558,6 +574,15 @@ router.beforeEach(async (to, from, next) => {
                 authState.unsetToken();
             }
         }
+    }
+
+    // storeId for custom domains (Refer to: resources/views/render.blade.php for window.storeId)
+    if (to.path === '/' && !window.storeId) {
+        return next({
+            name: 'login',
+            query: { redirect: to.fullPath },
+            replace: true
+        });
     }
 
     if (to.meta?.requiresAuth === true && !authState.user) {

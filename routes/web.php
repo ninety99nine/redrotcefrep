@@ -14,6 +14,17 @@ Route::prefix('auth')->group(function () {
     Route::get('/linkedin/callback', [AuthController::class, 'handleLinkedInCallback'])->name('social.auth.linkedin.callback');
 });
 
-Route::get('/{alias}/manifest.json', [PWAController::class, 'manifest'])->name('pwa.manifest');
+// Routes for custom domains
+Route::domain('{domain}')->middleware(['resolve.store.by.domain', 'record.store.visit'])->group(function () {
+    Route::get('/manifest.json', [PWAController::class, 'manifest'])->name('pwa.manifest');
+    Route::get('/{any?}', [AppController::class, 'render'])->where('any', '.*')->name('shop.render');
+});
 
-Route::get('/{any}', [AppController::class, 'render'])->where('any', '.*');
+// Routes for alias-based storefronts
+Route::prefix('{alias}')->middleware('record.store.visit')->group(function () {
+    Route::get('/manifest.json', [PWAController::class, 'manifest'])->name('pwa.manifest');
+    Route::get('/{any?}', [AppController::class, 'render'])->where('any', '.*')->name('shop.render');
+});
+
+// Fallback for non-domain, non-alias requests
+Route::get('/{any}', [AppController::class, 'render'])->where('any', '.*')->name('app.render');

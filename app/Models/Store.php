@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Enums\TagType;
 use App\Casts\JsonArray;
+use App\Enums\DomainStatus;
 use App\Services\UssdService;
 use App\Enums\UploadFolderName;
 use Illuminate\Support\Facades\Auth;
@@ -383,6 +384,26 @@ class Store extends Model
     public function activeSubscription(): MorphOne
     {
         return $this->morphOne(Subscription::class, 'owner')->oldest()->active();
+    }
+
+    /**
+     * Get domains.
+     *
+     * @return HasMany
+     */
+    public function domains(): HasMany
+    {
+        return $this->hasMany(Domain::class);
+    }
+
+    /**
+     * Get primary domain.
+     *
+     * @return HasOne
+     */
+    public function primaryDomain(): HasOne
+    {
+        return $this->hasOne(Domain::class)->where('status', DomainStatus::CONNECTED->value);
     }
 
     protected $appends = [

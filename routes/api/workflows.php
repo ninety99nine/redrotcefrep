@@ -7,9 +7,9 @@ Route::prefix('workflows')
     ->middleware(['auth:sanctum', 'store.permission'])
     ->controller(WorkflowController::class)
     ->group(function () {
-        Route::get('/', 'showWorkflows')->name('show.workflow');
+        Route::get('/', 'showWorkflows')->name('show.workflows');
         Route::post('/', 'createWorkflow')->name('create.workflow');
-        Route::delete('/', 'deleteWorkflows')->name('delete.workflow');
+        Route::delete('/', 'deleteWorkflows')->name('delete.workflows');
         Route::post('/arrangement', 'updateWorkflowArrangement')->name('update.workflow.arrangement');
 
         // Explicit route model binding applied: AppServiceProvider.php

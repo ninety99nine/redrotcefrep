@@ -426,6 +426,10 @@
                             associatedRouteNames: ['add-delivery-method', 'edit-delivery-method'],
                         },
                         {
+                            name: 'Domains',
+                            routeName: 'show-domains',
+                        },
+                        {
                             name: 'Billing',
                             routeName: 'show-billing-settings',
                         },
@@ -610,7 +614,7 @@
                     this.formState.setServerFormErrors(error);
                     console.error('Failed to fetch store:', error);
 
-                    if(error.status == 404) {
+                    if (error.response?.status === 404) {
                         await this.$router.replace({ name: 'show-stores' });
                     }
 

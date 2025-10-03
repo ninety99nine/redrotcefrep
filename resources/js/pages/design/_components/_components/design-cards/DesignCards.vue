@@ -62,7 +62,7 @@
 
                             <span
                                 class="text-xs whitespace-nowrap"
-                                v-if="['link'].includes(designCard.type) && !empty(designCard.metadata.title)">
+                                v-if="['link'].includes(designCard.type) && isNotEmpty(designCard.metadata.title)">
                                 {{ designCard.metadata.title }}
                             </span>
 
@@ -193,6 +193,7 @@
     import cloneDeep from 'lodash/cloneDeep';
     import Tooltip from '@Partials/Tooltip.vue';
     import VueSlideUpDown from 'vue-slide-up-down';
+    import { isNotEmpty } from '@Utils/stringUtils';
     import { VueDraggableNext } from 'vue-draggable-next';
     import MapDesignCard from '@Pages/design/_components/_components/design-cards/design-card/MapDesignCard.vue';
     import LogoDesignCard from '@Pages/design/_components/_components/design-cards/design-card/LogoDesignCard.vue';
@@ -260,9 +261,7 @@
             }
         },
         methods: {
-            empty(value) {
-                return value == null || value.trim() == '';
-            },
+            isNotEmpty: isNotEmpty,
             onToggleExpansion(index) {
                 for (let i = 0; i < this.designCards.length; i++) {
                     if(i === index) {

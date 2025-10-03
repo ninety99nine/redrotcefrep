@@ -27,10 +27,15 @@
             // need to set orderAgain before we can get to processing
             // the orderId() watcher.
             $route(to, from) {
-                this.orderAgain = from.name == 'show-shop-order' && to.name == 'show-checkout';
-            },
-            alias() {
-                this.showStoreByAlias();
+                this.orderAgain = from.name === 'show-shop-order' && to.name === 'show-checkout';
+
+                // Trigger store fetch only if alias changes
+                const oldAlias = from.params.alias || null;
+                const newAlias = to.params.alias || null;
+
+                if (newAlias !== oldAlias) {
+                    this.showStore();
+                }
             },
             orderId(newVal) {
                 const orderToOrderAgain = this.orderAgain ? this.order : null;
@@ -58,10 +63,10 @@
                 return this.storeState.store;
             },
             alias() {
-                return this.$route.params.alias;
+                return this.$route.params.alias || null;
             },
             orderId() {
-                return this.$route.params.order_id;
+                return this.$route.params.order_id || null;
             },
             order() {
                 return this.orderState.order;
@@ -92,7 +97,8 @@
                     }
                 }
             },
-            async showStoreByAlias() {
+            //  Responds to showing store via custom domain or alias
+            async showStore() {
                 try {
 
                     this.storeState.isLoadingStore = true;
@@ -103,7 +109,17 @@
                         }
                     };
 
-                    const response = await axios.get(`/api/stores/alias/${this.alias}`, config);
+                    let response;
+
+                    if (window.storeId && !this.alias) {
+                        // Show by storeId for custom domains (Refer to: resources/views/render.blade.php for window.storeId)
+                        response = await axios.get(`/api/stores/${window.storeId}`, config);
+                    } else if (this.alias) {
+                        // Show by alias for alias-based routes
+                        response = await axios.get(`/api/stores/alias/${this.alias}`, config);
+                    } else {
+                        throw new Error('No store ID or alias provided');
+                    }
 
                     this.storeState.setStore(response.data);
 
@@ -118,6 +134,7 @@
                     this.notificationState.showWarningNotification(message);
                     this.formState.setServerFormErrors(error);
                     console.error('Failed to fetch store:', error);
+                    this.$router.replace({ name: 'notFound' });
                 } finally {
                     this.storeState.isLoadingStore = false;
                 }
@@ -145,11 +162,11 @@
                     this.formState.setServerFormErrors(error);
                     console.error('Failed to fetch order:', error);
 
-                    if(error.status == 404) {
+                    if (error.response?.status === 404) {
                         await this.$router.replace({
                             name: 'show-storefront',
                             params: {
-                                alias: this.store.alias
+                                alias: window.storeId ? null : this.store.alias
                             }
                         });
                     }
@@ -200,7 +217,7 @@
                     this.prepareStoreForShopping();
                 }
             }else{
-                this.showStoreByAlias();
+                this.showStore();
             }
         }
     };

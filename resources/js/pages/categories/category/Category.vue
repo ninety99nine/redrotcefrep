@@ -286,7 +286,7 @@
                     this.formState.setServerFormErrors(error);
                     console.error('Failed to fetch category:', error);
 
-                    if(error.status == 404) {
+                    if (error.response?.status === 404) {
                         await this.$router.replace({
                             name: 'show-categories',
                             query: {

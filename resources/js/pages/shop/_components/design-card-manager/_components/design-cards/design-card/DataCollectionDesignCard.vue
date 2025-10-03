@@ -35,8 +35,8 @@
                 :labelStyle="{ color: designCard.metadata.design.title_color }"
                 :errorText="formState.getFormError('design_cards'+index+'metadata.title')"
                 :secondaryLabelStyle="{ color: designCard.metadata.design.optional_text_color }"
-                :showAsterisk="!empty(designCard.metadata.title) && designCard.metadata.required"
-                :secondaryLabel="!empty(designCard.metadata.title) && !designCard.metadata.required ? '(optional)' : null">
+                :showAsterisk="isNotEmpty(designCard.metadata.title) && designCard.metadata.required"
+                :secondaryLabel="isNotEmpty(designCard.metadata.title) && !designCard.metadata.required ? '(optional)' : null">
             </Input>
 
         </template>
@@ -52,8 +52,8 @@
                 :labelStyle="{ color: designCard.metadata.design.title_color }"
                 :errorText="formState.getFormError('design_cards'+index+'metadata.title')"
                 :secondaryLabelStyle="{ color: designCard.metadata.design.optional_text_color }"
-                :showAsterisk="!empty(designCard.metadata.title) && designCard.metadata.required"
-                :secondaryLabel="!empty(designCard.metadata.title) && !designCard.metadata.required ? '(optional)' : null">
+                :showAsterisk="isNotEmpty(designCard.metadata.title) && designCard.metadata.required"
+                :secondaryLabel="isNotEmpty(designCard.metadata.title) && !designCard.metadata.required ? '(optional)' : null">
             </Input>
 
         </template>
@@ -68,8 +68,8 @@
                 :labelStyle="{ color: designCard.metadata.design.title_color }"
                 :errorText="formState.getFormError('design_cards'+index+'metadata.title')"
                 :secondaryLabelStyle="{ color: designCard.metadata.design.optional_text_color }"
-                :showAsterisk="!empty(designCard.metadata.title) && designCard.metadata.required"
-                :secondaryLabel="!empty(designCard.metadata.title) && !designCard.metadata.required ? '(optional)' : null">
+                :showAsterisk="isNotEmpty(designCard.metadata.title) && designCard.metadata.required"
+                :secondaryLabel="isNotEmpty(designCard.metadata.title) && !designCard.metadata.required ? '(optional)' : null">
             </Input>
 
         </template>
@@ -87,8 +87,8 @@
                 :labelStyle="{ color: designCard.metadata.design.title_color }"
                 :errorText="formState.getFormError('design_cards'+index+'metadata.title')"
                 :secondaryLabelStyle="{ color: designCard.metadata.design.optional_text_color }"
-                :showAsterisk="!empty(designCard.metadata.title) && designCard.metadata.required"
-                :secondaryLabel="!empty(designCard.metadata.title) && !designCard.metadata.required ? '(optional)' : null">
+                :showAsterisk="isNotEmpty(designCard.metadata.title) && designCard.metadata.required"
+                :secondaryLabel="isNotEmpty(designCard.metadata.title) && !designCard.metadata.required ? '(optional)' : null">
             </Datepicker>
 
         </template>
@@ -103,8 +103,8 @@
                 :labelStyle="{ color: designCard.metadata.design.title_color }"
                 :errorText="formState.getFormError('design_cards'+index+'metadata.title')"
                 :secondaryLabelStyle="{ color: designCard.metadata.design.optional_text_color }"
-                :showAsterisk="!empty(designCard.metadata.title) && designCard.metadata.required"
-                :secondaryLabel="!empty(designCard.metadata.title) && !designCard.metadata.required ? '(optional)' : null">
+                :showAsterisk="isNotEmpty(designCard.metadata.title) && designCard.metadata.required"
+                :secondaryLabel="isNotEmpty(designCard.metadata.title) && !designCard.metadata.required ? '(optional)' : null">
             </Input>
 
         </template>
@@ -112,7 +112,7 @@
         <template v-if="['checkbox', 'selection', 'location'].includes(designCard.type)">
 
             <div class="mb-2"
-                v-if="!empty(designCard.metadata.title) || !empty(designCard.metadata.description)">
+                v-if="isNotEmpty(designCard.metadata.title) || isNotEmpty(designCard.metadata.description)">
                 <div class="flex items-center text-sm leading-6 font-medium space-x-1">
 
                     <span
@@ -120,7 +120,7 @@
                         {{ designCard.metadata.title }}
                     </span>
 
-                    <template v-if="!empty(designCard.metadata.title)">
+                    <template v-if="isNotEmpty(designCard.metadata.title)">
                         <span
                             class="text-red-500"
                             v-if="designCard.metadata.required">
@@ -135,7 +135,7 @@
                 </div>
 
                 <span
-                    v-if="!empty(designCard.metadata.description)"
+                    v-if="isNotEmpty(designCard.metadata.description)"
                     :style="{ color: designCard.metadata.design.description_color }"
                     class="leading-4 text-xs text-gray-400">
                     {{ designCard.metadata.description }}
@@ -239,8 +239,8 @@
                 :errorText="formState.getFormError('design_cards'+index+'metadata.photos')"
                 :wrapperStyle="{ backgroundColor: designCard.metadata.design.media_bg_color }"
                 :secondaryLabelStyle="{ color: designCard.metadata.design.optional_text_color }"
-                :showAsterisk="!empty(designCard.metadata.title) && designCard.metadata.required"
-                :secondaryLabel="!empty(designCard.metadata.title) && !designCard.metadata.required ? '(optional)' : null">
+                :showAsterisk="isNotEmpty(designCard.metadata.title) && designCard.metadata.required"
+                :secondaryLabel="isNotEmpty(designCard.metadata.title) && !designCard.metadata.required ? '(optional)' : null">
             </Input>
 
         </template>
@@ -254,6 +254,7 @@
     import Pill from '@Partials/Pill.vue';
     import Input from '@Partials/Input.vue';
     import Button from '@Partials/Button.vue';
+    import { isNotEmpty } from '@Utils/stringUtils';
     import Datepicker from '@Partials/Datepicker.vue';
     import AddressInput from '@Partials/AddressInput.vue';
 
@@ -287,9 +288,7 @@
             }
         },
         methods: {
-            empty(value) {
-                return value == null || value.trim() == '';
-            },
+            isNotEmpty: isNotEmpty,
             setAddress(address) {
 
             },

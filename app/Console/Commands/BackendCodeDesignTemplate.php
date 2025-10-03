@@ -12,14 +12,14 @@ class BackendCodeDesignTemplate extends Command
      *
      * @var string
      */
-    protected $signature = 'generate:design-template';
+    protected $signature = 'generate:design-template {focus? : Comma-separated focus areas (e.g., user,store,product)}';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'Generate backend code design template file and a customizable LLM prompt';
+    protected $description = 'Generate backend code design template file and a customizable LLM prompt for specified focus areas';
 
     /**
      * Execute the console command.
@@ -28,6 +28,12 @@ class BackendCodeDesignTemplate extends Command
     {
         // Prompt for the LLM instruction
         $llmPrompt = $this->ask('Please enter the LLM prompt for the design template (e.g., "Create migration and model for payment methods")');
+
+        // Get the focus areas from the command argument or prompt if not provided
+        $focusInput = $this->argument('focus') ?? $this->ask('Please enter the focus areas as a comma-separated list (e.g., user,store,product) or leave empty for all');
+
+        // Split focus areas into an array, trim whitespace, and filter out empty entries
+        $focusAreas = !empty($focusInput) ? array_filter(array_map('trim', explode(',', $focusInput))) : [];
 
         // Define the file paths to collect
         $fileGroups = [
@@ -58,7 +64,7 @@ class BackendCodeDesignTemplate extends Command
                   "- Use consistent docblocks and inline comments as seen in the existing code.\n" .
                   "The prompt for the new code is: [$llmPrompt]\n\n";
 
-        // Collect and append each file group's content
+        // Collect and append each file group's content based on focus areas
         foreach ($fileGroups as $groupName => $pattern) {
             $output .= "$groupName:";
             $files = glob($pattern);
@@ -68,9 +74,30 @@ class BackendCodeDesignTemplate extends Command
                 continue;
             }
 
-            foreach ($files as $file) {
+            $filteredFiles = $files;
+            if (!empty($focusAreas)) {
+                // Filter files based on any of the focus keywords in filename or content
+                $filteredFiles = array_filter($files, function ($file) use ($focusAreas) {
+                    $filename = basename($file);
+                    $content = File::get($file);
+                    foreach ($focusAreas as $focus) {
+                        if (stripos($filename, $focus) !== false || stripos($content, $focus) !== false) {
+                            return true;
+                        }
+                    }
+                    return false;
+                });
+            }
+
+            if (empty($filteredFiles)) {
+                $focusList = implode(', ', $focusAreas);
+                $output .= "\n\n// No $groupName found related to '$focusList'";
+                continue;
+            }
+
+            foreach ($filteredFiles as $file) {
                 $content = File::get($file);
-                $output .= "\n\n$content";
+                $output .= "\n\n// File: " . basename($file) . "\n$content";
             }
         }
 
