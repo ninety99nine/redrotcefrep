@@ -9,6 +9,7 @@ enum CacheName:string
     case STORE_VISIT = 'store visit';
     case SHOPPING_CART = 'shopping cart';
     case IS_SUPER_ADMIN = 'is super admin';
+    case NAMECHEAP_DOMAINS = 'namecheap domains';
     case IS_CUSTOMER_STATUS = 'is customer status';
     case CONVERTED_CURRENCY = 'converted currency';
     case SMS_ACCESS_TOKEN_RESPONSE = 'sms access token response';

@@ -60,4 +60,11 @@ return [
         'redirect' => env('LINKEDIN_REDIRECT_URI'),
     ],
 
+    'namecheap' => [
+        'api_url' => env('NAMECHEAP_URL'),
+        'api_key' => env('NAMECHEAP_API_KEY'),
+        'username' => env('NAMECHEAP_USERNAME'),
+        'client_ip' => env('NAMECHEAP_CLIENT_IP'),
+    ],
+
 ];

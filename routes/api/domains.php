@@ -11,6 +11,9 @@ Route::prefix('domains')
         Route::post('/', 'createDomain')->name('create.domain');
         Route::delete('/', 'deleteDomains')->name('delete.domains');
         Route::get('/server-ip', 'showServerIp')->name('show.server.ip');
+        Route::post('/search', 'searchDomains')->name('search.domains');
+        Route::post('/purchase', 'purchaseDomain')->name('purchase.domain');
+        Route::get('/pricing', 'showDomainPricing')->name('show.domain.pricing');
         Route::post('/verify-connection', 'verifyDomainConnection')->name('verify.domain.connection');
 
         // Explicit route model binding applied: AppServiceProvider.php

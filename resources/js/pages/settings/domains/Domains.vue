@@ -3,17 +3,25 @@
     <div class="max-w-2xl mx-auto pt-32 pb-40">
 
         <div
-            class="flex justify-end"
+            class="flex justify-end space-x-4"
             v-if="!isLoadingStore && !isLoadingDomains && hasDomains">
 
             <Button
                 size="md"
                 type="primary"
-                :leftIcon="Plus"
                 buttonClass="px-4"
                 :loading="isLoadingStore"
-                :action="navigateToAddDomain">
-                <span>Add Domain</span>
+                :action="navigateToBuyDomain">
+                <span>Buy Domain</span>
+            </Button>
+
+            <Button
+                size="md"
+                type="primary"
+                buttonClass="px-4"
+                :loading="isLoadingStore"
+                :action="navigateToConnectExistingDomain">
+                <span>Connect Existing Domain</span>
             </Button>
 
         </div>
@@ -93,13 +101,21 @@
                 </span>
             </div>
 
-            <button
-                size="lg"
-                type="bare"
-                @click.stop="navigateToAddDomain"
-                class="bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-medium py-3 px-6 rounded-lg hover:from-indigo-600 hover:to-purple-700 transition-all duration-300 hover:scale-105 cursor-pointer">
-                <span>Add Domain Now</span>
-            </button>
+            <div class="flex justify-end space-x-4">
+
+                <button
+                    @click.stop="navigateToBuyDomain"
+                    class="bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-medium py-3 px-6 rounded-lg hover:from-indigo-600 hover:to-purple-700 transition-all duration-300 hover:scale-105 cursor-pointer">
+                    <span>Buy Domain</span>
+                </button>
+
+                <button
+                    @click.stop="navigateToConnectExistingDomain"
+                    class="bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-medium py-3 px-6 rounded-lg hover:from-indigo-600 hover:to-purple-700 transition-all duration-300 hover:scale-105 cursor-pointer">
+                    <span>Connect Existing Domain</span>
+                </button>
+
+            </div>
 
         </div>
 
@@ -129,14 +145,13 @@
     import Modal from '@Partials/Modal.vue';
     import Button from '@Partials/Button.vue';
     import Skeleton from '@Partials/Skeleton.vue';
-    import { Plus, Trash2, Globe } from 'lucide-vue-next';
+    import { Trash2, Globe } from 'lucide-vue-next';
 
     export default {
         inject: ['formState', 'storeState', 'notificationState'],
-        components: { Pill, Modal, Button, Skeleton, Plus, Trash2, Globe },
+        components: { Pill, Modal, Button, Skeleton, Trash2, Globe },
         data() {
             return {
-                Plus,
                 Trash2,
                 domains: [],
                 pagination: null,
@@ -183,9 +198,17 @@
                 this.deletableDomain = domain;
                 this.$refs.deleteDomainModal.showModal();
             },
-            async navigateToAddDomain() {
+            async navigateToConnectExistingDomain() {
                 await this.$router.push({
                     name: 'add-domain',
+                    query: {
+                        store_id: this.store.id
+                    }
+                });
+            },
+            async navigateToBuyDomain() {
+                await this.$router.push({
+                    name: 'buy-domain',
                     query: {
                         store_id: this.store.id
                     }

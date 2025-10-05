@@ -386,7 +386,7 @@
 
                     if (this.isEmpty(this.domainForm.name)) {
                         this.formState.setFormError('name', 'The domain name is required');
-                    }else if(this.existingDomainNames.includes(this.domainForm.name)) {
+                    }else if(this.domain.name != this.domainForm.name && this.existingDomainNames.includes(this.domainForm.name)) {
                         this.formState.setFormError('name', 'The domain name already exists');
                     }
 
@@ -462,7 +462,7 @@
 
                     this.formState.hideFormErrors();
 
-                    if(this.existingDomainNames.includes(this.domainForm.name)) {
+                    if((this.isCreating || (this.isEditing && this.domain.name != this.domainForm.name)) && this.existingDomainNames.includes(this.domainForm.name)) {
                         this.formState.setFormError('name', 'The domain name already exists');
                     }
 

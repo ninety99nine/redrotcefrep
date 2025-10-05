@@ -12,6 +12,9 @@ use App\Http\Requests\Domain\CreateDomainRequest;
 use App\Http\Requests\Domain\UpdateDomainRequest;
 use App\Http\Requests\Domain\DeleteDomainRequest;
 use App\Http\Requests\Domain\DeleteDomainsRequest;
+use App\Http\Requests\Domain\PurchaseDomainRequest;
+use App\Http\Requests\Domain\SearchDomainsRequest;
+use App\Http\Requests\Domain\ShowDomainPricingRequest;
 use App\Http\Requests\Domain\VerifyDomainConnectionRequest;
 
 class DomainController extends Controller
@@ -73,6 +76,39 @@ class DomainController extends Controller
     public function showServerIp(): array
     {
         return $this->service->showServerIp();
+    }
+
+    /**
+     * Show domain pricing.
+     *
+     * @param ShowDomainPricingRequest $request
+     * @return array
+     */
+    public function showDomainPricing(ShowDomainPricingRequest $request): array
+    {
+        return $this->service->showDomainPricing($request->input('tld'));
+    }
+
+    /**
+     * Search domains.
+     *
+     * @param SearchDomainsRequest $request
+     * @return array
+     */
+    public function searchDomains(SearchDomainsRequest $request): array
+    {
+        return $this->service->searchDomains($request->validated());
+    }
+
+    /**
+     * Purchase domain.
+     *
+     * @param PurchaseDomainRequest $request
+     * @return array
+     */
+    public function purchaseDomain(PurchaseDomainRequest $request): array
+    {
+        return $this->service->purchaseDomain($request->validated());
     }
 
     /**

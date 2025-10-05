@@ -503,6 +503,11 @@ const routes = [
                                 component: () => import('@Pages/settings/domains/Domains.vue')
                             },
                             {
+                                path: 'buy',
+                                name: 'buy-domain',
+                                component: () => import('@Pages/settings/domains/BuyDomain.vue')
+                            },
+                            {
                                 path: 'add',
                                 name: 'add-domain',
                                 component: () => import('@Pages/settings/domains/Domain.vue')

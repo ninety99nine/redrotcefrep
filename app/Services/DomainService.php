@@ -3,11 +3,20 @@
 namespace App\Services;
 
 use Exception;
+use App\Models\Store;
 use App\Models\Domain;
 use App\Enums\DomainStatus;
+use App\Models\Transaction;
+use App\Models\PaymentMethod;
+use App\Enums\PaymentMethodType;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use App\Http\Resources\DomainResource;
 use App\Http\Resources\DomainResources;
+use App\Enums\TransactionPaymentStatus;
+use App\Enums\TransactionVerificationType;
+use App\Http\Resources\TransactionResource;
 
 class DomainService extends BaseService
 {
@@ -74,6 +83,95 @@ class DomainService extends BaseService
     public function showServerIp(): array
     {
         return ['server_ip' => $this->resolveServerIp()];
+    }
+
+    /**
+     * Show domain pricing for a specific TLD.
+     *
+     * @param string $tld
+     * @return array
+     */
+    public function showDomainPricing(string $tld): array
+    {
+        return NamecheapService::getDomainPricing($tld);
+    }
+
+    /**
+     * Search domains.
+     *
+     * @param array $data
+     * @return array
+     */
+    public function searchDomains(array $data): array
+    {
+        try {
+            $searchTerm = $data['search'];
+            $results = NamecheapService::searchDomains($searchTerm);
+
+            return [
+                'successful' => true,
+                'domains' => $results
+            ];
+        } catch (Exception $e) {
+            return [
+                'successful' => false,
+                'message' => $e->getMessage()
+            ];
+        }
+    }
+
+    /**
+     * Purchase domain.
+     *
+     * @param array $data
+     * @return TransactionResource|array
+     * @throws Exception
+     */
+    public function purchaseDomain(array $data): TransactionResource|array
+    {
+        try {
+            $user = Auth::user();
+            $store = Store::find($data['store_id']);
+
+            if (!$store) {
+                throw new Exception('The store does not exist');
+            }
+
+            $paymentMethod = PaymentMethod::whereType(PaymentMethodType::DPO->value)->first();
+
+            if (!$paymentMethod || !$paymentMethod->active) {
+                throw new Exception('The DPO payment method is not available');
+            }
+
+            $name = $data['domain_name'];
+            $price = $data['domain_price'];
+
+            if ($store->domains()->where('name', $name)->exists()) {
+                throw new Exception('This domain already exists');
+            }
+
+            $domain = $store->domains()->create(['name' => $name]);
+
+            $transactionPayload = $this->prepareTransactionPayload($user, $store, $domain, $price, $paymentMethod);
+            $transaction = Transaction::create($transactionPayload);
+
+            $transaction->setRelation('store', $store);
+            $transaction->setRelation('requestedByUser', $user);
+            $transaction->setRelation('paymentMethod', $paymentMethod);
+
+            $companyToken = config('app.dpo_company_token');
+            $dpoPaymentLinkPayload = $this->prepareDpoPaymentLinkPayload($user, $transaction, $domain);
+            $metadata = DirectPayOnlineService::createPaymentLink($companyToken, $dpoPaymentLinkPayload);
+
+            $transaction->update(['metadata' => $metadata]);
+            return (new TransactionService())->showResource($transaction);
+        } catch (Exception $e) {
+            Log::error('Failed to purchase domain: ' . $e->getMessage());
+            return [
+                'successful' => false,
+                'message' => $e->getMessage()
+            ];
+        }
     }
 
     /**
@@ -150,8 +248,7 @@ class DomainService extends BaseService
 
         $connected = $resolvedIp === $serverIp;
 
-        if($domain instanceof Domain) {
-
+        if ($domain instanceof Domain) {
             if ($connected) {
                 $domain->update([
                     'status' => DomainStatus::CONNECTED->value,
@@ -162,11 +259,8 @@ class DomainService extends BaseService
             }
 
             return $domain;
-
-        }else{
-
+        } else {
             return $connected;
-
         }
     }
 
@@ -192,5 +286,79 @@ class DomainService extends BaseService
             }
             return $ip;
         });
+    }
+
+    /**
+     * Prepare transaction payload.
+     *
+     * @param $user
+     * @param Store $store
+     * @param Domain $domain
+     * @param float $price
+     * @param PaymentMethod $paymentMethod
+     * @return array
+     */
+    private function prepareTransactionPayload($user, $store, $domain, $price, $paymentMethod): array
+    {
+        return [
+            'amount' => $price,
+            'percentage' => 100,
+            'currency' => 'USD',
+            'store_id' => $store->id,
+            'owner_type' => 'domain',
+            'owner_id' => $domain->id,
+            'requested_by_user_id' => $user->id,
+            'created_using_auto_billing' => false,
+            'payment_method_id' => $paymentMethod->id,
+            'description' => "Purchase of domain: {$domain->name}",
+            'payment_status' => TransactionPaymentStatus::PENDING_PAYMENT->value,
+            'verification_type' => TransactionVerificationType::AUTOMATIC->value
+        ];
+    }
+
+    /**
+     * Prepare DPO payment link payload.
+     *
+     * @param $user
+     * @param Transaction $transaction
+     * @param Domain $domain
+     * @return array
+     */
+    private function prepareDpoPaymentLinkPayload($user, $transaction, $domain): array
+    {
+        $customerPhone = $customerCountry = $customerDialCode = null;
+        $redirectUrl = config('app.url') . '/dashboard/domains/verify-payment?transaction_id=' . $transaction->id . '&store_id=' . $transaction->store_id;
+
+        if ($user->mobile_number) {
+            $customerCountry = $customerDialCode = $user->mobile_number->getCountry();
+            $customerPhone = PhoneNumberService::getNationalPhoneNumberWithoutSpaces($user->mobile_number);
+        }
+
+        return [
+            'ptl' => 24,
+            'ptlType' => 'hours',
+            'companyRefUnique' => 1,
+            'emailTransaction' => true,
+            'paymentCurrency' => 'USD',
+            'redirectURL' => $redirectUrl,
+            'backURL' => url()->previous(),
+            'customerEmail' => $user->email,
+            'companyRef' => $transaction->id,
+            'customerPhone' => $customerPhone,
+            'companyAccRef' => 'Domain Purchase',
+            'customerCountry' => $customerCountry,
+            'customerLastName' => $user->last_name,
+            'customerDialCode' => $customerDialCode,
+            'paymentAmount' => $transaction->amount,
+            'customerFirstName' => $user->first_name,
+            'emailTransaction' => !empty($user->email),
+            'metadata' => ['Transaction ID' => $transaction->id, 'Domain Name' => $domain->name],
+            'services' => [
+                [
+                    'serviceDescription' => "Purchase of domain: {$domain->name}",
+                    'serviceDate' => now()->format('Y/m/d H:i')
+                ]
+            ]
+        ];
     }
 }
