@@ -27,7 +27,7 @@ export function formattedDate(date) {
  * formattedDatetime('2024-07-14T15:30:00'); => "14 Jul 2024 15:30"
  */
 export function formattedDatetime(date) {
-    return dayjs(date).format('DD MMM YYYY HH:mm');
+    return dayjs(date).format('DD MMM YYYY @ HH:mm');
 }
 
 /**

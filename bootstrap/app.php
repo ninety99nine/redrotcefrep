@@ -1,6 +1,8 @@
 <?php
 
 use Illuminate\Http\Request;
+use App\Jobs\UpdateDomainStatus;
+use App\Jobs\VerifyDomainPayments;
 use App\Http\Middleware\SetUssdUser;
 use Illuminate\Foundation\Application;
 use App\Http\Middleware\StorePermission;
@@ -54,7 +56,9 @@ return Application::configure(basePath: dirname(__DIR__))
     })
     ->withSchedule(function (Schedule $schedule) {
 
-        $schedule->job(new StartAutoBillingSchedules)->everyFifteenSeconds();
+        $schedule->job(new UpdateDomainStatus)->everyFiveMinutes();
+        $schedule->job(new VerifyDomainPayments)->everyFiveMinutes();
+        $schedule->job(new StartAutoBillingSchedules)->everyFifteenMinutes();
 
     })
     ->withExceptions(function (Exceptions $exceptions) {

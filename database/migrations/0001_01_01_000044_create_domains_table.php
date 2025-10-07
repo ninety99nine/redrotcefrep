@@ -20,6 +20,7 @@ return new class extends Migration
             $table->enum('type', DomainType::values());
             $table->enum('status', DomainStatus::values())->default(DomainStatus::PENDING->value);
             $table->timestamp('verified_at')->nullable();
+            $table->timestamp('last_verification_attempt_at')->nullable();
             $table->timestamps();
 
             $table->index('store_id');

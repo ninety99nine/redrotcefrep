@@ -387,6 +387,16 @@ class Store extends Model
     }
 
     /**
+     * Get address.
+     *
+     * @return MorphOne
+     */
+    public function address(): MorphOne
+    {
+        return $this->morphOne(Address::class, 'owner');
+    }
+
+    /**
      * Get domains.
      *
      * @return HasMany

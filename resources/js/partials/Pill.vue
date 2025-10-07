@@ -20,7 +20,7 @@
             :content="tooltipContent"
             :triggerClass="tooltipTriggerClass"
             v-if="tooltipContent || $slots.tooltipContent">
-            <template v-slot:content>
+            <template v-if="$slots.tooltipContent" v-slot:content>
                 <slot name="tooltipContent"></slot>
             </template>
         </Tooltip>
@@ -103,7 +103,7 @@
             },
             tooltipTriggerClass: {
                 type: [String, Array, Object, null],
-                default: null
+                default: "w-4 h-4 text-gray-300 hover:text-gray-400",
             },
         },
         computed: {

@@ -68,13 +68,33 @@
                     </div>
 
                     <div class="flex items-center space-x-4">
-                        <Pill :type="getStatusPillType(domain.status)" size="xs">{{ domain.status }}</Pill>
+
+                        <div class="flex items-center space-x-1">
+
+                            <Tooltip
+                                trigger="hover"
+                                v-if="domain.last_verification_attempt_at"
+                                :content="`Status last updated: ${formattedDatetime(domain.last_verification_attempt_at)}`">
+                            </Tooltip>
+
+                            <Pill
+                                size="xs"
+                                :type="getStatusPillType(domain.status)">
+                                <div class="flex items-center space-x-2 mr-1">
+                                    <RefreshCcw v-if="domain.status == 'processing'" size="12" class="text-blue-800 animate-spin"></RefreshCcw>
+                                    <span>{{ domain.status }}</span>
+                                </div>
+                            </Pill>
+
+                        </div>
+
                         <Button
                             size="xs"
                             type="bareDanger"
                             :leftIcon="Trash2"
                             :action="() => showDeleteDomainModal(domain)">
                         </Button>
+
                     </div>
 
                 </div>
@@ -144,12 +164,14 @@
     import Pill from '@Partials/Pill.vue';
     import Modal from '@Partials/Modal.vue';
     import Button from '@Partials/Button.vue';
+    import Tooltip from '@Partials/Tooltip.vue';
     import Skeleton from '@Partials/Skeleton.vue';
-    import { Trash2, Globe } from 'lucide-vue-next';
+    import { formattedDatetime } from '@Utils/dateUtils';
+    import { Trash2, Globe, RefreshCcw } from 'lucide-vue-next';
 
     export default {
         inject: ['formState', 'storeState', 'notificationState'],
-        components: { Pill, Modal, Button, Skeleton, Trash2, Globe },
+        components: { Pill, Modal, Button, Tooltip, Skeleton, Trash2, Globe, RefreshCcw },
         data() {
             return {
                 Trash2,
@@ -179,6 +201,7 @@
             }
         },
         methods: {
+            formattedDatetime: formattedDatetime,
             setup() {
                 if (this.store) {
                     this.showDomains();
@@ -188,6 +211,8 @@
                 switch (status) {
                     case 'connected':
                         return 'success';
+                    case 'processing':
+                        return 'primary';
                     case 'pending':
                         return 'warning';
                     default:

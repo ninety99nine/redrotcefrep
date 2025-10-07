@@ -5,6 +5,7 @@ namespace App\Providers;
 use App\Models\Tag;
 use App\Models\Order;
 use App\Models\Store;
+use App\Models\Domain;
 use App\Models\Address;
 use App\Models\AiTopic;
 use App\Models\AiLesson;
@@ -55,6 +56,7 @@ class AppServiceProvider extends ServiceProvider
             'user' => 'App\Models\User',
             'order' => 'App\Models\Order',
             'store' => 'App\Models\Store',
+            'domain' => 'App\Models\Domain',
             'product' => 'App\Models\Product',
             'customer' => 'App\Models\Customer',
             'category' => 'App\Models\Category',
@@ -149,6 +151,12 @@ class AppServiceProvider extends ServiceProvider
         Route::bind('category', function ($value) {
             $allowedRoutes = ['show.category'];
             return $this->applyEagerLoading(Category::query(), $allowedRoutes)->findOrFail($value);
+        });
+
+        // Bind Domain model
+        Route::bind('domain', function ($value) {
+            $allowedRoutes = ['show.domain'];
+            return $this->applyEagerLoading(Domain::query(), $allowedRoutes)->findOrFail($value);
         });
 
         // Bind Promotion model

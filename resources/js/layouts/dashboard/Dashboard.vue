@@ -601,7 +601,11 @@
 
                     let config = {
                         params: {
-                            _relationships: ['logo', 'seoImage', 'productTags', 'customerTags', 'categories', 'activeSubscription.pricingPlan', /*  'storeRollingNumbers', 'userStoreAssociation'  */].join(',')
+                            _relationships: [
+                                'logo', 'seoImage', 'productTags', 'customerTags', 'categories',
+                                'activeSubscription.pricingPlan', 'address',
+                                /*  'storeRollingNumbers', 'userStoreAssociation'  */
+                            ].join(',')
                         }
                     };
 

@@ -21,10 +21,11 @@ class DomainResource extends JsonResource
             'name' => $this->name,
             'type' => $this->type,
             'status' => $this->status,
-            'verified_at' => $this->verified_at?->toDateTimeString(),
             'store_id' => $this->store_id,
             'created_at' => $this->created_at->toDateTimeString(),
             'updated_at' => $this->updated_at->toDateTimeString(),
+            'verified_at' => $this->verified_at?->toDateTimeString(),
+            'last_verification_attempt_at' => $this->last_verification_attempt_at?->toDateTimeString(),
 
             'store' => StoreResource::make($this->whenLoaded('store')),
         ];

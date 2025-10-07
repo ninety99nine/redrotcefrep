@@ -19,7 +19,8 @@ class Domain extends Model
      * @var array
      */
     protected $casts = [
-        'verified_at' => 'datetime'
+        'verified_at' => 'datetime',
+        'last_verification_attempt_at' => 'datetime'
     ];
 
     /**
@@ -28,7 +29,7 @@ class Domain extends Model
      * @var array
      */
     protected $fillable = [
-        'name','type','status','verified_at', 'store_id'
+        'name','type','status','verified_at','last_verification_attempt_at','store_id'
     ];
 
     /**

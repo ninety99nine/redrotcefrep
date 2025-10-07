@@ -2,8 +2,8 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AppController;
-use App\Http\Controllers\AuthController;
 use App\Http\Controllers\PWAController;
+use App\Http\Controllers\AuthController;
 
 Route::prefix('auth')->group(function () {
     Route::get('/google', [AuthController::class, 'redirectToGoogle'])->name('social.auth.google');

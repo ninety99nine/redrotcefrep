@@ -16,6 +16,6 @@ Route::middleware(['auth:sanctum'])
             Route::put('/', 'updatePricingPlan')->name('update.pricing.plan');
             Route::delete('/', 'deletePricingPlan')->name('delete.pricing.plan');
             Route::post('/pay', 'payPricingPlan')->name('pay.pricing.plan');
-            Route::post('/pay/verify/{transaction}', 'verifyPricingPlanPayment')->name('verify.pricing.plan.payment');
+            Route::post('/verify-payment/{transaction}', 'verifyPricingPlanPayment')->name('verify.pricing.plan.payment');
         });
     });

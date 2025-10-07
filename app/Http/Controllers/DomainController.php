@@ -3,18 +3,22 @@
 namespace App\Http\Controllers;
 
 use App\Models\Domain;
+use App\Models\Transaction;
 use App\Services\DomainService;
 use App\Http\Resources\DomainResource;
 use App\Http\Resources\DomainResources;
+use App\Http\Resources\TransactionResource;
 use App\Http\Requests\Domain\ShowDomainRequest;
 use App\Http\Requests\Domain\ShowDomainsRequest;
 use App\Http\Requests\Domain\CreateDomainRequest;
 use App\Http\Requests\Domain\UpdateDomainRequest;
 use App\Http\Requests\Domain\DeleteDomainRequest;
 use App\Http\Requests\Domain\DeleteDomainsRequest;
-use App\Http\Requests\Domain\PurchaseDomainRequest;
 use App\Http\Requests\Domain\SearchDomainsRequest;
+use App\Http\Requests\Domain\PurchaseDomainRequest;
 use App\Http\Requests\Domain\ShowDomainPricingRequest;
+use App\Http\Requests\Domain\ShowDomainContactsRequest;
+use App\Http\Requests\Domain\VerifyDomainPaymentRequest;
 use App\Http\Requests\Domain\VerifyDomainConnectionRequest;
 
 class DomainController extends Controller
@@ -104,11 +108,23 @@ class DomainController extends Controller
      * Purchase domain.
      *
      * @param PurchaseDomainRequest $request
-     * @return array
+     * @return TransactionResource|array
      */
-    public function purchaseDomain(PurchaseDomainRequest $request): array
+    public function purchaseDomain(PurchaseDomainRequest $request): TransactionResource|array
     {
         return $this->service->purchaseDomain($request->validated());
+    }
+
+    /**
+     * Verify domain payment.
+     *
+     * @param VerifyDomainPaymentRequest $request
+     * @param Transaction $transaction
+     * @return TransactionResource
+     */
+    public function verifyDomainPayment(VerifyDomainPaymentRequest $request, Transaction $transaction): TransactionResource
+    {
+        return $this->service->verifyDomainPayment($transaction);
     }
 
     /**
@@ -145,6 +161,18 @@ class DomainController extends Controller
     public function updateDomain(UpdateDomainRequest $request, Domain $domain): array
     {
         return $this->service->updateDomain($domain, $request->validated());
+    }
+
+    /**
+     * Show domain contacts.
+     *
+     * @param ShowDomainContactsRequest $request
+     * @param Domain $domain
+     * @return array
+     */
+    public function showDomainContacts(ShowDomainContactsRequest $request, Domain $domain): array
+    {
+        return $this->service->showDomainContacts($domain);
     }
 
     /**

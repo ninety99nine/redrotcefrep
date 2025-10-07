@@ -5,12 +5,14 @@ namespace App\Services;
 use Exception;
 use App\Models\Store;
 use App\Models\Domain;
+use App\Enums\DomainType;
 use App\Enums\DomainStatus;
 use App\Models\Transaction;
 use App\Models\PaymentMethod;
 use App\Enums\PaymentMethodType;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
+use App\Enums\TransactionFailureType;
 use Illuminate\Support\Facades\Cache;
 use App\Http\Resources\DomainResource;
 use App\Http\Resources\DomainResources;
@@ -146,24 +148,47 @@ class DomainService extends BaseService
             $name = $data['domain_name'];
             $price = $data['domain_price'];
 
-            if ($store->domains()->where('name', $name)->exists()) {
-                throw new Exception('This domain already exists');
-            }
+            $existingDomain = $store->domains()->where('name', $name)->first();
 
-            $domain = $store->domains()->create(['name' => $name]);
+            if ($existingDomain && $existingDomain->status === DomainStatus::CONNECTED->value) {
+                throw new Exception('This domain already exists');
+            } else if ($existingDomain && $existingDomain->status === DomainStatus::PENDING->value) {
+                $domain = $existingDomain;
+            } else {
+                $domain = $store->domains()->create(['name' => $name]);
+            }
 
             $transactionPayload = $this->prepareTransactionPayload($user, $store, $domain, $price, $paymentMethod);
             $transaction = Transaction::create($transactionPayload);
 
             $transaction->setRelation('store', $store);
+            $transaction->setRelation('owner', $domain);
             $transaction->setRelation('requestedByUser', $user);
             $transaction->setRelation('paymentMethod', $paymentMethod);
 
             $companyToken = config('app.dpo_company_token');
-            $dpoPaymentLinkPayload = $this->prepareDpoPaymentLinkPayload($user, $transaction, $domain);
+            $dpoPaymentLinkPayload = $this->prepareDpoPaymentLinkPayload($user, $store, $transaction, $domain);
             $metadata = DirectPayOnlineService::createPaymentLink($companyToken, $dpoPaymentLinkPayload);
 
-            $transaction->update(['metadata' => $metadata]);
+            $transaction->update([
+                'metadata' => array_merge(
+                    $metadata,
+                    [
+                        'user_profile' => [
+                            'city' => $data['city'],
+                            'state' => $data['state'],
+                            'email' => $data['email'],
+                            'phone' => $data['phone'],
+                            'country' => $data['country'],
+                            'address1' => $data['address1'],
+                            'last_name' => $data['last_name'],
+                            'first_name' => $data['first_name'],
+                            'postal_code' => $data['postal_code']
+                        ]
+                    ]
+                )
+            ]);
+
             return (new TransactionService())->showResource($transaction);
         } catch (Exception $e) {
             Log::error('Failed to purchase domain: ' . $e->getMessage());
@@ -171,6 +196,87 @@ class DomainService extends BaseService
                 'successful' => false,
                 'message' => $e->getMessage()
             ];
+        }
+    }
+
+    /**
+     * Verify domain payment.
+     *
+     * @param Transaction $transaction
+     * @return TransactionResource
+     * @throws Exception
+     */
+    public function verifyDomainPayment(Transaction $transaction): TransactionResource
+    {
+        try {
+
+            $transaction = $transaction->load(['owner', 'store', 'paymentMethod', 'requestedByUser']);
+
+            if (!$transaction->isPaid()) {
+
+                $paymentMethod = $transaction->paymentMethod;
+
+                if (!$paymentMethod) {
+                    throw new Exception('The transaction payment method does not exist');
+                }
+
+                $domain = $transaction->owner;
+
+                if (!$domain || $transaction->owner_type !== 'domain') {
+                    throw new Exception('The transaction is not associated with a domain');
+                }
+
+                $store = $transaction->store;
+
+                if (!$store) {
+                    throw new Exception('The store does not exist');
+                }
+
+                if ($paymentMethod->type == PaymentMethodType::DPO->value) {
+
+                    $companyToken = config('app.dpo_company_token');
+                    $transactionToken = $transaction->metadata['dpo_transaction_token'];
+                    $metadata = DirectPayOnlineService::verifyPayment($companyToken, $transactionToken);
+
+                    $userProfile = $transaction->metadata['user_profile'] ?? [];
+                    $namecheapResponse = NamecheapService::purchaseDomain($domain->name, $userProfile);
+
+                    $serverIp = $this->resolveServerIp();
+                    NamecheapService::configureDnsSettings($domain->name, $serverIp);
+
+                    $domain->update([
+                        'status' => DomainStatus::PROCESSING->value,
+                        'type' => DomainType::PURCHASED->value
+                    ]);
+
+                    $this->verifyConnection($domain);
+
+                    $transaction->update([
+                        'failure_type' => null,
+                        'failure_reason' => null,
+                        'payment_status' => TransactionPaymentStatus::PAID->value,
+                        'metadata' => array_merge($transaction->metadata, $metadata, [
+                            'namecheap_response' => $namecheapResponse
+                        ])
+                    ]);
+
+                } else {
+                    throw new Exception('The ' . $paymentMethod->name . ' payment method cannot be used to verify transaction payment');
+                }
+            }
+
+            return (new TransactionService)->showResource($transaction);
+
+        } catch (Exception $e) {
+
+            $transaction->update([
+                'failure_reason' => $e->getMessage(),
+                'payment_status' => TransactionPaymentStatus::FAILED_PAYMENT->value,
+                'failure_type' => TransactionFailureType::PAYMENT_VERIFICATION_FAILED->value
+            ]);
+
+            throw $e;
+
         }
     }
 
@@ -211,9 +317,24 @@ class DomainService extends BaseService
      */
     public function updateDomain(Domain $domain, array $data): array
     {
+        if($domain->type === DomainType::PURCHASED->value) {
+            throw new Exception('Purchased domains cannot be modified');
+        }
+
         $domain->update($data);
         $verifiedDomain = $this->verifyConnection($domain);
         return $this->showUpdatedResource($verifiedDomain);
+    }
+
+    /**
+     * Show domain contacts.
+     *
+     * @param Domain $domain
+     * @return array
+     */
+    public function showDomainContacts(Domain $domain): array
+    {
+        return NamecheapService::getDomainContacts($domain->name);
     }
 
     /**
@@ -235,32 +356,75 @@ class DomainService extends BaseService
     }
 
     /**
-     * Verify connection.
+     * Verify domain connection.
      *
      * @param string|Domain $name
      * @return bool|Domain
      */
-    private function verifyConnection(string|Domain $domain): bool|Domain
+    public function verifyConnection(string|Domain $domain): bool|Domain
     {
-        $name = $domain instanceof Domain ? $domain->name : $domain;
-        $serverIp = $this->resolveServerIp();
-        $resolvedIp = gethostbyname($name);
+        try {
 
-        $connected = $resolvedIp === $serverIp;
+            $serverIp = $this->resolveServerIp();
+            $domainName = $domain instanceof Domain ? $domain->name : $domain;
 
-        if ($domain instanceof Domain) {
-            if ($connected) {
-                $domain->update([
-                    'status' => DomainStatus::CONNECTED->value,
-                    'verified_at' => now()
-                ]);
-            } else {
-                $domain->update(['status' => DomainStatus::PENDING->value]);
+            // Attempt to resolve A record using dns_get_record
+            $resolvedIp = null;
+            $records = dns_get_record($domainName, DNS_A);
+
+            if (!empty($records) && isset($records[0]['ip']) && filter_var($records[0]['ip'], FILTER_VALIDATE_IP)) {
+                $resolvedIp = $records[0]['ip'];
             }
 
-            return $domain;
-        } else {
-            return $connected;
+            // Validate resolved IP
+            $isValidIp = filter_var($resolvedIp, FILTER_VALIDATE_IP);
+            $connected = $isValidIp && $resolvedIp === $serverIp;
+
+            // Validate resolved IP
+            $connected = $resolvedIp === $serverIp;
+
+            if(!$connected) {
+
+                // Attempt to resolve A record using NamecheapService (Assuming the domain was purchased via NamecheapService)
+                $dnsRecords = NamecheapService::checkDnsRecords($domainName);
+                $connected = $dnsRecords['A'] === $serverIp;
+
+            }
+
+            if ($domain instanceof Domain) {
+                if ($connected) {
+                    $domain->update([
+                        'verified_at' => now(),
+                        'last_verification_attempt_at' => now(),
+                        'status' => DomainStatus::CONNECTED->value,
+                    ]);
+                } else {
+                    $domain->update([
+                        'last_verification_attempt_at' => now(),
+                        'status' => $domain->status === DomainStatus::PROCESSING->value ? DomainStatus::PROCESSING->value : DomainStatus::PENDING->value
+                    ]);
+                }
+
+                return $domain;
+            } else {
+                return $connected;
+            }
+
+        } catch (Exception $e) {
+
+            if ($domain instanceof Domain) {
+
+                $domain->update([
+                    'last_verification_attempt_at' => now(),
+                    'status' => $domain->status === DomainStatus::PROCESSING->value ? DomainStatus::PROCESSING->value : DomainStatus::PENDING->value
+                ]);
+
+                return $domain;
+
+            }
+
+            return false;
+
         }
     }
 
@@ -270,7 +434,7 @@ class DomainService extends BaseService
      * @return string
      * @throws Exception
      */
-    private function resolveServerIp(): string
+    public function resolveServerIp(): string
     {
         $appUrl = config('app.url');
         $hostname = parse_url($appUrl, PHP_URL_HOST);
@@ -279,7 +443,7 @@ class DomainService extends BaseService
             throw new Exception('Unable to parse hostname from APP_URL: ' . $appUrl);
         }
 
-        return Cache::remember('app_server_ip', now()->addHours(24), function () use ($hostname) {
+        return Cache::remember('app_server_ip', now()->addHour(), function () use ($hostname) {
             $ip = gethostbyname($hostname);
             if ($ip === $hostname) {
                 throw new Exception('Unable to resolve IP for ' . $hostname);
@@ -310,7 +474,7 @@ class DomainService extends BaseService
             'requested_by_user_id' => $user->id,
             'created_using_auto_billing' => false,
             'payment_method_id' => $paymentMethod->id,
-            'description' => "Purchase of domain: {$domain->name}",
+            'description' => "Purchasing domain {$domain->name}",
             'payment_status' => TransactionPaymentStatus::PENDING_PAYMENT->value,
             'verification_type' => TransactionVerificationType::AUTOMATIC->value
         ];
@@ -320,14 +484,15 @@ class DomainService extends BaseService
      * Prepare DPO payment link payload.
      *
      * @param $user
+     * @param Store $store
      * @param Transaction $transaction
      * @param Domain $domain
      * @return array
      */
-    private function prepareDpoPaymentLinkPayload($user, $transaction, $domain): array
+    private function prepareDpoPaymentLinkPayload($user, $store, $transaction, $domain): array
     {
         $customerPhone = $customerCountry = $customerDialCode = null;
-        $redirectUrl = config('app.url') . '/dashboard/domains/verify-payment?transaction_id=' . $transaction->id . '&store_id=' . $transaction->store_id;
+        $redirectUrl = config('app.url') . '/dashboard/settings/domains/verify-payment?transaction_id=' . $transaction->id . '&store_id=' . $transaction->store_id;
 
         if ($user->mobile_number) {
             $customerCountry = $customerDialCode = $user->mobile_number->getCountry();
@@ -338,7 +503,6 @@ class DomainService extends BaseService
             'ptl' => 24,
             'ptlType' => 'hours',
             'companyRefUnique' => 1,
-            'emailTransaction' => true,
             'paymentCurrency' => 'USD',
             'redirectURL' => $redirectUrl,
             'backURL' => url()->previous(),
@@ -349,13 +513,18 @@ class DomainService extends BaseService
             'customerCountry' => $customerCountry,
             'customerLastName' => $user->last_name,
             'customerDialCode' => $customerDialCode,
-            'paymentAmount' => $transaction->amount,
             'customerFirstName' => $user->first_name,
             'emailTransaction' => !empty($user->email),
-            'metadata' => ['Transaction ID' => $transaction->id, 'Domain Name' => $domain->name],
+            'paymentAmount' => $transaction->amount->amount_without_currency,
+            'metadata' => [
+                'Transaction ID' => $transaction->id,
+                'Domain Name' => $domain->name,
+                'Store Name' => $store->name,
+                'Store ID' => $store->id,
+            ],
             'services' => [
                 [
-                    'serviceDescription' => "Purchase of domain: {$domain->name}",
+                    'serviceDescription' => "Buying domain {$domain->name}",
                     'serviceDate' => now()->format('Y/m/d H:i')
                 ]
             ]

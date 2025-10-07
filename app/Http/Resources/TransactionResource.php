@@ -71,6 +71,10 @@ class TransactionResource extends JsonResource
             return StoreResource::make($this->owner);
         }
 
+        if ($this->owner_type === 'domain') {
+            return DomainResource::make($this->owner);
+        }
+
         if ($this->owner_type === 'pricing plan') {
             return PricingPlanResource::make($this->owner);
         }

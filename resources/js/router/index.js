@@ -513,6 +513,11 @@ const routes = [
                                 component: () => import('@Pages/settings/domains/Domain.vue')
                             },
                             {
+                                path: 'verify-payment',
+                                name: 'verify-domain-payment',
+                                component: () => import('@Pages/settings/domains/VerifyDomainPayment.vue')
+                            },
+                            {
                                 path: ':domain_id',
                                 name: 'edit-domain',
                                 component: () => import('@Pages/settings/domains/Domain.vue')

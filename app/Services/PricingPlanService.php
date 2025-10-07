@@ -625,7 +625,6 @@ class PricingPlanService extends BaseService
             'ptlType' => 'hours',
             'companyRefUnique' => 1,
             'metadata' => $metadata,
-            'emailTransaction' => true,
             'customerEmail' => $user->email,
             'companyRef' => $transaction->id,
             'companyAccRef' => $companyAccRef,

@@ -10,6 +10,7 @@ export const useDomainStore = defineStore('domain', {
         isUpdatingDomain: false,
         isDeletingDomain: false,
         isVerifyingDomain: false,
+        isLoadingDomainContacts: false,
     }),
     actions: {
         reset() {
@@ -20,6 +21,7 @@ export const useDomainStore = defineStore('domain', {
             this.isUpdatingDomain = false;
             this.isDeletingDomain = false;
             this.isVerifyingDomain = false;
+            this.isLoadingDomainContacts = false;
             changeHistoryState().reset();
         },
         saveState(actionName) {

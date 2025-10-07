@@ -2,11 +2,8 @@
 
 namespace App\Services;
 
-use App\Enums\CacheName;
 use Exception;
 use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Log;
 
 class NamecheapService
 {
@@ -72,9 +69,14 @@ class NamecheapService
                 return array_values(array_unique($formattedDomains, SORT_REGULAR));
             }
 
-            $errorNumber = $result['Errors']['Error']['Number'] ?? 'Unknown error';
+            $errorNumber = $result['Errors']['Error']['Number'] ?? null;
             $errorMessage = $result['Errors']['Error'] ?? 'Unknown error';
-            throw new Exception("Namecheap API error: {$errorNumber} - {$errorMessage}");
+
+            if($errorNumber) {
+                throw new Exception("Namecheap: {$errorNumber} - {$errorMessage}");
+            }else{
+                throw new Exception("Namecheap: {$errorMessage}");
+            }
         }
 
         throw new Exception('Failed to connect to Namecheap API: HTTP ' . $response->status());
@@ -107,6 +109,7 @@ class NamecheapService
             'min_duration' => 1,
             'renewal_price' => 0.00,
             'regular_price' => 0.00,
+            'discount_percentage' => 0,
         ];
 
         // Fetch prices for both REGISTER and RENEW actions
@@ -168,6 +171,9 @@ class NamecheapService
                                     $result['min_duration'] = $minDuration;
                                     $result['price'] = (float) ($price['@attributes']['Price'] ?? 0);
                                     $result['regular_price'] = (float) ($price['@attributes']['RegularPrice'] ?? 0);
+                                    $result['discount_percentage'] = $result['price'] && $result['regular_price']
+                                        ? round((1 - $result['price'] / $result['regular_price']) * 100)
+                                        : 0;
                                 } elseif ($action === 'RENEW') {
                                     $result['renewal_price'] = (float) ($price['@attributes']['Price'] ?? 0);
                                 }
@@ -176,9 +182,16 @@ class NamecheapService
                     }
                 }
             } else {
-                $errorNumber = $data['Errors']['Error']['Number'] ?? 'Unknown error';
-                $errorMessage = $data['Errors']['Error'] ?? 'Unknown error';
-                throw new Exception("Namecheap getPricing API error for $action: {$errorNumber} - {$errorMessage}");
+
+                $errorNumber = $result['Errors']['Error']['Number'] ?? null;
+                $errorMessage = $result['Errors']['Error'] ?? 'Unknown error';
+
+                if($errorNumber) {
+                    throw new Exception("Namecheap: {$errorNumber} - {$errorMessage}");
+                }else{
+                    throw new Exception("Namecheap: {$errorMessage}");
+                }
+
             }
         }
 
@@ -189,60 +202,77 @@ class NamecheapService
      * Purchase a domain.
      *
      * @param string $domainName
-     * @param array $userData
+     * @param array $userProfile
      * @return array
      * @throws Exception
      */
-    public static function purchaseDomain(string $domainName, array $userData): array
+    public static function purchaseDomain(string $domainName, array $userProfile): array
     {
         $apiKey = config('services.namecheap.api_key');
         $apiUrl = config('services.namecheap.api_url');
         $username = config('services.namecheap.username');
+        $clientIp = request()->ip() === '127.0.0.1' ? config('services.namecheap.client_ip', '127.0.0.1') : request()->ip();
 
-        $response = Http::post("{$apiUrl}?Command=namecheap.domains.create", [
-            'ApiUser' => $username,
+        // Format phone number to match +NNN.NNNNNNNNNN
+        $phone = preg_replace('/^(\+\d{1,3})(\d{7,})$/', '$1.$2', $userProfile['phone']);
+
+        $params = [
             'ApiKey' => $apiKey,
+            'ApiUser' => $username,
             'UserName' => $username,
-            'ClientIp' => request()->ip() === '127.0.0.1' ? config('services.namecheap.client_ip', '127.0.0.1') : request()->ip(),
-            'DomainName' => $domainName,
+            'ClientIp' => $clientIp,
+            'Command' => 'namecheap.domains.create',
+
             'Years' => 1,
-            'RegistrantFirstName' => $userData['first_name'],
-            'RegistrantLastName' => $userData['last_name'],
-            'RegistrantAddress1' => $userData['address1'] ?? 'Unknown',
-            'RegistrantCity' => $userData['city'] ?? 'Unknown',
-            'RegistrantStateProvince' => $userData['state'] ?? 'Unknown',
-            'RegistrantPostalCode' => $userData['postal_code'] ?? '00000',
-            'RegistrantCountry' => $userData['country'] ?? 'US',
-            'RegistrantPhone' => $userData['phone'] ?? '',
-            'RegistrantEmailAddress' => $userData['email'],
-            'TechFirstName' => $userData['first_name'],
-            'TechLastName' => $userData['last_name'],
-            'TechAddress1' => $userData['address1'] ?? 'Unknown',
-            'TechCity' => $userData['city'] ?? 'Unknown',
-            'TechStateProvince' => $userData['state'] ?? 'Unknown',
-            'TechPostalCode' => $userData['postal_code'] ?? '00000',
-            'TechCountry' => $userData['country'] ?? 'US',
-            'TechPhone' => $userData['phone'] ?? '',
-            'TechEmailAddress' => $userData['email'],
-            'AdminFirstName' => $userData['first_name'],
-            'AdminLastName' => $userData['last_name'],
-            'AdminAddress1' => $userData['address1'] ?? 'Unknown',
-            'AdminCity' => $userData['city'] ?? 'Unknown',
-            'AdminStateProvince' => $userData['state'] ?? 'Unknown',
-            'AdminPostalCode' => $userData['postal_code'] ?? '00000',
-            'AdminCountry' => $userData['country'] ?? 'US',
-            'AdminPhone' => $userData['phone'] ?? '',
-            'AdminEmailAddress' => $userData['email'],
-            'AuxBillingFirstName' => $userData['first_name'],
-            'AuxBillingLastName' => $userData['last_name'],
-            'AuxBillingAddress1' => $userData['address1'] ?? 'Unknown',
-            'AuxBillingCity' => $userData['city'] ?? 'Unknown',
-            'AuxBillingStateProvince' => $userData['state'] ?? 'Unknown',
-            'AuxBillingPostalCode' => $userData['postal_code'] ?? '00000',
-            'AuxBillingCountry' => $userData['country'] ?? 'US',
-            'AuxBillingPhone' => $userData['phone'] ?? '',
-            'AuxBillingEmailAddress' => $userData['email']
-        ]);
+            'DomainName' => $domainName,
+
+            'RegistrantPhone' => $phone,
+            'RegistrantCity' => $userProfile['city'],
+            'RegistrantCountry' => $userProfile['country'],
+            'RegistrantAddress1' => $userProfile['address1'],
+            'RegistrantEmailAddress' => $userProfile['email'],
+            'RegistrantLastName' => $userProfile['last_name'],
+            'RegistrantStateProvince' => $userProfile['state'],
+            'RegistrantFirstName' => $userProfile['first_name'],
+            'RegistrantPostalCode' => $userProfile['postal_code'],
+
+            'TechPhone' => $phone,
+            'TechCity' => $userProfile['city'],
+            'TechCountry' => $userProfile['country'],
+            'TechAddress1' => $userProfile['address1'],
+            'TechLastName' => $userProfile['last_name'],
+            'TechEmailAddress' => $userProfile['email'],
+            'TechStateProvince' => $userProfile['state'],
+            'TechFirstName' => $userProfile['first_name'],
+            'TechPostalCode' => $userProfile['postal_code'],
+
+            'AdminPhone' => $phone,
+            'AdminCity' => $userProfile['city'],
+            'AdminCountry' => $userProfile['country'],
+            'AdminAddress1' => $userProfile['address1'],
+            'AdminLastName' => $userProfile['last_name'],
+            'AdminEmailAddress' => $userProfile['email'],
+            'AdminFirstName' => $userProfile['first_name'],
+            'AdminStateProvince' => $userProfile['state'],
+            'AdminPostalCode' => $userProfile['postal_code'],
+
+            'AuxBillingPhone' => $phone,
+            'AuxBillingCity' => $userProfile['city'],
+            'AuxBillingCountry' => $userProfile['country'],
+            'AuxBillingAddress1' => $userProfile['address1'],
+            'AuxBillingEmailAddress' => $userProfile['email'],
+            'AuxBillingLastName' => $userProfile['last_name'],
+            'AuxBillingStateProvince' => $userProfile['state'],
+            'AuxBillingFirstName' => $userProfile['first_name'],
+            'AuxBillingPostalCode' => $userProfile['postal_code'],
+        ];
+
+        // Build query string with proper URL encoding
+        $queryString = http_build_query($params);
+        $fullUrl = "{$apiUrl}?{$queryString}";
+
+        // Send POST request with query parameters
+        $response = Http::post($fullUrl);
 
         if ($response->successful()) {
             $xml = simplexml_load_string($response->body(), 'SimpleXMLElement', LIBXML_NOCDATA);
@@ -257,9 +287,14 @@ class NamecheapService
                 return $result['CommandResponse'];
             }
 
-            $errorNumber = $result['Errors']['Error']['Number'] ?? 'Unknown error';
+            $errorNumber = $result['Errors']['Error']['Number'] ?? null;
             $errorMessage = $result['Errors']['Error'] ?? 'Unknown error';
-            throw new Exception("Namecheap API error: {$errorNumber} - {$errorMessage}");
+
+            if($errorNumber) {
+                throw new Exception("Namecheap: {$errorNumber} - {$errorMessage}");
+            }else{
+                throw new Exception("Namecheap: {$errorMessage}");
+            }
         }
 
         throw new Exception('Failed to connect to Namecheap API: HTTP ' . $response->status());
@@ -278,67 +313,36 @@ class NamecheapService
         $apiKey = config('services.namecheap.api_key');
         $apiUrl = config('services.namecheap.api_url');
         $username = config('services.namecheap.username');
+        $clientIp = request()->ip() === '127.0.0.1' ? config('services.namecheap.client_ip', '127.0.0.1') : request()->ip();
 
         $sld = explode('.', $domainName)[0];
         $tld = explode('.', $domainName)[1];
 
-        $response = Http::post("{$apiUrl}?Command=namecheap.domains.dns.setHosts", [
+        $params = [
+            'Command' => 'namecheap.domains.dns.setHosts',
             'ApiUser' => $username,
             'ApiKey' => $apiKey,
             'UserName' => $username,
-            'ClientIp' => request()->ip() === '127.0.0.1' ? config('services.namecheap.client_ip', '127.0.0.1') : request()->ip(),
+            'ClientIp' => $clientIp,
             'SLD' => $sld,
             'TLD' => $tld,
             'HostName1' => '@',
             'RecordType1' => 'A',
             'Address1' => $serverIp,
-            'TTL1' => 1800
-        ]);
+            'TTL1' => '1800',
+        ];
+
+        // Build query string with proper URL encoding
+        $queryString = http_build_query($params);
+        $fullUrl = "{$apiUrl}?{$queryString}";
+
+        // Send POST request with query parameters
+        $response = Http::post($fullUrl);
 
         if ($response->successful()) {
+
             $xml = simplexml_load_string($response->body(), 'SimpleXMLElement', LIBXML_NOCDATA);
-            if ($xml === false) {
-                throw new Exception('Failed to parse Namecheap API XML response');
-            }
 
-            $json = json_encode($xml);
-            $result = json_decode($json, true);
-
-            if ($result['@attributes']['Status'] !== 'OK') {
-                $errorNumber = $result['Errors']['Error']['Number'] ?? 'Unknown error';
-                $errorMessage = $result['Errors']['Error'] ?? 'Unknown error';
-                throw new Exception("Namecheap API error: {$errorNumber} - {$errorMessage}");
-            }
-        } else {
-            throw new Exception('Failed to connect to Namecheap API: HTTP ' . $response->status());
-        }
-    }
-
-    /**
-     * Check DNS records for a domain.
-     *
-     * @param string $domainName
-     * @param string $serverIp
-     * @return array
-     * @throws Exception
-     */
-    public static function checkDnsRecords(string $domainName, string $serverIp): array
-    {
-        $apiKey = config('services.namecheap.api_key');
-        $username = config('services.namecheap.username');
-        $apiUrl = config('services.namecheap.api_url');
-
-        $response = Http::get("{$apiUrl}?Command=namecheap.domains.dns.getHosts", [
-            'ApiUser' => $username,
-            'ApiKey' => $apiKey,
-            'UserName' => $username,
-            'ClientIp' => request()->ip() === '127.0.0.1' ? config('services.namecheap.client_ip', '127.0.0.1') : request()->ip(),
-            'SLD' => explode('.', $domainName)[0],
-            'TLD' => explode('.', $domainName)[1]
-        ]);
-
-        if ($response->successful()) {
-            $xml = simplexml_load_string($response->body(), 'SimpleXMLElement', LIBXML_NOCDATA);
             if ($xml === false) {
                 throw new Exception('Failed to parse Namecheap API XML response');
             }
@@ -347,23 +351,223 @@ class NamecheapService
             $result = json_decode($json, true);
 
             if ($result['@attributes']['Status'] === 'OK') {
-                $hosts = $result['CommandResponse']['DomainDNSGetHostsResult']['Host'] ?? [];
-                if (isset($hosts['@attributes'])) {
-                    $hosts = [$hosts];
+                if ($result['CommandResponse']['DomainDNSSetHostsResult']['@attributes']['IsSuccess'] === 'true') {
+                    return;
                 }
+                throw new Exception('Namecheap: Failed to set DNS host records');
+            }
+
+            $errorNumber = $result['Errors']['Error']['Number'] ?? null;
+            $errorMessage = $result['Errors']['Error'] ?? 'Unknown error';
+
+            if ($errorNumber) {
+                throw new Exception("Namecheap: {$errorNumber} - {$errorMessage}");
+            } else {
+                throw new Exception("Namecheap: {$errorMessage}");
+            }
+        }
+
+        throw new Exception('Failed to connect to Namecheap API: HTTP ' . $response->status());
+    }
+
+    /**
+     * Check DNS records for a domain.
+     *
+     * @param string $domainName
+     * @return array
+     * @throws Exception
+     */
+    public static function checkDnsRecords(string $domainName): array
+    {
+        $apiKey = config('services.namecheap.api_key');
+        $apiUrl = config('services.namecheap.api_url');
+        $username = config('services.namecheap.username');
+
+        $response = Http::get("{$apiUrl}", [
+            'ApiKey' => $apiKey,
+            'ApiUser' => $username,
+            'UserName' => $username,
+            'Command' => 'namecheap.domains.dns.getHosts',
+            'ClientIp' => request()->ip() === '127.0.0.1' ? config('services.namecheap.client_ip', '127.0.0.1') : request()->ip(),
+            'SLD' => explode('.', $domainName)[0],
+            'TLD' => explode('.', $domainName)[1]
+        ]);
+
+        if ($response->successful()) {
+
+            $xml = simplexml_load_string($response->body(), 'SimpleXMLElement', LIBXML_NOCDATA);
+
+            if ($xml === false) {
+                throw new Exception('Failed to parse Namecheap API XML response');
+            }
+
+            $json = json_encode($xml);
+            $result = json_decode($json, true);
+
+            if ($result['@attributes']['Status'] === 'OK') {
+
+                $hosts = $result['CommandResponse']['DomainDNSGetHostsResult']['host'] ?? [];
+
                 $aRecord = null;
-                foreach ($hosts as $host) {
-                    if ($host['@attributes']['Type'] === 'A' && $host['@attributes']['Name'] === '@') {
-                        $aRecord = $host['@attributes']['Address'];
+
+                // Normalize hosts to always be an array of host records
+                $hostRecords = [];
+                if (!empty($hosts)) {
+                    if (isset($hosts['@attributes'])) {
+                        // Single host record
+                        $hostRecords = [$hosts];
+                    } else {
+                        // Multiple host records
+                        $hostRecords = $hosts;
+                    }
+                }
+
+                foreach ($hostRecords as $index => $host) {
+
+                    if (!isset($host['@attributes'])) {
+                        continue;
+                    }
+
+                    $type = $host['@attributes']['Type'] ?? '';
+                    $name = $host['@attributes']['Name'] ?? '';
+
+                    if ($type === 'A' && $name === '@') {
+                        $aRecord = $host['@attributes']['Address'] ?? null;
                         break;
                     }
                 }
+
                 return ['A' => $aRecord];
             }
 
-            $errorNumber = $result['Errors']['Error']['Number'] ?? 'Unknown error';
+            $errorNumber = $result['Errors']['Error']['Number'] ?? null;
             $errorMessage = $result['Errors']['Error'] ?? 'Unknown error';
-            throw new Exception("Namecheap API error: {$errorNumber} - {$errorMessage}");
+
+            if ($errorNumber) {
+                throw new Exception("Namecheap: {$errorNumber} - {$errorMessage}");
+            } else {
+                throw new Exception("Namecheap: {$errorMessage}");
+            }
+        }
+
+        throw new Exception('Failed to connect to Namecheap API: HTTP ' . $response->status());
+    }
+
+    /**
+     * Retrieve contact information for a domain.
+     *
+     * @param string $domainName
+     * @return array
+     * @throws Exception
+     */
+    public static function getDomainContacts(string $domainName): array
+    {
+        $apiKey = config('services.namecheap.api_key');
+        $apiUrl = config('services.namecheap.api_url');
+        $username = config('services.namecheap.username');
+        $clientIp = request()->ip() === '127.0.0.1' ? config('services.namecheap.client_ip', '127.0.0.1') : request()->ip();
+
+        // Validate domain format
+        if (!preg_match('/^([a-zA-Z0-9.-]+)\.[a-zA-Z]{2,}$/', $domainName)) {
+            throw new Exception('Invalid domain format: Must be a valid domain name (e.g., example.com)');
+        }
+
+        // Split domain into SLD and TLD
+        $sld = explode('.', $domainName)[0];
+        $tld = explode('.', $domainName)[1];
+
+        // Build query parameters
+        $params = [
+            'SLD' => $sld,
+            'TLD' => $tld,
+            'ApiKey' => $apiKey,
+            'ApiUser' => $username,
+            'UserName' => $username,
+            'ClientIp' => $clientIp,
+            'DomainName' => $domainName,
+            'Command' => 'namecheap.domains.getContacts',
+        ];
+
+        // Send GET request
+        $response = Http::timeout(60)->retry(3, 1000)->get($apiUrl, $params);
+
+        if ($response->successful()) {
+
+            $xml = simplexml_load_string($response->body(), 'SimpleXMLElement', LIBXML_NOCDATA);
+
+            if ($xml === false) {
+                throw new Exception('Failed to parse Namecheap API XML response');
+            }
+
+            $json = json_encode($xml);
+            $result = json_decode($json, true);
+
+            if (isset($result['@attributes']['Status']) && $result['@attributes']['Status'] === 'OK') {
+                $contactInfo = $result['CommandResponse']['DomainContactsResult'] ?? [];
+
+                // Extract all contact types
+                $registrant = $contactInfo['Registrant'] ?? [];
+                $tech = $contactInfo['Tech'] ?? [];
+                $admin = $contactInfo['Admin'] ?? [];
+                $auxBilling = $contactInfo['AuxBilling'] ?? [];
+
+                // Format the response to include all contact fields
+                return [
+                    'registrant' => [
+                        'first_name' => $registrant['FirstName'] ?? null,
+                        'last_name' => $registrant['LastName'] ?? null,
+                        'email' => $registrant['EmailAddress'] ?? null,
+                        'phone' => $registrant['Phone'] ?? null,
+                        'address1' => $registrant['Address1'] ?? null,
+                        'city' => $registrant['City'] ?? null,
+                        'state' => $registrant['StateProvince'] ?? null,
+                        'country' => $registrant['Country'] ?? null,
+                        'postal_code' => $registrant['PostalCode'] ?? null,
+                    ],
+                    'tech' => [
+                        'first_name' => $tech['FirstName'] ?? null,
+                        'last_name' => $tech['LastName'] ?? null,
+                        'email' => $tech['EmailAddress'] ?? null,
+                        'phone' => $tech['Phone'] ?? null,
+                        'address1' => $tech['Address1'] ?? null,
+                        'city' => $tech['City'] ?? null,
+                        'state' => $tech['StateProvince'] ?? null,
+                        'country' => $tech['Country'] ?? null,
+                        'postal_code' => $tech['PostalCode'] ?? null,
+                    ],
+                    'admin' => [
+                        'first_name' => $admin['FirstName'] ?? null,
+                        'last_name' => $admin['LastName'] ?? null,
+                        'email' => $admin['EmailAddress'] ?? null,
+                        'phone' => $admin['Phone'] ?? null,
+                        'address1' => $admin['Address1'] ?? null,
+                        'city' => $admin['City'] ?? null,
+                        'state' => $admin['StateProvince'] ?? null,
+                        'country' => $admin['Country'] ?? null,
+                        'postal_code' => $admin['PostalCode'] ?? null,
+                    ],
+                    'aux_billing' => [
+                        'first_name' => $auxBilling['FirstName'] ?? null,
+                        'last_name' => $auxBilling['LastName'] ?? null,
+                        'email' => $auxBilling['EmailAddress'] ?? null,
+                        'phone' => $auxBilling['Phone'] ?? null,
+                        'address1' => $auxBilling['Address1'] ?? null,
+                        'city' => $auxBilling['City'] ?? null,
+                        'state' => $auxBilling['StateProvince'] ?? null,
+                        'country' => $auxBilling['Country'] ?? null,
+                        'postal_code' => $auxBilling['PostalCode'] ?? null,
+                    ],
+                ];
+            }
+
+            $errorNumber = $result['Errors']['Error']['Number'] ?? null;
+            $errorMessage = $result['Errors']['Error'] ?? 'Unknown error';
+
+            if ($errorNumber) {
+                throw new Exception("Namecheap: {$errorNumber} - {$errorMessage}");
+            } else {
+                throw new Exception("Namecheap: {$errorMessage}");
+            }
         }
 
         throw new Exception('Failed to connect to Namecheap API: HTTP ' . $response->status());

@@ -15,11 +15,13 @@ Route::prefix('domains')
         Route::post('/purchase', 'purchaseDomain')->name('purchase.domain');
         Route::get('/pricing', 'showDomainPricing')->name('show.domain.pricing');
         Route::post('/verify-connection', 'verifyDomainConnection')->name('verify.domain.connection');
+        Route::post('/verify-payment/{transaction}', 'verifyDomainPayment')->name('verify.domain.payment');
 
         // Explicit route model binding applied: AppServiceProvider.php
         Route::prefix('{domain}')->group(function () {
             Route::get('/', 'showDomain')->name('show.domain');
             Route::put('/', 'updateDomain')->name('update.domain');
             Route::delete('/', 'deleteDomain')->name('delete.domain');
+            Route::get('/contacts', 'showDomainContacts')->name('show.domain.contacts');
         });
     });

@@ -40,7 +40,7 @@ export default {
             default: "This is a tooltip.",
         },
         triggerClass: {
-            type: [String, Array, Object, null],
+            type: [String, Array, Object],
             default: "w-4 h-4 text-gray-300 hover:text-gray-400",
         }
     },

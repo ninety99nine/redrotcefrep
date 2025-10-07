@@ -75,6 +75,7 @@ class StoreResource extends JsonResource
 
             'logo' => MediaFileResource::make($this->whenLoaded('logo')),
             'users' => UserResource::collection($this->whenLoaded('users')),
+            'address' => AddressResource::make($this->whenLoaded('address')),
             'seo_image' => MediaFileResource::make($this->whenLoaded('seoImage')),
             'domains' => DomainResources::collection($this->whenLoaded('domains')),
             'product_tags' => TagResource::collection($this->whenLoaded('productTags')),

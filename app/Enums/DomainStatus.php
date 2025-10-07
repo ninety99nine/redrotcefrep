@@ -6,6 +6,7 @@ enum DomainStatus: string
 {
     case PENDING = 'pending';
     case CONNECTED = 'connected';
+    case PROCESSING = 'processing';
 
     public static function values(): array
     {

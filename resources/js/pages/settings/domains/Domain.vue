@@ -26,10 +26,12 @@
                 label="Domain Name"
                 placeholder="example.com"
                 v-model="domainForm.name"
-                :skeleton="isLoadingStore || isLoadingDomain"
+                :disabled="domain?.type == 'purchased'"
                 :errorText="formState.getFormError('name')"
+                :skeleton="isLoadingStore || isLoadingDomain"
                 @input="domainState.saveStateDebounced('Domain name changed')"
                 tooltipContent="The domain name for your store (e.g., example.com)"
+                :description="domain?.type == 'purchased' ? 'This domain cannot be changed because its a purchased domain' : null"
             />
 
         </div>
@@ -83,6 +85,83 @@
 
         </div>
 
+        <!-- Domain Contacts -->
+        <div
+            v-if="!isLoadingStore && !isLoadingDomain && (isLoadingDomainContacts || domainContacts)"
+            class="bg-gray-50 border border-gray-300 rounded-lg p-4 space-y-4 mb-4">
+
+            <div class="flex items-center space-x-2 mb-4">
+                <User size="20"></User>
+                <h1 class="font-bold">Domain Contacts</h1>
+            </div>
+
+            <Tabs
+                :tabs="tabs"
+                v-model="tab">
+            </Tabs>
+
+            <p class="bg-blue-50 border border-blue-100 rounded-lg text-sm p-2">{{ tabs[selectedTabIndex].description }}</p>
+
+            <div class="bg-white border border-gray-200 rounded-lg p-4">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <p class="text-sm font-semibold mb-1">First Name</p>
+                        <Skeleton v-if="isLoadingDomainContacts" width="w-40" class="mt-2"></Skeleton>
+                        <p v-else class="text-sm">{{ domainContacts[tab].first_name || 'N/A' }}</p>
+                    </div>
+                    <div>
+                        <p class="text-sm font-semibold mb-1">Last Name</p>
+                        <Skeleton v-if="isLoadingDomainContacts" width="w-40" class="mt-2"></Skeleton>
+                        <p v-else class="text-sm">{{ domainContacts[tab].last_name || 'N/A' }}</p>
+                    </div>
+                    <div>
+                        <p class="text-sm font-semibold mb-1">Email</p>
+                        <Skeleton v-if="isLoadingDomainContacts" width="w-40" class="mt-2"></Skeleton>
+                        <p v-else class="text-sm">{{ domainContacts[tab].email || 'N/A' }}</p>
+                    </div>
+                    <div>
+                        <p class="text-sm font-semibold mb-1">Phone</p>
+                        <Skeleton v-if="isLoadingDomainContacts" width="w-40" class="mt-2"></Skeleton>
+                        <p v-else class="text-sm">{{ domainContacts[tab].phone || 'N/A' }}</p>
+                    </div>
+                    <div>
+                        <p class="text-sm font-semibold mb-1">Address</p>
+                        <Skeleton v-if="isLoadingDomainContacts" width="w-40" class="mt-2"></Skeleton>
+                        <p v-else class="text-sm">{{ domainContacts[tab].address1 || 'N/A' }}</p>
+                    </div>
+                    <div>
+                        <p class="text-sm font-semibold mb-1">City</p>
+                        <Skeleton v-if="isLoadingDomainContacts" width="w-40" class="mt-2"></Skeleton>
+                        <p v-else class="text-sm">{{ domainContacts[tab].city || 'N/A' }}</p>
+                    </div>
+                    <div>
+                        <p class="text-sm font-semibold mb-1">State</p>
+                        <Skeleton v-if="isLoadingDomainContacts" width="w-40" class="mt-2"></Skeleton>
+                        <p v-else class="text-sm">{{ domainContacts[tab].state || 'N/A' }}</p>
+                    </div>
+                    <div>
+                        <p class="text-sm font-semibold mb-1">Postal Code</p>
+                        <Skeleton v-if="isLoadingDomainContacts" width="w-40" class="mt-2"></Skeleton>
+                        <p v-else class="text-sm">{{ domainContacts[tab].postal_code || 'N/A' }}</p>
+                    </div>
+                    <div>
+                        <p class="text-sm font-semibold mb-1">Country</p>
+                        <Skeleton v-if="isLoadingDomainContacts" width="w-40" class="mt-2"></Skeleton>
+                        <p v-else class="text-sm">{{ domainContacts[tab].country || 'N/A' }}</p>
+                    </div>
+                </div>
+            </div>
+
+            <p class="text-sm">
+                Your domain is provided by
+                <a href="https://www.namecheap.com" target="_blank" class="underline inline-flex items-center">
+                    <span>Namecheap.com</span>
+                    <ExternalLink size="14" class="ml-1" />
+                </a>
+            </p>
+
+        </div>
+
         <!-- Delete Domain (edit mode only) -->
         <div
             v-if="domain && !isLoadingStore && !isLoadingDomain && isEditing"
@@ -119,6 +198,7 @@
 
 <script>
 
+    import Tabs from '@Partials/Tabs.vue';
     import Pill from '@Partials/Pill.vue';
     import Alert from '@Partials/Alert.vue';
     import Modal from '@Partials/Modal.vue';
@@ -126,11 +206,11 @@
     import Button from '@Partials/Button.vue';
     import Skeleton from '@Partials/Skeleton.vue';
     import { isEmpty, isNotEmpty } from '@Utils/stringUtils';
-    import { Plus, Globe, RefreshCcw, MoveLeft, Trash2, CheckCircle } from 'lucide-vue-next';
+    import { User, Plus, Globe, RefreshCcw, MoveLeft, Trash2, CheckCircle, ExternalLink } from 'lucide-vue-next';
 
     export default {
         inject: ['formState', 'storeState', 'domainState', 'changeHistoryState', 'notificationState'],
-        components: { Pill, Alert, Modal, Input, Button, Skeleton, Globe, MoveLeft, Trash2, CheckCircle },
+        components: { Tabs, Pill, Alert, Modal, Input, Button, Skeleton, User, Globe, MoveLeft, Trash2, CheckCircle, ExternalLink },
         data() {
             return {
                 Plus,
@@ -140,11 +220,35 @@
                 RefreshCcw,
                 serverIp: null,
                 connected: false,
+                domainContacts: null,
                 existingDomainNames: [],
                 isLoadingDomains: false,
                 isLoadingServerIp: false,
                 originalDomainName: null,
-                originalDomainStatus: null
+                originalDomainStatus: null,
+                tab: 'registrant',
+                tabs: [
+                    {
+                        label: 'Domain Owner',
+                        value: 'registrant',
+                        description: 'The individual or entity that owns the domain. This information is used to register the domain and is publicly visible in WHOIS records unless privacy protection is enabled.'
+                    },
+                    {
+                        label: 'Technical Contact',
+                        value: 'tech',
+                        description: 'The person or team responsible for managing the domain’s technical setup, such as DNS configurations. They handle technical issues related to the domain.'
+                    },
+                    {
+                        label: 'Administrative Contact',
+                        value: 'admin',
+                        description: 'The contact responsible for administrative tasks, such as managing domain renewals and updates. They may also handle billing and policy-related matters.'
+                    },
+                    {
+                        label: 'Billing Contact',
+                        value: 'aux_billing',
+                        description: 'The contact responsible for payment and billing details for the domain. This information is used for invoices and renewal notifications.'
+                    }
+                ]
             }
         },
         watch: {
@@ -201,12 +305,18 @@
             isVerifyingDomain() {
                 return this.domainState.isVerifyingDomain;
             },
+            isLoadingDomainContacts() {
+                return this.domainState.isLoadingDomainContacts;
+            },
             domainStatus() {
                 if (this.connected === true) {
                     return { label: 'connected', type: 'success' };
                 }else{
                     return { label: 'pending', type: 'warning' };
                 }
+            },
+            selectedTabIndex() {
+                return this.tabs.findIndex(tab => tab.value == this.tab);
             }
         },
         methods: {
@@ -313,6 +423,10 @@
                     this.domainState.setDomain(domain);
                     this.domainState.setDomainForm(domain, true);
 
+                    if(this.domain.type == 'purchased') {
+                        this.showDomainContacts();
+                    }
+
                     this.$nextTick(() => {
                         this.connected = domain.status === 'connected' ? true : false;
                         this.originalDomainStatus = this.domain.status;
@@ -326,6 +440,29 @@
                     console.error('Failed to fetch domain:', error);
                 } finally {
                     this.domainState.isLoadingDomain = false;
+                }
+            },
+            async showDomainContacts() {
+                try {
+
+                    this.domainState.isLoadingDomainContacts = true;
+
+                    let config = {
+                        params: {
+                            store_id: this.store.id
+                        }
+                    };
+
+                    const response = await axios.get(`/api/domains/${this.domainId}/contacts`, config);
+                    this.domainContacts = response.data;
+
+                } catch (error) {
+                    const message = error?.response?.data?.message || error?.message || 'Something went wrong while fetching domain contacts';
+                    this.notificationState.showWarningNotification(message);
+                    this.formState.setServerFormErrors(error);
+                    console.error('Failed to fetch domain contacts:', error);
+                } finally {
+                    this.domainState.isLoadingDomainContacts = false;
                 }
             },
             async createDomain() {
