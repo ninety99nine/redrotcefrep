@@ -36,7 +36,7 @@
                         size="xs"
                         type="primary"
                         :showDot="false"
-                        :action="() => {}">workflows</Pill>,
+                        :action="navigateToShowWorkflows">workflows</Pill>,
                     ensuring clear and timely communication
                 </p>
 
@@ -123,6 +123,12 @@
             }
         },
         methods: {
+            async navigateToShowWorkflows() {
+                await this.$router.push({
+                    name: 'show-workflows',
+                    query: { store_id: this.store.id }
+                });
+            },
             setAddress(address) {
                 this.customerState.storeForm.address = address;
                 this.customerState.saveStateDebounced('Address changed');

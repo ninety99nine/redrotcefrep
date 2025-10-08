@@ -1,43 +1,70 @@
 <template>
-    <div class="max-w-2xl mx-auto pt-24 pb-40">
 
-        <!-- Heading -->
-        <h2 class="text-2xl font-semibold text-center mb-2">Marketing</h2>
-
-        <!-- Instruction -->
-        <p class="text-gray-500 text-center mb-6">Share your store link and start selling everywhere!</p>
+    <div class="max-w-lg mx-auto pt-24 pb-40">
 
         <!-- Share -->
-        <div class="space-y-3 mb-4">
+        <div class="space-y-4 mb-4">
 
-            <div class="bg-white space-y-4 py-8 px-4 shadow-sm rounded-xl flex flex-col items-center">
+            <div class="flex flex-col items-center bg-white py-8 px-4 shadow-sm rounded-xl">
 
-                <img :src="store.qr_code_file_path" alt="QR Code" class="w-32 h-32">
+                <div class="flex flex-col items-center space-y-8">
 
-                <p class="text-center text-xs text-gray-600">
-                    Customers can scan this QR code to visit your store instantly. Download it and add it to your marketing materials, such as flyers, business cards, t-shirts, and more, to make it easy for them to find your store.
-                </p>
+                    <div class="space-y-4">
 
-                <div class="flex space-x-2">
+                        <!-- Heading -->
+                        <h2 class="text-2xl font-semibold text-center mb-2">Marketing</h2>
 
-                    <Button
-                        size="sm"
-                        type="primary"
-                        buttonClass="w-full"
-                        :action="downloadQR"
-                        :loading="downloadingQr"
-                        :leftIcon="ArrowDownToLine">
-                        <span>Download</span>
-                    </Button>
+                        <!-- Instruction -->
+                        <p class="text-gray-500 text-center mb-6">Get your store out there and start selling everywhere!</p>
 
-                    <Button
-                        size="sm"
-                        type="success"
-                        buttonClass="w-full"
-                        :rightIcon="Forward"
-                        :action="sendQrCodeToWhatsapp">
-                        <span>Send To WhatsApp</span>
-                    </Button>
+                        <div class="animated-border-blue rounded-lg overflow-hidden">
+                            <img :src="'/images/qr-code-example-use.jpg'" alt="QR Code" class="max-w-96 rounded-t-lg inset-shadow-sm inset-shadow-red-500">
+
+                            <p class="max-w-96 text-center text-sm bg-gray-100 p-4 rounded-b-lg shadow">
+                                Download this QR code and add it to your flyers, business cards, packaging, t-shirts and more
+                            </p>
+                        </div>
+                    </div>
+
+                   <div class="w-full space-y-2">
+
+                        <div class="flex justify-between space-x-2">
+
+                            <Button
+                                size="sm"
+                                type="primary"
+                                class="w-full"
+                                buttonClass="w-full"
+                                :action="downloadQR"
+                                :loading="downloadingQr"
+                                :leftIcon="ArrowDownToLine">
+                                <span>Download</span>
+                            </Button>
+
+                            <Button
+                                size="sm"
+                                class="w-full"
+                                type="success"
+                                buttonClass="w-full"
+                                :rightIcon="Forward"
+                                :action="sendQrCodeToWhatsapp">
+                                <span>Send To WhatsApp</span>
+                            </Button>
+
+                        </div>
+
+                        <Button
+                            size="sm"
+                            type="primary"
+                            class="w-full"
+                            buttonClass="w-full"
+                            :action="visitCanva"
+                            :skeleton="isLoadingStore" >
+                            <span>Create design with</span>
+                            <img class="h-4 ml-1.5" :src="'/images/canva-logo-white.png'">
+                        </Button>
+
+                   </div>
 
                 </div>
 
@@ -59,56 +86,71 @@
                         <!-- Instruction -->
                         <p class="text-xs">Copy your store link and share it anywhere you want</p>
 
-                        <Copy
-                            :text="store.web_link">
-                        </Copy>
+                        <!-- Copy -->
+                        <Copy :text="store.web_link"></Copy>
 
                     </div>
 
                 </div>
 
                 <!-- Hint -->
-                <div class="flex items-center space-x-1 p-2 bg-blue-50 text-xs rounded-lg">
-                    <Info size="14"></Info>
-                    <span>You can change to your own domain later</span>
+                <div class="flex items-center justify-between space-x-1 py-2 px-4 bg-blue-50 text-xs rounded-lg">
+                    <div class="flex items-center space-x-1">
+                        <Info size="14"></Info>
+                        <span>Want your own domain?</span>
+                    </div>
+
+                    <Button
+                        size="xs"
+                        type="success"
+                        leftIconSize="16"
+                        :leftIcon="Earth"
+                        buttonClass="w-full"
+                        :action="navigateToShowDomains">
+                        <span>Connect Your Own Domain</span>
+                    </Button>
                 </div>
 
             </div>
 
-            <h2 class="text-sm font-semibold text-center mb-2">Share On Social Media</h2>
+            <h2 class="text-sm font-semibold text-center mb-4">Share On Social Media</h2>
 
             <!-- Share On Social Platforms -->
-            <a
-                :key="index"
-                target="_blank"
-                :href="socialPlatform.link"
-                v-for="(socialPlatform, index) in socialPlatforms"
-                :class="['block', { 'hidden': !showMore && index >= 5 }]">
+            <div class="space-y-2">
 
-                <div class="social-item flex justify-between items-center gap-8 bg-white py-3 px-4 shadow-sm rounded-xl transition-all duration-300 border border-transparent hover:border-gray-300 hover:shadow-lg cursor-pointer">
+                <a
+                    :key="index"
+                    target="_blank"
+                    :href="socialPlatform.link"
+                    v-for="(socialPlatform, index) in socialPlatforms"
+                    :class="['block', { 'hidden': !showMore && index >= 5 }]">
 
-                    <div class="flex items-center space-x-4">
+                    <div class="social-item flex justify-between items-center gap-8 bg-white py-3 px-4 shadow-sm rounded-xl transition-all duration-300 border border-transparent hover:border-gray-300 hover:shadow-lg cursor-pointer">
 
-                        <!-- Logo -->
-                        <img :src="`/images/social-media-icons/${socialPlatform.name.toLowerCase()}.png`" :alt="`${socialPlatform.name} Logo`" class="w-8 h-8" />
+                        <div class="flex items-center space-x-4">
 
-                        <!-- Name -->
-                        <div class="space-y-1 text-sm">
-                            <p class="font-bold">{{ socialPlatform.name }}</p>
-                            <p class="text-xs">{{ socialPlatform.description }}</p>
+                            <!-- Logo -->
+                            <img :src="`/images/social-media-icons/${socialPlatform.name.toLowerCase()}.png`" :alt="`${socialPlatform.name} Logo`" class="w-8 h-8" />
+
+                            <!-- Name -->
+                            <div class="space-y-1 text-sm">
+                                <p class="font-bold">{{ socialPlatform.name }}</p>
+                                <p class="text-xs">{{ socialPlatform.description }}</p>
+                            </div>
+
+                        </div>
+
+                        <div class="rounded-md border p-1 border-transparent hover:border-gray-300 hover:bg-gray-50">
+
+                            <ExternalLink size="20" class="text-gray-500"></ExternalLink>
+
                         </div>
 
                     </div>
 
-                    <div class="rounded-md border p-1 border-transparent hover:border-gray-300 hover:bg-gray-50">
+                </a>
 
-                        <ExternalLink size="20" class="text-gray-500"></ExternalLink>
-
-                    </div>
-
-                </div>
-
-            </a>
+            </div>
 
         </div>
 
@@ -132,7 +174,7 @@
 <script>
     import Copy from '@Partials/Copy.vue';
     import Button from '@Partials/Button.vue';
-    import { Info, Link, Forward, ChevronUp, ChevronDown, ExternalLink, ArrowDownToLine } from 'lucide-vue-next';
+    import { Info, Link, Earth, Forward, ChevronUp, ChevronDown, ExternalLink, ArrowDownToLine } from 'lucide-vue-next';
 
     export default {
         inject: ['storeState'],
@@ -142,6 +184,7 @@
         },
         data() {
             return {
+                Earth,
                 Forward,
                 ArrowDownToLine,
                 showMore: false,
@@ -227,6 +270,12 @@
             }
         },
         methods: {
+            async navigateToShowDomains() {
+                await this.$router.push({
+                    name: 'show-domains',
+                    query: { store_id: this.store.id }
+                });
+            },
             async downloadQR() {
                 try {
                     this.downloadingQr = true;
