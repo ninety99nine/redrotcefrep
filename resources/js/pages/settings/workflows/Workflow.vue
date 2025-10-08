@@ -33,8 +33,8 @@
                 :errorText="formState.getFormError('name')"
                 :skeleton="isLoadingStore || isLoadingWorkflow"
                 @input="workflowState.saveStateDebounced('Name changed')"
-                tooltipContent="The workflow name to help you know what this workflow does e.g New order notification">
-            </Input>
+                tooltipContent="The workflow name to help you know what this workflow does e.g New order notification"
+            />
 
         </div>
 
@@ -42,7 +42,7 @@
 
             <!-- Heading -->
             <div class="flex items-center space-x-2 mb-4">
-                <Star size="20"></Star>
+                <Star size="20" class="shrink-0"></Star>
                 <h1 class="font-bold text-lg">Trigger</h1>
             </div>
 
@@ -57,8 +57,8 @@
                     :options="targetTypes"
                     v-model="workflowForm.target"
                     :errorText="formState.getFormError('target')"
-                    @change="workflowState.saveStateDebounced('Target changed')">
-                </Select>
+                    @change="workflowState.saveStateDebounced('Target changed')"
+                />
 
                 <span>is</span>
 
@@ -69,19 +69,20 @@
                     :options="triggerTypes"
                     v-model="workflowForm.trigger"
                     :errorText="formState.getFormError('trigger')"
-                    @change="workflowState.saveStateDebounced('Trigger changed')">
-                </Select>
+                    @change="workflowState.saveStateDebounced('Trigger changed')"
+                />
 
             </div>
 
         </div>
 
-        <div v-if="!isLoadingStore && !isLoadingWorkflow">
+        <div v-if="!isLoadingStore && !isLoadingWorkflow && !isLoadingWorkflowConfigurations">
 
             <!-- Down Pointing Arrow Separator -->
             <div class="w-40 text-blue-500 border border-blue-500 mx-auto py-1 px-2 rounded-xl">
                 <h1 class="text-xs text-center">{{ totalWorkflowActions }} {{ totalWorkflowActions == 1 ? 'Action' : 'Actions' }}</h1>
             </div>
+
             <div class="flex justify-center">
                 <svg class="w-6 h-6 text-blue-500 -mt-0.5 mb-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 17.25 12 21m0 0-3.75-3.75M12 21V3" />
@@ -113,26 +114,24 @@
 
                                 <!-- Icon -->
                                 <WhatsappIcon
-                                    class="flex-shrink-0 mr-2"
-                                    v-if="['whatsapp customer', 'whatsapp team'].includes(workflowForm.actions[index].action)">
-                                </WhatsappIcon>
+                                    class="shrink-0 mr-2"
+                                    v-if="['whatsapp customer', 'whatsapp team'].includes(action.action)" />
+
                                 <Mail
                                     size="28"
-                                    class="text-indigo-500"
-                                    v-else-if="['email customer', 'email team'].includes(workflowForm.actions[index].action)">
-                                </Mail>
+                                    class="shrink-0 text-indigo-500"
+                                    v-else-if="['email customer', 'email team'].includes(action.action)" />
 
                                 <!-- Action Select -->
                                 <Select
                                     class="w-full"
                                     :search="false"
                                     :options="actionTypes"
-                                    v-model="workflowForm.actions[index].action"
-                                    @change="workflowState.saveStateDebounced('Action changed')"
-                                    :errorText="formState.getFormError(`actions.${index}.action`)">
-                                </Select>
+                                    v-model="action.action"
+                                    @change="updateActionFields(index)"
+                                    :errorText="formState.getFormError(`actions.${index}.action`)" />
 
-                                <template v-if="templateTypes(workflowForm.actions[index].action).length >= 2">
+                                <template v-if="templateTypes(action.action).length >= 2">
 
                                     <span>using</span>
 
@@ -140,11 +139,11 @@
                                     <Select
                                         class="w-full"
                                         :search="false"
-                                        v-model="workflowForm.actions[index].template"
-                                        :options="templateTypes(workflowForm.actions[index].action)"
-                                        @change="workflowState.saveStateDebounced('Template changed')"
-                                        :errorText="formState.getFormError(`actions.${index}.template`)">
-                                    </Select>
+                                        v-model="action.template"
+                                        :options="templateTypes(action.action)"
+                                        @change="updateTemplateFields(index)"
+                                        :errorText="formState.getFormError(`actions.${index}.template`)"
+                                    />
 
                                 </template>
 
@@ -157,9 +156,8 @@
                                     size="xs"
                                     type="bareDanger"
                                     :leftIcon="Trash2"
-                                    :action="() => removeWorkflowAction(index)">
-                                </Button>
-
+                                    :action="() => removeWorkflowAction(index)"
+                                />
                                 <!-- Drag & Drop Handle -->
                                 <Move @click.stop size="16" class="draggable-handle cursor-grab active:cursor-grabbing text-gray-500 hover:text-yellow-500"></Move>
 
@@ -167,127 +165,129 @@
 
                         </div>
 
-                        <div v-if="workflowForm.actions[index].action == 'whatsapp team'"
-                            :class="{'space-y-4 p-4 bg-slate-100 border border-gray-200 rounded-lg' : workflowForm.actions[index].mobile_numbers.length == 0 }">
+                        <!-- Dynamic Fields Rendering -->
+                        <div v-for="(field, fieldName) in getActionFields(action.action, action.template, index)" :key="fieldName">
 
-                            <div v-if="workflowForm.actions[index].mobile_numbers.length == 0" class="space-y-1 mb-4">
+                            <!-- Mobile Numbers for whatsapp team -->
+                            <div
+                                v-if="fieldName === 'mobile_numbers' && action.action === 'whatsapp team'"
+                                :class="{'space-y-4 p-4 bg-slate-100 border border-gray-200 rounded-lg': !action[fieldName]?.length}">
 
-                                <h1 class="flex items-center font-lg font-bold">
-                                    <span>Send WhatsApp</span>
-                                </h1>
+                                <div v-if="!action[fieldName]?.length" class="space-y-1 mb-4">
 
-                                <p class="text-sm text-gray-500">
-                                    Add one or more mobile numbers to send the Whatsapp message
-                                </p>
+                                    <h1 class="flex items-center font-lg font-bold">
+                                        <span>Send WhatsApp</span>
+                                    </h1>
+
+                                    <p class="text-sm text-gray-500">
+                                        Add one or more mobile numbers to send the Whatsapp message
+                                    </p>
+
+                                </div>
+
+                                <div class="flex justify-center">
+
+                                    <InputMobileNumbers
+                                        :isSubmitting="false"
+                                        v-model="action[fieldName]"
+                                        @change="workflowState.saveStateDebounced('Mobile numbers changed')" />
+
+                                </div>
 
                             </div>
 
-                            <div class="flex justify-center">
+                            <!-- Email for email team -->
+                            <div v-if="fieldName === 'email' && action.action === 'email team'">
 
-                                <!-- Mobile Numbers Input -->
-                                <InputMobileNumbers
-                                    :isSubmitting="false"
-                                    v-model="workflowForm.actions[index].mobile_numbers"
-                                    @change="workflowState.saveStateDebounced('Mobile numbers changed')">
-                                </InputMobileNumbers>
+                                <Input
+                                    type="email"
+                                    label="Email"
+                                    v-model="action[fieldName]"
+                                    placeholder="company@example.com"
+                                    @input="workflowState.saveStateDebounced('Email changed')"
+                                    :errorText="formState.getFormError(`actions.${index}.email`)" />
 
                             </div>
 
-                        </div>
+                            <!-- Payment Reminder Fields -->
+                            <div v-if="action.template === 'payment reminder' && fieldName === 'add_delay'" class="space-y-4">
 
-                        <div v-if="workflowForm.actions[index].action == 'email team'">
+                                <div class="space-y-2">
 
-                            <!-- Email Input -->
-                            <Input
-                                type="email"
-                                label="Email"
-                                placeholder="company@example.com"
-                                v-model="workflowForm.actions[index].email"
-                                :errorText="formState.getFormError('email')"
-                                @input="workflowState.saveStateDebounced('Email changed')">
-                            </Input>
+                                    <Input
+                                        type="checkbox"
+                                        inputLabel="Add delay"
+                                        v-model="action[fieldName]"
+                                        :errorText="formState.getFormError(`actions.${index}.add_delay`)"
+                                        @change="workflowState.saveStateDebounced('Add delay status changed')"
+                                    />
 
-                        </div>
+                                    <template v-if="action[fieldName]">
 
-                        <div v-if="workflowForm.actions[index].template == 'payment reminder'" class="space-y-4">
+                                        <p class="text-xs text-gray-400 mb-2">Time to wait before sending payment reminder</p>
 
-                            <div class="space-y-2">
+                                        <div class="flex items-center space-x-4">
+
+                                            <Input
+                                                min="1"
+                                                type="number"
+                                                class="w-40"
+                                                v-model="action.delay_time_value"
+                                                @input="workflowState.saveStateDebounced('Delay time changed')"
+                                                :errorText="formState.getFormError(`actions.${index}.delay_time_value`)"
+                                            />
+
+                                            <Select
+                                                class="w-40"
+                                                :search="false"
+                                                v-model="action.delay_time_unit"
+                                                :options="delayTimeUnits(action.delay_time_value)"
+                                                @change="workflowState.saveStateDebounced('Delay time changed')"
+                                                :errorText="formState.getFormError(`actions.${index}.delay_time_unit`)"
+                                            />
+
+                                        </div>
+
+                                    </template>
+
+                                </div>
+
+                            </div>
+
+                            <div
+                                v-if="action.template === 'payment reminder' && fieldName === 'auto_cancel'"
+                                :class="['space-y-2', { 'border-t border-b border-gray-300 border-dashed py-4': action.add_delay && action[fieldName] }]">
 
                                 <Input
                                     type="checkbox"
-                                    inputLabel="Add delay"
-                                    v-model="workflowForm.actions[index].add_delay"
-                                    :errorText="formState.getFormError(`actions.${index}.add_delay`)"
-                                    @change="workflowState.saveStateDebounced('Add delay status changed')">
-                                </Input>
-
-                                <template v-if="workflowForm.actions[index].add_delay">
-
-                                    <p class="text-xs text-gray-400 mb-2">Time to wait before sending payment reminder</p>
-
-                                    <div class="flex items-center space-x-4">
-
-                                        <!-- Delay Time Value Input -->
-                                        <Input
-                                            min="1"
-                                            type="number"
-                                            class="w-40"
-                                            v-model="workflowForm.actions[index].delay_time_value"
-                                            @input="workflowState.saveStateDebounced('Delay time changed')"
-                                            :errorText="formState.getFormError(`actions.${index}.delay_time_value`)">
-                                        </Input>
-
-                                        <!-- Delay Time Units Input -->
-                                        <Select
-                                            class="w-40"
-                                            :search="false"
-                                            :options="delayTimeUnits(index)"
-                                            v-model="workflowForm.actions[index].delay_time_unit"
-                                            @change="workflowState.saveStateDebounced('Delay time changed')"
-                                            :errorText="formState.getFormError(`actions.${index}.delay_time_unit`)">
-                                        </Select>
-
-                                    </div>
-
-                                </template>
-
-                            </div>
-
-                            <div :class="['space-y-2', { 'border-t border-b border-gray-300 border-dashed py-4' : workflowForm.actions[index].add_delay && workflowForm.actions[index].auto_cancel }]">
-
-                                <Input
-                                    type="checkbox"
-                                    v-model="workflowForm.actions[index].auto_cancel"
+                                    v-model="action[fieldName]"
                                     inputLabel="Cancel order if payment is not received"
                                     :errorText="formState.getFormError(`actions.${index}.auto_cancel`)"
-                                    @change="workflowState.saveStateDebounced('Auto cancel status changed')">
-                                </Input>
+                                    @change="workflowState.saveStateDebounced('Auto cancel status changed')" />
 
-                                <template v-if="workflowForm.actions[index].auto_cancel">
+                                <template v-if="action[fieldName]">
 
                                     <p class="text-xs text-gray-400 mb-2">Time to wait before cancelling the order after sending payment reminder</p>
 
                                     <div class="flex items-center space-x-4">
 
-                                        <!-- Cancel Time Value Input -->
                                         <Input
                                             min="1"
                                             type="number"
                                             class="w-40"
-                                            v-model="workflowForm.actions[index].cancel_time_value"
+                                            v-model="action.cancel_time_value"
                                             @input="workflowState.saveStateDebounced('Cancel time changed')"
-                                            :errorText="formState.getFormError(`actions.${index}.cancel_time_value`)">
-                                        </Input>
+                                            :errorText="formState.getFormError(`actions.${index}.cancel_time_value`)"
+                                        />
 
-                                        <!-- Cancel Time Units Input -->
                                         <Select
                                             class="w-40"
                                             :search="false"
-                                            :options="delayTimeUnits(index)"
-                                            v-model="workflowForm.actions[index].delay_time_unit"
+                                            v-model="action.cancel_time_unit"
+                                            :options="delayTimeUnits(action.cancel_time_value)"
                                             @change="workflowState.saveStateDebounced('Cancel time changed')"
-                                            :errorText="formState.getFormError(`actions.${index}.cancel_time_unit`)">
-                                        </Select>
+                                            :errorText="formState.getFormError(`actions.${index}.cancel_time_unit`)"
+                                        />
 
                                     </div>
 
@@ -295,40 +295,40 @@
 
                             </div>
 
-                        </div>
+                            <!-- Review Link for request review -->
+                            <div v-if="fieldName === 'review_link' && action.template === 'request review'">
 
-                        <div v-if="workflowForm.actions[index].template == 'request review'">
+                                <Input
+                                    type="text"
+                                    label="Review Link"
+                                    placeholder="https://"
+                                    secondaryLabel="(optional)"
+                                    v-model="action[fieldName]"
+                                    @input="workflowState.saveStateDebounced('Review link changed')"
+                                    :errorText="formState.getFormError(`actions.${index}.review_link`)"
+                                    :description="`If empty a review link will be provided automatically`"
+                                    tooltipContent="Link to the platform that allows customers to add a review e.g Google Reviews"
+                                />
 
-                            <!-- Review Link Input -->
-                            <Input
-                                type="text"
-                                label="Review Link"
-                                placeholder="https://"
-                                secondaryLabel="(optional)"
-                                v-model="workflowForm.actions[index].review_link"
-                                @input="workflowState.saveStateDebounced('Review link changed')"
-                                :errorText="formState.getFormError(`actions.${index}.review_link`)"
-                                :description="`If empty a review link will be provided automatically`"
-                                tooltipContent="Link to the platform that allows customers to add a review e.g Google Reviews">
-                            </Input>
+                            </div>
 
-                        </div>
+                            <!-- Notes for payment reminder or request review -->
+                            <div v-if="fieldName === 'notes' && ['payment reminder', 'request review'].includes(action.template)">
 
-                        <div v-if="['payment reminder', 'request review'].includes(workflowForm.actions[index].template)">
+                                <Input
+                                    rows="1"
+                                    max="200"
+                                    :resize="true"
+                                    type="textarea"
+                                    label="Additional Notes"
+                                    secondaryLabel="(optional)"
+                                    description="Less than 200 characters"
+                                    v-model="action[fieldName]"
+                                    :errorText="formState.getFormError(`actions.${index}.notes`)"
+                                    @input="workflowState.saveStateDebounced('Additional notes changed')"
+                                />
 
-                            <!-- Additional Notes Input -->
-                            <Input
-                                rows="1"
-                                max="200"
-                                :resize="true"
-                                type="textarea"
-                                label="Additional Notes"
-                                secondaryLabel="(optional)"
-                                description="Less than 200 characters"
-                                v-model="workflowForm.actions[index].notes"
-                                :errorText="formState.getFormError('notes')"
-                                @input="workflowState.saveStateDebounced('Additional notes changed')">
-                            </Input>
+                            </div>
 
                         </div>
 
@@ -358,14 +358,12 @@
                 v-if="totalWorkflowActions == maxWorkflowActions">
 
                 <template #content>
-
                     <div class="flex items-center space-x-2">
                         <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" d="m11.25 11.25.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z" />
                         </svg>
                         <span>You can only add up to <span class="font-bold">{{ maxWorkflowActions }} actions</span> per workflow</span>
                     </div>
-
                 </template>
 
             </Alert>
@@ -381,7 +379,6 @@
             </div>
 
             <div class="flex justify-end">
-
                 <Modal
                     triggerType="danger"
                     approveType="danger"
@@ -391,14 +388,11 @@
                     :approveAction="deleteWorkflow"
                     :triggerLoading="isDeletingWorkflow"
                     :approveLoading="isDeletingWorkflow">
-
                     <template #content>
                         <p class="text-lg font-bold border-b border-gray-300 border-dashed pb-4 mb-4">Confirm Delete</p>
                         <p class="mb-8">Are you sure you want to delete <span class="font-bold text-black">{{ workflow.name }}</span>?</p>
                     </template>
-
                 </Modal>
-
             </div>
 
         </div>
@@ -415,7 +409,9 @@
     import Switch from '@Partials/Switch.vue';
     import Select from '@Partials/Select.vue';
     import Button from '@Partials/Button.vue';
+    import { isEmpty } from '@Utils/stringUtils';
     import Skeleton from '@Partials/Skeleton.vue';
+    import { capitalize } from '@Utils/stringUtils';
     import WhatsappIcon from '@Partials/WhatsappIcon.vue';
     import { VueDraggableNext } from 'vue-draggable-next';
     import InputMobileNumbers from '@Partials/InputMobileNumbers.vue';
@@ -432,53 +428,41 @@
                 Trash2,
                 MoveLeft,
                 maxWorkflowActions: 3,
+                workflowConfigurations: [],
                 appName: import.meta.env.VITE_APP_NAME,
-                targetTypes: [
-                    { label: 'Order', value: 'order' },
-                    { label: 'Payment', value: 'payment' },
-                    { label: 'Product', value: 'product' },
-                ]
-            }
+                isLoadingWorkflowConfigurations: false,
+            };
         },
         watch: {
             store(newValue, oldValue) {
-                if(!oldValue && newValue) {
+                if (!oldValue && newValue) {
                     this.setup();
                 }
             },
-            workflowForm: {
-                handler(newValue, oldValue) {
-
-                    if(oldValue != null) {
-
-                        const trigger = this.workflowForm.trigger;
-                        const actionTypeValues = this.actionTypes.map(actionType => actionType.value);
-                        const triggerTypeValues = this.triggerTypes.map(triggerType => triggerType.value);
-
-                        if(!triggerTypeValues.includes(trigger)) {
-                            this.workflowForm.trigger = triggerTypeValues[0];
+            'workflowForm.target': {
+                handler() {
+                    const trigger = this.workflowForm.trigger;
+                    const availableTriggers = this.triggerTypes.map(t => t.value);
+                    this.workflowForm.trigger = availableTriggers.includes(trigger) ? trigger : this.triggerTypes[0]?.value || null;
+                }
+            },
+            'workflowForm.trigger': {
+                handler() {
+                    const availableActions = this.actionTypes.map(a => a.value);
+                    this.workflowForm.actions = this.workflowForm.actions.map(action => {
+                        if (!availableActions.includes(action.action)) {
+                            const defaultAction = this.actionTypes[0]?.value;
+                            const defaultTemplate = this.templateTypes(defaultAction)[0]?.value || null;
+                            const fields = this.getActionFields(defaultAction, defaultTemplate, 0);
+                            return {
+                                action: defaultAction,
+                                template: defaultTemplate,
+                                ...fields
+                            };
                         }
-
-                        for (let index = 0; index < this.workflowForm.actions.length; index++) {
-
-                            const action = this.workflowForm.actions[index].action;
-                            const template = this.workflowForm.actions[index].template;
-                            const templateTypeValues = this.templateTypes(action).map(templateType => templateType.value);
-
-                            if(!actionTypeValues.includes(action)) {
-                                this.workflowForm.actions[index].action = this.actionTypes[0].value;
-                            }
-
-                            if(!templateTypeValues.includes(template)) {
-                                this.workflowForm.actions[index].template = templateTypeValues[0];
-                            }
-
-                        }
-
-                    }
-
-                },
-                deep: true
+                        return action;
+                    });
+                }
             }
         },
         computed: {
@@ -512,51 +496,42 @@
             totalWorkflowActions() {
                 return this.workflowForm.actions?.length ?? 0;
             },
+            targetTypes() {
+                // Deduplicate targets and map to options
+                const uniqueTargets = [...new Set(this.workflowConfigurations.map(config => config.target))];
+                return uniqueTargets.map(target => ({
+                    label: capitalize(target),
+                    value: target
+                }));
+            },
             triggerTypes() {
-                if(this.workflowForm.target == 'order') {
-                    return [
-                        { label: 'Waiting', value: 'waiting' },
-                        { label: 'Cancelled', value: 'cancelled' },
-                        { label: 'Completed', value: 'completed' },
-                        { label: 'On its way', value: 'on its way' },
-                        { label: 'Ready for pickup', value: 'ready for pickup' },
-                    ];
-                }else if(this.workflowForm.target == 'payment') {
-                    return [
-                        { label: 'Paid', value: 'paid' },
-                        { label: 'Unpaid', value: 'unpaid' },
-                        { label: 'Partially paid', value: 'partially paid' },
-                        { label: 'Waiting confirmation', value: 'waiting confirmation' },
-                    ];
-                }else if(this.workflowForm.target == 'product') {
-                    return [
-                        { label: 'No stock', value: 'no stock' },
-                        { label: 'Low stock', value: 'low stock' },
-                    ];
-                }else{
-                    return [];
-                }
-
+                if (!this.workflowForm.target) return [];
+                // Filter workflow configurations by selected target and deduplicate triggers
+                const triggers = this.workflowConfigurations
+                    .filter(c => c.target === this.workflowForm.target)
+                    .map(c => c.trigger);
+                return [...new Set(triggers)].map(trigger => ({
+                    label: capitalize(trigger),
+                    value: trigger
+                }));
             },
             actionTypes() {
-                const actions = {
-                    whatsappTeam: { label: 'Whatsapp team', value: 'whatsapp team' },
-                    whatsappCustomer: { label: 'Whatsapp customer', value: 'whatsapp customer' },
-                    emailTeam: { label: 'Email team', value: 'email team' },
-                    emailCustomer: { label: 'Email customer', value: 'email customer' }
-                };
-
-                if (this.workflowForm.trigger === 'product') {
-                    return [actions.whatsappTeam, actions.emailTeam];
-                } else {
-                    return [actions.whatsappTeam, actions.whatsappCustomer, actions.emailTeam, actions.emailCustomer];
-                }
+                if (!this.workflowForm.target || !this.workflowForm.trigger) return [];
+                const config = this.workflowConfigurations.find(c => c.target === this.workflowForm.target && c.trigger === this.workflowForm.trigger);
+                if (!config) return [];
+                return config.actions.map(action => ({
+                    label: capitalize(action.name.replace(/([A-Z])/g, ' $1').trim()),
+                    value: action.name
+                }));
             }
         },
         methods: {
-            setup() {
-                this.workflowState.setWorkflowForm(null, true);
-                if(this.store && this.workflowId) this.showWorkflow();
+            isEmpty,
+            capitalize,
+            async setup() {
+                this.workflowState.setWorkflowForm(null, false);
+                if (this.store) await this.showWorkflowConfigurations();
+                if (this.store && this.workflowId) await this.showWorkflow();
             },
             setActionButtons() {
                 this.changeHistoryState.removeButtons();
@@ -565,88 +540,111 @@
                     this.isEditing ? 'Save Changes' : 'Add Workflow',
                     this.isEditing ? this.updateWorkflow : this.createWorkflow,
                     'primary',
-                    null,
+                    null
                 );
             },
-            async navigateToShowWorkflows() {
-                await this.$router.push({
-                    name: 'show-workflows',
-                    query: {
-                        store_id: this.store.id
-                    }
-                });
-            },
-            templateTypes(action) {
-                const templates = {
-                    orderDetails: { label: 'Order details', value: 'order details' },
-                    requestReview: { label: 'Request review', value: 'request review' },
-                    paymentReminder: { label: 'Payment reminder', value: 'payment reminder' },
-                };
-
-                if (action === 'whatsapp customer') {
-                    if (this.workflowForm.trigger === 'paid') {
-                        return [templates.orderDetails, templates.requestReview];
-                    } else if (this.workflowForm.trigger === 'unpaid') {
-                        return [templates.orderDetails, templates.paymentReminder];
-                    } else if (this.workflowForm.trigger === 'completed') {
-                        return [templates.orderDetails, templates.requestReview];
-                    } else {
-                    return [templates.orderDetails];
-                }
-                } else if (this.workflowForm.action === 'whatsapp team') {
-                    return [templates.orderDetails];
-                }
-
-                return [];
-            },
-            delayTimeUnits(index) {
+            delayTimeUnits(value) {
                 return [
-                    { label: (this.workflowForm.actions[index].delay_time_value == '1' ? 'Minute' : 'Minutes'), value: 'minute' },
-                    { label: (this.workflowForm.actions[index].delay_time_value == '1' ? 'Hour' : 'Hours'), value: 'hour' },
+                    { label: value == '1' ? 'Minute' : 'Minutes', value: 'minute' },
+                    { label: value == '1' ? 'Hour' : 'Hours', value: 'hour' }
                 ];
             },
-            addWorkflowAction() {
-                this.workflowForm.actions.push({
-                    notes : '',
-                    email : '',
-                    mobile_numbers : [],
-                    action: this.actionTypes[0].value,
-                    template: this.templateTypes[0]?.value ?? null,
-
-                    add_delay: false,
-                    delay_time_value: '1',
-                    delay_time_unit: 'hour',
-
-                    auto_cancel: false,
-                    cancel_time_value: '24',
-                    cancel_time_unit: 'hour',
-
-                    review_link : ''
+            templateTypes(action) {
+                if (!this.workflowForm.target || !this.workflowForm.trigger) return [];
+                const config = this.workflowConfigurations.find(c => c.target === this.workflowForm.target && c.trigger === this.workflowForm.trigger);
+                if (!config) return [];
+                const actionConfig = config.actions.find(a => a.name === action);
+                if (!actionConfig) return [];
+                return actionConfig.templates.map(template => ({
+                    label: capitalize(template.name.replace(/([A-Z])/g, ' $1').trim()),
+                    value: template.name
+                }));
+            },
+            updateTemplateFields(index) {
+                const action = this.workflowForm.actions[index];
+                const fields = this.getActionFields(action.action, action.template, index);
+                // Preserve action and template, reset other fields
+                Object.keys(action).forEach(key => {
+                    if (key !== 'action' && key !== 'template') {
+                        delete action[key];
+                    }
                 });
-
+                Object.assign(action, fields);
+                this.workflowState.saveStateDebounced('Template changed');
+            },
+            getActionFields(actionName, templateName, index) {
+                if (!this.workflowForm.target || !this.workflowForm.trigger) return {};
+                const config = this.workflowConfigurations.find(c => c.target === this.workflowForm.target && c.trigger === this.workflowForm.trigger);
+                if (!config) return {};
+                const actionConfig = config.actions.find(a => a.name === actionName);
+                if (!actionConfig) return {};
+                const templateConfig = actionConfig.templates.find(t => t.name === templateName);
+                if (!templateConfig) return {};
+                return templateConfig.fields;
+            },
+            updateActionFields(index) {
+                const action = this.workflowForm.actions[index];
+                const config = this.workflowConfigurations.find(c => c.target === this.workflowForm.target && c.trigger === this.workflowForm.trigger);
+                if (!config) return;
+                const actionConfig = config.actions.find(a => a.name === action.action);
+                if (!actionConfig) return;
+                const defaultTemplate = actionConfig.templates[0]?.name || 'order details';
+                action.template = defaultTemplate;
+                // Reset fields and apply defaults from API
+                const fields = this.getActionFields(action.action, defaultTemplate, index);
+                Object.keys(action).forEach(key => {
+                    if (key !== 'action' && key !== 'template') {
+                        delete action[key];
+                    }
+                });
+                Object.assign(action, fields);
+                this.workflowState.saveStateDebounced('Action changed');
+            },
+            addWorkflowAction() {
+                if (!this.actionTypes.length) return;
+                const defaultAction = this.actionTypes[0].value;
+                const defaultTemplate = this.templateTypes(defaultAction)[0]?.value || 'order details';
+                const fields = this.getActionFields(defaultAction, defaultTemplate, 0);
+                this.workflowForm.actions.push({
+                    action: defaultAction,
+                    template: defaultTemplate,
+                    ...fields
+                });
                 this.workflowState.saveStateDebounced('Action added');
             },
             removeWorkflowAction(index) {
                 this.workflowForm.actions.splice(index, 1);
                 this.workflowState.saveStateDebounced('Action removed');
             },
-            async showWorkflow() {
+            async showWorkflowConfigurations() {
                 try {
 
-                    this.workflowState.isLoadingWorkflow = true;
+                    this.isLoadingWorkflowConfigurations = true;
 
-                    let config = {
-                        params: {
-                            store_id: this.store.id
-                        }
+                    const config = {
+                        params: { store_id: this.store.id }
                     };
 
-                    const response = await axios.get(`/api/workflows/${this.workflowId}`, config);
+                    const response = await axios.get('/api/workflows/configurations', config);
+                    this.workflowConfigurations = response.data;
 
+                } catch (error) {
+                    const message = error?.response?.data?.message || error?.message || 'Failed to fetch workflow configurations';
+                    this.notificationState.showWarningNotification(message);
+                    console.error('Failed to fetch workflow configurations:', error);
+                } finally {
+                    this.isLoadingWorkflowConfigurations = false;
+                }
+            },
+            async showWorkflow() {
+                try {
+                    this.workflowState.isLoadingWorkflow = true;
+                    const response = await axios.get(`/api/workflows/${this.workflowId}`, {
+                        params: { store_id: this.store.id }
+                    });
                     const workflow = response.data;
                     this.workflowState.setWorkflow(workflow);
                     this.workflowState.setWorkflowForm(workflow, true);
-
                 } catch (error) {
                     const message = error?.response?.data?.message || error?.message || 'Something went wrong while fetching workflow';
                     this.notificationState.showWarningNotification(message);
@@ -657,39 +655,22 @@
                 }
             },
             async createWorkflow() {
-
                 try {
-
-                    if(this.workflowState.isCreatingWorkflow) return;
-
+                    if (this.workflowState.isCreatingWorkflow) return;
                     this.formState.hideFormErrors();
-
-                    if(this.workflowForm.name == null || this.workflowForm.name.trim() === '') {
+                    if (this.isEmpty(this.workflowForm.name)) {
                         this.formState.setFormError('name', 'The name is required');
                     }
-
-                    if(this.formState.hasErrors) {
-                        return;
-                    }
-
+                    if (this.formState.hasErrors) return;
                     this.workflowState.isCreatingWorkflow = true;
                     this.changeHistoryState.actionButtons[1].loading = true;
-
-                    const data = {
-                        ...this.workflowForm,
-                        store_id: this.store.id,
-                    }
-
-                    const response = await axios.post(`/api/workflows`, data);
-                    const workflow = response.data.delivery_method;
-
+                    const data = { ...this.workflowForm, store_id: this.store.id };
+                    const response = await axios.post('/api/workflows', data);
+                    const workflow = response.data;
                     this.workflowState.setWorkflow(workflow);
-
-                    this.notificationState.showSuccessNotification(`Workflow created`);
+                    this.notificationState.showSuccessNotification('Workflow created');
                     this.workflowState.saveOriginalState('Original workflow');
-
-                    this.navigateToShowWorkflows();
-
+                    await this.navigateToShowWorkflows();
                 } catch (error) {
                     const message = error?.response?.data?.message || error?.message || 'Something went wrong while creating workflow';
                     this.notificationState.showWarningNotification(message);
@@ -699,40 +680,23 @@
                     this.workflowState.isCreatingWorkflow = false;
                     this.changeHistoryState.actionButtons[1].loading = false;
                 }
-
             },
             async updateWorkflow() {
-
                 try {
-
-                    if(this.workflowState.isUpdatingWorkflow) return;
-
+                    if (this.workflowState.isUpdatingWorkflow) return;
                     this.formState.hideFormErrors();
-
-                    if(this.workflowForm.name == null || this.workflowForm.name.trim() === '') {
+                    if (this.isEmpty(this.workflowForm.name)) {
                         this.formState.setFormError('name', 'The name is required');
                     }
-
-                    if(this.formState.hasErrors) {
-                        return;
-                    }
-
+                    if (this.formState.hasErrors) return;
                     this.workflowState.isUpdatingWorkflow = true;
                     this.changeHistoryState.actionButtons[1].loading = true;
-
-                    const data = {
-                        ...this.workflowForm,
-                        store_id: this.store.id
-                    }
-
+                    const data = { ...this.workflowForm, store_id: this.store.id };
                     const response = await axios.put(`/api/workflows/${this.workflowId}`, data);
-                    const workflow = response.data.delivery_method;
-
+                    const workflow = response.data;
                     this.workflowState.setWorkflow(workflow);
-
-                    this.notificationState.showSuccessNotification(`Workflow updated`);
+                    this.notificationState.showSuccessNotification('Workflow updated');
                     this.workflowState.saveOriginalState('Original workflow');
-
                 } catch (error) {
                     const message = error?.response?.data?.message || error?.message || 'Something went wrong while updating workflow';
                     this.notificationState.showWarningNotification(message);
@@ -742,31 +706,18 @@
                     this.workflowState.isUpdatingWorkflow = false;
                     this.changeHistoryState.actionButtons[1].loading = false;
                 }
-
             },
             async deleteWorkflow(hideModal) {
-
                 try {
-
-                    if(this.workflowState.isDeletingWorkflow) return;
-
+                    if (this.workflowState.isDeletingWorkflow) return;
                     this.workflowState.isDeletingWorkflow = true;
-
-                    const config = {
-                        data: {
-                            store_id: this.store.id
-                        }
-                    }
-
-                    await axios.delete(`/api/workflows/${this.workflowId}`, config);
-
+                    await axios.delete(`/api/workflows/${this.workflowId}`, {
+                        data: { store_id: this.store.id }
+                    });
                     hideModal();
-                    await new Promise(resolve => setTimeout(resolve, 500));    //  Wait for modal to close
-
+                    await new Promise(resolve => setTimeout(resolve, 500));
                     this.notificationState.showSuccessNotification('Workflow deleted');
-
                     await this.navigateToShowWorkflows();
-
                 } catch (error) {
                     const message = error?.response?.data?.message || error?.message || 'Something went wrong while deleting workflow';
                     this.notificationState.showWarningNotification(message);
@@ -776,7 +727,12 @@
                 } finally {
                     this.workflowState.isDeletingWorkflow = false;
                 }
-
+            },
+            async navigateToShowWorkflows() {
+                await this.$router.push({
+                    name: 'show-workflows',
+                    query: { store_id: this.store.id }
+                });
             },
             setWorkflowForm(workflowForm) {
                 this.workflowState.workflowForm = workflowForm;
@@ -786,17 +742,12 @@
             this.workflowState.reset();
         },
         created() {
-
             this.setup();
             this.setActionButtons();
-
             const listeners = ['undo', 'redo', 'jumpToHistory', 'resetHistoryToCurrent', 'resetHistoryToOriginal'];
-
-            for (let i = 0; i < listeners.length; i++) {
-                let listener = listeners[i];
+            for (let listener of listeners) {
                 this.changeHistoryState.listeners[listener] = this.setWorkflowForm;
             }
-
         }
     };
 

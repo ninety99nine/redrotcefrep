@@ -258,14 +258,14 @@
                 this.expanded = !this.expanded;
             },
             navigateToProduct() {
-
+                console.log(this.orderProduct);
                 this.$router.push({
-                    name: 'show-product',
+                    name: 'edit-product',
                     params: {
-                        'product_id': this.orderProduct._links.showProduct
+                        'product_id': this.orderProduct.product_id
                     },
                     query: {
-                        'store_id': this.store._links.showStore
+                        'store_id': this.store.id
                     }
                 });
 

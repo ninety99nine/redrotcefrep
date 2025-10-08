@@ -108,6 +108,7 @@
 
     import Input from '@Partials/Input.vue';
     import Skeleton from '@Partials/Skeleton.vue';
+    import { isNotEmpty } from '@Utils/stringUtils';
     import AddCustomer from '@Pages/orders/order/editable/components/order-customer/add-customer/AddCustomer.vue';
 
     export default {
@@ -158,14 +159,17 @@
                 return this.orderState.isLoadingOrder;
             },
             hasEmail() {
-                return this.orderForm.customer_email?.trim();
+                return this.isNotEmpty(this.orderForm.customer_email);
             },
             hasMobileNumber() {
-                return this.orderForm.customer_mobile_number?.trim();
+                return this.isNotEmpty(this.orderForm.customer_mobile_number);
             },
             hasCustomerDetails() {
                 return this.orderState.hasCustomerDetails
             },
+        },
+        methods: {
+            isNotEmpty: isNotEmpty
         }
     };
 

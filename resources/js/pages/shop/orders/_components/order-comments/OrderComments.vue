@@ -184,9 +184,10 @@
     import Input from '@Partials/Input.vue';
     import Modal from '@Partials/Modal.vue';
     import Button from '@Partials/Button.vue';
+    import { isEmpty } from '@Utils/stringUtils';
     import Skeleton from '@Partials/Skeleton.vue';
     import { Trash2, ArrowDownToLine } from 'lucide-vue-next';
-    import OrderComment from '@Pages/shop/order/_components/order-comments/OrderComment.vue';
+    import OrderComment from '@Pages/shop/orders/_components/order-comments/OrderComment.vue';
 
     export default {
         inject: ['authState' ,'formState', 'storeState', 'orderState', 'notificationState'],
@@ -242,6 +243,7 @@
             }
         },
         methods: {
+            isEmpty: isEmpty,
             reset() {
                 this.form.photos = [];
                 this.form.comment = '';
@@ -285,7 +287,7 @@
 
                     this.formState.hideFormErrors();
 
-                    if(this.form.comment == null || this.form.comment.trim() === '') {
+                    if(this.isEmpty(this.form.comment)) {
                         this.formState.setFormError('comment', 'The comment is required');
                     }
 

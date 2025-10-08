@@ -296,6 +296,8 @@
 
                     </template>
 
+                    <span v-if="showCharacterLengthCounter" class="text-xs text-gray-500">{{ modelValue ? modelValue.length : 0 }}<template v-if="maxLength">/{{ maxLength }}</template></span>
+
                     <!-- Suffix Icon Slot -->
                     <slot v-if="$slots.suffix" name="suffix"></slot>
                     <div v-else-if="type == 'password'" :class="[showPassword ? '' : '']">
@@ -569,6 +571,10 @@
                 type: [String, null],
                 default: null
             },
+            showCharacterLengthCounter: {
+                type: Boolean,
+                default: false
+            },
 
             //  Textarea
             rows: {
@@ -600,16 +606,6 @@
             allowNegativeAmounts: {
                 type: Boolean,
                 default: false
-            },
-
-            //  Text
-            minLength: {
-                type: [String, null],
-                default: null
-            },
-            maxLength: {
-                type: [String, null],
-                default: null
             },
 
             //  Checkbox & Radio

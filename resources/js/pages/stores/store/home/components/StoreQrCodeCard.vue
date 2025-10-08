@@ -17,6 +17,7 @@
             <Button
                 size="xs"
                 type="primary"
+                class="w-full"
                 buttonClass="w-full"
                 :action="downloadQR"
                 :loading="downloadingQr"
@@ -26,6 +27,7 @@
 
             <Button
                 size="xs"
+                class="w-full"
                 type="success"
                 buttonClass="w-full"
                 :rightIcon="Forward"
@@ -38,6 +40,7 @@
         <Button
             size="sm"
             type="primary"
+            class="w-full"
             buttonClass="w-full"
             :action="visitCanva"
             :skeleton="isLoadingStore" >

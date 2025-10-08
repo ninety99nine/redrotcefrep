@@ -101,6 +101,7 @@
     import Logo from '@Partials/Logo.vue';
     import Input from '@Partials/Input.vue';
     import Button from '@Partials/Button.vue';
+    import { isEmpty } from '@Utils/stringUtils';
     import SocialLinks from '@Pages/auth/components/SocialLinks.vue';
 
     export default {
@@ -130,17 +131,18 @@
             };
         },
         methods: {
+            isEmpty: isEmpty,
             async submit() {
 
                 if (this.loading) return;
 
                 this.formState.hideFormErrors();
 
-                if (this.form.type == 'email' && this.form.email.trim() === '') {
+                if (this.form.type == 'email' && this.isEmpty(this.form.email)) {
                     this.formState.setFormError('email', 'Enter your email');
-                }else if (this.form.type == 'mobile_number' && this.form.mobile_number.trim() === '') {
+                }else if (this.form.type == 'mobile_number' && this.isEmpty(this.form.mobile_number)) {
                     this.formState.setFormError('mobile_number', 'Enter your mobile number');
-                } else if (this.form.password.trim() === '') {
+                } else if (this.isEmpty(this.form.password)) {
                     this.formState.setFormError('password', 'Enter your password');
                 }
 

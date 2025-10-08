@@ -1,6 +1,6 @@
 <template>
 
-    <div v-if="isLoadingStore || isLoadingOrder || hasDeliveryAddress" class="bg-white rounded-lg">
+    <div v-if="isLoadingStore || isLoadingOrder || !hasOrder || hasDeliveryAddress" class="bg-white rounded-lg">
 
         <div class="flex items-center space-x-2 mb-4">
 
@@ -14,7 +14,7 @@
         </div>
 
         <!-- Skeleton Loading -->
-        <div v-if="isLoadingStore || isLoadingOrder" class="w-full border-b shadow-sm rounded-lg py-6 px-4 bg-gray-50 space-y-1">
+        <div v-if="isLoadingStore || isLoadingOrder || !hasOrder" class="w-full border-b shadow-sm rounded-lg py-6 px-4 bg-gray-50 space-y-1">
             <Skeleton width="w-4/5" :shine="true"></Skeleton>
             <Skeleton width="w-1/3" :shine="true"></Skeleton>
         </div>
@@ -76,6 +76,9 @@
         computed: {
             order() {
                 return this.orderState.order;
+            },
+            hasOrder() {
+                return this.order != null;
             },
             isLoadingStore() {
                 return this.storeState.isLoadingStore;

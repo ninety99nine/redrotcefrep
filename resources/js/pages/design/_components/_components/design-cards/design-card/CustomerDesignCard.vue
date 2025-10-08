@@ -13,8 +13,10 @@
 
             <Input
                 type="text"
+                maxLength="40"
                 class="w-full mb-4"
                 placeholder="Title"
+                :showCharacterLengthCounter="true"
                 v-model="designCard.metadata.title"
                 @input="designState.saveStateDebounced('Title changed')"
                 :errorText="formState.getFormError(`design_cards.${index}.metadata.title`)">
@@ -22,8 +24,11 @@
 
             <Input
                 rows="2"
+                :resize="true"
                 type="textarea"
+                maxLength="200"
                 class="w-full mb-4"
+                :showCharacterLengthCounter="true"
                 placeholder="Additional Information"
                 v-model="designCard.metadata.description"
                 @input="designState.saveStateDebounced('Description changed')"

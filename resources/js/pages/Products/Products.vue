@@ -673,6 +673,7 @@
     import Popover from '@Partials/Popover.vue';
     import Dropdown from '@Partials/Dropdown.vue';
     import Table from '@Partials/table/Table.vue';
+    import { isNotEmpty } from '@Utils/stringUtils';
     import SelectTags from '@Partials/SelectTags.vue';
     import { VueDraggableNext } from 'vue-draggable-next';
     import { formattedDatetime, formattedRelativeDate } from '@Utils/dateUtils.js';
@@ -805,7 +806,7 @@
                 return this.storeState.store;
             },
             hasSearchTerm() {
-                return this.searchTerm != null && this.searchTerm.trim() != '';
+                return this.isNotEmpty(this.searchTerm);
             },
             isDeletingProducts() {
                 return this.isDeletingProductIds.length > 0;
@@ -821,6 +822,7 @@
             },
         },
         methods: {
+            isNotEmpty: isNotEmpty,
             formattedDatetime: formattedDatetime,
             formattedRelativeDate: formattedRelativeDate,
             async setTags() {

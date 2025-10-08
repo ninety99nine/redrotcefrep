@@ -416,6 +416,7 @@
     import Popover from '@Partials/Popover.vue';
     import Dropdown from '@Partials/Dropdown.vue';
     import Table from '@Partials/table/Table.vue';
+    import { isNotEmpty } from '@Utils/stringUtils';
     import { VueDraggableNext } from 'vue-draggable-next';
     import { Move, Info, Plus, Trash2 } from 'lucide-vue-next';
     import { formattedDatetime, formattedRelativeDate } from '@Utils/dateUtils.js';
@@ -486,7 +487,7 @@
                 return this.storeState.store;
             },
             hasSearchTerm() {
-                return this.searchTerm != null && this.searchTerm.trim() != '';
+                return this.isNotEmpty(this.searchTerm);
             },
             isDeletingCategories() {
                 return this.isDeletingCategoryIds.length > 0;
@@ -502,6 +503,7 @@
             },
         },
         methods: {
+            isNotEmpty: isNotEmpty,
             formattedDatetime: formattedDatetime,
             formattedRelativeDate: formattedRelativeDate,
             prepareColumns() {
@@ -819,7 +821,7 @@
                                     categoryMessage += `${checkedCategories[i].name}\n`;
                                     break;
                                 case "Description":
-                                    categoryMessage += `${checkedCategories[i].description != null && checkedCategories[i].description.trim() != '' ? checkedCategories[i].description : 'None'}\n`;
+                                    categoryMessage += `${checkedCategories[i].description != null && this.isNotEmpty(checkedCategories[i].description) ? checkedCategories[i].description : 'None'}\n`;
                                     break;
                                 case "Visibility":
                                     categoryMessage += `${checkedCategories[i].visible ? 'visible' : 'hidden'}\n`;

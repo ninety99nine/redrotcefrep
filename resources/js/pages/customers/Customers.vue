@@ -567,6 +567,7 @@
     import Popover from '@Partials/Popover.vue';
     import Dropdown from '@Partials/Dropdown.vue';
     import Table from '@Partials/table/Table.vue';
+    import { isNotEmpty } from '@Utils/stringUtils';
     import { VueDraggableNext } from 'vue-draggable-next';
     import NoDataPlaceholder from '@Partials/table/components/NoDataPlaceholder.vue';
     import { Move, Info, Plus, Trash2, RefreshCcw, ArrowDownToLine } from 'lucide-vue-next';
@@ -660,7 +661,7 @@
                 return this.storeState.store;
             },
             hasSearchTerm() {
-                return this.searchTerm != null && this.searchTerm.trim() != '';
+                return this.isNotEmpty(this.searchTerm);
             },
             isDeletingCustomers() {
                 return this.isDeletingCustomerIds.length > 0;
@@ -676,6 +677,7 @@
             },
         },
         methods: {
+            isNotEmpty: isNotEmpty,
             formattedDate: formattedDate,
             formattedDatetime: formattedDatetime,
             formattedRelativeDate: formattedRelativeDate,

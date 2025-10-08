@@ -89,6 +89,7 @@
                             <Input
                                 type="text"
                                 label="Mobile Number"
+                                placeholder="+26772000001"
                                 v-model="customerForm.mobile_number"
                                 :errorText="formState.getFormError('mobile_number')"
                                 @input="customerState.saveStateDebounced('Mobile number changed')">
@@ -203,6 +204,7 @@
     import Loader from '@Partials/Loader.vue';
     import Select from '@Partials/Select.vue';
     import Popover from '@Partials/Popover.vue';
+    import { isEmpty } from '@Utils/stringUtils';
     import Skeleton from '@Partials/Skeleton.vue';
     import SelectTags from '@Partials/SelectTags.vue';
     import { Trash2, MoveLeft } from 'lucide-vue-next';
@@ -272,6 +274,7 @@
             }
         },
         methods: {
+            isEmpty: isEmpty,
             goBack() {
                 this.navigateToCustomers();
             },
@@ -371,7 +374,7 @@
 
                     this.formState.hideFormErrors();
 
-                    if(this.customerForm.first_name == null || this.customerForm.first_name.trim() === '') {
+                    if(this.isEmpty(this.customerForm.first_name)) {
                         this.formState.setFormError('first_name', 'The first name is required');
                     }
 
@@ -422,7 +425,7 @@
 
                     this.formState.hideFormErrors();
 
-                    if(this.customerForm.first_name == null || this.customerForm.first_name.trim() === '') {
+                    if(this.isEmpty(this.customerForm.first_name)) {
                         this.formState.setFormError('first_name', 'The first name is required');
                     }
 

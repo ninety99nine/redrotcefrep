@@ -111,6 +111,7 @@
     import Button from '@Partials/Button.vue';
     import Skeleton from '@Partials/Skeleton.vue';
     import { Plus, ArrowLeft } from 'lucide-vue-next';
+    import { isNotEmpty } from '@Utils/stringUtils.js';
     import CartProductOptions from '@Pages/shop/_components/design-card-manager/_components/design-cards/design-card/items-design-card/cart-products/add-product/cart-product-options/CartProductOptions.vue';
     import CartProductVariationOptions from '@Pages/shop/_components/design-card-manager/_components/design-cards/design-card/items-design-card/cart-products/add-product/cart-product-variation-options/CartProductVariationOptions.vue';
 
@@ -142,13 +143,14 @@
                 return this.storeState.isLoadingStore;
             },
             hasSearchTerm() {
-                return this.searchTerm != null && this.searchTerm.trim() != '';
+                return this.isNotEmpty(this.searchTerm);
             },
             hasProducts() {
                 return this.products.length > 0;
             },
         },
         methods: {
+            isNotEmpty: isNotEmpty,
             onShow() {
                 this.hasLoadedInitialProducts = false;
                 this.selectedProduct = null;

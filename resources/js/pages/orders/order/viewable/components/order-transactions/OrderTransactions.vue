@@ -226,6 +226,7 @@
     import Input from '@Partials/Input.vue';
     import Modal from '@Partials/Modal.vue';
     import Button from '@Partials/Button.vue';
+    import { isEmpty } from '@Utils/stringUtils';
     import Skeleton from '@Partials/Skeleton.vue';
     import { Plus, Link2, Trash2, ExternalLink, CircleDollarSign } from 'lucide-vue-next';
     import OrderTransaction from '@Pages/orders/order/viewable/components/order-transactions/OrderTransaction.vue';
@@ -288,6 +289,7 @@
             }
         },
         methods: {
+            isEmpty: isEmpty,
             reset() {
                 this.form.photo = [];
                 this.form.amount = '0.00';
@@ -338,7 +340,7 @@
 
                     this.formState.hideFormErrors();
 
-                    if(this.form.description == null || this.form.description.trim() === '') {
+                    if(this.isEmpty(this.form.description)) {
                         this.formState.setFormError('description', 'Enter payment name');
                     }
 

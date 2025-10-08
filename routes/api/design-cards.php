@@ -11,11 +11,12 @@ Route::prefix('design-cards')
         Route::post('/', 'createDesignCard')->name('create.design.card');
         Route::delete('/', 'deleteDesignCards')->name('delete.design.cards');
         Route::post('/arrangement', 'updateDesignCardArrangement')->name('update.design.card.arrangement');
+        Route::get('/configurations', 'showDesignCardConfigurations')->name('show.design.card.configurations');
 
-        // Explicit route model binding applied: AppServiceProvider.php
         Route::prefix('{designCard}')->group(function () {
             Route::get('/', 'showDesignCard')->name('show.design.card');
             Route::put('/', 'updateDesignCard')->name('update.design.card');
             Route::delete('/', 'deleteDesignCard')->name('delete.design.card');
         });
-});
+    });
+?>

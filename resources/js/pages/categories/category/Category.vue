@@ -157,6 +157,7 @@
     import Loader from '@Partials/Loader.vue';
     import Select from '@Partials/Select.vue';
     import Popover from '@Partials/Popover.vue';
+    import { isEmpty } from '@Utils/stringUtils';
     import Skeleton from '@Partials/Skeleton.vue';
     import { Trash2, MoveLeft } from 'lucide-vue-next';
     import { VueDraggableNext } from 'vue-draggable-next';
@@ -230,6 +231,7 @@
             }
         },
         methods: {
+            isEmpty: isEmpty,
             goBack() {
                 this.navigateToCategories();
             },
@@ -310,7 +312,7 @@
 
                     this.formState.hideFormErrors();
 
-                    if(this.categoryForm.name == null || this.categoryForm.name.trim() === '') {
+                    if(this.isEmpty(this.categoryForm.name)) {
                         this.formState.setFormError('name', 'The name is required');
                     }
 
@@ -362,7 +364,7 @@
 
                     this.formState.hideFormErrors();
 
-                    if(this.categoryForm.name == null || this.categoryForm.name.trim() === '') {
+                    if(this.isEmpty(this.categoryForm.name)) {
                         this.formState.setFormError('name', 'The name is required');
                     }
 

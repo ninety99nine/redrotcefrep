@@ -214,8 +214,8 @@
     import Switch from '@Partials/Switch.vue';
     import Button from '@Partials/Button.vue';
     import Skeleton from '@Partials/Skeleton.vue';
-    import { capitalize } from '@Utils/stringUtils.js';
     import { Info, Trash2, MoveLeft } from 'lucide-vue-next';
+    import { isEmpty, capitalize } from '@Utils/stringUtils.js';
     import EmailConfig from '@Pages/settings/payment-methods/_components/PaymentMethodConfigInput/EmailConfig.vue';
     import ImageConfig from '@Pages/settings/payment-methods/_components/PaymentMethodConfigInput/ImageConfig.vue';
     import SelectConfig from '@Pages/settings/payment-methods/_components/PaymentMethodConfigInput/SelectConfig.vue';
@@ -284,6 +284,7 @@ import cloneDeep from 'lodash.clonedeep';
             }
         },
         methods: {
+            isEmpty: isEmpty,
             capitalize: capitalize,
             setup() {
                 this.storePaymentMethodState.setStorePaymentMethodForm(null, null, true);
@@ -371,7 +372,7 @@ import cloneDeep from 'lodash.clonedeep';
 
                     this.formState.hideFormErrors();
 
-                    if(this.paymentMethod.type == 'other' && (this.storePaymentMethodForm.custom_name == null || this.storePaymentMethodForm.custom_name.trim() === '')) {
+                    if(this.paymentMethod.type == 'other' && this.isEmpty(this.storePaymentMethodForm.custom_name)) {
                         this.formState.setFormError('custom_name', 'The name is required');
                     }
 
@@ -433,7 +434,7 @@ import cloneDeep from 'lodash.clonedeep';
 
                     this.formState.hideFormErrors();
 
-                    if(this.storePaymentMethodForm.custom_name == null || this.storePaymentMethodForm.custom_name.trim() === '') {
+                    if(this.isEmpty(this.storePaymentMethodForm.custom_name)) {
                         this.formState.setFormError('custom_name', 'The name is required');
                     }
 

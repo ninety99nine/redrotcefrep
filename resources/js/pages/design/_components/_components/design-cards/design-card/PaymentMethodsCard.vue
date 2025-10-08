@@ -16,7 +16,9 @@
                 <Input
                     type="text"
                     class="w-full"
+                    maxLength="40"
                     placeholder="Title"
+                    :showCharacterLengthCounter="true"
                     v-model="designCard.metadata.title"
                     @input="designState.saveStateDebounced('Title changed')"
                     :errorText="formState.getFormError(`design_cards.${index}.metadata.title`)">
@@ -25,7 +27,9 @@
                 <Input
                     type="text"
                     class="w-full"
+                    maxLength="60"
                     placeholder="Subtitle"
+                    :showCharacterLengthCounter="true"
                     v-model="designCard.metadata.subtitle"
                     @input="designState.saveStateDebounced('Subtitle changed')"
                     :errorText="formState.getFormError(`design_cards.${index}.metadata.subtitle`)">

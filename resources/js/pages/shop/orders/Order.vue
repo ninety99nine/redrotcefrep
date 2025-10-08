@@ -18,11 +18,11 @@
 
 <script>
 
-    import Advert from '@Pages/shop/order/_components/advert/Advert.vue';
-    import Actions from '@Pages/shop/order/_components/actions/Actions.vue';
-    import OrderDetails from '@Pages/shop/order/_components/order-details/OrderDetails.vue';
-    import OrderComments from '@Pages/shop/order/_components/order-comments/OrderComments.vue';
-    import DeliveryAddress from '@Pages/shop/order/_components/delivery-address/DeliveryAddress.vue';
+    import Advert from '@Pages/shop/orders/_components/advert/Advert.vue';
+    import Actions from '@Pages/shop/orders/_components/actions/Actions.vue';
+    import OrderDetails from '@Pages/shop/orders/_components/order-details/OrderDetails.vue';
+    import OrderComments from '@Pages/shop/orders/_components/order-comments/OrderComments.vue';
+    import DeliveryAddress from '@Pages/shop/orders/_components/delivery-address/DeliveryAddress.vue';
 
     export default {
         components: { Advert, Actions, OrderDetails, OrderComments, DeliveryAddress }

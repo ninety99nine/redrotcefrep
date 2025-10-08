@@ -178,20 +178,21 @@
 
                 <div class="font-medium">
 
-                    <template v-if="isShowingSettings">
+                    <div v-if="isShowingSettings" class="flex justify-center">
 
                         <!-- Return to dashboard -->
                         <Button
                             size="sm"
                             type="light"
+                            :leftIcon="MoveLeft"
                             buttonClass="mb-4 ml-2"
                             icon="short-left-arrow"
                             :action="navigateToHome"
                             :skeleton="isLoadingStore">
-                            <span>Return to dashboard</span>
+                            <span class="ml-1">Return to dashboard</span>
                         </Button>
 
-                    </template>
+                    </div>
 
                     <template
                         :key="index"
@@ -219,6 +220,9 @@
 
                                 <!-- Promotions Icon -->
                                 <TicketPercent v-else-if="navMenu.name == 'Promotions'" size="20"></TicketPercent>
+
+                                <!-- Marketing Icon -->
+                                <Megaphone v-else-if="navMenu.name == 'Marketing'" size="20"></Megaphone>
 
                                 <!-- Design Icon -->
                                 <WandSparkles v-else-if="navMenu.name == 'Design'" size="20"></WandSparkles>
@@ -314,17 +318,18 @@
     import StoreLogo from '@Components/StoreLogo.vue';
     import Notifications from '@Layouts/dashboard/components/Notifications.vue';
     import ChangeHistoryNavigation from '@Layouts/dashboard/components/ChangeHistoryNavigation.vue';
-    import { Box, Star, Menu, Files, House, Inbox, Rocket, LogOut, UserRound, UsersRound, Banknote, Settings, ExternalLink, ChevronUp, ChevronDown, Smartphone, WandSparkles, TicketPercent } from 'lucide-vue-next';
+    import { Box, Star, Menu, Files, Megaphone, House, Inbox, Rocket, LogOut, MoveLeft, UserRound, UsersRound, Banknote, Settings, ExternalLink, ChevronUp, ChevronDown, Smartphone, WandSparkles, TicketPercent } from 'lucide-vue-next';
 
     export default {
         inject: ['uiState', 'formState', 'authState', 'storeState', 'notificationState', 'changeHistoryState'],
         components: {
-            Box, Star, Menu, Files, House, Inbox, Rocket, LogOut, UserRound, UsersRound, Banknote, Settings, ExternalLink, ChevronUp, ChevronDown, Smartphone, WandSparkles, TicketPercent,
+            Box, Star, Menu, Files, Megaphone, House, Inbox, Rocket, LogOut, UserRound, UsersRound, Banknote, Settings, ExternalLink, ChevronUp, ChevronDown, Smartphone, WandSparkles, TicketPercent,
             Logo, Loader, Button, Dropdown, Skeleton, StoreLogo, Notifications, ChangeHistoryNavigation
         },
         data() {
             return {
                 Menu,
+                MoveLeft,
                 ExternalLink,
                 navMenus: [],
                 profileNavMenus: [
@@ -505,6 +510,10 @@
                             ]
                         },
                         {
+                            name: 'Marketing',
+                            routeName: 'show-marketing'
+                        },
+                        {
                             name: 'Design',
                             routeName: 'edit-storefront'
                         },
@@ -603,8 +612,7 @@
                         params: {
                             _relationships: [
                                 'logo', 'seoImage', 'productTags', 'customerTags', 'categories',
-                                'activeSubscription.pricingPlan', 'address',
-                                /*  'storeRollingNumbers', 'userStoreAssociation'  */
+                                'activeSubscription.pricingPlan', 'address'
                             ].join(',')
                         }
                     };

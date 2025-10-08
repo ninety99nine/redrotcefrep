@@ -99,7 +99,7 @@
                     <span>Name</span>
                     <div class="col-span-2 flex items-center space-x-2">
                         <UserRoundCheck v-if="customer" size="16"></UserRoundCheck>
-                        <span :class="{ 'text-blue-500 hover:underline cursor-pointer' : customer }" @click="customer ? navigateToCustomer : null">{{ order.customer_name }}</span>
+                        <span :class="{ 'text-blue-500 hover:underline cursor-pointer' : customer }" @click="() => customer ? navigateToCustomer() : null">{{ order.customer_name }}</span>
                         <Button
                             size="xs"
                             type="light"

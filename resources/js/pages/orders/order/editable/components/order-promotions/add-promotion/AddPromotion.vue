@@ -90,6 +90,7 @@
     import Modal from '@Partials/Modal.vue';
     import Button from '@Partials/Button.vue';
     import Skeleton from '@Partials/Skeleton.vue';
+    import { isNotEmpty } from '@Utils/stringUtils';
     import PromotionOptions from '@Pages/orders/order/editable/components/order-promotions/add-promotion/promotion-options/PromotionOptions.vue';
 
     export default {
@@ -127,13 +128,14 @@
                 return this.$route.name === 'edit-order';
             },
             hasSearchTerm() {
-                return this.searchTerm != null && this.searchTerm.trim() != '';
+                return this.isNotEmpty(this.searchTerm);
             },
             hasPromotions() {
                 return this.promotions.length > 0;
             },
         },
         methods: {
+            isNotEmpty: isNotEmpty,
             onShow() {
                 this.hasLoadedInitialPromotions = false;
                 this.lastSearchTerm = null;

@@ -15,9 +15,9 @@
 
 <script>
 
-    import PayButton from '@Pages/shop/order/_components/actions/PayButton.vue';
-    import OrderAgainButton from '@Pages/shop/order/_components/actions/OrderAgainButton.vue';
-    import EmailInvoiceButton from '@Pages/shop/order/_components/actions/EmailInvoiceButton.vue';
+    import PayButton from '@Pages/shop/orders/_components/actions/PayButton.vue';
+    import OrderAgainButton from '@Pages/shop/orders/_components/actions/OrderAgainButton.vue';
+    import EmailInvoiceButton from '@Pages/shop/orders/_components/actions/EmailInvoiceButton.vue';
 
     export default {
         components: { PayButton, OrderAgainButton, EmailInvoiceButton }

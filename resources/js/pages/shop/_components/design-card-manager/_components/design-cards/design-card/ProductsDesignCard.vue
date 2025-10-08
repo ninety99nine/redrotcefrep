@@ -154,11 +154,12 @@
         data() {
             return {
                 category: null,
+                lastCategoryId: null,
                 isLoadingCategory: false
             }
         },
         watch: {
-            categoryId() {
+            categoryId(newValue, oldValue) {
                 this.showCategory();
             }
         },
@@ -204,7 +205,7 @@
                 try {
 
                     // Skip if have already loaded, are loading or categoryId is invalid
-                    if (!this.categoryId || this.category || this.isLoadingCategory) return;
+                    if (!this.categoryId) return;
 
                     this.isLoadingCategory = true;
 
@@ -215,15 +216,22 @@
                         }
                     };
 
+                    this.lastCategoryId = this.categoryId;
+
                     const response = await axios.get(`/api/categories/${this.categoryId}`, config);
-                    this.category = response.data;
+
+                    if(this.categoryId == this.lastCategoryId) {
+                        this.category = response.data;
+                    }
 
                 } catch (error) {
                     const message = error?.response?.data?.message || error?.message || 'Something went wrong while fetching category';
                     this.notificationState.showWarningNotification(message);
                     this.formState.setServerFormErrors(error);
                 } finally {
-                    this.isLoadingCategory = false;
+                    if(this.categoryId == this.lastCategoryId) {
+                        this.isLoadingCategory = false;
+                    }
                 }
             },
         },

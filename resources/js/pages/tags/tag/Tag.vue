@@ -132,6 +132,7 @@
     import Button from '@Partials/Button.vue';
     import Loader from '@Partials/Loader.vue';
     import Popover from '@Partials/Popover.vue';
+    import { isEmpty } from '@Utils/stringUtils';
     import Skeleton from '@Partials/Skeleton.vue';
     import { Trash2, MoveLeft } from 'lucide-vue-next';
     import BackdropLoader from '@Partials/BackdropLoader.vue';
@@ -222,6 +223,7 @@
             },
         },
         methods: {
+            isEmpty: isEmpty,
             goBack() {
                 this.navigateToTags();
             },
@@ -303,7 +305,7 @@
 
                     this.formState.hideFormErrors();
 
-                    if(this.tagForm.name == null || this.tagForm.name.trim() === '') {
+                    if(this.isEmpty(this.tagForm.name)) {
                         this.formState.setFormError('name', 'The name is required');
                     }
 
@@ -350,7 +352,7 @@
 
                     this.formState.hideFormErrors();
 
-                    if(this.tagForm.name == null || this.tagForm.name.trim() === '') {
+                    if(this.isEmpty(this.tagForm.name)) {
                         this.formState.setFormError('name', 'The name is required');
                     }
 

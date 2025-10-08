@@ -12,6 +12,7 @@ use App\Http\Requests\DesignCard\DeleteDesignCardRequest;
 use App\Http\Requests\DesignCard\CreateDesignCardRequest;
 use App\Http\Requests\DesignCard\UpdateDesignCardRequest;
 use App\Http\Requests\DesignCard\DeleteDesignCardsRequest;
+use App\Http\Requests\DesignCard\ShowDesignCardConfigurationsRequest;
 use App\Http\Requests\DesignCard\UpdateDesignCardArrangementRequest;
 
 class DesignCardController extends Controller
@@ -63,6 +64,17 @@ class DesignCardController extends Controller
     {
         $designCardIds = request()->input('design_card_ids', []);
         return $this->service->deleteDesignCards($designCardIds);
+    }
+
+    /**
+     * Show design card configurations.
+     *
+     * @param ShowDesignCardConfigurationsRequest $request
+     * @return array
+     */
+    public function showDesignCardConfigurations(ShowDesignCardConfigurationsRequest $request): array
+    {
+        return $this->service->showDesignCardConfigurations($request->validated());
     }
 
     /**

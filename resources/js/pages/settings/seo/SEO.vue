@@ -48,12 +48,10 @@
                     maxlength="60"
                     label="SEO Title"
                     v-model="storeForm.seo_title"
+                    :showCharacterLengthCounter="true"
                     :skeleton="isLoadingStore || !store"
                     :errorText="formState.getFormError('seo_title')"
                     @change="storeState.saveStateDebounced('SEO title changed')">
-                    <template #suffix>
-                        <span class="text-xs text-gray-500">{{ storeForm.seo_title ? storeForm.seo_title.length : 0 }}/60</span>
-                    </template>
                 </Input>
 
                 <!-- SEO Description Input -->
@@ -62,13 +60,11 @@
                     type="textarea"
                     maxlength="160"
                     label="SEO Description"
+                    :showCharacterLengthCounter="true"
                     v-model="storeForm.seo_description"
                     :skeleton="isLoadingStore || !store"
                     :errorText="formState.getFormError('seo_description')"
                     @change="storeState.saveStateDebounced('SEO description changed')">
-                    <template #suffix>
-                        <span class="text-xs text-gray-500">{{ storeForm.seo_description ? storeForm.seo_description.length : 0 }}/160</span>
-                    </template>
                 </Input>
 
                 <!-- SEO Image  -->

@@ -25,16 +25,6 @@ class MiscellaneousController extends Controller
     }
 
     /**
-     * Show social media links.
-     *
-     * @return array
-     */
-    public function showSocialMediaLinks(): array
-    {
-        return $this->service->showSocialMediaLinks();
-    }
-
-    /**
      * Show filters.
      *
      * @param ShowFiltersRequest $request

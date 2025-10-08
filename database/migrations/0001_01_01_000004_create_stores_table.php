@@ -40,6 +40,12 @@ return new class extends Migration
             $table->boolean('show_opening_hours')->default(false);
             $table->boolean('allow_checkout_on_closed_hours')->default(true);
             $table->json('opening_hours')->nullable();
+
+            $table->json('tips')->nullable();
+            $table->json('checkout_fees')->nullable();
+            $table->boolean('combine_fees')->default(false);
+            $table->boolean('combine_discounts')->default(false);
+
             $table->unsignedInteger('order_number_padding')->default(2);
             $table->unsignedInteger('order_number_counter')->default(0);
             $table->string('order_number_prefix')->nullable();

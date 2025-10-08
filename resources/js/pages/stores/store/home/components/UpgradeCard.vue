@@ -28,7 +28,7 @@
                 size="xs"
                 type="primary"
                 :skeleton="isLoadingStore"
-                :action="navigateToSubscription">
+                :action="navigateToShowBillingSettings">
                 <span>{{ isLoadingStore ? 'Checking' : 'View Subscription' }}</span>
             </Button>
 
@@ -110,14 +110,11 @@
                     query: { store_id: this.store.id }
                 })
             },
-            navigateToSubscription() {
-                this.$router.push({
-                    name: 'show-store-subscription',
-                    params: {
-                        store_id: this.store.id,
-                        'subscription_href': this.activeSubscription._links.show
-                     }
-                })
+            async navigateToShowBillingSettings() {
+                await this.$router.push({
+                    name: 'show-billing-settings',
+                    query: { store_id: this.store.id }
+                });
             },
             manageUpgradeButtonAnimation() {
 

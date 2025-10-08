@@ -327,303 +327,284 @@ class StoreService extends BaseService
         $insights = [];
         $platform = $data['platform'] ?? Platform::WEB->value;
         $period = $data['period'] ?? InsightPeriod::TODAY->value;
-        $isUssd = Platform::tryFrom($platform) == Platform::USSD;
         $categories = $data['categories'] ?? [InsightCategory::SALES->value];
+        $isUssd = Platform::tryFrom($platform) === Platform::USSD;
 
-        $add = function($title, $description, array $categoryInsights) use (&$insights) {
-            array_push($insights, [
+        // Validate period to prevent undefined variable errors
+        if (!InsightPeriod::tryFrom($period)) {
+            Log::warning('Invalid insight period provided', ['period' => $period, 'store_id' => $store->id]);
+            $period = InsightPeriod::TODAY->value; // Default to TODAY
+        }
+
+        // Define date ranges
+        [$dateRange1, $dateRange2] = match ($period) {
+            InsightPeriod::TODAY->value => [Carbon::today(), Carbon::now()],
+            InsightPeriod::YESTERDAY->value => [Carbon::yesterday()->startOfDay(), Carbon::yesterday()->endOfDay()],
+            InsightPeriod::THIS_WEEK->value => [Carbon::now()->startOfWeek(), Carbon::now()->endOfWeek()],
+            InsightPeriod::THIS_MONTH->value => [Carbon::now()->startOfMonth(), Carbon::now()->endOfMonth()],
+            InsightPeriod::THIS_YEAR->value => [Carbon::now()->startOfYear(), Carbon::now()->endOfYear()],
+            default => [Carbon::today(), Carbon::now()] // Fallback
+        };
+
+        // Define period formatting
+        [$periodName, $periodType] = match ($period) {
+            InsightPeriod::TODAY->value => ['hour', '%H:00'],
+            InsightPeriod::YESTERDAY->value => ['hour', '%H:00'],
+            InsightPeriod::THIS_WEEK->value => ['day', '%a'],
+            InsightPeriod::THIS_MONTH->value => ['day', '%d'],
+            InsightPeriod::THIS_YEAR->value => ['month', '%b'],
+            default => ['hour', '%H:00'] // Fallback
+        };
+
+        // Helper function to add insights
+        $add = function ($title, $description, array $categoryInsights) use (&$insights) {
+            $insights[] = [
                 'title' => $title,
                 'description' => $description,
-                'category_insights' => collect($categoryInsights)->map(function($categoryInsight) {
+                'category_insights' => collect($categoryInsights)->map(function ($categoryInsight) {
                     return [
                         'name' => $categoryInsight[0],
                         'type' => $categoryInsight[2],
                         'metric' => $categoryInsight[1],
                         'description' => $categoryInsight[3],
                     ];
-                })->values()
-            ]);
+                })->values()->all()
+            ];
         };
 
-        [$dateRange1, $dateRange2] = match ($period) {
-            InsightPeriod::TODAY->value => [Carbon::today(), Carbon::now()],
-            InsightPeriod::YESTERDAY->value => [Carbon::yesterday()->startOfDay(), Carbon::yesterday()->endOfDay()],
-            InsightPeriod::THIS_WEEK->value => [Carbon::now()->startOfWeek(), Carbon::now()->endOfWeek()],
-            InsightPeriod::THIS_MONTH->value => [Carbon::now()->startOfMonth(), Carbon::now()->endOfMonth()],
-            InsightPeriod::THIS_YEAR->value => [Carbon::now()->startOfYear(), Carbon::now()->endOfYear()]
-        };
+        // Base orders query (reused for SALES and ORDERS)
+        $ordersQuery = DB::table('orders')
+            ->where('store_id', $store->id)
+            ->whereBetween('created_at', [$dateRange1, $dateRange2]);
 
-        [$periodName, $periodType] = match ($period) {
-            InsightPeriod::TODAY->value => ['hour', '%H:00'],
-            InsightPeriod::YESTERDAY->value => ['hour', '%H:00'],
-            InsightPeriod::THIS_WEEK->value => ['day', '%a'],
-            InsightPeriod::THIS_MONTH->value => ['day', '%D'],
-            InsightPeriod::THIS_YEAR->value => ['month', '%b']
-        };
-
-        $ordersQuery = DB::table('orders')->where('store_id', $store->id);
-
-        if ($dateRange1 && $dateRange2) $ordersQuery->whereBetween('created_at', [$dateRange1, $dateRange2]);
-
-        if (empty($categories) || in_array(InsightCategory::SALES->value, $categories)) {
-
-            $salesByPeriod = $ordersQuery
-                ->selectRaw("DATE_FORMAT(created_at, '$periodType') as period, COUNT(*) as total_orders, SUM(grand_total) as total_grand_total")
-                ->groupByRaw("DATE_FORMAT(created_at, '$periodType')")
-                ->orderByRaw("COUNT(*) DESC")
-                ->get();
-
-            $totalOrders = $salesByPeriod->sum('total_orders');
-            $totalSales = $salesByPeriod->sum('total_grand_total');
-            $avgSalesPerOrder = $totalSales / max($totalOrders, 1);
-
-            $totalSalesByPeriod = $salesByPeriod->pluck('total_grand_total', 'period')->sortDesc();
-
-            if ($totalSalesByPeriod->isEmpty()) {
-                $highestSalesDay = $lowestSalesDay = 'N/A';
-            } else {
-                $highestSalesHour = $totalSalesByPeriod->keys()->first();
-                $highestSalesAmount = $totalSalesByPeriod->get($highestSalesHour, 0);
-
-                $lowestSalesHour = $totalSalesByPeriod->keys()->last();
-                $lowestSalesAmount = $totalSalesByPeriod->get($lowestSalesHour, 0);
-
-                $highestSalesDay = $highestSalesHour ? "{$highestSalesHour} ({MoneyService::convertToMoneyFormat($highestSalesAmount, $store->getRawOriginal('currency'))->amount_with_currency})" : 'N/A';
-
-                $lowestSalesDays = $totalSalesByPeriod->filter(function ($amount) use ($lowestSalesAmount) {
-                    return $amount === $lowestSalesAmount;
-                })->keys();
-
-                if ($lowestSalesDays->count() === 1) {
-                    $lowestSalesDay = "{$lowestSalesDays->first()} ({MoneyService::convertToMoneyFormat($lowestSalesAmount, $store->getRawOriginal('currency'))->amount_with_currency})";
-                } else {
-                    $lowestSalesDay = 'N/A';
-                }
-
-                if ($highestSalesAmount === $lowestSalesAmount) {
-                    $lowestSalesDay = 'N/A';
-                }
-            }
-
-            $totalSales = MoneyService::convertToMoneyFormat($totalSales, $store->getRawOriginal('currency'))->amount_with_currency;
-
-            $add(
-                'Sale Insights',
-                'Store performance based on sales',
-                [
-                    [($isUssd ? 'Sales' : 'Total sales'), $totalSales.' ('. $totalOrders . ($totalOrders == 1 ? ' order' : ' orders') . ')', 'total_sales', 'The total sales revenue generated from orders placed in the store'],
-                    [($isUssd ? 'Avg sale per order' : 'Average sale per order'), MoneyService::convertToMoneyFormat($avgSalesPerOrder, $store->getRawOriginal('currency'))->amount_with_currency, 'average_sale_per_order', 'The average sales revenue earned per order based on the total sales divided by the number of orders'],
-                    [($isUssd ? "Best $periodName" : "Highest sales $periodName"), $highestSalesDay, 'highest_sale_period', "The $periodName with the highest recorded sales amount"],
-                    [($isUssd ? "Worst $periodName" : "Lowest sales $periodName"), $lowestSalesDay, 'lowest_sale_period', "The $periodName with the lowest recorded sales amount"]
-                ]
-            );
-
-        }
-
-        if (empty($categories) || in_array(InsightCategory::ORDERS->value, $categories)) {
-
+        try {
+            // Shared query for SALES and ORDERS
             $ordersByPeriod = $ordersQuery
-                ->selectRaw("DATE_FORMAT(created_at, '$periodType') as period, COUNT(*) as total_orders, SUM(grand_total) as total_grand_total")
-                ->groupByRaw("DATE_FORMAT(created_at, '$periodType')")
-                ->orderByRaw("COUNT(*) DESC")
+                ->selectRaw("DATE_FORMAT(created_at, ?) as period, COUNT(*) as total_orders, SUM(grand_total) as total_grand_total", [$periodType])
+                ->groupByRaw('period')
+                ->orderByRaw('total_orders DESC')
                 ->get();
 
-            $totalOrders = $ordersByPeriod->sum('total_orders');
-            $totalSales = $ordersByPeriod->sum('total_grand_total');
+            if (empty($categories) || in_array(InsightCategory::SALES->value, $categories)) {
+                $totalOrders = $ordersByPeriod->sum('total_orders');
+                $totalSales = $ordersByPeriod->sum('total_grand_total');
+                $avgSalesPerOrder = $totalOrders > 0 ? $totalSales / $totalOrders : 0;
 
-            $totalOrdersByPeriod = $ordersByPeriod->pluck('total_orders', 'period')->sortDesc();
+                $totalSalesByPeriod = $ordersByPeriod->pluck('total_grand_total', 'period')->sortByDesc(null);
 
-            if ($ordersByPeriod->isEmpty()) {
-                $mostOrderDay = $leastOrderDay = 'N/A';
-            } else {
-                $mostOrderPeriod = $totalOrdersByPeriod->keys()->first();
-                $mostOrderCount = $totalOrdersByPeriod->values()->first();
+                $highestSalesDay = 'N/A';
+                $lowestSalesDay = 'N/A';
 
-                $leastOrderPeriod = $totalOrdersByPeriod->keys()->last();
-                $leastOrderCount = $totalOrdersByPeriod->values()->last();
+                if ($totalSalesByPeriod->isNotEmpty()) {
+                    $highestSalesPeriod = $totalSalesByPeriod->keys()->first();
+                    $highestSalesAmount = $totalSalesByPeriod->get($highestSalesPeriod, 0);
 
-                $mostOrderDay = "{$mostOrderPeriod} ({$mostOrderCount} " . ($mostOrderCount == 1 ? 'order' : 'orders') . ")";
+                    $lowestSalesPeriod = $totalSalesByPeriod->keys()->last();
+                    $lowestSalesAmount = $totalSalesByPeriod->get($lowestSalesPeriod, 0);
 
-                $leastOrderPeriods = $ordersByPeriod->filter(function ($order) use ($leastOrderCount) {
-                    return $order->total_orders === $leastOrderCount;
-                })->pluck('period');
+                    // Fixed: Properly evaluate MoneyService::convertToMoneyFormat
+                    $highestSalesDay = "{$highestSalesPeriod} (" . MoneyService::convertToMoneyFormat($highestSalesAmount, $store->getRawOriginal('currency'))->amount_with_currency . ")";
 
-                if ($leastOrderPeriods->count() === 1) {
-                    $leastOrderDay = "{$leastOrderPeriods->first()} ({$leastOrderCount} " . ($leastOrderCount == 1 ? 'order' : 'orders') . ")";
-                } else {
-                    $leastOrderDay = 'N/A';
-                }
-            }
+                    $lowestSalesDays = $totalSalesByPeriod->filter(fn($amount) => $amount === $lowestSalesAmount)->keys();
 
-            $totalSales = MoneyService::convertToMoneyFormat($totalSales, $store->getRawOriginal('currency'))->amount_with_currency;
-
-            $add(
-                'Order Insights',
-                'Store performance based on orders',
-                [
-                    [($isUssd ? 'Orders' : 'Total orders'), "{$totalOrders} ({$totalSales})", 'total_orders', 'The total number of orders placed, along with the total sales revenue generated from those orders'],
-                    ['Most orders', $mostOrderDay, 'most_orders', "The $periodName with the highest number of orders placed"],
-                    ['Least orders', $leastOrderDay, 'least_orders', "The $periodName with the lowest number of orders placed"],
-                ]
-            );
-
-        }
-
-        if (empty($categories) || in_array(InsightCategory::PRODUCTS->value, $categories)) {
-
-            $productsBySales = DB::table('order_products')
-                ->selectRaw("
-                    product_id,
-                    products.name as product_name,
-                    SUM(quantity) as total_quantity,
-                    SUM(grand_total) as total_revenue,
-                    SUM(CASE WHEN is_cancelled = 1 THEN quantity ELSE 0 END) as cancelled_quantity,
-                    SUM(CASE WHEN is_cancelled = 1 THEN grand_total ELSE 0 END) as cancelled_revenue,
-                    SUM(order_products.unit_sale_discount) as total_discount
-                ")
-                ->join('products', 'order_products.product_id', '=', 'products.id')
-                ->where('order_products.store_id', $store->id)
-                ->whereBetween('order_products.created_at', [$dateRange1, $dateRange2])
-                ->groupBy('product_id')
-                ->orderBy('total_revenue', 'desc')
-                ->orderBy('total_quantity', 'desc')
-                ->get();
-
-            // Top-selling product
-            $topSellingProduct = $productsBySales->first();
-            $topSelling = $topSellingProduct
-                ? "{$topSellingProduct->product_name} ({$topSellingProduct->total_quantity} units, " .
-                    MoneyService::convertToMoneyFormat($topSellingProduct->total_revenue, $store->getRawOriginal('currency'))->amount_with_currency . ")"
-                : 'N/A';
-
-            // Least-selling product
-            $leastSellingProduct = $productsBySales->last();
-            if ($leastSellingProduct) {
-                if ($topSellingProduct->product_id != $leastSellingProduct->product_id) {
-                    $matchingLeastSellingProducts = $productsBySales->filter(function ($productBySale) use ($leastSellingProduct) {
-                        return $productBySale->total_revenue === $leastSellingProduct->total_revenue &&
-                                $productBySale->total_quantity === $leastSellingProduct->total_quantity;
-                    });
-
-                    if ($matchingLeastSellingProducts->count() === 1) {
-                        $leastSelling = "{$leastSellingProduct->product_name} ({$leastSellingProduct->total_quantity} units, " .
-                            MoneyService::convertToMoneyFormat($leastSellingProduct->total_revenue, $store->getRawOriginal('currency'))->amount_with_currency . ")";
-                    } else {
-                        $leastSelling = 'N/A';
+                    if ($lowestSalesDays->count() === 1 && $highestSalesAmount !== $lowestSalesAmount) {
+                        $lowestSalesDay = "{$lowestSalesDays->first()} (" . MoneyService::convertToMoneyFormat($lowestSalesAmount, $store->getRawOriginal('currency'))->amount_with_currency . ")";
                     }
-                } else {
-                    $leastSelling = 'N/A';
                 }
-            } else {
+
+                $totalSalesFormatted = MoneyService::convertToMoneyFormat($totalSales, $store->getRawOriginal('currency'))->amount_with_currency;
+
+                $add(
+                    'Sale Insights',
+                    'Store performance based on sales',
+                    [
+                        [$isUssd ? 'Sales' : 'Total sales', "{$totalSalesFormatted} ({$totalOrders} " . ($totalOrders == 1 ? 'order' : 'orders') . ")", 'total_sales', 'The total sales revenue generated from orders placed in the store'],
+                        [$isUssd ? 'Avg sale per order' : 'Average sale per order', MoneyService::convertToMoneyFormat($avgSalesPerOrder, $store->getRawOriginal('currency'))->amount_with_currency, 'average_sale_per_order', 'The average sales revenue earned per order based on the total sales divided by the number of orders'],
+                        [$isUssd ? "Best $periodName" : "Highest sales $periodName", $highestSalesDay, 'highest_sale_period', "The $periodName with the highest recorded sales amount"],
+                        [$isUssd ? "Worst $periodName" : "Lowest sales $periodName", $lowestSalesDay, 'lowest_sale_period', "The $periodName with the lowest recorded sales amount"]
+                    ]
+                );
+            }
+
+            if (empty($categories) || in_array(InsightCategory::ORDERS->value, $categories)) {
+                $totalOrders = $ordersByPeriod->sum('total_orders');
+                $totalSales = $ordersByPeriod->sum('total_grand_total');
+
+                $totalOrdersByPeriod = $ordersByPeriod->pluck('total_orders', 'period')->sortByDesc(null);
+
+                $mostOrderDay = 'N/A';
+                $leastOrderDay = 'N/A';
+
+                if ($totalOrdersByPeriod->isNotEmpty()) {
+                    $mostOrderPeriod = $totalOrdersByPeriod->keys()->first();
+                    $mostOrderCount = $totalOrdersByPeriod->get($mostOrderPeriod, 0);
+
+                    $leastOrderPeriod = $totalOrdersByPeriod->keys()->last();
+                    $leastOrderCount = $totalOrdersByPeriod->get($leastOrderPeriod, 0);
+
+                    $mostOrderDay = "{$mostOrderPeriod} ({$mostOrderCount} " . ($mostOrderCount == 1 ? 'order' : 'orders') . ")";
+
+                    $leastOrderPeriods = $totalOrdersByPeriod->filter(fn($count) => $count === $leastOrderCount)->keys();
+
+                    if ($leastOrderPeriods->count() === 1 && $mostOrderCount !== $leastOrderCount) {
+                        $leastOrderDay = "{$leastOrderPeriods->first()} ({$leastOrderCount} " . ($leastOrderCount == 1 ? 'order' : 'orders') . ")";
+                    }
+                }
+
+                $totalSalesFormatted = MoneyService::convertToMoneyFormat($totalSales, $store->getRawOriginal('currency'))->amount_with_currency;
+
+                $add(
+                    'Order Insights',
+                    'Store performance based on orders',
+                    [
+                        [$isUssd ? 'Orders' : 'Total orders', "{$totalOrders} ({$totalSalesFormatted})", 'total_orders', 'The total number of orders placed, along with the total sales revenue generated from those orders'],
+                        ['Most orders', $mostOrderDay, 'most_orders', "The $periodName with the highest number of orders placed"],
+                        ['Least orders', $leastOrderDay, 'least_orders', "The $periodName with the lowest number of orders placed"],
+                    ]
+                );
+            }
+
+            if (empty($categories) || in_array(InsightCategory::PRODUCTS->value, $categories)) {
+                $productsBySales = DB::table('order_products')
+                    ->selectRaw("
+                        product_id,
+                        products.name as product_name,
+                        SUM(quantity) as total_quantity,
+                        SUM(grand_total) as total_revenue,
+                        SUM(CASE WHEN is_cancelled = 1 THEN quantity ELSE 0 END) as cancelled_quantity,
+                        SUM(CASE WHEN is_cancelled = 1 THEN grand_total ELSE 0 END) as cancelled_revenue,
+                        SUM(order_products.unit_sale_discount) as total_discount
+                    ")
+                    ->join('products', 'order_products.product_id', '=', 'products.id')
+                    ->where('order_products.store_id', $store->id)
+                    ->whereBetween('order_products.created_at', [$dateRange1, $dateRange2])
+                    ->groupBy('product_id', 'products.name')
+                    ->orderByDesc('total_revenue')
+                    ->orderByDesc('total_quantity')
+                    ->get();
+
+                $topSelling = 'N/A';
                 $leastSelling = 'N/A';
+
+                if ($productsBySales->isNotEmpty()) {
+                    $topSellingProduct = $productsBySales->first();
+                    $topSelling = "{$topSellingProduct->product_name}";
+
+                    $leastSellingProduct = $productsBySales->last();
+                    $matchingLeastSellingProducts = $productsBySales->filter(fn($product) =>
+                        $product->total_revenue === $leastSellingProduct->total_revenue &&
+                        $product->total_quantity === $leastSellingProduct->total_quantity
+                    );
+
+                    if ($matchingLeastSellingProducts->count() === 1 && $topSellingProduct->product_id !== $leastSellingProduct->product_id) {
+                        $leastSelling = "{$leastSellingProduct->product_name}";
+                    }
+                }
+
+                $totalQuantity = $productsBySales->sum('total_quantity');
+                $totalProductRevenue = $productsBySales->sum('total_revenue');
+                $totalCancelledQuantity = $productsBySales->sum('cancelled_quantity');
+                $totalCancelledRevenue = $productsBySales->sum('cancelled_revenue');
+                $totalDiscount = $productsBySales->sum('total_discount');
+
+                $avgRevenuePerProduct = $totalQuantity > 0 ? $totalProductRevenue / $totalQuantity : 0;
+
+                $avgRevenuePerProductFormatted = MoneyService::convertToMoneyFormat($avgRevenuePerProduct, $store->getRawOriginal('currency'))->amount_with_currency;
+                $totalProductRevenueFormatted = MoneyService::convertToMoneyFormat($totalProductRevenue, $store->getRawOriginal('currency'))->amount_with_currency;
+                $totalCancelledRevenueFormatted = MoneyService::convertToMoneyFormat($totalCancelledRevenue, $store->getRawOriginal('currency'))->amount_with_currency;
+                $totalDiscountFormatted = MoneyService::convertToMoneyFormat($totalDiscount, $store->getRawOriginal('currency'))->amount_with_currency;
+
+                $add(
+                    'Product Insights',
+                    'Store performance based on products',
+                    [
+                        ['Top-selling', $topSelling, 'top_selling', 'The product that has generated the highest quantity of sales'],
+                        ['Least-selling', $leastSelling, 'least_selling', 'The product that has generated the lowest quantity of sales'],
+                        ['Products sold', "{$totalQuantity} ({$totalProductRevenueFormatted})", 'products_sold', 'The total quantity of products sold, along with the total revenue generated from their sales'],
+                        ['Products cancelled', "{$totalCancelledQuantity} ({$totalCancelledRevenueFormatted})", 'products_cancelled', 'The total number of products cancelled on placed orders, along with the total revenue associated with those cancellations'],
+                        ['Offered discounts', $totalDiscountFormatted, 'offered_discounts', 'The total value of discounts provided across all products and orders'],
+                        [$isUssd ? 'Avg revenue per product' : 'Average revenue per product', $avgRevenuePerProductFormatted, 'average_revenue_per_product', 'The average amount of revenue earned per product sold']
+                    ]
+                );
             }
 
-            // Total and canceled quantities, revenue, and discount
-            $totalQuantity = $productsBySales->sum('total_quantity');
-            $totalProductRevenue = $productsBySales->sum('total_revenue');
-            $totalCancelledQuantity = $productsBySales->sum('cancelled_quantity');
-            $totalCancelledRevenue = $productsBySales->sum('cancelled_revenue');
-            $totalDiscount = $productsBySales->sum('total_discount');
+            if (empty($categories) || in_array(InsightCategory::CUSTOMERS->value, $categories)) {
+                $customersData = DB::table('customers')
+                    ->selectRaw("
+                        customers.id as customer_id,
+                        COUNT(orders.id) as total_orders,
+                        SUM(orders.grand_total) as total_spend
+                    ")
+                    ->leftJoin('orders', 'customers.id', '=', 'orders.customer_id')
+                    ->where('orders.store_id', $store->id)
+                    ->whereBetween('orders.created_at', [$dateRange1, $dateRange2])
+                    ->groupBy('customers.id')
+                    ->get();
 
-            // Average revenue per product
-            $avgRevenuePerProduct = $totalQuantity > 0 ? $totalProductRevenue / $totalQuantity : 0;
+                $totalCustomers = $customersData->count();
+                $newCustomers = $customersData->filter(fn($record) => $record->total_orders == 1)->count();
+                $returnCustomers = $customersData->filter(fn($record) => $record->total_orders > 1)->count();
+                $retentionRate = $totalCustomers > 0 ? ($returnCustomers / $totalCustomers) * 100 : 0;
 
-            $avgRevenuePerProductFormatted = MoneyService::convertToMoneyFormat($avgRevenuePerProduct, $store->getRawOriginal('currency'))->amount_with_currency;
-            $totalProductRevenueFormatted = MoneyService::convertToMoneyFormat($totalProductRevenue, $store->getRawOriginal('currency'))->amount_with_currency;
-            $totalCancelledRevenueFormatted = MoneyService::convertToMoneyFormat($totalCancelledRevenue, $store->getRawOriginal('currency'))->amount_with_currency;
-            $totalDiscountFormatted = MoneyService::convertToMoneyFormat($totalDiscount, $store->getRawOriginal('currency'))->amount_with_currency;
+                $totalRevenue = $customersData->sum('total_spend');
+                $revenuePerCustomer = $totalCustomers > 0 ? $totalRevenue / $totalCustomers : 0;
+                $revenuePerCustomerFormatted = MoneyService::convertToMoneyFormat($revenuePerCustomer, $store->getRawOriginal('currency'))->amount_with_currency;
 
-            $add(
-                'Product Insights',
-                'Store performance based on products',
-                [
-                    ['Top-selling', $topSelling, 'top_selling', 'The product that has generated the highest quantity of sales'],
-                    ['Least-selling', $leastSelling, 'least_selling', 'The product that has generated the lowest quantity of sales'],
-                    ['Products sold', $totalQuantity . ' (' . $totalProductRevenueFormatted . ')', 'products_sold', 'The total quantity of products sold, along with the total revenue generated from their sales'],
-                    ['Products cancelled', $totalCancelledQuantity . ' (' . $totalCancelledRevenueFormatted . ')', 'products_cancelled', 'The total number of products cancelled on placed orders, along with the total revenue associated with those cancellations'],
-                    ['Offered discounts', $totalDiscountFormatted, 'offered_discounts', 'The total value of discounts provided across all products and orders'],
-                    [$isUssd ? 'Avg revenue per product' : 'Average revenue per product', $avgRevenuePerProductFormatted, 'average_revenue_per_product', 'The average amount of revenue earned per product sold']
-                ]
-            );
-        }
+                [$previousDateRange1, $previousDateRange2] = match ($period) {
+                    InsightPeriod::TODAY->value => [$dateRange1->copy()->subDay(), $dateRange2->copy()->subDay()],
+                    InsightPeriod::YESTERDAY->value => [$dateRange1->copy()->subDays(2), $dateRange2->copy()->subDay(2)],
+                    InsightPeriod::THIS_WEEK->value => [$dateRange1->copy()->subWeek(), $dateRange2->copy()->subWeek()],
+                    InsightPeriod::THIS_MONTH->value => [$dateRange1->copy()->subMonth(), $dateRange2->copy()->subMonth()],
+                    InsightPeriod::THIS_YEAR->value => [$dateRange1->copy()->subYear(), $dateRange2->copy()->subYear()],
+                    default => [$dateRange1->copy()->subDay(), $dateRange2->copy()->subDay()]
+                };
 
-        if (empty($categories) || in_array(InsightCategory::CUSTOMERS->value, $categories)) {
+                $previousPeriodCustomers = DB::table('customers')
+                    ->leftJoin('orders', 'customers.id', '=', 'orders.customer_id')
+                    ->where('orders.store_id', $store->id)
+                    ->whereBetween('orders.created_at', [$previousDateRange1, $previousDateRange2])
+                    ->distinct('customers.id')
+                    ->count('customers.id');
 
-            $customersData = DB::table('customers')
-                ->selectRaw("
-                    customers.id as customer_id,
-                    COUNT(orders.id) as total_orders,
-                    SUM(orders.grand_total) as total_spend
-                ")
-                ->leftJoin('orders', 'customers.id', '=', 'orders.customer_id')
-                ->where('orders.store_id', $store->id)
-                ->whereBetween('orders.created_at', [$dateRange1, $dateRange2])
-                ->groupBy('customer_id')
-                ->get();
+                $customerGrowthRate = $previousPeriodCustomers == 0 && $totalCustomers > 0
+                    ? 100
+                    : ($previousPeriodCustomers > 0 ? (($totalCustomers - $previousPeriodCustomers) / $previousPeriodCustomers) * 100 : 0);
 
-            // Total customers
-            $totalCustomers = $customersData->count();
-
-            // New and return customers
-            $newCustomers = $customersData->filter(fn($record) => $record->total_orders == 1)->count();
-            $returnCustomers = $customersData->filter(fn($record) => $record->total_orders > 1)->count();
-
-            // Retention Rate
-            $retentionRate = $totalCustomers ? ($returnCustomers / $totalCustomers) * 100 : 0;
-
-            // Revenue per Customer
-            $totalRevenue = $customersData->sum('total_spend');
-            $revenuePerCustomer = $totalCustomers ? $totalRevenue / $totalCustomers : 0;
-            $revenuePerCustomer = MoneyService::convertToMoneyFormat($revenuePerCustomer, $store->getRawOriginal('currency'))->amount_with_currency;
-
-            // Determine previous date range based on the period
-            [$previousDateRange1, $previousDateRange2] = match ($period) {
-                InsightPeriod::TODAY->value => [$dateRange1->subDay(), $dateRange2->subDay()],
-                InsightPeriod::YESTERDAY->value => [$dateRange1->subDays(2), $dateRange2->subDay(2)],
-                InsightPeriod::THIS_WEEK->value => [$dateRange1->subWeek(), $dateRange2->subWeek()],
-                InsightPeriod::THIS_MONTH->value => [$dateRange1->subMonth(), $dateRange2->subMonth()],
-                InsightPeriod::THIS_YEAR->value => [$dateRange1->subYear(), $dateRange2->subYear()],
-            };
-
-            // Get the number of customers in the previous period
-            $previousPeriodCustomers = DB::table('customers')
-                ->leftJoin('orders', 'customers.id', '=', 'orders.customer_id')
-                ->where('orders.store_id', $store->id)
-                ->whereBetween('orders.created_at', [$previousDateRange1, $previousDateRange2])
-                ->count();
-
-            // Calculate Customer Growth Rate
-            $customerGrowthRate = 0;
-
-            if ($previousPeriodCustomers == 0 && $totalCustomers > 0) {
-                $customerGrowthRate = 100;
-            } elseif ($previousPeriodCustomers > 0) {
-                $customerGrowthRate = (($totalCustomers - $previousPeriodCustomers) / $previousPeriodCustomers) * 100;
+                $add(
+                    'Customer Insights',
+                    'Store performance based on customers',
+                    [
+                        ['Total customers', $totalCustomers, 'total_customers', 'The total number of unique customers on this store'],
+                        ['New customers', $newCustomers, 'new_customers', 'The number of customers who have only placed one order'],
+                        ['Return customers', $returnCustomers, 'return_customers', 'The number of customers who have placed more than one order'],
+                        ['Retention Rate', sprintf('%.1f%%', $retentionRate), 'retention_rate', 'The percentage of customers who made repeat purchases, indicating customer loyalty'],
+                        ['Revenue per Customer', $revenuePerCustomerFormatted, 'revenue_per_customer', 'The average revenue generated from each customer, calculated as total sales divided by the total number of customers'],
+                        ['Customer Growth Rate', sprintf('%.1f%% (%s)', $customerGrowthRate, $customerGrowthRate > 0 ? 'increased' : ($customerGrowthRate == 0 ? 'no change' : 'decreased')), 'customer_growth_rate', 'The rate at which the customer base has grown or decreased, expressed as a percentage']
+                    ]
+                );
             }
 
-            $add(
-                'Customer Insights',
-                'Store performance based on customers',
-                [
-                    ['Total customers', $totalCustomers, 'total_customers', 'The total number of unique customers on this store'],
-                    ['New customers', $newCustomers, 'new_customers', 'The number of customers who have only placed one order'],
-                    ['Return customers', $returnCustomers, 'return_customers', 'The number of customers who have placed more than one order'],
-                    ['Retention Rate', $retentionRate . '%', 'retention_rate', 'The percentage of customers who made repeat purchases, indicating customer loyalty'],
-                    ['Revenue per Customer', $revenuePerCustomer, 'revenue_per_customer', 'The average revenue generated from each customer, calculated as total sales divided by the total number of customers'],
-                    ['Customer Growth Rate', round($customerGrowthRate, 1) . '% (' . ($customerGrowthRate > 0 ? 'increased' : ($customerGrowthRate == 0 ? 'no change' : 'decreased')) . ')', 'customer_growth_rate', 'The rate at which the customer base has grown or decreased, expressed as a percentage']
-                ]
-            );
-
+            if (empty($categories) || in_array(InsightCategory::OPERATIONS->value, $categories)) {
+                // TODO: Implement operations insights (e.g., order fulfillment times, staff performance)
+                $add(
+                    'Operations Insights',
+                    'Store performance based on operational metrics',
+                    [
+                        ['Operational Metrics', 'N/A', 'operational_metrics', 'Operational insights are not yet implemented']
+                    ]
+                );
+            }
+        } catch (\Exception $e) {
+            Log::error('Failed to generate store insights', [
+                'store_id' => $store->id,
+                'period' => $period,
+                'categories' => $categories,
+                'error' => $e->getMessage()
+            ]);
+            return ['insights' => []]; // Return empty insights on failure
         }
 
-        if (empty($categories) || in_array(InsightCategory::OPERATIONS->value, $categories)) {
-
-
-        }
-
-        return [
-            'insights' => $insights
-        ];
+        return ['insights' => $insights];
     }
 
     /**

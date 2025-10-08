@@ -198,6 +198,7 @@
     import Button from '@Partials/Button.vue';
     import Loader from '@Partials/Loader.vue';
     import { RotateCcw } from 'lucide-vue-next';
+    import { isNotEmpty } from '@Utils/stringUtils';
     import { generateUniqueId } from '@Utils/generalUtils.js';
     import Paginator from '@Partials/table/components/Paginator.vue';
     import FilterDrawer from '@Partials/table/components/FilterDrawer.vue';
@@ -289,7 +290,7 @@
         },
         computed: {
             hasSearchTerm() {
-                return this.localSearchTerm != null && this.localSearchTerm.trim() != '';
+                return this.isNotEmpty(this.localSearchTerm);
             },
             hasFilters() {
                 return this.filters.length > 0;
@@ -311,6 +312,7 @@
             }
         },
         methods: {
+            isNotEmpty: isNotEmpty,
             refresh() {
                 if(!this.localIsLoading) this.$emit('refresh');
             },

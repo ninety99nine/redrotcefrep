@@ -173,11 +173,15 @@
             nationalMobileNumbers() {
                 return this.modelValue.map((mobileNumber) => {
 
-                    const phoneNumber = parsePhoneNumberFromString(mobileNumber);
-                    let nationalNumber =  phoneNumber.formatNational();
-                    return nationalNumber.replace(/\s+/g, '');
+                    const phoneNumber = parsePhoneNumberFromString(mobileNumber) || null;
+                    if(phoneNumber && phoneNumber.isValid()) {
+                        let nationalNumber = phoneNumber.formatNational();
+                        return nationalNumber.replace(/\s+/g, '');
+                    }
 
-                });
+                    return null;
+
+                }).filter(mobileNumber => mobileNumber != null);
             },
             formHasChanged() {
                 return !isEqual(this.form, this.originalForm);
@@ -213,6 +217,12 @@
             },
             _createMobileNumber(hideModal) {
 
+                const phoneNumber = parsePhoneNumberFromString(this.form.mobile_number) || null;
+                if(!phoneNumber || !phoneNumber.isValid()) {
+                    this.formState.setFormError('mobile_number', 'This is not a valid mobile number');
+                    return;
+                }
+
                 // Check if the mobile number already exists
                 const mobileNumberExists = this.modelValue.some(
                     (number) => number === this.form.mobile_number
@@ -238,6 +248,12 @@
 
             },
             _updateMobileNumber(hideModal) {
+
+                const phoneNumber = parsePhoneNumberFromString(this.form.mobile_number) || null;
+                if(!phoneNumber || !phoneNumber.isValid()) {
+                    this.formState.setFormError('mobile_number', 'This is not a valid mobile number');
+                    return;
+                }
 
                 // Check if the mobile number already exists
                 const mobileNumberExists = this.modelValue.some(

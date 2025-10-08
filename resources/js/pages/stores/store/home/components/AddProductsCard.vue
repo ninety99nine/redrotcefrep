@@ -50,8 +50,8 @@
         methods: {
             onAddProduct() {
                 this.$router.push({
-                    name: 'create-store-product',
-                    params: {
+                    name: 'create-product',
+                    query: {
                         store_id: this.store.id
                     }
                 });

@@ -39,7 +39,7 @@
 
                 <Markdown
                     :text="designCard.metadata.upper_text"
-                    v-if="designCard.metadata.upper_text?.trim()">
+                    v-if="isNotEmpty(designCard.metadata.upper_text)">
                 </Markdown>
 
                 <div
@@ -55,7 +55,7 @@
 
                 <Markdown
                     :text="designCard.metadata.lower_text"
-                    v-if="designCard.metadata.lower_text?.trim()">
+                    v-if="isNotEmpty(designCard.metadata.lower_text)">
                 </Markdown>
 
             </div>
@@ -69,6 +69,7 @@
 <script>
 
     import Markdown from '@Partials/Markdown.vue';
+    import { isNotEmpty } from '@Utils/stringUtils';
 
     export default {
         components: { Markdown },
@@ -79,10 +80,11 @@
         },
         computed: {
             hasLink() {
-                return !(this.designCard.metadata.link == null || this.designCard.metadata.link.trim() == '');
+                return this.isNotEmpty(this.designCard.metadata.link);
             }
         },
         methods: {
+            isNotEmpty: isNotEmpty,
             handleLink(e) {
                 if(!this.hasLink) {
                     e.preventDefault();

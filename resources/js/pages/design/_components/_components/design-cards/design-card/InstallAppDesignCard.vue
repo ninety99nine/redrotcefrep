@@ -13,8 +13,10 @@
 
             <Input
                 type="text"
+                maxLength="40"
                 class="w-full mb-4"
                 placeholder="Button Text"
+                :showCharacterLengthCounter="true"
                 v-model="designCard.metadata.button_text"
                 @input="designState.saveStateDebounced('Button text changed')"
                 :errorText="formState.getFormError(`design_cards.${index}.metadata.button_text`)">

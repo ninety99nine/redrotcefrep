@@ -200,6 +200,7 @@
     import Loader from '@Partials/Loader.vue';
     import Button from '@Partials/Button.vue';
     import Skeleton from '@Partials/Skeleton.vue';
+    import { isNotEmpty } from '@Utils/stringUtils.js';
     import Menu from '@Pages/shop/_components/menu/Menu.vue';
     import MyCartButton from '@Pages/shop/_components/design-card-manager/_components/my-cart/MyCartButton.vue';
 
@@ -244,7 +245,7 @@
                 return this.storeState.isLoadingStore;
             },
             hasSearchTerm() {
-                return this.searchTerm != null && this.searchTerm.trim() != '';
+                return this.isNotEmpty(this.searchTerm);
             },
             hasProducts() {
                 return this.products.length > 0;
@@ -259,6 +260,7 @@
             }
         },
         methods: {
+            isNotEmpty: isNotEmpty,
             setup() {
                 if(this.store) {
                     if(!this.hasCategories) this.showCategories();

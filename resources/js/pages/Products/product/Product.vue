@@ -865,6 +865,7 @@
     import Switch from '@Partials/Switch.vue';
     import Select from '@Partials/Select.vue';
     import Popover from '@Partials/Popover.vue';
+    import { isEmpty } from '@Utils/stringUtils';
     import Skeleton from '@Partials/Skeleton.vue';
     import SelectTags from '@Partials/SelectTags.vue';
     import { VueDraggableNext } from 'vue-draggable-next';
@@ -1007,6 +1008,7 @@
             }
         },
         methods: {
+            isEmpty: isEmpty,
             goBack() {
                 this.navigateToProducts();
             },
@@ -1192,14 +1194,14 @@
 
                         this.formState.hideFormErrors();
 
-                        if(this.productForm.name == null || this.productForm.name.trim() === '') {
+                        if(this.isEmpty(this.productForm.name)) {
                             this.formState.setFormError('name', 'The name is required');
                         }
 
                         for (let index = 0; index < this.productForm.variants.length; index++) {
                             const variant = this.productForm.variants[index];
 
-                            if(variant.name == null || variant.name.trim() === '') {
+                            if(this.isEmpty(variant.name)) {
                                 this.formState.setFormError(`variants.${index}.name`, 'The name is required');
                             }
                         }
@@ -1289,14 +1291,14 @@
 
                         this.formState.hideFormErrors();
 
-                        if(this.productForm.name == null || this.productForm.name.trim() === '') {
+                        if(this.isEmpty(this.productForm.name)) {
                             this.formState.setFormError('name', 'The name is required');
                         }
 
                         for (let index = 0; index < this.productForm.variants.length; index++) {
                             const variant = this.productForm.variants[index];
 
-                            if(variant.name == null || variant.name.trim() === '') {
+                            if(this.isEmpty(variant.name)) {
                                 this.formState.setFormError(`variants.${index}.name`, 'The name is required');
                             }
                         }

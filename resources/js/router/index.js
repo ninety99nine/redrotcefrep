@@ -359,6 +359,16 @@ const routes = [
                 ]
             },
             {
+                path: 'marketing',
+                children: [
+                    {
+                        path: '',
+                        name: 'show-marketing',
+                        component: () => import('@Pages/marketing/Marketing.vue')
+                    }
+                ]
+            },
+            {
                 path: 'design',
                 component: () => import('@Pages/design/Design.vue'),
                 children: [

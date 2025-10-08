@@ -255,6 +255,7 @@
     import Input from '@Partials/Input.vue';
     import Button from '@Partials/Button.vue';
     import StoreLogo from '@Components/StoreLogo.vue';
+    import { isEmpty, isNotEmpty } from '@Utils/stringUtils.js';
     import { X, Check, RefreshCw, CloudUpload, ExternalLink } from 'lucide-vue-next';
 
     export default {
@@ -310,6 +311,8 @@
             }
         },
         methods: {
+            isEmpty: isEmpty,
+            isNotEmpty: isNotEmpty,
             addProduct() {
                 this.products.push({
                     id: null,
@@ -424,14 +427,14 @@
 
                 // Check if any product is missing required fields
                 for (const [index, product] of this.products.entries()) {
-                    if (product.name.trim() === '') {
+                    if (this.isEmpty(product.name)) {
                         this.formState.setFormError('name', 'The product name is required', index);
                         this.notificationState.showWarningNotification(`The product name is required`);
                         this.formErrorMessagesIndex = index;
                         return;
                     }
 
-                    if (product.unit_regular_price.trim() === '') {
+                    if (this.isEmpty(product.unit_regular_price)) {
                         this.formState.setFormError('unit_regular_price', 'The product price is required', index);
                         this.notificationState.showWarningNotification(`The product price is required`);
                         this.formErrorMessagesIndex = index;
@@ -607,7 +610,7 @@
                     return next(false);
                 }
 
-            } else if (this.totalCompletedSteps == 0 && this.products.some(product => product.name.trim() !== '' || product.photos.length > 0)) {
+            } else if (this.totalCompletedSteps == 0 && this.products.some(product => this.isNotEmpty(product.name) || product.photos.length > 0)) {
 
                 const answer = window.confirm("Are you sure you want to leave before adding products?");
                 if (!answer) {

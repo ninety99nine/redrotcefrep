@@ -30,7 +30,7 @@
 
             <Markdown
                 :text="designCard.metadata.upper_text"
-                v-if="designCard.metadata.upper_text != null && designCard.metadata.upper_text?.trim() != ''">
+                v-if="isNotEmpty(designCard.metadata.upper_text)">
             </Markdown>
 
             <AddressInput
@@ -49,7 +49,7 @@
 
             <Markdown
                 :text="designCard.metadata.lower_text"
-                v-if="designCard.metadata.lower_text != null && designCard.metadata.lower_text?.trim() != ''">
+                v-if="isNotEmpty(designCard.metadata.lower_text)">
             </Markdown>
 
         </div>
@@ -61,6 +61,7 @@
 <script>
 
     import Markdown from '@Partials/Markdown.vue';
+    import { isNotEmpty } from '@Utils/stringUtils';
     import AddressInput from '@Partials/AddressInput.vue';
 
     export default {
@@ -69,6 +70,9 @@
             designCard: {
                 type: Object
             }
+        },
+        methods: {
+            isNotEmpty: isNotEmpty,
         }
     }
 </script>

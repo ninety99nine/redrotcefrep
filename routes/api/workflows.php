@@ -11,6 +11,7 @@ Route::prefix('workflows')
         Route::post('/', 'createWorkflow')->name('create.workflow');
         Route::delete('/', 'deleteWorkflows')->name('delete.workflows');
         Route::post('/arrangement', 'updateWorkflowArrangement')->name('update.workflow.arrangement');
+        Route::get('/configurations', 'showWorkflowConfigurations')->name('show.workflow.configurations');
 
         // Explicit route model binding applied: AppServiceProvider.php
         Route::prefix('{workflow}')->group(function () {
@@ -18,4 +19,5 @@ Route::prefix('workflows')
             Route::put('/', 'updateWorkflow')->name('update.workflow');
             Route::delete('/', 'deleteWorkflow')->name('delete.workflow');
         });
-});
+    });
+?>

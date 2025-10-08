@@ -4,6 +4,7 @@
     <Input
         type="text"
         v-model="localModelValue"
+        placeholder="+26772000001"
         :label="configSchemaEntity.label"
         :description="configSchemaEntity.description"
         :popoverContent="configSchemaEntity.description_info"

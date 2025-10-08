@@ -89,6 +89,7 @@
     import Modal from '@Partials/Modal.vue';
     import Button from '@Partials/Button.vue';
     import Skeleton from '@Partials/Skeleton.vue';
+    import { isNotEmpty } from '@Utils/stringUtils';
     import { Plus, RefreshCcw } from 'lucide-vue-next';
     import CustomerOptions from '@Pages/orders/order/editable/components/order-customer/add-customer/customer-options/CustomerOptions.vue';
 
@@ -130,13 +131,14 @@
                 return this.$route.name === 'edit-order';
             },
             hasSearchTerm() {
-                return this.searchTerm != null && this.searchTerm.trim() != '';
+                return this.isNotEmpty(this.searchTerm);
             },
             hasCustomers() {
                 return this.customers.length > 0;
             },
         },
         methods: {
+            isNotEmpty: isNotEmpty,
             onShow() {
                 this.hasLoadedInitialCustomers = false;
                 this.lastSearchTerm = null;

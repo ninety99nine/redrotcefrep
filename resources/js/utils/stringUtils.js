@@ -15,5 +15,7 @@ export function isEmpty(value) {
 }
 
 export function isNotEmpty(value) {
+    console.log('value');
+    console.log(value);
     return value != null && value.trim() != '';
 }

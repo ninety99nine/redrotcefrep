@@ -25,9 +25,9 @@ export const useDesignStore = defineStore('design', {
         saveOriginalState(actionName) {
             changeHistoryState().saveOriginalState(actionName, this.designForm);
         },
-        setDesignForm(designForm) {
+        setDesignForm(design, store) {
 
-            designForm.design_cards = designForm.design_cards.map((designCard) => {
+            design.design_cards = design.design_cards.map((designCard) => {
 
                 /**
                  *  Some metadata fields must never be null, but instead of null must
@@ -50,7 +50,21 @@ export const useDesignStore = defineStore('design', {
 
             });
 
-            this.designForm = designForm;
+            design['store_settings'] = {
+                tips: store.tips,
+                combine_fees: store.combine_fees,
+                combine_discounts: store.combine_discounts,
+                checkout_fees: (store.checkout_fees ?? []).map((checkoutFee) => {
+                    return {
+                        'name': checkoutFee.name,
+                        'rate_type': checkoutFee.rate_type,
+                        'percentage_rate': checkoutFee.percentage_rate,
+                        'flat_rate': checkoutFee.flat_rate.amount_without_currency,
+                    }
+                })
+            }
+
+            this.designForm = design;
 
             this.saveOriginalState('Original design');
         },

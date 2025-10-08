@@ -103,6 +103,7 @@
     import Logo from '@Partials/Logo.vue';
     import Input from '@Partials/Input.vue';
     import Button from '@Partials/Button.vue';
+    import { isEmpty } from '@Utils/stringUtils';
     import VueSlideUpDown from 'vue-slide-up-down';
     import SocialLinks from '@Pages/auth/components/SocialLinks.vue';
 
@@ -125,25 +126,26 @@
         },
         computed: {
             expand() {
-                return this.form.first_name.trim().length > 0 && this.form.last_name.trim().length > 0;
+                return this.isEmpty(this.form.first_name) && this.isEmpty(this.form.last_name);
             }
         },
         methods: {
+            isEmpty: isEmpty,
             async submit() {
 
                 if (this.loading) return;
 
                 this.formState.hideFormErrors();
 
-                if (this.form.first_name.trim() === '') {
+                if (this.isEmpty(this.form.first_name)) {
                     this.formState.setFormError('first_name', 'Enter your first name');
-                }else if (this.form.last_name.trim() === '') {
+                }else if (this.isEmpty(this.form.last_name)) {
                     this.formState.setFormError('last_name', 'Enter your last name');
-                }else if (this.form.email.trim() === '') {
+                }else if (this.isEmpty(this.form.email)) {
                     this.formState.setFormError('email', 'Enter your email');
-                } else if (this.form.password.trim() === '') {
+                } else if (this.isEmpty(this.form.password)) {
                     this.formState.setFormError('password', 'Enter your password');
-                } else if (this.form.confirm_password.trim() === '') {
+                } else if (this.isEmpty(this.form.confirm_password)) {
                     this.formState.setFormError('confirm_password', 'Confirm your password');
                 } else if (this.form.password != this.form.confirm_password) {
                     this.formState.setFormError('password', 'Passwords do not match');

@@ -231,6 +231,7 @@
     import Skeleton from '@Partials/Skeleton.vue';
     import SelectCountry from '@Partials/SelectCountry.vue';
     import { Check, Globe, MoveLeft } from 'lucide-vue-next';
+    import { isEmpty, isNotEmpty } from '@Utils/stringUtils';
     import { parsePhoneNumberFromString } from 'libphonenumber-js';
 
     export default {
@@ -281,10 +282,12 @@
                 return this.storeState.isLoadingStore;
             },
             hasSearchTerm() {
-                return this.searchTerm != null && this.searchTerm.trim() != '';
+                return this.isNotEmpty(this.searchTerm);
             }
         },
         methods: {
+            isEmpty: isEmpty,
+            isNotEmpty: isNotEmpty,
             async goBack() {
                 if(this.viewMode === 'search') {
                     this.navigateToShowDomains();
@@ -476,7 +479,7 @@
 
                     // Validate required fields
                     const requiredFields = ['first_name', 'last_name', 'email', 'phone', 'address1', 'city', 'state', 'postal_code', 'country'];
-                    const missingFields = requiredFields.filter(field => !this.formData[field] || this.formData[field].trim() === '');
+                    const missingFields = requiredFields.filter(field => !this.formData[field] || this.isEmpty(this.formData[field]));
 
                     if (missingFields.length > 0) {
                         missingFields.forEach(field => {

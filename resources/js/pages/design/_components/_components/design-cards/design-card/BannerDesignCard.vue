@@ -13,8 +13,10 @@
 
             <Input
                 type="text"
+                maxLength="40"
                 class="w-full mb-4"
                 placeholder="Title"
+                :showCharacterLengthCounter="true"
                 v-model="designCard.metadata.title"
                 @input="designState.saveStateDebounced('Title changed')"
                 :errorText="formState.getFormError(`design_cards.${index}.metadata.title`)">

@@ -185,6 +185,7 @@
     import Popover from '@Partials/Popover.vue';
     import Tooltip from '@Partials/Tooltip.vue';
     import Skeleton from '@Partials/Skeleton.vue';
+    import { isNotEmpty } from '@Utils/stringUtils';
     import capitalize from '@Directives/capitalize.js';
     import { generateUniqueId } from '@Utils/generalUtils.js';
 
@@ -290,10 +291,11 @@
         },
         computed: {
             hasSearchQuery() {
-                return this.searchQuery != null && this.searchQuery.trim() != '';
+                return this.isNotEmpty(this.searchQuery);
             }
         },
         methods: {
+            isNotEmpty: isNotEmpty,
             openDropdown() {
                 this.isOpen = true;
             },

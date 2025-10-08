@@ -26,6 +26,7 @@
 
 <script>
 
+    import { isEmpty } from '@Utils/stringUtils';
     import Tax from '@Pages/settings/general/_components/tax/Tax.vue';
     import Basics from '@Pages/settings/general/_components/basics/Basics.vue';
     import Danger from '@Pages/settings/general/_components/danger/Danger.vue';
@@ -54,6 +55,7 @@
             }
         },
         methods: {
+            isEmpty: isEmpty,
             setup() {
                 if(this.store) {
                     this.storeState.setStoreForm(this.store, true);
@@ -79,7 +81,7 @@
 
                     this.formState.hideFormErrors();
 
-                    if(this.storeForm.name == null || this.storeForm.name.trim() === '') {
+                    if(this.isEmpty(this.storeForm.name)) {
                         this.formState.setFormError('name', 'The name is required');
                     }
 

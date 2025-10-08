@@ -10,21 +10,6 @@ use App\Enums\FilterResourceType;
 class MiscellaneousService
 {
     /**
-     * Show social media links.
-     *
-     * @return array
-     */
-    public function showSocialMediaLinks(): array
-    {
-        return collect(SocialMediaLink::values())->map(function($socialMediaPlatform) {
-            return [
-                'name' => $socialMediaPlatform,
-                'icon' => asset('/images/social-media-icons/'.strtolower($socialMediaPlatform).'.png')
-            ];
-        })->toArray();
-    }
-
-    /**
      * Show filters.
      *
      * @param array $data

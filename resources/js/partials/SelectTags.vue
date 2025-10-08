@@ -206,6 +206,7 @@
 
     import Popover from '@Partials/Popover.vue';
     import Tooltip from '@Partials/Tooltip.vue';
+    import { isNotEmpty } from '@Utils/stringUtils';
     import capitalize from '@Directives/capitalize.js';
     import { VueDraggableNext } from 'vue-draggable-next';
     import { generateUniqueId } from '@Utils/generalUtils.js';
@@ -361,7 +362,7 @@
                 return this.selectedOptions.length > 0;
             },
             hasSearchQuery() {
-                return this.searchQuery && this.searchQuery.trim().length > 0;
+                return this.isNotEmpty(this.searchQuery);
             },
             filteredOptions() {
                 if (!this.searchQuery) return this.localOptions;
@@ -373,6 +374,7 @@
             }
         },
         methods: {
+            isNotEmpty: isNotEmpty,
             openDropdown() {
                 if (this.disabled) return;
                 if (!this.isOpen) {

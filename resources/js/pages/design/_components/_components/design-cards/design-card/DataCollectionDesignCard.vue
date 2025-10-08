@@ -21,7 +21,9 @@
                         <Input
                             type="text"
                             class="w-full"
+                            maxLength="40"
                             placeholder="Title"
+                            :showCharacterLengthCounter="true"
                             v-model="designCard.metadata.title"
                             @input="designState.saveStateDebounced('Option title changed')"
                             :errorText="formState.getFormError('design_cards'+index+'metadata.title')">
@@ -31,7 +33,10 @@
                         <Input
                             rows="2"
                             class="w-full"
+                            :resize="true"
                             type="textarea"
+                            maxLength="200"
+                            :showCharacterLengthCounter="true"
                             v-model="designCard.metadata.description"
                             placeholder="Short description (optional)"
                             @input="designState.saveStateDebounced('Option description changed')"
@@ -68,7 +73,9 @@
 
                                 <!-- Option Name Text Input -->
                                 <Input
+                                    maxLength="40"
                                     class="w-full"
+                                    :showCharacterLengthCounter="true"
                                     :placeholder="`Option ${index2 + 1}`"
                                     v-model="designCard.metadata.options[index2].name"
                                     @input="designState.saveStateDebounced('Sub option name changed')"

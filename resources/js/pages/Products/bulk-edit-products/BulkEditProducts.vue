@@ -860,6 +860,7 @@
     import Popover from '@Partials/Popover.vue';
     import Dropdown from '@Partials/Dropdown.vue';
     import Table from '@Partials/table/Table.vue';
+    import { isNotEmpty } from '@Utils/stringUtils';
     import SelectTags from '@Partials/SelectTags.vue';
     import { Plus, EyeOff, Trash2, RefreshCcw, CornerRightUp, CornerRightDown } from 'lucide-vue-next';
 
@@ -976,7 +977,7 @@
                 return this.storeState.store;
             },
             hasSearchTerm() {
-                return this.searchTerm != null && this.searchTerm.trim() != '';
+                return this.isNotEmpty(this.searchTerm);
             },
             isDeletingProducts() {
                 return this.isDeletingProducIds.length > 0;
@@ -995,6 +996,7 @@
             },
         },
         methods: {
+            isNotEmpty: isNotEmpty,
             async setTags() {
                 if(!this.store || this.tags.length) return;
                 this.tagOptions = this.store.product_tags.map((tag) => {

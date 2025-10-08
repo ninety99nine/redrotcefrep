@@ -14,6 +14,7 @@
 <script>
 
     import Button from '@Partials/Button.vue';
+    import { isEmpty } from '@Utils/stringUtils';
 
     export default {
         inject: ['formState', 'designState', 'orderState', 'storeState', 'notificationState'],
@@ -63,6 +64,7 @@
             }
         },
         methods: {
+            isEmpty: isEmpty,
             async createOrder() {
 
                 try {
@@ -71,19 +73,19 @@
 
                     const metadata = this.customerDesignCard.metadata;
 
-                    if(metadata.show_first_name && metadata.first_name_required && (this.orderForm.customer_first_name == null || this.orderForm.customer_first_name.trim() == '')) {
+                    if(metadata.show_first_name && metadata.first_name_required && this.isEmpty(this.orderForm.customer_first_name)) {
                         this.formState.setFormError('customer_first_name', 'Enter your first name');
                     }
 
-                    if(metadata.show_last_name && metadata.last_name_required && (this.orderForm.customer_last_name == null || this.orderForm.customer_last_name.trim() == '')) {
+                    if(metadata.show_last_name && metadata.last_name_required && this.isEmpty(this.orderForm.customer_last_name == null)) {
                         this.formState.setFormError('customer_last_name', 'Enter your last name');
                     }
 
-                    if(metadata.show_mobile_number && metadata.mobile_number_required && (this.orderForm.customer_mobile_number == null || this.orderForm.customer_mobile_number.trim() == '')) {
+                    if(metadata.show_mobile_number && metadata.mobile_number_required && this.isEmpty(this.orderForm.customer_mobile_number == null)) {
                         this.formState.setFormError('customer_mobile_number', 'Enter your mobile number');
                     }
 
-                    if(metadata.show_email && metadata.email_required && (this.orderForm.customer_email == null || this.orderForm.customer_email.trim() == '')) {
+                    if(metadata.show_email && metadata.email_required && this.isEmpty(this.orderForm.customer_email)) {
                         this.formState.setFormError('customer_email', 'Enter your email');
                     }
 

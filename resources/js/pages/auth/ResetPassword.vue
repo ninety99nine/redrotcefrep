@@ -81,6 +81,7 @@
     import Logo from '@Partials/Logo.vue';
     import Input from '@Partials/Input.vue';
     import Button from '@Partials/Button.vue';
+    import { isEmpty } from '@Utils/stringUtils';
 
     export default {
         name: 'ResetPassword',
@@ -99,21 +100,22 @@
             };
         },
         methods: {
+            isEmpty: isEmpty,
             async submit() {
 
                 if (this.loading) return;
 
                 this.formState.hideFormErrors();
 
-                if (this.form.email.trim() === '') {
+                if (this.isEmpty(this.form.email)) {
                     this.formState.setFormError('email', 'Email is required');
                 }
 
-                if (this.form.password.trim() === '') {
+                if (this.isEmpty(this.form.password)) {
                     this.formState.setFormError('password', 'New Password is required');
                 }
 
-                if (this.form.confirmPassword.trim() === '') {
+                if (this.isEmpty(this.form.confirmPassword)) {
                     this.formState.setFormError('confirmPassword', 'Confirm New Password is required');
                 }
 

@@ -1,6 +1,6 @@
 <template>
 
-    <div v-if="!isLoadingStore && !isLoadingOrder" class="flex items-center space-x-1">
+    <div v-if="_order" class="flex items-center space-x-1">
         <Pill :type="type" size="xs">
             <span class="whitespace-nowrap">{{ _order.payment_status }}</span>
         </Pill>

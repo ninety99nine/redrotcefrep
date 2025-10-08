@@ -30,6 +30,7 @@
 
     import axios from 'axios';
     import Button from '@Partials/Button.vue';
+    import { isNotEmpty } from '@Utils/stringUtils';
     import { ChevronLeft, ChevronRight } from 'lucide-vue-next';
 
     export default {
@@ -72,7 +73,7 @@
                 return this.storeState.isLoadingStore;
             },
             hasSearchTerm() {
-                return this.searchTerm != null && this.searchTerm.trim() != '';
+                return this.isNotEmpty(this.searchTerm);
             },
             hasFilterExpressions() {
                 return this.filterExpressions.length > 0;
@@ -98,6 +99,7 @@
             }
         },
         methods: {
+            isNotEmpty: isNotEmpty,
             onView(direction) {
 
                 let currentIndex = this.pagination.data.findIndex(orderId => orderId === this.order.id);

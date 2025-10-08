@@ -200,6 +200,7 @@
     import Skeleton from '@Partials/Skeleton.vue';
     import VueSlideUpDown from 'vue-slide-up-down';
     import StoreLogo from '@Components/StoreLogo.vue';
+    import { isNotEmpty } from '@Utils/stringUtils.js';
     import WhatsappIcon from '@Partials/WhatsappIcon.vue';
     import WhatsappMessage from '@Partials/WhatsappMessage.vue';
     import { ArrowLeft, ReceiptText, ChevronUp, ChevronDown, Copy as CopyIcon } from 'lucide-vue-next';
@@ -283,9 +284,9 @@
 
                     message += `\n\n*Grand Total: ${this.order.grand_total.amount_with_currency}* (Qty: ${this.order.total_uncancelled_product_quantities})\n`;
 
-                    const hasMobile = this.order.customer_mobile_number != null;
-                    const hasName = this.order.customer_name != null && this.order.customer_name.trim() != '';
-                    const hasEmail = this.order.customer_email != null && this.order.customer_email.trim() != '';
+                    const hasName = this.isNotEmpty(this.order.customer_name);
+                    const hasEmail = this.isNotEmpty(this.order.customer_email);
+                    const hasMobile = this.isNotEmpty(this.order.customer_mobile_number);
 
                     if(hasName) {
                         message += `\nName: ${this.order.customer_name}`;
@@ -323,6 +324,7 @@
             }
         },
         methods: {
+            isNotEmpty: isNotEmpty,
             setup() {
                 if(this.store && this.order) {
                     this.generateQRCode();

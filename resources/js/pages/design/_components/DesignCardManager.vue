@@ -103,9 +103,11 @@
                     const response = await axios.get('/api/design-cards', config);
                     const designCards = response.data.data;
 
-                    this.designState.setDesignForm({
+                    const design = {
                         design_cards: designCards
-                    });
+                    };
+
+                    this.designState.setDesignForm(design, this.store);
 
                 } catch (error) {
                     const message = error?.response?.data?.message || error?.message || 'Something went wrong while fetching design cards';
@@ -125,7 +127,8 @@
                     const originalState = this.changeHistoryState.getOriginalState();
                     let totalUpdated = 0;
 
-                    const promises = this.designCards.map(async (designCard, index) => {
+                    const storePromise = this.updateStore();
+                    const designCardPromises = this.designCards.map(async (designCard, index) => {
                         try {
 
                             if (designCard.delete) {
@@ -154,6 +157,9 @@
 
                                 const currDesignCard = cloneDeep(designCard);
                                 const originalDesignCard = cloneDeep(originalState.design_cards.find(originalDesignCard => originalDesignCard.id == designCard.id));
+
+                                delete currDesignCard.expanded;
+                                delete originalDesignCard.expanded;
 
                                 if(!originalDesignCard || isEqual(currDesignCard, originalDesignCard)) return;
 
@@ -188,24 +194,55 @@
                         }
                     });
 
-                    await Promise.allSettled(promises).then((results) => {
-                        const successCount = results.filter(r => r.status === 'fulfilled').length;
-                        if (successCount > 0) {
-                            if(totalUpdated == 0) {
-                                this.notificationState.showSuccessNotification('Design cards updated successfully');
-                            }else{
-                                this.notificationState.showSuccessNotification(`${totalUpdated} design card${totalUpdated == 1 ? '' : 's'} updated successfully`);
-                            }
-                            this.designState.setDesignForm(this.designForm);
+                    const [storeResult, ...designCardResults] = await Promise.allSettled([storePromise, ...designCardPromises]);
+
+                    if (storeResult.status === 'rejected') {
+                        this.notificationState.showWarningNotification('Failed to update store settings');
+                        console.error('Store update failed:', storeResult.reason);
+                    }
+
+                    const successCount = designCardResults.filter(r => r.status === 'fulfilled').length;
+                    if (successCount > 0 || storeResult.status === 'fulfilled') {
+                        if (totalUpdated == 0 && storeResult.status === 'fulfilled') {
+                            this.notificationState.showSuccessNotification('Store settings updated successfully');
+                        } else if (totalUpdated > 0) {
+                            this.notificationState.showSuccessNotification(`${totalUpdated} design card${totalUpdated == 1 ? '' : 's'} updated successfully`);
                             this.changeDesignCardArrangement();
                         }
-                    });
+                        this.designState.saveOriginalState('Original design');
+                    }
+
                 } catch (error) {
                     this.notificationState.showWarningNotification('An unexpected error occurred while processing design cards.');
                     console.error(error);
                 } finally {
                     this.designState.isUpdatingDesignCards = false;
                 }
+            },
+            async updateStore() {
+
+                try {
+
+                    if(this.storeState.isUpdatingStore) return;
+
+                    this.storeState.isUpdatingStore = true;
+
+                    const data = {
+                        ...this.designForm['store_settings'],
+                        store_id: this.store.id
+                    }
+
+                    await axios.put(`/api/stores/${this.store.id}`, data);
+
+                } catch (error) {
+                    const message = error?.response?.data?.message || error?.message || 'Something went wrong while updating store';
+                    this.notificationState.showWarningNotification(message);
+                    this.formState.setServerFormErrors(error);
+                    console.error('Failed to update store:', error);
+                } finally {
+                    this.storeState.isUpdatingStore = false;
+                }
+
             },
             async uploadImages(designCardId, photoIndex = null, cardIndex = null) {
 

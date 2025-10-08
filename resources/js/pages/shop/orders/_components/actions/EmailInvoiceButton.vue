@@ -76,6 +76,7 @@
     import Modal from '@Partials/Modal.vue';
     import Button from '@Partials/Button.vue';
     import SelectTags from '@Partials/SelectTags.vue';
+    import { isEmpty, isNotEmpty } from '@Utils/stringUtils';
 
     export default {
         inject: ['orderState', 'storeState', 'notificationState'],
@@ -120,11 +121,13 @@
             },
         },
         methods: {
+            isEmpty: isEmpty,
+            isNotEmpty: isNotEmpty,
             prepareEmail() {
                 this.body = this.generateBody();
                 this.subject = this.generateSubject();
 
-                if(this.order.customer_email != null || this.order.customer_email?.trim() != '') {
+                if(this.isNotEmpty(this.order.customer_email)) {
                     this.receipientEmails.push(this.order.customer_email);
                 }
             },
@@ -153,9 +156,9 @@ Grand Total: ${this.order.grand_total.amount_with_currency} (Qty: ${this.order.t
 `;
 
         // Add customer details
+        const hasName = this.isNotEmpty(this.order.customer_name);
+        const hasEmail = this.isNotEmpty(this.order.customer_email);
         const hasMobile = this.order.customer_mobile_number != null;
-        const hasName = this.order.customer_name != null && this.order.customer_name.trim() !== '';
-        const hasEmail = this.order.customer_email != null && this.order.customer_email.trim() !== '';
 
         if (hasName) {
             body += `Name: ${this.order.customer_name}\n`;
@@ -213,12 +216,12 @@ ${this.store.name}`;
                 try {
                     this.isEmailingOrder = true;
 
-                    if (this.subject.trim() == '') {
+                    if (this.isEmpty(this.subject)) {
                         this.notificationState.showWarningNotification('Email subject is required');
                         return;
                     }
 
-                    if (this.body.trim() == '') {
+                    if (this.isEmpty(this.body)) {
                         this.notificationState.showWarningNotification('Email body is required');
                         return;
                     }

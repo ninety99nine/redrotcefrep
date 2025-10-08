@@ -13,6 +13,7 @@ use App\Http\Requests\Workflow\UpdateWorkflowRequest;
 use App\Http\Requests\Workflow\DeleteWorkflowRequest;
 use App\Http\Requests\Workflow\DeleteWorkflowsRequest;
 use App\Http\Requests\Workflow\UpdateWorkflowArrangementRequest;
+use App\Http\Requests\Workflow\ShowWorkflowConfigurationsRequest;
 
 class WorkflowController extends Controller
 {
@@ -66,6 +67,17 @@ class WorkflowController extends Controller
     }
 
     /**
+     * Show workflow configurations.
+     *
+     * @param ShowWorkflowConfigurationsRequest $request
+     * @return array
+     */
+    public function showWorkflowConfigurations(ShowWorkflowConfigurationsRequest $request): array
+    {
+        return $this->service->showWorkflowConfigurations($request->validated());
+    }
+
+    /**
      * Update workflow arrangement.
      *
      * @param UpdateWorkflowArrangementRequest $request
@@ -112,3 +124,4 @@ class WorkflowController extends Controller
         return $this->service->deleteWorkflow($workflow);
     }
 }
+?>

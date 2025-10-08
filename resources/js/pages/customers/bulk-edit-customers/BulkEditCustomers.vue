@@ -373,6 +373,7 @@
     import Button from '@Partials/Button.vue';
     import Dropdown from '@Partials/Dropdown.vue';
     import Table from '@Partials/table/Table.vue';
+    import { isNotEmpty } from '@Utils/stringUtils';
     import { Plus, Trash2, RefreshCcw } from 'lucide-vue-next';
 
     export default {
@@ -432,7 +433,7 @@
                 return this.storeState.store;
             },
             hasSearchTerm() {
-                return this.searchTerm != null && this.searchTerm.trim() != '';
+                return this.isNotEmpty(this.searchTerm);
             },
             isDeletingCustomers() {
                 return this.isDeletingProducIds.length > 0;
@@ -451,6 +452,7 @@
             },
         },
         methods: {
+            isNotEmpty: isNotEmpty,
             prepareColumns() {
                 const columnNames = ['First Name', 'Last Name', 'Mobile', 'Email', 'Birthday', 'Notes', 'Referral Code'];
                 const defaultColumnNames  = ['First Name', 'Last Name', 'Mobile', 'Email', 'Birthday', 'Notes', 'Referral Code'];

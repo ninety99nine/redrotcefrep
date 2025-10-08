@@ -2,14 +2,11 @@
 
 namespace App\Http\Requests\DesignCard;
 
-use App\Models\DesignCard;
-use App\Enums\Association;
-use Illuminate\Support\Arr;
+use App\Enums\DesignCardType;
 use Illuminate\Validation\Rule;
-use App\Enums\DesignCardPlacement;
 use Illuminate\Foundation\Http\FormRequest;
 
-class ShowDesignCardsRequest extends FormRequest
+class ShowDesignCardConfigurationsRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -18,7 +15,7 @@ class ShowDesignCardsRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return $this->user()->can('viewAny', DesignCard::class);
+        return $this->user()->can('viewAny', \App\Models\DesignCard::class);
     }
 
     /**
@@ -29,9 +26,8 @@ class ShowDesignCardsRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'store_id' => ['sometimes', 'uuid'],
-            'placement' => ['sometimes', Rule::enum(DesignCardPlacement::class)],
-            'association' => ['sometimes', Rule::enum(Association::class)->only([Association::SHOPPER])],
+            'store_id' => ['required', 'uuid'],
+            'type' => ['sometimes', Rule::in(DesignCardType::values())],
         ];
     }
 
@@ -43,9 +39,10 @@ class ShowDesignCardsRequest extends FormRequest
     public function messages(): array
     {
         return [
+            'store_id.required' => 'The store ID is required.',
             'store_id.uuid' => 'The store ID must be a valid UUID.',
-            'association.enum' => 'The association must be: shopper.',
-            'placement.enum' => 'The design card placement must be one of: ' . Arr::join(DesignCardPlacement::values(), ', ', ' or '),
+            'type.in' => 'The type must be one of: ' . implode(', ', DesignCardType::values()),
         ];
     }
 }
+?>

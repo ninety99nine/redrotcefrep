@@ -6,8 +6,8 @@
         class="w-full"
         buttonClass="w-full"
         :action="navigateToStorePaymentMethods"
-        :skeleton="isLoadingStore || isLoadingOrder"
-        v-if="isLoadingStore || isLoadingOrder || !['paid', 'waiting confirmation'].includes(order.payment_status)">
+        :skeleton="isLoadingStore || isLoadingOrder || !hasOrder"
+        v-if="isLoadingStore || isLoadingOrder || !hasOrder || !['paid', 'waiting confirmation'].includes(order.payment_status)">
         <span>Pay</span>
     </Button>
 
@@ -28,6 +28,9 @@
         computed: {
             order() {
                 return this.orderState.order;
+            },
+            hasOrder() {
+                return this.order != null;
             },
             store() {
                 return this.storeState.store;

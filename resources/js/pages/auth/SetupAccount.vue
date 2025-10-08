@@ -95,6 +95,7 @@
     import Alert from '@Partials/Alert.vue';
     import Input from '@Partials/Input.vue';
     import Button from '@Partials/Button.vue';
+    import { isEmpty } from '@Utils/stringUtils';
 
     export default {
         name: 'SetupAccount',
@@ -115,6 +116,7 @@
             };
         },
         methods: {
+            isEmpty: isEmpty,
             goHome() {
                 this.$router.push({ name: 'login' });
             },
@@ -137,13 +139,13 @@
 
                 this.formState.hideFormErrors();
 
-                if (this.form.email.trim() === '') {
+                if (this.isEmpty(this.form.email)) {
                     this.formState.setFormError('email', 'Email is required');
                 }
-                if (this.form.password.trim() === '') {
+                if (this.isEmpty(this.form.password)) {
                     this.formState.setFormError('password', 'Password is required');
                 }
-                if (this.form.confirm_password.trim() === '') {
+                if (this.isEmpty(this.form.confirm_password)) {
                     this.formState.setFormError('confirm_password', 'Confirm password');
                 }
                 if (this.form.password !== this.form.confirm_password) {

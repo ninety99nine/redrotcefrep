@@ -117,6 +117,7 @@
     import Input from '@Partials/Input.vue';
     import Alert from '@Partials/Alert.vue';
     import Button from '@Partials/Button.vue';
+    import { isEmpty } from '@Utils/stringUtils';
 
     export default {
         name: 'ForgotPassword',
@@ -143,6 +144,7 @@
             };
         },
         methods: {
+            isEmpty: isEmpty,
             goToLogin() {
                 this.$router.push({ name: 'login' });
             },
@@ -152,7 +154,7 @@
 
                 this.formState.hideFormErrors();
 
-                if (this.form.email.trim() === '') {
+                if (this.isEmpty(this.form.email)) {
                     this.formState.setFormError('email', 'Email is required');
                 }
 

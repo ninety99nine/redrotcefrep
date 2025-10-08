@@ -108,6 +108,7 @@
     import StoreLogo from '@Components/StoreLogo.vue';
     import WhatsappIcon from '@Partials/WhatsappIcon.vue';
     import SelectCountry from '@Partials/SelectCountry.vue';
+    import { isEmpty, isNotEmpty } from '@Utils/stringUtils';
     import SelectCurrency from '@Partials/SelectCurrency.vue';
 
     export default {
@@ -130,6 +131,8 @@
             }
         },
         methods: {
+            isEmpty: isEmpty,
+            isNotEmpty: isNotEmpty,
             syncWithAlias() {
                 if(this.aliasModified == false) {
                     this.form.alias = this.form.name;
@@ -155,7 +158,7 @@
 
                     this.formState.hideFormErrors();
 
-                    if(this.form.name == null || this.form.name?.trim() === '') {
+                    if(this.isEmpty(this.form.name)) {
                         this.formState.setFormError('name', 'Enter store name');
                     }
 
@@ -170,8 +173,8 @@
                     formData.append('name', this.form.name);
                     formData.append('country', this.form.country);
                     formData.append('currency', this.form.currency);
-                    if (this.form.alias?.trim()) formData.append('alias', this.form.alias.trim());
-                    if (this.form.whatsapp_mobile_number?.trim()) formData.append('whatsapp_mobile_number', this.form.whatsapp_mobile_number.trim());
+                    if (this.isNotEmpty(this.form.alias)) formData.append('alias', this.form.alias.trim());
+                    if (this.isNotEmpty(this.form.whatsapp_mobile_number)) formData.append('whatsapp_mobile_number', this.form.whatsapp_mobile_number.trim());
 
                     // Attach store logo if available
                     if (this.logo) {

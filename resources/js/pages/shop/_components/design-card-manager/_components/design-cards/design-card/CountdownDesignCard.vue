@@ -27,7 +27,7 @@
         v-if="designCard.metadata.body || designCard.metadata.date || designCard.photos?.[0]?.path">
 
             <Markdown
-                v-if="designCard.metadata.upper_text != null && designCard.metadata.upper_text?.trim() != ''"
+                v-if="isNotEmpty(designCard.metadata.upper_text)"
                 :text="designCard.metadata.upper_text">
             </Markdown>
 
@@ -55,7 +55,7 @@
             </Countdown>
 
             <Markdown
-                v-if="designCard.metadata.lower_text != null && designCard.metadata.lower_text?.trim() != ''"
+                v-if="isNotEmpty(designCard.metadata.lower_text)"
                 :text="designCard.metadata.lower_text">
             </Markdown>
 
@@ -67,6 +67,7 @@
 
     import Markdown from '@Partials/Markdown.vue';
     import Countdown from '@Partials/Countdown.vue';
+    import { isNotEmpty } from '@Utils/stringUtils';
 
     export default {
         components: { Markdown, Countdown },
@@ -74,6 +75,9 @@
             designCard: {
                 type: Object
             }
+        },
+        methods: {
+            isNotEmpty: isNotEmpty
         }
     }
 </script>

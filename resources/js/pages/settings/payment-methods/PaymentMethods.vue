@@ -274,8 +274,8 @@
     import Modal from '@Partials/Modal.vue';
     import Button from '@Partials/Button.vue';
     import Skeleton from '@Partials/Skeleton.vue';
-    import { capitalize } from '@Utils/stringUtils.js';
     import { VueDraggableNext } from 'vue-draggable-next';
+    import { isNotEmpty, capitalize } from '@Utils/stringUtils.js';
     import { Plus, Move, Trash2, CircleDollarSign } from 'lucide-vue-next';
 
     export default {
@@ -327,10 +327,11 @@
                 return this.storePaymentMethods.length > 0;
             },
             hasSearchTerm() {
-                return this.searchTerm != null && this.searchTerm.trim() != '';
+                return this.isNotEmpty(this.searchTerm);
             },
         },
         methods: {
+            isNotEmpty: isNotEmpty,
             capitalize: capitalize,
             setup() {
                 if(this.store) {

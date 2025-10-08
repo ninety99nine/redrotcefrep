@@ -19,7 +19,7 @@
 
                 <div
                     v-if="!designCard.hasOwnProperty('delete')"
-                    class="group w-full bg-gray-50 border border-gray-300 rounded-lg overflow-hidden relative">
+                    class="group w-full bg-gray-50 border border-gray-300 rounded-lg relative">
 
                     <div
                         @click.stop="() => onToggleExpansion(index)"
@@ -78,8 +78,7 @@
 
                                 <Pill
                                     size="xs"
-                                    type="primary"
-                                    tooltipContent="This design card is a standard design that cannot be hidden or removed">
+                                    type="primary">
                                     standard
                                 </Pill>
 
@@ -97,8 +96,7 @@
                                     size="xs"
                                     type="primary"
                                     :action="() => copyStyles(index)"
-                                    class="opacity-0 group-hover:opacity-100"
-                                    tooltipContent="Copy the styles of this design card">
+                                    class="opacity-0 group-hover:opacity-100">
                                     copy styles
                                 </Pill>
 
@@ -107,8 +105,7 @@
                                     type="success"
                                     v-if="copiedStyles"
                                     :action="() => pasteStyles(index)"
-                                    class="opacity-0 group-hover:opacity-100"
-                                    tooltipContent="Paste the copied styles to this design card">
+                                    class="opacity-0 group-hover:opacity-100">
                                     paste styles
                                 </Pill>
 

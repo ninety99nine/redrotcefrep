@@ -2,12 +2,18 @@
 
 namespace App\Services;
 
+use App\Enums\OrderPaymentStatus;
+use App\Enums\OrderStatus;
 use Exception;
 use App\Models\Store;
 use App\Models\Workflow;
 use Illuminate\Support\Facades\DB;
 use App\Http\Resources\WorkflowResource;
 use App\Http\Resources\WorkflowResources;
+use App\Enums\WorkflowTarget;
+use App\Enums\WorkflowTrigger;
+use App\Enums\WorkflowAction;
+use App\Enums\WorkflowTemplate;
 
 class WorkflowService extends BaseService
 {
@@ -73,6 +79,172 @@ class WorkflowService extends BaseService
         } else {
             throw new Exception('No Workflows deleted');
         }
+    }
+
+    /**
+     * Show workflow configurations.
+     *
+     * @return array
+     */
+    public function showWorkflowConfigurations(): array
+    {
+        $targets = collect(WorkflowTarget::cases())->map(function ($target) {
+            $triggers = $this->getTriggerTypes($target->value);
+            $triggerConfigs = collect($triggers)->map(function ($trigger) use ($target) {
+                return [
+                    'target' => $target->value,
+                    'trigger' => $trigger['value'],
+                    'actions' => $this->getActionConfigurations($target->value, $trigger['value'])
+                ];
+            })->values()->all();
+            return $triggerConfigs;
+        })->flatten(1)->all();
+
+        return $targets;
+    }
+
+    /**
+     * Get trigger types based on target.
+     *
+     * @param string $target
+     * @return array
+     */
+    protected function getTriggerTypes(string $target): array
+    {
+        $triggers = match ($target) {
+            'order' => OrderStatus::values(),
+            'payment' => OrderPaymentStatus::values(),
+            'product' => ['no stock', 'low stock'],
+            default => [],
+        };
+
+        return collect($triggers)->map(function ($trigger) {
+            return [
+                'label' => ucfirst($trigger),
+                'value' => $trigger
+            ];
+        })->values()->all();
+    }
+
+    /**
+     * Get action configurations for a specific target and trigger.
+     *
+     * @param string $target
+     * @param string $trigger
+     * @return array
+     */
+    protected function getActionConfigurations(string $target, string $trigger): array
+    {
+        $actions = $this->getActionTypes($target, $trigger);
+
+        return collect($actions)->map(function ($action) use ($target, $trigger) {
+
+            $templates = $this->getTemplateTypes($trigger, $action['value']);
+
+            $templateFields = collect($templates)->map(function ($template) use ($action) {
+                $fields = $this->getTemplateConfig($template['value'], $action['value']);
+
+                return [
+                    'name' => $template['value'],
+                    'fields' => $fields
+                ];
+            })->values()->all();
+
+            return [
+                'name' => $action['value'],
+                'templates' => $templateFields
+            ];
+
+        })->values()->all();
+    }
+
+    /**
+     * Get action types based on target and trigger.
+     *
+     * @param string $target
+     * @param string $trigger
+     * @return array
+     */
+    protected function getActionTypes(string $target, string $trigger): array
+    {
+        $actions = WorkflowAction::cases();
+
+        if ($target === 'product') {
+            $actions = collect($actions)->filter(fn($actionType) => in_array($actionType, [
+                WorkflowAction::WHATSAPP_TEAM,
+                WorkflowAction::EMAIL_TEAM
+            ]))->all();
+        }
+
+        return collect($actions)->map(function ($actionType) {
+            return [
+                'label' => ucfirst($actionType->value),
+                'value' => $actionType->value
+            ];
+        })->values()->all();
+    }
+
+    /**
+     * Get template types based on action.
+     *
+     * @param string $trigger
+     * @param string $action
+     * @return array
+     */
+    protected function getTemplateTypes(string $trigger, string $action): array
+    {
+        if(in_array($trigger, [OrderStatus::COMPLETED->value, OrderPaymentStatus::PAID->value]) && in_array($action, [WorkflowAction::WHATSAPP_CUSTOMER->value, WorkflowAction::EMAIL_CUSTOMER->value])) {
+            $templates = [WorkflowTemplate::ORDER_DETAILS, WorkflowTemplate::REQUEST_REVIEW];
+        }else if($trigger === OrderPaymentStatus::UNPAID->value && in_array($action, [WorkflowAction::WHATSAPP_CUSTOMER->value, WorkflowAction::EMAIL_CUSTOMER->value])) {
+            $templates = [WorkflowTemplate::ORDER_DETAILS, WorkflowTemplate::PAYMENT_REMINDER];
+        }else{
+            $templates = [WorkflowTemplate::ORDER_DETAILS];
+        }
+
+        return collect($templates)->map(function ($templateType) {
+            return [
+                'label' => ucfirst($templateType->value),
+                'value' => $templateType->value
+            ];
+        })->values()->all();
+    }
+
+    /**
+     * Get template configuration.
+     *
+     * @param string $template
+     * @param string $action
+     * @return array
+     */
+    protected function getTemplateConfig(string $template, string $action): array
+    {
+        $template = match ($template) {
+            'order details' => [
+
+            ],
+            'request review' => [
+                'review_link' => ''
+            ],
+            'payment reminder' => [
+                'add_delay' => false,
+                'delay_time_value' => '1',
+                'delay_time_unit' => 'hour',
+                'auto_cancel' => false,
+                'cancel_time_value' => '24',
+                'cancel_time_unit' => 'hour',
+            ],
+            default => [],
+        };
+
+        if ($action === WorkflowAction::WHATSAPP_TEAM->value) {
+            $template['mobile_numbers'] = [];
+        } elseif ($action === WorkflowAction::EMAIL_TEAM->value) {
+            $template['email'] = '';
+        }else if ($action === WorkflowAction::WHATSAPP_CUSTOMER->value) {
+            $template['notes'] = '';
+        }
+
+        return $template;
     }
 
     /**
@@ -161,3 +333,4 @@ class WorkflowService extends BaseService
         }
     }
 }
+?>

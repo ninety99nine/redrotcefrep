@@ -6,6 +6,7 @@ use App\Models\Store;
 use App\Enums\TaxMethod;
 use App\Enums\WeightUnit;
 use App\Enums\DistanceUnit;
+use App\Enums\RateType;
 use Illuminate\Support\Arr;
 use Illuminate\Validation\Rule;
 use Illuminate\Foundation\Http\FormRequest;
@@ -78,6 +79,14 @@ class CreateStoreRequest extends FormRequest
             'invoice_company_name' => ['nullable', 'string', 'max:255'],
             'invoice_company_email' => ['nullable', 'email', 'max:255'],
             'invoice_company_mobile_number' => ['nullable', 'phone:INTERNATIONAL', 'max:20'],
+            'tips' => ['nullable', 'array'],
+            'checkout_fees' => ['nullable', 'array'],
+            'checkout_fees.*.name' => ['required', 'string', 'max:40'],
+            'checkout_fees.*.rate_type' => ['required', Rule::enum(RateType::class)],
+            'checkout_fees.*.flat_rate' => ['required_if:checkout_fees.*.rate_type,flat', 'numeric', 'min:0'],
+            'checkout_fees.*.percentage_rate' => ['required_if:checkout_fees.*.rate_type,percentage', 'numeric', 'min:0', 'max:100'],
+            'combine_fees' => ['nullable', 'boolean'],
+            'combine_discounts' => ['nullable', 'boolean'],
             'seo_title' => ['nullable', 'string', 'max:60'],
             'seo_description' => ['nullable', 'string', 'max:160'],
             'seo_keywords' => ['nullable', 'array'],
@@ -180,6 +189,20 @@ class CreateStoreRequest extends FormRequest
             'invoice_company_email.max' => 'The invoice company email must not exceed 255 characters.',
             'invoice_company_mobile_number.phone' => 'The invoice company mobile number must be a valid international phone number (e.g., +26772000001).',
             'invoice_company_mobile_number.max' => 'The invoice company mobile number must not exceed 20 characters.',
+            'tips.array' => 'The tips must be an array.',
+            'checkout_fees.array' => 'The checkout fees must be an array.',
+            'checkout_fees.*.name.required' => 'The fee name is required.',
+            'checkout_fees.*.name.string' => 'The fee name must be a string.',
+            'checkout_fees.*.name.max' => 'The fee name must not exceed 40 characters.',
+            'checkout_fees.*.rate_type.required' => 'The fee type is required.',
+            'checkout_fees.*.rate_type.enum' => 'The fee type must be either flat or percentage.',
+            'checkout_fees.*.flat_rate.required_if' => 'The flat rate is required for a flat fee type.',
+            'checkout_fees.*.flat_rate.numeric' => 'The flat rate must be a number.',
+            'checkout_fees.*.flat_rate.min' => 'The flat rate must be at least 0.',
+            'checkout_fees.*.percentage_rate.required_if' => 'The percentage rate is required for a percentage fee type.',
+            'checkout_fees.*.percentage_rate.numeric' => 'The percentage rate must be a number.',
+            'checkout_fees.*.percentage_rate.min' => 'The percentage rate must be at least 0.',
+            'checkout_fees.*.percentage_rate.max' => 'The percentage rate must not exceed 100.',
             'seo_title.string' => 'The SEO title must be a string.',
             'seo_title.max' => 'The SEO title must not exceed 60 characters.',
             'seo_description.string' => 'The SEO description must be a string.',

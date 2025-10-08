@@ -12,8 +12,8 @@
 
 <script>
 
-    import OrderHeader from '@Pages/shop/order/_components/order-details/order-header/OrderHeader.vue';
-    import OrderContent from '@Pages/shop/order/_components/order-details/order-content/OrderContent.vue';
+    import OrderHeader from '@Pages/shop/orders/_components/order-details/order-header/OrderHeader.vue';
+    import OrderContent from '@Pages/shop/orders/_components/order-details/order-content/OrderContent.vue';
 
     export default {
         components: { OrderHeader, OrderContent }

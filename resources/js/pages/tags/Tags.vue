@@ -376,6 +376,7 @@
     import Popover from '@Partials/Popover.vue';
     import Dropdown from '@Partials/Dropdown.vue';
     import Table from '@Partials/table/Table.vue';
+    import { isNotEmpty } from '@Utils/stringUtils';
     import { VueDraggableNext } from 'vue-draggable-next';
     import { Move, Info, Plus, Trash2 } from 'lucide-vue-next';
     import { formattedDatetime, formattedRelativeDate } from '@Utils/dateUtils.js';
@@ -443,7 +444,7 @@
                 return this.storeState.store;
             },
             hasSearchTerm() {
-                return this.searchTerm != null && this.searchTerm.trim() != '';
+                return this.isNotEmpty(this.searchTerm );
             },
             isDeletingTags() {
                 return this.isDeletingTagIds.length > 0;
@@ -462,6 +463,7 @@
             },
         },
         methods: {
+            isNotEmpty: isNotEmpty,
             formattedDatetime: formattedDatetime,
             formattedRelativeDate: formattedRelativeDate,
             prepareColumns() {

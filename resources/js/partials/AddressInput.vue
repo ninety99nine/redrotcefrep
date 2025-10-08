@@ -217,6 +217,7 @@
     import Modal from '@Partials/Modal.vue';
     import cloneDeep from 'lodash/cloneDeep';
     import Button from '@Partials/Button.vue';
+    import { isNotEmpty } from '@Utils/stringUtils';
     import GoogleMaps from '@Partials/GoogleMaps.vue';
     import SelectCountry from '@Partials/SelectCountry.vue';
     import { Plus, Trash2, MoveLeft, RefreshCcw } from 'lucide-vue-next';
@@ -344,11 +345,11 @@
             googleMapsAddress() {
                 var googleMapsAddress = this.form.address_line;
 
-                if(this.form.address_line2 && this.form.address_line2.trim() !== '') googleMapsAddress += (', '+this.form.address_line2);
-                if(this.form.city && this.form.city.trim() !== '') googleMapsAddress += (', '+this.form.city);
-                if(this.form.state && this.form.state.trim() !== '') googleMapsAddress += (', '+this.form.state);
-                if(this.form.postal_code && this.form.postal_code.trim() !== '') googleMapsAddress += (', '+this.form.postal_code);
-                if(this.form.country && this.form.country.trim() !== '') googleMapsAddress += (', '+this.form.country);
+                if(this.isNotEmpty(this.form.address_line2)) googleMapsAddress += (', '+this.form.address_line2);
+                if(this.isNotEmpty(this.form.city)) googleMapsAddress += (', '+this.form.city);
+                if(this.isNotEmpty(this.form.state)) googleMapsAddress += (', '+this.form.state);
+                if(this.isNotEmpty(this.form.postal_code)) googleMapsAddress += (', '+this.form.postal_code);
+                if(this.isNotEmpty(this.form.country)) googleMapsAddress += (', '+this.form.country);
 
                 return googleMapsAddress;
             },
@@ -368,6 +369,7 @@
             },
         },
         methods: {
+            isNotEmpty: isNotEmpty,
             showModal() {
                 this.step = 1;
                 this.copyOriginalForm();

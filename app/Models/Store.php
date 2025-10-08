@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Enums\TagType;
 use App\Casts\JsonArray;
 use App\Enums\DomainStatus;
+use App\Casts\CheckoutFees;
 use App\Services\UssdService;
 use App\Enums\UploadFolderName;
 use Illuminate\Support\Facades\Auth;
@@ -63,8 +64,10 @@ class Store extends Model
         'reward_percentage_rate' => 'decimal:2',
 
         'online' => 'boolean',
+        'combine_fees' => 'boolean',
         'offer_rewards' => 'boolean',
         'show_sms_channel' => 'boolean',
+        'combine_discounts' => 'boolean',
         'show_line_channel' => 'boolean',
         'show_opening_hours' => 'boolean',
         'show_whatsapp_channel' => 'boolean',
@@ -74,6 +77,9 @@ class Store extends Model
         'invoice_show_logo' => 'boolean',
         'invoice_show_qr_code' => 'boolean',
 
+        'checkout_fees' => CheckoutFees::class,
+
+        'tips' => JsonArray::class,
         'seo_keywords' => JsonArray::class,
         'opening_hours' => JsonArray::class,
         'ussd_mobile_number' => E164PhoneNumberCast::class,
@@ -93,7 +99,8 @@ class Store extends Model
         'show_line_channel','show_whatsapp_channel','show_telegram_channel','show_messenger_channel','line_channel_username',
         'telegram_channel_username','messenger_channel_username','invoice_show_logo','invoice_show_qr_code','invoice_header',
         'invoice_footer','invoice_company_name','invoice_company_email','invoice_company_mobile_number','seo_title',
-        'seo_description','seo_keywords','google_analytics_id','meta_pixel_id','tiktok_pixel_id'
+        'seo_description','seo_keywords','google_analytics_id','meta_pixel_id','tiktok_pixel_id',
+        'tips','checkout_fees','combine_fees','combine_discounts',
     ];
 
     /**

@@ -13,8 +13,10 @@
 
             <Input
                 type="text"
+                maxLength="40"
                 class="w-full mb-4"
                 placeholder="Title"
+                :showCharacterLengthCounter="true"
                 v-model="designCard.metadata.title"
                 @input="designState.saveStateDebounced('Title changed')"
                 :errorText="formState.getFormError(`design_cards.${index}.metadata.title`)">
@@ -22,8 +24,11 @@
 
             <Input
                 rows="2"
+                :resize="true"
+                maxLength="200"
                 type="textarea"
                 class="w-full mb-4"
+                :showCharacterLengthCounter="true"
                 placeholder="Additional Information"
                 v-model="designCard.metadata.description"
                 @input="designState.saveStateDebounced('Description changed')"
@@ -57,13 +62,13 @@
                     class="mt-4 space-y-2"
                     ghost-class="bg-yellow-50"
                     handle=".draggable-handle-3"
-                    v-model="designCard.metadata.checkout_fees"
-                    v-if="designCard.metadata.checkout_fees.length"
+                    v-model="designForm.store_settings.checkout_fees"
+                    v-if="designForm.store_settings.checkout_fees.length"
                     @change="designState.saveStateDebounced('Fee moved')">
 
                     <template
                         :key="index"
-                        v-for="(checkoutFee, index) in designCard.metadata.checkout_fees">
+                        v-for="(checkoutFee, index) in designForm.store_settings.checkout_fees">
 
                         <div class="bg-white border border-gray-200 shadow rounded-lg space-y-2 p-2">
 
@@ -71,9 +76,12 @@
                             <Input
                                 type="text"
                                 class="w-full"
+                                maxLength="40"
                                 placeholder="Packaging"
-                                v-model="designCard.metadata.checkout_fees[index].name"
-                                @input="designState.saveStateDebounced('Checkout fee name changed')">
+                                :showCharacterLengthCounter="true"
+                                v-model="designForm.store_settings.checkout_fees[index].name"
+                                @input="designState.saveStateDebounced('Checkout fee name changed')"
+                                    :errorText="formState.getFormError(`checkout_fees.${index}.name`)">
                             </Input>
 
                             <div class="flex items-center space-x-2">
@@ -83,25 +91,28 @@
                                     :search="false"
                                     :options="feeTypes"
                                     placeholder="Select fee type"
-                                    v-model="designCard.metadata.checkout_fees[index].rate_type"
-                                    @change="designState.saveStateDebounced('Checkout fee type changed')">
+                                    v-model="designForm.store_settings.checkout_fees[index].rate_type"
+                                    @change="designState.saveStateDebounced('Checkout fee type changed')"
+                                    :errorText="formState.getFormError(`checkout_fees.${index}.rate_type`)">
                                 </Select>
 
                                 <Input
                                     type="money"
                                     class="w-60"
                                     :currency="store.currency.code"
-                                    v-model="designCard.metadata.checkout_fees[index].flat_rate"
-                                    v-if="designCard.metadata.checkout_fees[index].rate_type == RATE_TYPES.FLAT"
-                                    @input="designState.saveStateDebounced('Checkout fee amount changed')">
+                                    v-model="designForm.store_settings.checkout_fees[index].flat_rate"
+                                    @input="designState.saveStateDebounced('Checkout fee amount changed')"
+                                    :errorText="formState.getFormError(`checkout_fees.${index}.flat_rate`)"
+                                    v-if="designForm.store_settings.checkout_fees[index].rate_type == RATE_TYPES.FLAT">
                                 </Input>
 
                                 <Input
                                     v-else
                                     class="w-60"
                                     type="percentage"
-                                    v-model="designCard.metadata.checkout_fees[index].percentage_rate"
-                                    @input="designState.saveStateDebounced('Checkout fee amount changed')">
+                                    @input="designState.saveStateDebounced('Checkout fee amount changed')"
+                                    v-model="designForm.store_settings.checkout_fees[index].percentage_rate"
+                                    :errorText="formState.getFormError(`checkout_fees.${index}.percentage_rate`)">
                                 </Input>
 
                                 <!-- Remove Button -->
@@ -132,7 +143,8 @@
                 class="mb-4"
                 type="checkbox"
                 inputLabel="Combine fees"
-                v-model="designCard.metadata.combine_fees"
+                v-model="designForm.store_settings.combine_fees"
+                :errorText="formState.getFormError(`combine_fees`)"
                 @change="designState.saveStateDebounced('Combine fees status changed')">
             </Input>
 
@@ -140,7 +152,8 @@
                 class="mb-4"
                 type="checkbox"
                 inputLabel="Combine discounts"
-                v-model="designCard.metadata.combine_discounts"
+                v-model="designForm.store_settings.combine_discounts"
+                :errorText="formState.getFormError(`combine_discounts`)"
                 @change="designState.saveStateDebounced('Combine discounts status changed')">
             </Input>
 
@@ -185,6 +198,9 @@
             store() {
                 return this.storeState.store;
             },
+            designForm() {
+                return this.designState.designForm;
+            },
             feeTypes() {
                 return Object.entries(RATE_TYPES).map(([key, value]) => ({
                     label: capitalize(value),
@@ -194,15 +210,17 @@
         },
         methods: {
             addCheckoutFee() {
-                this.designCard.metadata.checkout_fees.unshift({
+                this.designForm.store_settings.checkout_fees.unshift({
                     'name': '',
                     'flat_rate': '0',
                     'rate_type': 'flat',
                     'percentage_rate': '0'
                 });
+                this.designState.saveStateDebounced('Checkout fee added');
             },
             removeCheckoutFee(index) {
-                this.designCard.metadata.checkout_fees.splice(index, 1);
+                this.designForm.store_settings.checkout_fees.splice(index, 1);
+                this.designState.saveStateDebounced('Checkout fee removed');
             }
         }
     }

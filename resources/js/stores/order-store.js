@@ -166,7 +166,7 @@ export const useOrderStore = defineStore('order', {
                 'removable': false,
                 'name': orderFee.name,
                 'rate_type': orderFee.rate_type,
-                'flatRate': orderFee.amount.amount_without_currency,
+                'flat_rate': orderFee.amount.amount_without_currency,
                 'percentage_rate': orderFee.percentage_rate.toString()
             });
         },

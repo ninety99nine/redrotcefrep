@@ -516,6 +516,7 @@
     import Switch from '@Partials/Switch.vue';
     import Select from '@Partials/Select.vue';
     import Button from '@Partials/Button.vue';
+    import { isEmpty } from '@Utils/stringUtils';
     import Skeleton from '@Partials/Skeleton.vue';
     import { Info, Trash2, MoveLeft } from 'lucide-vue-next';
     import FeeByWeight from '@Pages/settings/delivery-methods/_components/FeeByWeight.vue';
@@ -612,6 +613,7 @@
             }
         },
         methods: {
+            isEmpty: isEmpty,
             setup() {
                 this.deliveryMethodState.setDeliveryMethodForm(null, true);
                 if(this.store && this.deliveryMethodId) this.showDeliveryMethod();
@@ -668,7 +670,7 @@
 
                     this.formState.hideFormErrors();
 
-                    if(this.deliveryMethodForm.name == null || this.deliveryMethodForm.name.trim() === '') {
+                    if(this.isEmpty(this.deliveryMethodForm.name)) {
                         this.formState.setFormError('name', 'The name is required');
                     }
 
@@ -713,7 +715,7 @@
 
                     this.formState.hideFormErrors();
 
-                    if(this.deliveryMethodForm.name == null || this.deliveryMethodForm.name.trim() === '') {
+                    if(this.isEmpty(this.deliveryMethodForm.name)) {
                         this.formState.setFormError('name', 'The name is required');
                     }
 

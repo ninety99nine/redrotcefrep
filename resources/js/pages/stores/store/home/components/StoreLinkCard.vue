@@ -18,6 +18,7 @@
 
         <Button
             size="lg"
+            class="w-full"
             type="primary"
             rightIconSize="20"
             buttonClass="w-full"
@@ -44,7 +45,8 @@
                 leftIconSize="16"
                 :leftIcon="Earth"
                 buttonClass="w-full"
-                :skeleton="isLoadingStore">
+                :skeleton="isLoadingStore"
+                :action="navigateToShowDomains">
                 <span>Connect Your Own Domain</span>
             </Button>
 
@@ -86,7 +88,13 @@
             visitStore() {
                 if(this.isLoadingStore) return;
                 window.open(this.store.web_link, '_blank');
-            }
+            },
+            async navigateToShowDomains() {
+                await this.$router.push({
+                    name: 'show-domains',
+                    query: { store_id: this.store.id }
+                });
+            },
         }
     };
 
