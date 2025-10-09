@@ -33,8 +33,7 @@ class MessageCrafterService
      *  @return string
      */
     public function craftStoreSubscriptionPaidMessage(Store $store) {
-        return $store->name.' is now open! Customers can order via '.$store->ussd_shortcode.'. Share on WhatsApp, Facebook & flyers!';
-        //  return $store->name.' is live! Customers can order via '.$store->ussd_shortcode.' or ' . $store->web_link . '. Share on WhatsApp, Facebook & flyers!';
+        return $store->name.' is open! Customers order using '.$store->ussd_shortcode.' or visiting your website ' . $store->web_link . '. Share on WhatsApp, Facebook & flyers!';
     }
 
     /**
@@ -44,8 +43,7 @@ class MessageCrafterService
      *  @return string
      */
     public function craftStoreMarketingMessage(Store $store) {
-        return 'Customers can buy by dialing '.$store->ussd_shortcode.'. Share on WhatsApp, Facebook & flyers!';
-        //  return 'Customers can buy by dialing '.$store->ussd_shortcode.' or visiting your website ' . $store->web_link . '. Share on WhatsApp, Facebook & flyers!';
+        return 'Customers order using '.$store->ussd_shortcode.' or visiting your website ' . $store->web_link . '. Share on WhatsApp, Facebook & flyers!';
     }
 
     /**
