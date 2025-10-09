@@ -1,5 +1,7 @@
 <template>
+
     <div class="min-h-screen flex flex-col items-center pt-20 pb-40">
+
         <div class="w-full max-w-lg">
             <StoreLogo :showButton="false" class="flex justify-center mb-4"></StoreLogo>
             <h2 class="text-2xl font-semibold text-center mb-2">Connect Your Socials</h2>
