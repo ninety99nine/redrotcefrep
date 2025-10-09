@@ -493,6 +493,8 @@
                     if (this.workflow) {
                         this.additionalFeatures.automated_whatsapp_notifications.active = this.workflow.active;
                         this.additionalFeatures.automated_whatsapp_notifications.mobile_numbers = this.workflow.actions[0].mobile_numbers || [];
+                    }else if(!isEmpty(this.store.whatsapp_mobile_number)) {
+                        this.additionalFeatures.automated_whatsapp_notifications.mobile_numbers = [this.store.whatsapp_mobile_number.international];
                     }
 
                 } catch (error) {
