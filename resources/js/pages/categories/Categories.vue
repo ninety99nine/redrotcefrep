@@ -821,7 +821,7 @@
                                     categoryMessage += `${checkedCategories[i].name}\n`;
                                     break;
                                 case "Description":
-                                    categoryMessage += `${checkedCategories[i].description != null && this.isNotEmpty(checkedCategories[i].description) ? checkedCategories[i].description : 'None'}\n`;
+                                    categoryMessage += `${this.isNotEmpty(checkedCategories[i].description) ? checkedCategories[i].description : 'None'}\n`;
                                     break;
                                 case "Visibility":
                                     categoryMessage += `${checkedCategories[i].visible ? 'visible' : 'hidden'}\n`;

@@ -73,6 +73,7 @@ class StoreService extends BaseService
 
         // Create default tags
         $defaultTags = ['popular', 'new'];
+
         foreach ($defaultTags as $tagName) {
             Tag::firstOrCreate([
                 'name' => $tagName,
@@ -139,6 +140,9 @@ class StoreService extends BaseService
             ]);
 
         }
+
+        //  Build the store design cards
+        $this->buildStoreDesignCards($store);
 
         //  Forget cache
         (new UssdService)->cacheManager($user)->forget();
@@ -332,7 +336,6 @@ class StoreService extends BaseService
 
         // Validate period to prevent undefined variable errors
         if (!InsightPeriod::tryFrom($period)) {
-            Log::warning('Invalid insight period provided', ['period' => $period, 'store_id' => $store->id]);
             $period = InsightPeriod::TODAY->value; // Default to TODAY
         }
 
@@ -594,13 +597,7 @@ class StoreService extends BaseService
                     ]
                 );
             }
-        } catch (\Exception $e) {
-            Log::error('Failed to generate store insights', [
-                'store_id' => $store->id,
-                'period' => $period,
-                'categories' => $categories,
-                'error' => $e->getMessage()
-            ]);
+        } catch (Exception $e) {
             return ['insights' => []]; // Return empty insights on failure
         }
 
@@ -623,13 +620,692 @@ class StoreService extends BaseService
     }
 
     /**
-     * Show store QR code preview.
+     * Build store design cards.
      *
      * @param Store $store
-     * @return View
      */
-    public function showStoreQrCodePreview(Store $store): View
+    public function buildStoreDesignCards(Store $store)
     {
-        return view('qr-code-image-previews.store-qr-code-image-preview', ['store' => $store]);
+        $categoryId = $store->categories()->withCount('products')->orderByDesc('products_count')->pluck('id')->first();
+        $contactMobileNumber = $store->whatsapp_mobile_number?->formatE164() ?? $store->ussd_mobile_number?->formatE164() ?? $store->invoice_company_mobile_number?->formatE164() ?? '';
+
+        if($store->whatsapp_mobile_number) {
+            $bannerTitle = 'Reach Us On Whatsapp';
+            $bannerLink = 'https://wa.me/'.ltrim($store->whatsapp_mobile_number?->formatE164(), '+').'?text='.urlencode('Hello, I\'m interested in some products i found at '.$store->name);
+        }else {
+            $bannerTitle = '';
+            $bannerLink = '';
+        }
+
+        $storefront = [
+            [
+                'type' => 'banner',
+                'placement' => 'storefront',
+                'metadata' => [
+                    'link' => $bannerLink,
+                    'title' => $bannerTitle,
+                    'design' => [
+                        'b_border' => '0',
+                        'b_margin' => '8',
+                        'bg_color' => '#01a045',
+                        'l_border' => '0',
+                        'l_margin' => '0',
+                        'r_border' => '0',
+                        'r_margin' => '0',
+                        't_border' => '0',
+                        't_margin' => '0',
+                        'b_padding' => '16',
+                        'l_padding' => '16',
+                        'r_padding' => '16',
+                        't_padding' => '16',
+                        'text_color' => '#ffffff',
+                        'title_color' => '#111827',
+                        'border_color' => '#E5E7EB',
+                        'bl_border_radius' => '0',
+                        'br_border_radius' => '0',
+                        'tl_border_radius' => '0',
+                        'tr_border_radius' => '0'
+                    ]
+                ],
+            ],
+            [
+                'type' => 'logo',
+                'placement' => 'storefront',
+                'metadata' => [
+                    'alignment' => 'center',
+                    'design' => [
+                        'b_border' => '0',
+                        'b_margin' => '8',
+                        'bg_color' => null,
+                        'l_border' => '0',
+                        'l_margin' => '0',
+                        'r_border' => '0',
+                        'r_margin' => '0',
+                        't_border' => '0',
+                        't_margin' => '0',
+                        'b_padding' => '16',
+                        'l_padding' => '16',
+                        'r_padding' => '16',
+                        't_padding' => '16',
+                        'title_color' => '#111827',
+                        'border_color' => '#E5E7EB',
+                        'bl_border_radius' => '0',
+                        'br_border_radius' => '0',
+                        'tl_border_radius' => '0',
+                        'tr_border_radius' => '0'
+                    ]
+                ],
+            ],
+            [
+                'type' => 'text',
+                'placement' => 'storefront',
+                'metadata' => [
+                    'body' => ('Welcome to '.$store->name.' shop') . (!empty($store->description) ? ' .'.$store->description : ''),
+                    'design' => [
+                        'b_border' => '2',
+                        'b_margin' => '0',
+                        'bg_color' => '#e3f2e5ff',
+                        'l_border' => '0',
+                        'l_margin' => '0',
+                        'r_border' => '0',
+                        'r_margin' => '0',
+                        't_border' => '2',
+                        't_margin' => '0',
+                        'b_padding' => '15',
+                        'l_padding' => '15',
+                        'r_padding' => '15',
+                        't_padding' => '15',
+                        'text_color' => '#111827',
+                        'title_color' => '#111827',
+                        'border_color' => '#c8e6caff',
+                        'bl_border_radius' => '0',
+                        'br_border_radius' => '0',
+                        'tl_border_radius' => '0',
+                        'tr_border_radius' => '0'
+                    ]
+                ],
+            ],
+            [
+                'type' => 'products',
+                'placement' => 'storefront',
+                'metadata' => [
+                    'feature' => '4',
+                    'layout' => 'grid',
+                    'category_id' => $categoryId,
+                    'design' => [
+                        'b_border' => '0',
+                        'b_margin' => '8',
+                        'bg_color' => '#ffffff',
+                        'l_border' => '0',
+                        'l_margin' => '4',
+                        'r_border' => '0',
+                        'r_margin' => '4',
+                        't_border' => '0',
+                        't_margin' => '0',
+                        'b_padding' => '16',
+                        'l_padding' => '16',
+                        'r_padding' => '16',
+                        't_padding' => '16',
+                        'title_color' => '#111827',
+                        'border_color' => '#E5E7EB',
+                        'bl_border_radius' => '8',
+                        'br_border_radius' => '8',
+                        'tl_border_radius' => '8',
+                        'tr_border_radius' => '8',
+                        'description_color' => '#4B5563',
+                        'product_name_color' => '#111827',
+                        'product_price_color' => '#111827',
+                        'product_cancelled_price_color' => '#9CA3AF'
+                    ],
+                ],
+            ],
+            [
+                'type' => 'divider',
+                'placement' => 'storefront',
+                'metadata' => [
+                    'thickness' => '1',
+                    'divider' => 'solid',
+                    'design' => [
+                        'b_border' => '0',
+                        'b_margin' => '8',
+                        'bg_color' => null,
+                        'l_border' => '0',
+                        'l_margin' => '0',
+                        'r_border' => '0',
+                        'r_margin' => '0',
+                        't_border' => '0',
+                        't_margin' => '8',
+                        'b_padding' => '16',
+                        'l_padding' => '16',
+                        'r_padding' => '16',
+                        't_padding' => '16',
+                        'title_color' => '#111827',
+                        'border_color' => '#E5E7EB',
+                        'divider_color' => '#e9e9ecff',
+                        'bl_border_radius' => '0',
+                        'br_border_radius' => '0',
+                        'tl_border_radius' => '0',
+                        'tr_border_radius' => '0'
+                    ]
+                ],
+            ],
+            [
+                'type' => 'contact',
+                'placement' => 'storefront',
+                'metadata' => [
+                    'title' => 'Contact Us',
+                    'mobile_number' => $contactMobileNumber,
+                    'design' => [
+                        'b_border' => '1',
+                        'b_margin' => '8',
+                        'bg_color' => '#ffffff',
+                        'l_border' => '1',
+                        'l_margin' => '4',
+                        'r_border' => '1',
+                        'r_margin' => '4',
+                        't_border' => '1',
+                        't_margin' => '0',
+                        'b_padding' => '16',
+                        'l_padding' => '16',
+                        'r_padding' => '16',
+                        't_padding' => '16',
+                        'icon_color' => '#6B7280',
+                        'title_color' => '#111827',
+                        'border_color' => '#E5E7EB',
+                        'bl_border_radius' => '16',
+                        'br_border_radius' => '16',
+                        'tl_border_radius' => '16',
+                        'tr_border_radius' => '16'
+                    ]
+                ],
+            ]
+        ];
+
+        $checkout = [
+            [
+                'type' => 'logo',
+                'placement' => 'checkout',
+                'metadata' => [
+                    'alignment' => 'center',
+                    'design' => [
+                        'b_border' => '0',
+                        'b_margin' => '8',
+                        'bg_color' => null,
+                        'l_border' => '0',
+                        'l_margin' => '0',
+                        'r_border' => '0',
+                        'r_margin' => '0',
+                        't_border' => '0',
+                        't_margin' => '0',
+                        'b_padding' => '16',
+                        'l_padding' => '16',
+                        'r_padding' => '16',
+                        't_padding' => '16',
+                        'border_color' => '#000000',
+                        'bl_border_radius' => '0',
+                        'br_border_radius' => '0',
+                        'tl_border_radius' => '0',
+                        'tr_border_radius' => '0'
+                    ]
+                ],
+            ],
+            [
+                'type' => 'customer',
+                'placement' => 'checkout',
+                'metadata' => [
+                    'title' => 'Customer',
+                    'show_email' => false,
+                    'description' => null,
+                    'email_required' => false,
+                    'show_last_name' => false,
+                    'show_first_name' => true,
+                    'last_name_required' => false,
+                    'show_mobile_number' => true,
+                    'first_name_required' => true,
+                    'mobile_number_required' => true,
+                    'design' => [
+                        'b_border' => '0',
+                        'b_margin' => '8',
+                        'bg_color' => '#ffffff',
+                        'l_border' => '0',
+                        'l_margin' => '4',
+                        'r_border' => '0',
+                        'r_margin' => '4',
+                        't_border' => '0',
+                        't_margin' => '0',
+                        'b_padding' => '16',
+                        'l_padding' => '16',
+                        'r_padding' => '16',
+                        't_padding' => '16',
+                        'title_color' => '#111827',
+                        'border_color' => '#E5E7EB',
+                        'bl_border_radius' => '16',
+                        'br_border_radius' => '16',
+                        'tl_border_radius' => '16',
+                        'tr_border_radius' => '16',
+                        'description_color' => '#111827',
+                        'optional_text_color' => '#9CA3AF'
+                    ]
+                ],
+            ],
+            [
+                'type' => 'items',
+                'placement' => 'checkout',
+                'metadata' => [
+                    'title' => 'Items',
+                    'show_items' => true,
+                    'description' => null,
+                    'design' => [
+                        'b_border' => '0',
+                        'b_margin' => '8',
+                        'bg_color' => '#ffffff',
+                        'l_border' => '0',
+                        'l_margin' => '4',
+                        'r_border' => '0',
+                        'r_margin' => '4',
+                        't_border' => '0',
+                        't_margin' => '0',
+                        'b_padding' => '16',
+                        'l_padding' => '16',
+                        'r_padding' => '16',
+                        't_padding' => '16',
+                        'title_color' => '#111827',
+                        'border_color' => '#E5E7EB',
+                        'bl_border_radius' => '16',
+                        'br_border_radius' => '16',
+                        'tl_border_radius' => '16',
+                        'tr_border_radius' => '16',
+                        'description_color' => '#111827'
+                    ]
+                ],
+            ],
+            [
+                'type' => 'delivery',
+                'placement' => 'checkout',
+                'metadata' => [
+                    'title' => 'Delivery Methods',
+                    'description' => null,
+                    'address_title' => 'Address',
+                    'schedule_title' => 'Schedule',
+                    'show_delivery_methods' => true,
+                    'design' => [
+                        'b_border' => '0',
+                        'b_margin' => '8',
+                        'bg_color' => '#ffffff',
+                        'l_border' => '0',
+                        'l_margin' => '4',
+                        'r_border' => '0',
+                        'r_margin' => '4',
+                        't_border' => '0',
+                        't_margin' => '0',
+                        'b_padding' => '16',
+                        'l_padding' => '16',
+                        'r_padding' => '16',
+                        't_padding' => '16',
+                        'title_color' => '#111827',
+                        'border_color' => '#E5E7EB',
+                        'bl_border_radius' => '16',
+                        'br_border_radius' => '16',
+                        'tl_border_radius' => '16',
+                        'tr_border_radius' => '16',
+                        'description_color' => '#111827'
+                    ]
+                ],
+            ],
+            [
+                'type' => 'promo code',
+                'placement' => 'checkout',
+                'metadata' => [
+                    'title' => 'Promo code',
+                    'description' => null,
+                    'show_promo_code' => true,
+                    'design' => [
+                        'b_border' => '0',
+                        'b_margin' => '8',
+                        'bg_color' => '#ffffff',
+                        'l_border' => '0',
+                        'l_margin' => '4',
+                        'r_border' => '0',
+                        'r_margin' => '4',
+                        't_border' => '0',
+                        't_margin' => '0',
+                        'b_padding' => '16',
+                        'l_padding' => '16',
+                        'r_padding' => '16',
+                        't_padding' => '16',
+                        'title_color' => '#111827',
+                        'border_color' => '#E5E7EB',
+                        'bl_border_radius' => '16',
+                        'br_border_radius' => '16',
+                        'tl_border_radius' => '16',
+                        'tr_border_radius' => '16',
+                        'description_color' => '#111827'
+                    ]
+                ],
+            ],
+            [
+                'type' => 'tips',
+                'placement' => 'checkout',
+                'metadata' => [
+                    'title' => 'Tip',
+                    'show_tips' => true,
+                    'description' => null,
+                    'tips' => ['10', '20'],
+                    'show_specify_tip' => true,
+                    'design' => [
+                        'b_border' => '0',
+                        'b_margin' => '8',
+                        'bg_color' => '#ffffff',
+                        'l_border' => '0',
+                        'l_margin' => '4',
+                        'r_border' => '0',
+                        'r_margin' => '4',
+                        't_border' => '0',
+                        't_margin' => '0',
+                        'b_padding' => '16',
+                        'l_padding' => '16',
+                        'r_padding' => '16',
+                        't_padding' => '16',
+                        'title_color' => '#111827',
+                        'border_color' => '#E5E7EB',
+                        'pill_bg_color' => '#DBEAFE',
+                        'pill_text_color' => '#1E40AF',
+                        'bl_border_radius' => '16',
+                        'br_border_radius' => '16',
+                        'tl_border_radius' => '16',
+                        'tr_border_radius' => '16',
+                        'description_color' => '#111827'
+                    ]
+                ],
+            ],
+            [
+                'type' => 'order summary',
+                'placement' => 'checkout',
+                'metadata' => [
+                    'title' => 'Order Summary',
+                    'description' => null,
+                    'combine_fees' => false,
+                    'checkout_fees' => [],
+                    'combine_discounts' => false,
+                    'design' => [
+                        'b_border' => '0',
+                        'b_margin' => '8',
+                        'bg_color' => '#ffffff',
+                        'l_border' => '0',
+                        'l_margin' => '4',
+                        'r_border' => '0',
+                        'r_margin' => '4',
+                        't_border' => '0',
+                        't_margin' => '0',
+                        'b_padding' => '16',
+                        'l_padding' => '16',
+                        'r_padding' => '16',
+                        't_padding' => '16',
+                        'title_color' => '#111827',
+                        'border_color' => '#E5E7EB',
+                        'bl_border_radius' => '16',
+                        'br_border_radius' => '16',
+                        'tl_border_radius' => '16',
+                        'tr_border_radius' => '16',
+                        'description_color' => '#111827'
+                    ]
+                ],
+            ]
+        ];
+
+        $payment = [
+            [
+                'type' => 'logo',
+                'placement' => 'payment',
+                'metadata' => [
+                    'alignment' => 'center',
+                    'design' => [
+                        'b_border' => '0',
+                        'b_margin' => '0',
+                        'bg_color' => null,
+                        'l_border' => '0',
+                        'l_margin' => '0',
+                        'r_border' => '0',
+                        'r_margin' => '0',
+                        't_border' => '0',
+                        't_margin' => '20',
+                        'b_padding' => '16',
+                        'l_padding' => '16',
+                        'r_padding' => '16',
+                        't_padding' => '16',
+                        'border_color' => '#000000',
+                        'bl_border_radius' => '0',
+                        'br_border_radius' => '0',
+                        'tl_border_radius' => '0',
+                        'tr_border_radius' => '0'
+                    ]
+                ]
+            ],
+            [
+                'type' => 'payment methods',
+                'placement' => 'payment',
+                'metadata' => [
+                    'title' => 'Complete Your Payment',
+                    'subtitle' => 'Amount to pay',
+                    'design' => [
+                        'b_border' => '0',
+                        'b_margin' => '8',
+                        'bg_color' => null,
+                        'l_border' => '0',
+                        'l_margin' => '4',
+                        'r_border' => '0',
+                        'r_margin' => '4',
+                        't_border' => '0',
+                        't_margin' => '0',
+                        'b_padding' => '16',
+                        'l_padding' => '16',
+                        'r_padding' => '16',
+                        't_padding' => '16',
+                        'title_color' => '#111827',
+                        'amount_color' => '#111827',
+                        'border_color' => '#E5E7EB',
+                        'subtitle_color' => '#111827',
+                        'bl_border_radius' => '16',
+                        'br_border_radius' => '16',
+                        'tl_border_radius' => '16',
+                        'tr_border_radius' => '16'
+                    ]
+                ],
+            ]
+        ];
+
+        $menu = [
+            [
+                'type' => 'logo',
+                'placement' => 'menu',
+                'metadata' => [
+                    'design' => [
+                        'b_border' => '0',
+                        'b_margin' => '8',
+                        'bg_color' => null,
+                        'l_border' => '0',
+                        'l_margin' => '0',
+                        'r_border' => '0',
+                        'r_margin' => '0',
+                        't_border' => '0',
+                        't_margin' => '0',
+                        'b_padding' => '16',
+                        'l_padding' => '16',
+                        'r_padding' => '16',
+                        't_padding' => '16',
+                        'title_color' => '#111827',
+                        'border_color' => '#E5E7EB',
+                        'bl_border_radius' => '0',
+                        'br_border_radius' => '0',
+                        'tl_border_radius' => '0',
+                        'tr_border_radius' => '0'
+                    ],
+                    'alignment' => 'center'
+                ],
+            ],
+            [
+                'type' => 'link',
+                'placement' => 'menu',
+                'metadata' => [
+                    'link' => 'https://www.example.com',
+                    'title' => 'Home',
+                    'design' => [
+                        'b_border' => '1',
+                        'b_margin' => '16',
+                        'bg_color' => '#ffffff',
+                        'l_border' => '1',
+                        'l_margin' => '16',
+                        'r_border' => '1',
+                        'r_margin' => '16',
+                        't_border' => '1',
+                        't_margin' => '16',
+                        'b_padding' => '8',
+                        'l_padding' => '8',
+                        'r_padding' => '8',
+                        't_padding' => '8',
+                        'icon_color' => '#6B7280',
+                        'title_color' => '#111827',
+                        'border_color' => '#E5E7EB',
+                        'bl_border_radius' => '4',
+                        'br_border_radius' => '4',
+                        'tl_border_radius' => '4',
+                        'tr_border_radius' => '4'
+                    ]
+                ],
+            ],
+            [
+                'type' => 'categories',
+                'placement' => 'menu',
+                'metadata' => [
+                    'title' => 'Categories',
+                    'design' => [
+                        'b_border' => '0',
+                        'b_margin' => '0',
+                        'bg_color' => null,
+                        'l_border' => '0',
+                        'l_margin' => '0',
+                        'r_border' => '0',
+                        'r_margin' => '0',
+                        't_border' => '0',
+                        't_margin' => '0',
+                        'b_padding' => '0',
+                        'l_padding' => '0',
+                        'r_padding' => '0',
+                        't_padding' => '0',
+                        'title_color' => '#111827',
+                        'border_color' => '#E5E7EB',
+                        'bl_border_radius' => '0',
+                        'br_border_radius' => '0',
+                        'tl_border_radius' => '0',
+                        'tr_border_radius' => '0'
+                    ]
+                ],
+            ],
+            [
+                'type' => 'divider',
+                'placement' => 'menu',
+                'metadata' => [
+                    'thickness' => '1',
+                    'divider' => 'solid',
+                    'design' => [
+                        'b_border' => '0',
+                        'b_margin' => '16',
+                        'bg_color' => null,
+                        'l_border' => '0',
+                        'l_margin' => '16',
+                        'r_border' => '0',
+                        'r_margin' => '16',
+                        't_border' => '0',
+                        't_margin' => '16',
+                        'b_padding' => '0',
+                        'l_padding' => '0',
+                        'r_padding' => '0',
+                        't_padding' => '0',
+                        'title_color' => '#111827',
+                        'border_color' => '#E5E7EB',
+                        'divider_color' => '#f0f0f0ff',
+                        'bl_border_radius' => '0',
+                        'br_border_radius' => '0',
+                        'tl_border_radius' => '0',
+                        'tr_border_radius' => '0'
+                    ]
+                ],
+            ],
+            [
+                'type' => 'socials',
+                'placement' => 'menu',
+                'metadata' => [
+                    'title' => null,
+                    'platforms' => [],
+                    'design' => [
+                        'b_border' => '0',
+                        'b_margin' => '0',
+                        'bg_color' => '#ffffff',
+                        'l_border' => '0',
+                        'l_margin' => '0',
+                        'r_border' => '0',
+                        'r_margin' => '0',
+                        't_border' => '0',
+                        't_margin' => '0',
+                        'b_padding' => '0',
+                        'l_padding' => '0',
+                        'r_padding' => '0',
+                        't_padding' => '0',
+                        'icon_color' => '#6B7280',
+                        'title_color' => '#111827',
+                        'border_color' => '#E5E7EB',
+                        'bl_border_radius' => '16',
+                        'br_border_radius' => '16',
+                        'tl_border_radius' => '16',
+                        'tr_border_radius' => '16'
+                    ]
+                ],
+            ],
+            [
+                'type' => 'install_app',
+                'placement' => 'menu',
+                'metadata' => [
+                    'button_text' => 'Install Our App',
+                    'design' => [
+                        'b_border' => '0',
+                        'b_margin' => '8',
+                        'bg_color' => '#ffffff',
+                        'l_border' => '0',
+                        'l_margin' => '0',
+                        'r_border' => '0',
+                        'r_margin' => '0',
+                        't_border' => '0',
+                        't_margin' => '24',
+                        'b_padding' => '0',
+                        'l_padding' => '0',
+                        'r_padding' => '0',
+                        't_padding' => '0',
+                        'title_color' => '#111827',
+                        'border_color' => '#E5E7EB',
+                        'button_color' => '#1E40AF',
+                        'bl_border_radius' => '0',
+                        'br_border_radius' => '0',
+                        'tl_border_radius' => '0',
+                        'tr_border_radius' => '0',
+                        'button_text_color' => '#ffffff'
+                    ]
+                ],
+            ]
+        ];
+
+        $designCards = array_merge($storefront, $checkout, $payment, $menu);
+
+        foreach ($designCards as $key => $designCard) {
+            $designCards[$key]['visible'] = 1;
+            $designCards[$key]['id'] = Str::uuid();
+            $designCards[$key]['created_at'] = now();
+            $designCards[$key]['updated_at'] = now();
+            $designCards[$key]['position'] = $key + 1;
+            $designCards[$key]['store_id'] = $store->id;
+            $designCards[$key]['metadata'] = json_encode($designCard['metadata']);
+        }
+
+        DB::table('design_cards')->where('store_id', $store->id)->delete();
+        DB::table('design_cards')->insert($designCards);
     }
 }

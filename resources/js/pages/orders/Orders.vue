@@ -9,12 +9,6 @@
 
             <h1 class="text-lg text-gray-700 font-semibold mb-4">Orders</h1>
 
-            <Tabs
-                class="mb-4"
-                :tabs="filterTabs"
-                v-model="filterTab">
-            </Tabs>
-
             <!-- Orders Table -->
             <Table
                 @search="search"
@@ -658,7 +652,6 @@
 <script>
 
     import axios from 'axios';
-    import Tabs from '@Partials/Tabs.vue';
     import isEqual from 'lodash/isEqual';
     import Input from '@Partials/Input.vue';
     import Modal from '@Partials/Modal.vue';
@@ -681,7 +674,7 @@
     export default {
         inject: ['formState', 'storeState', 'notificationState'],
         components: {
-            Move, Info, Tabs, Input, Modal, Loader, Button, Switch, Select, Popover, Dropdown, Table, draggable: VueDraggableNext,
+            Move, Info, Input, Modal, Loader, Button, Switch, Select, Popover, Dropdown, Table, draggable: VueDraggableNext,
             Status, NoDataPlaceholder, PaymentStatus, CollectionStatus
         },
         data() {
@@ -721,14 +714,6 @@
                 includeOrderFieldNames: true,
                 columns: this.prepareColumns(),
                 whatsappFields: this.prepareWhatsappFields(),
-                filterTab: 'all',
-                filterTabs: [
-                    { label: 'All', value: 'all'},
-                    { label: 'Paid', value: 'Paid'},
-                    { label: 'Unpaid', value: 'unpaid'},
-                    { label: 'Partially paid', value: 'partially paid'},
-                    { label: 'Waiting confirmation', value: 'waiting confirmation'},
-                ],
                 exportLimits: [
                     { label: '100', value: '100'},
                     { label: '500', value: '500'},

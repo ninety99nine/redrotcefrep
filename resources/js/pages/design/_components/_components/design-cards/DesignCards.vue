@@ -23,7 +23,7 @@
 
                     <div
                         @click.stop="() => onToggleExpansion(index)"
-                        :class="['flex items-center justify-between cursor-pointer shadow p-4 group-hover:bg-gray-100', { 'bg-gray-100 mb-4' : designCard.expanded }]">
+                        :class="['flex items-center justify-between cursor-pointer shadow p-4 group-hover:bg-gray-100', designCard.expanded ? 'bg-gray-100 rounded-t-lg mb-4' : 'rounded-lg']">
 
                         <div class="flex items-center space-x-2 text-gray-500">
 

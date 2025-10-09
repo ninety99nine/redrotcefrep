@@ -10,12 +10,28 @@ export function capitalizeAll(value) {
     }).join(' ');
 }
 
-export function isEmpty(value) {
-    return value == null || value.trim() == '';
+export function isNotEmpty(value) {
+  return !isEmpty(value);
 }
 
-export function isNotEmpty(value) {
-    console.log('value');
-    console.log(value);
-    return value != null && value.trim() != '';
+export function isEmpty(value) {
+
+  // Handle null or undefined
+  if (value == null) {
+    return true;
+  }
+
+  // Handle strings
+  if (typeof value === 'string') {
+    return value.trim() === '';
+  }
+
+  // Handle objects (including arrays)
+  if (typeof value === 'object') {
+    return Object.keys(value).length === 0;
+  }
+
+  // Handle other types (numbers, booleans, etc.)
+  return false;
+
 }

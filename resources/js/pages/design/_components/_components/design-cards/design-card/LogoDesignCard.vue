@@ -11,6 +11,8 @@
 
         <template v-if="designCard.mode == '1'">
 
+            <StoreLogo :showButton="false" class="flex justify-center mb-4"></StoreLogo>
+
             <Tabs
                 size="sm"
                 class="w-full"
@@ -32,12 +34,13 @@
 
     import Pill from '@Partials/Pill.vue';
     import Tabs from '@Partials/Tabs.vue';
+    import StoreLogo from '@Components/StoreLogo.vue';
     import { ArrowLeftToLine, ArrowRightToLine } from 'lucide-vue-next';
     import Designer from '@Pages/design/_components/_components/design-cards/design-card/_components/Designer.vue';
 
     export default {
         inject: ['formState', 'designState'],
-        components: { Pill, Tabs, Designer },
+        components: { Pill, Tabs, Designer, StoreLogo },
         props: {
             index: {
                 type: Number

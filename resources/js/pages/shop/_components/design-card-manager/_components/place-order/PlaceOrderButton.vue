@@ -77,11 +77,11 @@
                         this.formState.setFormError('customer_first_name', 'Enter your first name');
                     }
 
-                    if(metadata.show_last_name && metadata.last_name_required && this.isEmpty(this.orderForm.customer_last_name == null)) {
+                    if(metadata.show_last_name && metadata.last_name_required && this.isEmpty(this.orderForm.customer_last_name)) {
                         this.formState.setFormError('customer_last_name', 'Enter your last name');
                     }
 
-                    if(metadata.show_mobile_number && metadata.mobile_number_required && this.isEmpty(this.orderForm.customer_mobile_number == null)) {
+                    if(metadata.show_mobile_number && metadata.mobile_number_required && this.isEmpty(this.orderForm.customer_mobile_number)) {
                         this.formState.setFormError('customer_mobile_number', 'Enter your mobile number');
                     }
 

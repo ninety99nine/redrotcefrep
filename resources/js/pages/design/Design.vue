@@ -35,7 +35,7 @@
             </div>
 
             <div class="flex-grow">
-                <div class="mockup-phone scale-75 overflow-hidden border-8 border-slate-900 rounded-4xl fixed top-8 right-8 shadow-lg shadow-gray-500">
+                <div class="mockup-phone bg-white scale-75 overflow-hidden border-8 border-slate-900 rounded-4xl fixed top-8 right-8 shadow-lg shadow-gray-500">
                     <div class="w-[360px] h-[800px] overflow-y-auto text-gray-700">
                         <router-view name="preview"></router-view>
                     </div>

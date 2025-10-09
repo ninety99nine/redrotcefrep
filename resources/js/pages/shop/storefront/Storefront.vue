@@ -1,6 +1,6 @@
 <template>
 
-    <div class="max-w-4xl mx-auto">
+    <div class="max-w-4xl mx-auto pb-20">
 
         <Menu menuClass="max-w-4xl mx-auto"></Menu>
         <DesignCardManager placement="storefront"></DesignCardManager>
