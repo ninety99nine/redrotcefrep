@@ -632,7 +632,7 @@ class StoreService extends BaseService
 
         if($store->whatsapp_mobile_number) {
             $bannerTitle = 'Reach Us On Whatsapp';
-            $bannerLink = 'https://wa.me/'.ltrim($store->whatsapp_mobile_number?->formatE164(), '+').'?text='.urlencode('Hello, I\'m interested in some products i found at '.$store->name);
+            $bannerLink = 'https://wa.me/'.ltrim($store->whatsapp_mobile_number?->formatE164(), '+').'?text='.urlencode('Hello, I\'m interested in some products i found at your '.$store->name.' shop');
         }else {
             $bannerTitle = '';
             $bannerLink = '';
