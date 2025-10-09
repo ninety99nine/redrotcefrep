@@ -3,10 +3,10 @@
 namespace App\Http\Requests\Store;
 
 use App\Models\Store;
+use App\Enums\RateType;
 use App\Enums\TaxMethod;
 use App\Enums\WeightUnit;
 use App\Enums\DistanceUnit;
-use App\Enums\RateType;
 use Illuminate\Support\Arr;
 use Illuminate\Validation\Rule;
 use Illuminate\Foundation\Http\FormRequest;
@@ -32,7 +32,7 @@ class CreateStoreRequest extends FormRequest
     {
         return [
             'name' => ['required', 'string', 'max:255'],
-            'alias' => ['required', 'string', 'max:255', Rule::unique('stores', 'alias')],
+            'alias' => ['sometimes', 'string', 'max:255', Rule::unique('stores', 'alias')],
             'email' => ['nullable', 'email', 'max:255'],
             'ussd_mobile_number' => ['nullable', 'phone:INTERNATIONAL', 'max:20'],
             'whatsapp_mobile_number' => ['nullable', 'phone:INTERNATIONAL', 'max:20'],
