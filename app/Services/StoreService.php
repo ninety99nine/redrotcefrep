@@ -12,23 +12,24 @@ use App\Enums\Platform;
 use App\Models\Category;
 use App\Enums\Association;
 use App\Models\Permission;
+use App\Models\PricingPlan;
 use Illuminate\Support\Str;
 use App\Enums\InsightPeriod;
 use Illuminate\Http\Response;
 use App\Enums\InsightCategory;
-use App\Enums\PaymentMethodType;
 use App\Enums\PricingPlanType;
 use App\Enums\UploadFolderName;
+use App\Enums\PaymentMethodType;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
 use App\Http\Resources\StoreResource;
 use App\Http\Resources\StoreResources;
-use App\Models\PricingPlan;
 
 class StoreService extends BaseService
 {
+    public static $defaultCategoryName = 'General';
+
     /**
      * Show stores.
      *
@@ -83,7 +84,7 @@ class StoreService extends BaseService
 
         // Create default category
         Category::firstOrCreate([
-            'name' => 'General',
+            'name' => $this->defaultCategoryName,
             'store_id' => $store->id
         ]);
 

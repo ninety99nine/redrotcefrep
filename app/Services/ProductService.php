@@ -100,6 +100,8 @@ class ProductService extends BaseService
 
         if(!is_null($categories)) {
             $this->createProductCategories($product, $categories);
+        }else{
+            $this->createProductCategories($product, [StoreService::$defaultCategoryName]);
         }
 
         if(!is_null($deliveryMethodIds)) {
