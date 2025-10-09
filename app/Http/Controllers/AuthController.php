@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Services\AuthService;
 use App\Http\Resources\UserResource;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\Session;
 use Laravel\Socialite\Facades\Socialite;
 use App\Http\Requests\Auth\LoginRequest;
 use App\Http\Requests\Auth\LogoutRequest;
@@ -206,6 +207,10 @@ class AuthController extends Controller
      */
     public function redirectToGoogle(): RedirectResponse
     {
+        $storeId = request()->query('store_id');
+        if ($storeId) {
+            Session::put('social_login_store_id', $storeId);
+        }
         return Socialite::driver('google')->redirect();
     }
 
@@ -226,6 +231,10 @@ class AuthController extends Controller
      */
     public function redirectToFacebook(): RedirectResponse
     {
+        $storeId = request()->query('store_id');
+        if ($storeId) {
+            Session::put('social_login_store_id', $storeId);
+        }
         return Socialite::driver('facebook')->redirect();
     }
 
@@ -246,6 +255,10 @@ class AuthController extends Controller
      */
     public function redirectToLinkedIn(): RedirectResponse
     {
+        $storeId = request()->query('store_id');
+        if ($storeId) {
+            Session::put('social_login_store_id', $storeId);
+        }
         return Socialite::driver('linkedin-openid')->redirect();
     }
 

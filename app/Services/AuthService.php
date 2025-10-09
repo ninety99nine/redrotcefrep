@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\Session;
 use Laravel\Socialite\Facades\Socialite;
 use Illuminate\Validation\ValidationException;
 
@@ -333,6 +334,14 @@ class AuthService
             'logo_url' => asset("/images/social-login-icons/google.png"),
         ];
 
+        // Retrieve store_id from session
+        $storeId = Session::get('social_login_store_id');
+
+        if ($storeId) {
+            $params['store_id'] = $storeId;
+            Session::forget('social_login_store_id'); // Clean up session
+        }
+
         if (request()->has('error')) {
 
             $params = array_merge($params, [
@@ -421,6 +430,14 @@ class AuthService
             'provider' => 'facebook',
             'logo_url' => asset("/images/social-login-icons/facebook.png"),
         ];
+
+        // Retrieve store_id from session
+        $storeId = Session::get('social_login_store_id');
+
+        if ($storeId) {
+            $params['store_id'] = $storeId;
+            Session::forget('social_login_store_id'); // Clean up session
+        }
 
         if (request()->has('error')) {
 
@@ -519,6 +536,14 @@ class AuthService
             'provider' => 'linkedin',
             'logo_url' => asset("/images/social-login-icons/linkedin.png"),
         ];
+
+        // Retrieve store_id from session
+        $storeId = Session::get('social_login_store_id');
+
+        if ($storeId) {
+            $params['store_id'] = $storeId;
+            Session::forget('social_login_store_id'); // Clean up session
+        }
 
         if (request()->has('error')) {
 

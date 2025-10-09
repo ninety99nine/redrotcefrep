@@ -701,7 +701,7 @@ class StoreService extends BaseService
                 'type' => 'text',
                 'placement' => 'storefront',
                 'metadata' => [
-                    'body' => ('Welcome to '.$store->name.' shop') . (!empty($store->description) ? ' .'.$store->description : ''),
+                    'body' => ('Welcome to '.$store->name.' shop') . (!empty($store->description) ? '. '.$store->description : ''),
                     'design' => [
                         'b_border' => '2',
                         'b_margin' => '0',

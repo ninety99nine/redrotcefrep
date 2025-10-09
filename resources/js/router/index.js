@@ -62,6 +62,11 @@ const routes = [
                 component: () => import('@Pages/shop/checkout/Checkout.vue'),
             },
             {
+                path: 'login',
+                name: 'show-login',
+                component: () => import('@Pages/shop/login/Login.vue'),
+            },
+            {
                 path: 'orders',
                 children: [
                     {

@@ -1,7 +1,9 @@
 <template>
     <div class="select-none max-w-xl mx-auto pt-16">
 
-        <div class="w-full bg-white border border-gray-100 shadow-sm rounded-xl mb-4">
+        <div
+            @click="navigateToShowShopOrder"
+            class="w-full bg-white border border-gray-100 shadow-sm rounded-xl cursor-pointer hover:bg-gray-50 hover:scale-105 active:opacity-80 active:scale-100 transition-all duration-300 mb-4">
 
             <div class="p-4 flex items-center space-x-4">
 

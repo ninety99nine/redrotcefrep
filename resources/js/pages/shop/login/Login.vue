@@ -1,16 +1,31 @@
 <template>
 
-    <div class="min-h-screen grid grid-cols-1 lg:grid-cols-2 transition-opacity opacity-100 duration-750 lg:grow starting:opacity-0">
+    <div class="min-h-screen transition-opacity opacity-100 duration-750 lg:grow starting:opacity-0">
 
-        <div class="flex items-center justify-center p-6 bg-gradient-to-b from-blue-100 to-white-100">
+        <div class="flex items-center justify-center py-6 bg-gradient-to-b from-blue-100 to-white-100">
 
             <div class="w-full max-w-md">
 
-                <Logo height="h-20 mx-auto mb-4"></Logo>
+                <div class="flex justify-center mb-4">
+                    <StoreLogo size="w-20 h-20" :showButton="false"></StoreLogo>
+                </div>
 
                 <div class="bg-white rounded-lg shadow-sm border border-slate-200 p-6 mb-6">
 
-                    <h1 class="text-2xl font-semibold leading-none tracking-tight mb-4">Sign in</h1>
+                    <div class="flex items-center justify-between mb-4">
+
+                        <h1 class="text-2xl font-semibold leading-none tracking-tight">Sign in</h1>
+
+                        <Button
+                            size="md"
+                            type="bare"
+                            v-if="store"
+                            leftIconSize="24"
+                            :leftIcon="House"
+                            :action="navigateToStorefront">
+                        </Button>
+
+                    </div>
 
                     <h1 class="text-sm text-gray-500 mb-4">Pick how you would like to sign in</h1>
 
@@ -72,19 +87,9 @@
 
                 </div>
 
-                <p class="text-sm text-center text-gray-500">© {{ currentYear }} Perfect Order. All rights reserved.</p>
+                <p class="text-sm text-center text-gray-500 mb-16">© {{ currentYear }} Perfect Order. All rights reserved.</p>
 
             </div>
-
-        </div>
-
-        <!-- Right: Full Height Image (hidden on small screens) -->
-        <div class="hidden lg:block">
-
-            <img
-                :src="'/images/lady-holding-boxes.jpg'"
-                 class="w-full h-full object-cover"
-                 alt="Lady holding boxes" />
 
         </div>
 
@@ -99,15 +104,18 @@
     import Logo from '@Partials/Logo.vue';
     import Input from '@Partials/Input.vue';
     import Button from '@Partials/Button.vue';
+    import { House } from 'lucide-vue-next';
     import { isEmpty } from '@Utils/stringUtils';
+    import StoreLogo from '@Components/StoreLogo.vue';
     import SocialLinks from '@Pages/auth/components/SocialLinks.vue';
 
     export default {
         name: 'Login',
-        components: { Pill, Logo, Input, Button, SocialLinks },
-        inject: ['authState', 'formState', 'notificationState'],
+        components: { Pill, Logo, Input, Button, StoreLogo, SocialLinks },
+        inject: ['authState', 'formState',  'storeState', 'notificationState'],
         data() {
             return {
+                House,
                 form: {
                     email: '',
                     password: '',
@@ -128,8 +136,21 @@
                 currentYear: new Date().getFullYear()
             };
         },
+        computed: {
+            store() {
+                return this.storeState.store;
+            }
+        },
         methods: {
             isEmpty: isEmpty,
+            navigateToStorefront() {
+                this.$router.push({
+                    name: 'show-storefront',
+                    params: {
+                        alias: this.store.alias
+                    }
+                });
+            },
             async submit() {
 
                 if (this.loading) return;
@@ -163,7 +184,10 @@
                     if (redirect) {
                         this.$router.push(redirect);
                     } else {
-                        this.$router.push({ name: 'show-stores' });
+                        this.$router.push({
+                            name: 'show-store-home',
+                            params: { store_id: this.store.id }
+                        });
                     }
 
                 } catch (error) {

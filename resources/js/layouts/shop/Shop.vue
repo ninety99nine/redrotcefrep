@@ -118,7 +118,7 @@
                         // Show by alias for alias-based routes
                         response = await axios.get(`/api/stores/alias/${this.alias}`, config);
                     } else {
-                        throw new Error('No store ID or alias provided');
+                        return;
                     }
 
                     this.storeState.setStore(response.data);
