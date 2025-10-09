@@ -84,7 +84,7 @@ class StoreService extends BaseService
 
         // Create default category
         Category::firstOrCreate([
-            'name' => $this->defaultCategoryName,
+            'name' => self::$defaultCategoryName,
             'store_id' => $store->id
         ]);
 
