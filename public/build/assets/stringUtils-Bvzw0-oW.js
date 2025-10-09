@@ -1,0 +1,1 @@
+function n(t){return t?t.charAt(0).toUpperCase()+t.slice(1):""}function e(t){return t?t.split(" ").map(r=>r.charAt(0).toUpperCase()+r.slice(1)).join(" "):""}function s(t){return!i(t)}function i(t){return t==null?!0:typeof t=="string"?t.trim()==="":typeof t=="object"?Object.keys(t).length===0:!1}export{s as a,e as b,n as c,i};
