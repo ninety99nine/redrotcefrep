@@ -17,7 +17,7 @@ class ShowOrderCommentsRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return $this->user()->can('viewAny', OrderComment::class);
+        return true;
     }
 
     /**

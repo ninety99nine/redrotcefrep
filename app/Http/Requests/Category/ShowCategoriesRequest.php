@@ -2,7 +2,6 @@
 
 namespace App\Http\Requests\Category;
 
-use App\Models\Category;
 use App\Enums\Association;
 use Illuminate\Support\Arr;
 use Illuminate\Validation\Rule;
@@ -17,7 +16,7 @@ class ShowCategoriesRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return $this->user()->can('viewAny', Category::class);
+        return true;
     }
 
     /**

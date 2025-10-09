@@ -2,7 +2,6 @@
 
 namespace App\Http\Requests\Store;
 
-use App\Models\Store;
 use Illuminate\Foundation\Http\FormRequest;
 
 class ShowStoreByAliasRequest extends FormRequest
@@ -14,7 +13,7 @@ class ShowStoreByAliasRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return $this->user()->can('viewAny', Store::class);
+        return true;
     }
 
     /**

@@ -13,7 +13,7 @@ class ShowProductRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return $this->user()->can('view', $this->route('product'));
+        return true;
     }
 
     /**

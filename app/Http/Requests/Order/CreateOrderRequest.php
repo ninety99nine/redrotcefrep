@@ -2,7 +2,6 @@
 
 namespace App\Http\Requests\Order;
 
-use App\Models\Order;
 use App\Models\Store;
 use App\Enums\RateType;
 use App\Enums\Association;
@@ -23,7 +22,7 @@ class CreateOrderRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return $this->user()->can('create', Order::class);
+        return true;
     }
 
     /**
@@ -43,7 +42,7 @@ class CreateOrderRequest extends FormRequest
             'inspect' => ['sometimes', 'boolean'],
             'association' => ['sometimes', Rule::in([Association::SHOPPER->value, Association::TEAM_MEMBER->value])],
             'store_id' => ['required', 'uuid'],
-            'guest_id' => [Rule::requiredIf(!Auth::user()), 'uuid'],
+            'guest_id' => ['sometimes', 'uuid'],
             'cart_products' => ['array'],
             'cart_products.*' => ['array'],
             'cart_products.*.id' => ['nullable', 'uuid'],

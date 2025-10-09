@@ -86,7 +86,7 @@ export const useOrderStore = defineStore('order', {
 
             this.orderForm = {
 
-                guestId: uuidv4(),
+                guest_id: uuidv4(),
 
                 cart_fees: [],
                 cart_products: [],

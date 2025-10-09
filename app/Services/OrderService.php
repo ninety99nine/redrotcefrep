@@ -310,7 +310,9 @@ class OrderService extends BaseService
      */
     public function updateOrder(Order $order, array $data): array
     {
-        if(isset($data['cart_products'])) {
+        $inspect = $data['inspect'] ?? false;
+
+        if($inspect) {
 
             $store = $order->store;
 
@@ -368,9 +370,7 @@ class OrderService extends BaseService
             return $this->showUpdatedResource($order);
 
         }else{
-
             $order->update($data);
-
         }
 
         return $this->showUpdatedResource($order);

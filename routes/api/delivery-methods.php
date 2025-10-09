@@ -7,7 +7,8 @@ Route::prefix('delivery-methods')
     ->middleware(['auth:sanctum', 'store.permission'])
     ->controller(DeliveryMethodController::class)
     ->group(function () {
-        Route::get('/', 'showDeliveryMethods')->name('show.delivery.methods');
+        //  Allow Guest shopping on showDeliveryMethods
+        Route::get('/', 'showDeliveryMethods')->withoutMiddleware(['auth:sanctum', 'store.permission'])->name('show.delivery.methods');
         Route::post('/', 'createDeliveryMethod')->name('create.delivery.method');
         Route::delete('/', 'deleteDeliveryMethods')->name('delete.delivery.methods');
         Route::post('/arrangement', 'updateDeliveryMethodArrangement')->name('update.delivery.method.arrangement');

@@ -10,11 +10,14 @@ Route::middleware(['auth:sanctum'])
         Route::get('/', 'showStores')->name('show.stores');
         Route::post('/', 'createStore')->name('create.store');
         Route::delete('/', 'deleteStores')->name('delete.stores');
-        Route::get('/alias/{alias}', 'showStoreByAlias')->name('show.store.by.alias');
+
+        //  Allow Guest shopping on showStoreByAlias
+        Route::get('/alias/{alias}', 'showStoreByAlias')->withoutMiddleware(['auth:sanctum', 'store.permission'])->name('show.store.by.alias');
 
         // Explicit route model binding applied: AppServiceProvider.php
         Route::middleware(['store.permission', 'record.store.visit'])->prefix('{store}')->group(function () {
-            Route::get('/', 'showStore')->name('show.store');
+            //  Allow Guest shopping on showStore
+            Route::get('/', 'showStore')->withoutMiddleware(['auth:sanctum', 'store.permission'])->name('show.store');
             Route::put('/', 'updateStore')->name('update.store');
             Route::delete('/', 'deleteStore')->name('delete.store');
             Route::post('/follow', 'followStore')->name('follow.store');
@@ -22,8 +25,8 @@ Route::middleware(['auth:sanctum'])
             Route::get('/insights', 'showStoreInsights')->name('show.store.insights');
 
             Route::withoutMiddleware(['auth:sanctum', 'store.permission', 'record.store.visit'])->group(function () {
-                Route::get('/qr-code', 'showStoreQrCode')->withoutMiddleware(['auth:sanctum', 'store.permission'])->name('show.store.qr.code');
-                Route::get('/qr-code-preview', 'showStoreQrCodePreview')->withoutMiddleware(['auth:sanctum', 'store.permission'])->name('show.store.qr.code.preview');
+                Route::get('/qr-code', 'showStoreQrCode')->name('show.store.qr.code');
+                Route::get('/qr-code-preview', 'showStoreQrCodePreview')->name('show.store.qr.code.preview');
             });
         });
     });

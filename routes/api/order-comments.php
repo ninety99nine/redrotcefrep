@@ -7,7 +7,8 @@ Route::prefix('order-comments')
     ->middleware(['auth:sanctum', 'store.permission'])
     ->controller(OrderCommentController::class)
     ->group(function () {
-        Route::get('/', 'showOrderComments')->name('show.order.comments');
+        //  Allow Guest shopping on showOrderComments
+        Route::get('/', 'showOrderComments')->withoutMiddleware(['auth:sanctum', 'store.permission'])->name('show.order.comments');
         Route::post('/', 'createOrderComment')->name('create.order.comment');
         Route::delete('/', 'deleteOrderComments')->name('delete.order.comments');
 

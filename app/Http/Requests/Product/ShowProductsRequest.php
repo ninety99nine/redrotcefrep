@@ -2,7 +2,6 @@
 
 namespace App\Http\Requests\Product;
 
-use App\Models\Product;
 use App\Enums\Association;
 use Illuminate\Support\Arr;
 use Illuminate\Validation\Rule;
@@ -17,7 +16,7 @@ class ShowProductsRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return $this->user()->can('viewAny', Product::class);
+        return true;
     }
 
     /**

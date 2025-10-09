@@ -13,7 +13,7 @@ class ShowOrderRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return $this->user()->can('view', $this->route('order'));
+        return true;
     }
 
     /**

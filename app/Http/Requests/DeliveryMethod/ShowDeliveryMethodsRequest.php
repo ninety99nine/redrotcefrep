@@ -4,7 +4,6 @@ namespace App\Http\Requests\DeliveryMethod;
 
 use App\Enums\Association;
 use Illuminate\Support\Arr;
-use App\Models\DeliveryMethod;
 use Illuminate\Validation\Rule;
 use Illuminate\Foundation\Http\FormRequest;
 
@@ -17,7 +16,7 @@ class ShowDeliveryMethodsRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return $this->user()->can('viewAny', DeliveryMethod::class);
+        return true;
     }
 
     /**

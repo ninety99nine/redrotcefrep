@@ -5,7 +5,6 @@ namespace App\Http\Requests\StorePaymentMethod;
 use App\Enums\Association;
 use Illuminate\Support\Arr;
 use Illuminate\Validation\Rule;
-use App\Models\StorePaymentMethod;
 use Illuminate\Foundation\Http\FormRequest;
 
 class ShowStorePaymentMethodsRequest extends FormRequest
@@ -15,7 +14,7 @@ class ShowStorePaymentMethodsRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return $this->user()->can('viewAny', StorePaymentMethod::class);
+        return true;
     }
 
     /**

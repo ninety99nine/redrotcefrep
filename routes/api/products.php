@@ -7,7 +7,8 @@ Route::prefix('products')
     ->middleware(['auth:sanctum', 'store.permission'])
     ->controller(ProductController::class)
     ->group(function () {
-        Route::get('/', 'showProducts')->name('show.products');
+        //  Allow Guest shopping on showProducts
+        Route::get('/', 'showProducts')->withoutMiddleware(['auth:sanctum', 'store.permission'])->name('show.products');
         Route::post('/', 'createProduct')->name('create.product');
         Route::put('/', 'updateProducts')->name('update.products');
         Route::delete('/', 'deleteProducts')->name('delete.products');
@@ -17,7 +18,8 @@ Route::prefix('products')
 
         //  Explicit route model binding applied: AppServiceProvider.php
         Route::prefix('{product}')->group(function () {
-            Route::get('/', 'showProduct')->name('show.product');
+            //  Allow Guest shopping on showProduct
+            Route::get('/', 'showProduct')->withoutMiddleware(['auth:sanctum', 'store.permission'])->name('show.product');
             Route::put('/', 'updateProduct')->name('update.product');
             Route::delete('/', 'deleteProduct')->name('delete.product');
             Route::get('/variants', 'showProductVariants')->name('show.product.variants');

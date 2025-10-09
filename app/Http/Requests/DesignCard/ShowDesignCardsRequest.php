@@ -2,7 +2,6 @@
 
 namespace App\Http\Requests\DesignCard;
 
-use App\Models\DesignCard;
 use App\Enums\Association;
 use Illuminate\Support\Arr;
 use Illuminate\Validation\Rule;
@@ -18,7 +17,7 @@ class ShowDesignCardsRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return $this->user()->can('viewAny', DesignCard::class);
+        return true;
     }
 
     /**

@@ -22,7 +22,7 @@ class UpdateOrderRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return $this->user()->can('update', $this->route('order'));
+        return true;
     }
 
     /**
@@ -39,9 +39,10 @@ class UpdateOrderRequest extends FormRequest
         $requiresTimeslot = $requiresDate && $deliveryMethod->schedule_type === DeliveryMethodScheduleType::DATE_AND_TIME->value;
 
         return [
+            'inspect' => ['sometimes', 'boolean'],
             'association' => ['sometimes', Rule::in([Association::SHOPPER->value, Association::TEAM_MEMBER->value])],
             'store_id' => ['required', 'uuid'],
-            'guest_id' => [Rule::requiredIf(!Auth::user()), 'uuid'],
+            'guest_id' => ['sometimes', 'uuid'],
             'cart_products' => ['sometimes', 'array'],
             'cart_products.*' => ['array'],
             'cart_products.*.id' => ['nullable', 'uuid'],

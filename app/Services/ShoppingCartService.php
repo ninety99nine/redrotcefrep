@@ -21,6 +21,7 @@ use App\Enums\DeliveryMethodFeeType;
 use Illuminate\Support\Facades\Http;
 use App\Enums\DeliveryMethodScheduleType;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\ValidationException;
 
 class ShoppingCartService
 {
@@ -420,23 +421,39 @@ class ShoppingCartService
     }
 
     /**
-     *  Get shopping cart cache manager.
+     * Get shopping cart cache manager.
      *
-     *  @return CacheService
+     * @return CacheService
+     * @throws ValidationException
      */
     public function getShoppingCartCacheService(): CacheService
     {
-        return (new CacheService(CacheName::SHOPPING_CART))->append($this->store->id)->append($this->authUser ? $this->authUser->id : request()->input('guest_id'));
+        $guestId = request()->input('guest_id');
+
+        // Validate guest_id if no authenticated user
+        if (!$this->authUser && !$guestId) {
+            throw ValidationException::withMessages(['guest_id' => 'The guest ID is required when not authenticated.']);
+        }
+
+        return (new CacheService(CacheName::SHOPPING_CART))->append($this->store->id)->append($this->authUser ? $this->authUser->id : $guestId);
     }
 
     /**
-     *  Get the "is customer status" cache manager
+     * Get the "is customer status" cache manager.
      *
-     *  @return CacheService
+     * @return CacheService
+     * @throws ValidationException
      */
-    public function getIsCustomerStatusCacheService()
+    public function getIsCustomerStatusCacheService(): CacheService
     {
-        return (new CacheService(CacheName::IS_CUSTOMER_STATUS))->append($this->store->id)->append($this->authUser ? $this->authUser->id : request()->input('guest_id'));
+        $guestId = request()->input('guest_id');
+
+        // Validate guest_id if no authenticated user
+        if (!$this->authUser && !$guestId) {
+            throw ValidationException::withMessages(['guest_id' => 'The guest ID is required when not authenticated.']);
+        }
+
+        return (new CacheService(CacheName::IS_CUSTOMER_STATUS))->append($this->store->id)->append($this->authUser ? $this->authUser->id : $guestId);
     }
 
     /**
