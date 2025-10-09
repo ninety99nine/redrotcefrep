@@ -2,7 +2,7 @@
 
 namespace App\Enums;
 
-enum InsightPeriod
+enum BaseEnum
 {
     public static function values(): array
     {

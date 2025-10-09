@@ -5,7 +5,7 @@ namespace App\Policies;
 use App\Models\User;
 use App\Models\AILesson;
 
-class AILessonPolicy extends BasePolicy
+class AiLessonPolicy extends BasePolicy
 {
     /**
      * Grant all permissions to super admins who have roles not tied to any store.
