@@ -16,14 +16,14 @@ Route::prefix('auth')->group(function () {
 
 // Routes for custom domains
 Route::domain('{domain}')->middleware(['resolve.store.by.domain', 'record.store.visit'])->group(function () {
-    Route::get('/manifest.json', [PWAController::class, 'manifest'])->name('pwa.manifest');
-    Route::get('/{any?}', [AppController::class, 'render'])->where('any', '.*')->name('shop.render');
+    Route::get('/manifest.json', [PWAController::class, 'manifest'])->name('domain.pwa.manifest');
+    Route::get('/{any?}', [AppController::class, 'render'])->where('any', '.*')->name('domain.shop.render');
 });
 
 // Routes for alias-based storefronts
 Route::prefix('{alias}')->middleware('record.store.visit')->group(function () {
-    Route::get('/manifest.json', [PWAController::class, 'manifest'])->name('pwa.manifest');
-    Route::get('/{any?}', [AppController::class, 'render'])->where('any', '.*')->name('shop.render');
+    Route::get('/manifest.json', [PWAController::class, 'manifest'])->name('alias.pwa.manifest');
+    Route::get('/{any?}', [AppController::class, 'render'])->where('any', '.*')->name('alias.shop.render');
 });
 
 // Fallback for non-domain, non-alias requests
