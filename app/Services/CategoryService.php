@@ -6,9 +6,7 @@ use Exception;
 use App\Models\Store;
 use App\Models\Category;
 use App\Enums\Association;
-use App\Enums\SortCategoryBy;
 use App\Enums\UploadFolderName;
-use App\Enums\StockQuantityType;
 use Illuminate\Support\Facades\DB;
 use App\Http\Resources\CategoryResource;
 use App\Http\Resources\CategoryResources;
@@ -187,85 +185,9 @@ class CategoryService extends BaseService
     {
         $storeId = $data['store_id'];
         $store = Store::find($storeId);
+        $categoryIds = $data['category_ids'];
         $parentCategoryId = $data['parent_category_id'] ?? null;
         $categories = $store->categories()->when(!empty($parentCategoryId), fn($query) => $query->where('parent_category_id', $parentCategoryId))->orderBy('position', 'asc')->get();
-
-        if (isset($data['sort_by'])) {
-            $query = $store->categories()->when(!empty($parentCategoryId), fn($query) => $query->where('parent_category_id', $parentCategoryId));
-
-            switch ($data['sort_by']) {
-                case SortCategoryBy::BEST_SELLING->value:
-                    /**
-                     * Best Selling Ranking Algorithm:
-                     * -------------------------------
-                     *
-                     * 1) Rank each category by sales velocity.
-                     * 2) Categories with unlimited or high stock levels have an advantage.
-                     * 3) Do not consider cancelled order categories.
-                     * 4) Do not consider order categories of cancelled orders.
-                     *
-                     * Note: Clone query because the query instance is modified.
-                     */
-                    $categoryWithHighestStockQuantity = (clone $query)->where('stock_quantity_type', StockQuantityType::LIMITED->value)->orderBy('stock_quantity', 'desc')->first();
-                    $maxStockQuantity = $categoryWithHighestStockQuantity && $categoryWithHighestStockQuantity->stock_quantity > 0
-                                        ? $categoryWithHighestStockQuantity->stock_quantity
-                                        : 1;
-                    $categoryIds = $query->select('categories.id')
-                        ->selectRaw(
-                            '(
-                                (
-                                    SELECT SUM(order_categories.quantity)
-                                    FROM order_categories
-                                    INNER JOIN orders ON orders.id = order_categories.order_id
-                                    WHERE order_categories.category_id = categories.id
-                                    AND order_categories.is_cancelled = 0
-                                    AND orders.status != "cancelled"
-                                ) /
-                                GREATEST(
-                                    (
-                                        SELECT DATEDIFF(MAX(orders.created_at), MIN(orders.created_at))
-                                        FROM orders
-                                        INNER JOIN order_categories ON order_categories.order_id = orders.id
-                                        WHERE order_categories.category_id = categories.id
-                                        AND order_categories.is_cancelled = 0
-                                    ),
-                                    1
-                                )
-                            ) *
-                            (CASE
-                                WHEN categories.stock_quantity_type = ?
-                                    THEN LEAST(categories.stock_quantity / ?, 1)
-                                ELSE 1
-                            END) as sales_rate',
-                            [StockQuantityType::LIMITED->value, $maxStockQuantity]
-                        )
-                        ->orderByDesc('sales_rate')
-                        ->pluck('categories.id');
-                    break;
-                case SortCategoryBy::MOST_STOCK->value:
-                    $categoryIds = $query->select('id')->where('stock_quantity_type', StockQuantityType::LIMITED->value)->orderBy('stock_quantity', 'desc')->pluck('id');
-                    break;
-                case SortCategoryBy::LEAST_STOCK->value:
-                    $categoryIds = $query->select('id')->where('stock_quantity_type', StockQuantityType::LIMITED->value)->orderBy('stock_quantity', 'asc')->pluck('id');
-                    break;
-                case SortCategoryBy::MOST_DISCOUNTED->value:
-                    $categoryIds = $query->select('id')->where('on_sale', '1')->orderBy('unit_sale_discount_percentage', 'desc')->pluck('id');
-                    break;
-                case SortCategoryBy::MOST_EXPENSIVE->value:
-                    $categoryIds = $query->select('id')->orderBy('unit_price', 'desc')->pluck('id');
-                    break;
-                case SortCategoryBy::MOST_AFFORDABLE->value:
-                    $categoryIds = $query->select('id')->orderBy('unit_price', 'asc')->pluck('id');
-                    break;
-                case SortCategoryBy::ALPHABETICALLY->value:
-                    $categoryIds = $query->select('id')->orderBy('name', 'asc')->pluck('id');
-                    break;
-                default:
-                    return ['message' => 'Cannot sort using the sort by method provided'];
-            }
-        } else {
-            $categoryIds = $data['category_ids'];
-        }
 
         $originalCategoryPositions = $categories->pluck('position', 'id');
 
