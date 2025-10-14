@@ -510,6 +510,20 @@
                             ]
                         },
                         {
+                            name: 'Promotions',
+                            children: [
+                                {
+                                    name: 'All',
+                                    routeName: 'show-promotions',
+                                    associatedRouteNames: ['create-promotion', 'edit-promotion']
+                                },
+                                {
+                                    name: 'Bulk Edit',
+                                    routeName: 'bulk-edit-promotions'
+                                },
+                            ]
+                        },
+                        {
                             name: 'Marketing',
                             routeName: 'show-marketing'
                         },

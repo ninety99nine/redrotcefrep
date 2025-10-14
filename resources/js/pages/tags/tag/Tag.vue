@@ -244,7 +244,7 @@
                     }
                 });
             },
-            async onView(tag) {
+            async navigateToEditTag(tag) {
                 await this.$router.push({
                     name: this.isCreatingProductTag ? 'edit-product-tag' : 'edit-customer-tag',
                     params: {
@@ -331,7 +331,7 @@
 
                     this.notificationState.showSuccessNotification(`Tag created`);
                     this.tagState.saveOriginalState('Original tag');
-                    await this.onView(createdTag);
+                    await this.navigateToEditTag(createdTag);
 
                 } catch (error) {
                     const message = error?.response?.data?.message || error?.message || 'Something went wrong while creating tag';

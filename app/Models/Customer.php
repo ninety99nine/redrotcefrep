@@ -29,7 +29,6 @@ class Customer extends Model
             'birthday' => 'date',
             'total_orders' => 'integer',
             'last_order_at' => 'datetime',
-
             'total_spend' => Money::class,
             'total_average_spend' => Money::class,
             'mobile_number' => E164PhoneNumberCast::class,

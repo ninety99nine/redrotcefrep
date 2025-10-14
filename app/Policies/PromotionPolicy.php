@@ -78,6 +78,17 @@ class PromotionPolicy extends BasePolicy
     }
 
     /**
+     * Determine whether the user can update any promotions.
+     *
+     * @param User $user
+     * @return bool
+     */
+    public function updateAny(User $user): bool
+    {
+        return $this->isStoreUserWithPermission($user, 'manage promotions');
+    }
+
+    /**
      * Determine whether the user can delete any promotions.
      *
      * @param User $user

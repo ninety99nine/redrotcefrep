@@ -250,7 +250,7 @@
                     }
                 });
             },
-            async onView(category) {
+            async navigateToEditCategory(category) {
                 await this.$router.push({
                     name: 'edit-category',
                     params: {
@@ -342,7 +342,7 @@
 
                     this.notificationState.showSuccessNotification(`Category created`);
                     this.categoryState.saveOriginalState('Original category');
-                    await this.onView(createdCategory);
+                    await this.navigateToEditCategory(createdCategory);
 
                 } catch (error) {
                     const message = error?.response?.data?.message || error?.message || 'Something went wrong while creating category';

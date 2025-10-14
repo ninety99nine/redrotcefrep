@@ -12,6 +12,8 @@ use App\Http\Requests\Promotion\CreatePromotionRequest;
 use App\Http\Requests\Promotion\UpdatePromotionRequest;
 use App\Http\Requests\Promotion\DeletePromotionRequest;
 use App\Http\Requests\Promotion\DeletePromotionsRequest;
+use App\Http\Requests\Promotion\ImportPromotionsRequest;
+use App\Http\Requests\Promotion\UpdatePromotionsRequest;
 
 class PromotionController extends Controller
 {
@@ -53,6 +55,17 @@ class PromotionController extends Controller
     }
 
     /**
+     * Update promotions.
+     *
+     * @param UpdatePromotionsRequest $request
+     * @return array
+     */
+    public function updatePromotions(UpdatePromotionsRequest $request): array
+    {
+        return $this->service->updatePromotions($request->validated());
+    }
+
+    /**
      * Delete multiple promotions.
      *
      * @param DeletePromotionsRequest $request
@@ -62,6 +75,17 @@ class PromotionController extends Controller
     {
         $promotionIds = request()->input('promotion_ids', []);
         return $this->service->deletePromotions($promotionIds);
+    }
+
+    /**
+     * Import promotions from CSV.
+     *
+     * @param ImportPromotionsRequest $request
+     * @return array
+     */
+    public function importPromotions(ImportPromotionsRequest $request): array
+    {
+        return $this->service->importPromotions($request->validated());
     }
 
     /**

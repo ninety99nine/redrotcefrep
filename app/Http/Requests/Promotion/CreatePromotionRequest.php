@@ -26,7 +26,7 @@ class CreatePromotionRequest extends FormRequest
      *
      * @return array
      */
-    public function rules(): array
+    public function rules($importing = false): array
     {
         return [
             'name' => ['required', 'string', 'max:60'],
@@ -38,7 +38,7 @@ class CreatePromotionRequest extends FormRequest
             'discount_flat_rate' => ['nullable', 'numeric', 'min:0'],
             'offer_free_delivery' => ['nullable', 'boolean'],
             'activate_using_code' => ['nullable', 'boolean'],
-            'code' => ['nullable', 'string', 'max:20', 'unique:promotions,code'],
+            'code' => ['nullable', 'string', 'max:20', $importing ? null : 'unique:promotions,code'],
             'activate_using_minimum_grand_total' => ['nullable', 'boolean'],
             'minimum_grand_total' => ['nullable', 'numeric', 'min:0'],
             'currency' => ['nullable', 'string', 'size:3'],
@@ -55,13 +55,13 @@ class CreatePromotionRequest extends FormRequest
             'hours_of_day.*' => ['string', 'regex:/^([01]\d|2[0-3]):[0-5]\d$/'],
             'activate_using_days_of_the_week' => ['nullable', 'boolean'],
             'days_of_the_week' => ['nullable', 'array'],
-            'days_of_the_week.*' => ['string', 'in:monday,tuesday,wednesday,thursday,friday,saturday,sunday'],
+            'days_of_the_week.*' => ['string', 'in:Monday,Tuesday,Wednesday,Thursday,Friday,Saturday,Sunday'],
             'activate_using_days_of_the_month' => ['nullable', 'boolean'],
             'days_of_the_month' => ['nullable', 'array'],
-            'days_of_the_month.*' => ['integer', 'min:1', 'max:31'],
+            'days_of_the_month.*' => ['string', 'regex:/^(0[1-9]|[12]\d|3[01])$/'],
             'activate_using_months_of_the_year' => ['nullable', 'boolean'],
             'months_of_the_year' => ['nullable', 'array'],
-            'months_of_the_year.*' => ['integer', 'min:1', 'max:12'],
+            'months_of_the_year.*' => ['string', 'in:January,February,March,April,May,June,July,August,September,October,November,December'],
             'activate_for_new_customer' => ['nullable', 'boolean'],
             'activate_for_existing_customer' => ['nullable', 'boolean'],
             'activate_using_usage_limit' => ['nullable', 'boolean'],
@@ -104,15 +104,11 @@ class CreatePromotionRequest extends FormRequest
             'hours_of_day.array' => 'The hours of day must be an array.',
             'hours_of_day.*.regex' => 'Each hour of day must be in HH:MM format (e.g., 09:00).',
             'days_of_the_week.array' => 'The days of the week must be an array.',
-            'days_of_the_week.*.in' => 'Each day of the week must be one of: ' . Arr::join(DaysOfTheWeek::values(), ', ', ' or '),
+            'days_of_the_week.*.in' => 'Each day of the week must be one of: Monday, Tuesday, Wednesday, Thursday, Friday, Saturday, or Sunday',
             'days_of_the_month.array' => 'The days of the month must be an array.',
-            'days_of_the_month.*.integer' => 'Each day of the month must be an integer.',
-            'days_of_the_month.*.min' => 'Each day of the month must be at least 1.',
-            'days_of_the_month.*.max' => 'Each day of the month must not exceed 31.',
+            'days_of_the_month.*.regex' => 'Each day of the month must be a two-digit string (e.g., 01, 15).',
             'months_of_the_year.array' => 'The months of the year must be an array.',
-            'months_of_the_year.*.integer' => 'Each month of the year must be an integer.',
-            'months_of_the_year.*.min' => 'Each month of the year must be at least 1.',
-            'months_of_the_year.*.max' => 'Each month of the year must not exceed 12.',
+            'months_of_the_year.*.in' => 'Each month of the year must be one of: January, February, March, April, May, June, July, August, September, October, November, or December',
             'store_id.required' => 'The store ID is required.',
             'store_id.uuid' => 'The store ID must be a valid UUID.',
             'user_id.uuid' => 'The user ID must be a valid UUID.',

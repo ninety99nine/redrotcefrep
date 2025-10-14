@@ -9,7 +9,9 @@ Route::prefix('promotions')
     ->group(function () {
         Route::get('/', 'showPromotions')->name('show.promotions');
         Route::post('/', 'createPromotion')->name('create.promotion');
+        Route::put('/', 'updatePromotions')->name('update.promotions');
         Route::delete('/', 'deletePromotions')->name('delete.promotions');
+        Route::post('/import', 'importPromotions')->name('import.promotions');
 
         //  Explicit route model binding applied: AppServiceProvider.php
         Route::prefix('{promotion}')->group(function () {

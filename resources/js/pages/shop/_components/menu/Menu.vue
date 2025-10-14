@@ -1,8 +1,8 @@
 <template>
     <div :style="{ height: '65px' }" class="relative">
-        <div :class="[menuClass, 'fixed top-0 left-0 right-0 z-10 boder-b flex items-center justify-between bg-white shadow p-4 mx-auto']">
+        <div :class="[menuClass, 'fixed top-0 left-0 right-0 z-10 boder-b flex items-center justify-between space-x-2 bg-white shadow p-4 mx-auto']">
             <MenuButton></MenuButton>
-            <div class="flex items-center justify-between space-x-4">
+            <div class="flex items-center justify-between space-x-2">
                 <LoginButton v-if="onStorefront"></LoginButton>
                 <HomeButton v-if="!onStorefront"></HomeButton>
                 <SearchButton v-if="!onSearchPage"></SearchButton>

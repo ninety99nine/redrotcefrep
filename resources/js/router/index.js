@@ -344,6 +344,36 @@ const routes = [
                 ]
             },
             {
+                path: 'promotions',
+                children: [
+                    {
+                        path: '',
+                        name: 'show-promotions',
+                        component: () => import('@Pages/promotions/Promotions.vue')
+                    },
+                    {
+                        path: 'create',
+                        name: 'create-promotion',
+                        component: () => import('@Pages/promotions/promotion/Promotion.vue')
+                    },
+                    {
+                        path: 'import-promotions',
+                        name: 'import-promotions',
+                        component: () => import('@Pages/promotions/import-promotions/ImportPromotions.vue')
+                    },
+                    {
+                        path: 'bulk-edit',
+                        name: 'bulk-edit-promotions',
+                        component: () => import('@Pages/promotions/bulk-edit-promotions/BulkEditPromotions.vue')
+                    },
+                    {
+                        path: ':promotion_id',
+                        name: 'edit-promotion',
+                        component: () => import('@Pages/promotions/promotion/Promotion.vue')
+                    }
+                ]
+            },
+            {
                 path: 'categories',
                 children: [
                     {
