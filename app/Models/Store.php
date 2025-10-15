@@ -134,7 +134,7 @@ class Store extends Model
      */
     public function users(): BelongsToMany
     {
-        return $this->belongsToMany(User::class)
+        return $this->belongsToMany(User::class, 'store_user')
                     ->using(StoreUser::class)
                     ->withTimestamps()
                     ->as('store_user');
@@ -157,7 +157,7 @@ class Store extends Model
      */
     public function followers(): BelongsToMany
     {
-        return $this->belongsToMany(User::class)
+        return $this->belongsToMany(User::class, 'store_follower')
                     ->using(StoreFollower::class)
                     ->as('store_follower')
                     ->withTimestamps();
@@ -180,7 +180,7 @@ class Store extends Model
      */
     public function visitors(): BelongsToMany
     {
-        return $this->belongsToMany(User::class)
+        return $this->belongsToMany(User::class, 'store_visitor')
                     ->using(StoreVisitor::class)
                     ->as('store_visitor')
                     ->withPivot([

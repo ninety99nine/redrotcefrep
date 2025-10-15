@@ -142,7 +142,7 @@
             }
         },
         methods: {
-            isEmpty: isEmpty,
+            isEmpty,
             navigateToStorefront() {
                 this.$router.push({
                     name: 'show-storefront',

@@ -84,7 +84,7 @@
             }
         },
         methods: {
-            isNotEmpty: isNotEmpty,
+            isNotEmpty,
             handleLink(e) {
                 if(!this.hasLink) {
                     e.preventDefault();

@@ -311,8 +311,8 @@
             }
         },
         methods: {
-            isEmpty: isEmpty,
-            isNotEmpty: isNotEmpty,
+            isEmpty,
+            isNotEmpty,
             addProduct() {
                 this.products.push({
                     id: null,

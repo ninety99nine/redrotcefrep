@@ -58,7 +58,10 @@ class User extends Authenticatable
      */
     public function stores(): BelongsToMany
     {
-        return $this->belongsToMany(Store::class, 'store_user')->withTimestamps();
+        return $this->belongsToMany(Store::class, 'store_follower')
+                    ->using(StoreFollower::class)
+                    ->as('store_follower')
+                    ->withTimestamps();
     }
 
     /**
@@ -78,7 +81,12 @@ class User extends Authenticatable
      */
     public function visitedStores(): BelongsToMany
     {
-        return $this->belongsToMany(Store::class, 'store_visitor')->withPivot('guest_id', 'last_visited_at');
+        return $this->belongsToMany(Store::class, 'store_visitor')
+                    ->using(StoreVisitor::class)
+                    ->as('store_visitor')
+                    ->withPivot([
+                        'guest_id', 'last_visited_at'
+                    ]);
     }
 
     /**

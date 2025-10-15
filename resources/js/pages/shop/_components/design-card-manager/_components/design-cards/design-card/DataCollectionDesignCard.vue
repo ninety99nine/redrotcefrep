@@ -288,7 +288,7 @@
             }
         },
         methods: {
-            isNotEmpty: isNotEmpty,
+            isNotEmpty,
             setAddress(address) {
 
             },

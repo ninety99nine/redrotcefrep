@@ -122,7 +122,7 @@
             }
         },
         methods: {
-            formattedRelativeDate: formattedRelativeDate,
+            formattedRelativeDate,
             formattedShortWeekday: formattedShortWeekday,
             onIsLoadingDateOptions(isLoading) {
                 this.testDeliveryDate = null;

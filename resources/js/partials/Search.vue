@@ -295,7 +295,7 @@
             }
         },
         methods: {
-            isNotEmpty: isNotEmpty,
+            isNotEmpty,
             openDropdown() {
                 this.isOpen = true;
             },

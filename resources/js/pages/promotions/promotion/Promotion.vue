@@ -830,7 +830,7 @@
             }
         },
         methods: {
-            isEmpty: isEmpty,
+            isEmpty,
             goBack() {
                 this.navigateToPromotions();
             },

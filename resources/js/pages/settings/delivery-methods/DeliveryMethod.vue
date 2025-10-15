@@ -613,7 +613,7 @@
             }
         },
         methods: {
-            isEmpty: isEmpty,
+            isEmpty,
             setup() {
                 this.deliveryMethodState.setDeliveryMethodForm(null, true);
                 if(this.store && this.deliveryMethodId) this.showDeliveryMethod();

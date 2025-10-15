@@ -274,7 +274,7 @@
             }
         },
         methods: {
-            isEmpty: isEmpty,
+            isEmpty,
             goBack() {
                 this.navigateToCustomers();
             },

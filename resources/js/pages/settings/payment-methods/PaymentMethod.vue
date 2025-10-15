@@ -284,7 +284,7 @@ import cloneDeep from 'lodash.clonedeep';
             }
         },
         methods: {
-            isEmpty: isEmpty,
+            isEmpty,
             capitalize: capitalize,
             setup() {
                 this.storePaymentMethodState.setStorePaymentMethodForm(null, null, true);

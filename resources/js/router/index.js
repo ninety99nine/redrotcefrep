@@ -50,21 +50,25 @@ const routes = [
                 path: '',
                 name: 'show-storefront',
                 component: () => import('@Pages/shop/storefront/Storefront.vue'),
+                meta: { title: 'Storefront' }
             },
             {
                 path: 'search',
                 name: 'show-search',
                 component: () => import('@Pages/shop/search/Search.vue'),
+                meta: { title: 'Search' }
             },
             {
                 path: 'checkout',
                 name: 'show-checkout',
                 component: () => import('@Pages/shop/checkout/Checkout.vue'),
+                meta: { title: 'Checkout' }
             },
             {
                 path: 'login',
                 name: 'show-login',
                 component: () => import('@Pages/shop/login/Login.vue'),
+                meta: { title: 'Login' }
             },
             {
                 path: 'orders',
@@ -76,6 +80,7 @@ const routes = [
                                 path: '',
                                 name: 'show-shop-order',
                                 component: () => import('@Pages/shop/orders/Order.vue'),
+                                meta: { title: 'Order summary' }
                             },
                             {
                                 path: 'pay',
@@ -84,21 +89,25 @@ const routes = [
                                         path: '',
                                         name: 'show-shop-payment-methods',
                                         component: () => import('@Pages/shop/payments/PaymentMethods.vue'),
+                                        meta: { title: 'Payment methods' }
                                     },
                                     {
                                         path: ':store_payment_method_id',
                                         name: 'show-shop-payment-method',
                                         component: () => import('@Pages/shop/payments/PaymentMethod.vue'),
+                                        meta: { title: 'Payment method' }
                                     },
                                     {
                                         path: 'pending',
                                         name: 'show-shop-pending-payment',
                                         component: () => import('@Pages/shop/payments/PendingPayment.vue'),
+                                        meta: { title: 'Pending payment' }
                                     },
                                     {
                                         path: 'confirming',
                                         name: 'show-shop-confirming-payment',
                                         component: () => import('@Pages/shop/payments/ConfirmingPayment.vue'),
+                                        meta: { title: 'Confirming payment' }
                                     }
                                 ]
                             },
@@ -116,6 +125,7 @@ const routes = [
                                 path: '',
                                 name: 'show-shop-product',
                                 component: () => import('@Pages/shop/products/Product.vue'),
+                                meta: { title: 'Product' }
                             }
                         ]
                     }
@@ -131,8 +141,26 @@ const routes = [
                                 path: '',
                                 name: 'show-shop-category',
                                 component: () => import('@Pages/shop/categories/Category.vue'),
+                                meta: { title: 'Category' }
                             }
                         ]
+                    }
+                ]
+            },
+            {
+                path: 'reviews',
+                children: [
+                    {
+                        path: '',
+                        name: 'show-shop-reviews',
+                        component: () => import('@Pages/shop/reviews/Reviews.vue'),
+                        meta: { title: 'Customer reviews' }
+                    },
+                    {
+                        path: 'create',
+                        name: 'create-shop-review',
+                        component: () => import('@Pages/shop/reviews/CreateReview.vue'),
+                        meta: { title: 'Write a review' }
                     }
                 ]
             }
@@ -394,6 +422,36 @@ const routes = [
                 ]
             },
             {
+                path: 'reviews',
+                children: [
+                    {
+                        path: '',
+                        name: 'show-reviews',
+                        component: () => import('@Pages/reviews/Reviews.vue')
+                    },
+                    {
+                        path: 'create',
+                        name: 'create-review',
+                        component: () => import('@Pages/reviews/review/Review.vue')
+                    },
+                    {
+                        path: ':review_id',
+                        name: 'edit-review',
+                        component: () => import('@Pages/reviews/review/Review.vue')
+                    }
+                ]
+            },
+            {
+                path: 'analytics',
+                children: [
+                    {
+                        path: '',
+                        name: 'show-analytics',
+                        component: () => import('@Pages/analytics/Analytics.vue')
+                    }
+                ]
+            },
+            {
                 path: 'marketing',
                 children: [
                     {
@@ -607,6 +665,17 @@ const router = createRouter({
             return { top: 0 };
         }
     },
+});
+
+// Axios interceptor to add custom headers
+axios.interceptors.request.use(config => {
+    /**
+     *  Headers to capture and send page views to the backend.
+     */
+    const currentRoute = router.currentRoute.value;
+    config.headers['frontend-page-url'] = currentRoute.fullPath || '/';
+    config.headers['frontend-page-name'] = currentRoute.meta?.title || currentRoute.name || 'Unknown Page';
+    return config;
 });
 
 router.beforeEach(async (to, from, next) => {

@@ -29,13 +29,11 @@
             $route(to, from) {
                 this.orderAgain = from.name === 'show-shop-order' && to.name === 'show-checkout';
 
-                // Trigger store fetch only if alias changes
-                const oldAlias = from.params.alias || null;
-                const newAlias = to.params.alias || null;
-
-                if (newAlias !== oldAlias) {
-                    this.showStore();
-                }
+                /**
+                 *  Get the store again so that we can update the page views on the server.
+                 *  Refer to: Middleware -> RecordStoreVisit
+                 */
+                this.showStore();
             },
             orderId(newVal) {
                 const orderToOrderAgain = this.orderAgain ? this.order : null;
@@ -101,7 +99,7 @@
             async showStore() {
                 try {
 
-                    this.storeState.isLoadingStore = true;
+                    if(!this.store) this.storeState.isLoadingStore = true;
 
                     let config = {
                         params: {

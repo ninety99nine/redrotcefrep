@@ -15,6 +15,13 @@ class StoreVisitor extends Model
     protected $table = 'store_visitor';
 
     /**
+     * Disable automatic timestamps since this table doesn't have created_at/updated_at columns
+     *
+     * @var bool
+     */
+    public $timestamps = false;
+
+    /**
      * The attributes that should be cast.
      *
      * @var array

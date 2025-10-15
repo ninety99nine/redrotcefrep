@@ -246,7 +246,7 @@
             }
         },
         methods: {
-            isEmpty: isEmpty,
+            isEmpty,
             reset() {
                 this.form.photos = [];
                 this.form.comment = '';

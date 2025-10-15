@@ -4,9 +4,8 @@ import { useChangeHistoryStore as changeHistoryState } from '@Stores/change-hist
 export const usePromotionStore = defineStore('promotion', {
     state: () => ({
         promotion: null,
-        promotionForm: null,
         promotionForms: [],
-        isUploading: false,
+        promotionForm: null,
         isLoadingPromotion: false,
         isCreatingPromotion: false,
         isUpdatingPromotion: false,
@@ -15,9 +14,8 @@ export const usePromotionStore = defineStore('promotion', {
     actions: {
         reset() {
             this.promotion = null;
-            this.promotionForm = null;
             this.promotionForms = [];
-            this.isUploading = false;
+            this.promotionForm = null;
             this.isLoadingPromotion = false;
             this.isCreatingPromotion = false;
             this.isUpdatingPromotion = false;

@@ -144,7 +144,7 @@
             };
         },
         methods: {
-            isEmpty: isEmpty,
+            isEmpty,
             goToLogin() {
                 this.$router.push({ name: 'login' });
             },

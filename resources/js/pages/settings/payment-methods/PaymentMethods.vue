@@ -331,7 +331,7 @@
             },
         },
         methods: {
-            isNotEmpty: isNotEmpty,
+            isNotEmpty,
             capitalize: capitalize,
             setup() {
                 if(this.store) {

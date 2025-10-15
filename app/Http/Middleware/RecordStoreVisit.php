@@ -5,12 +5,15 @@ namespace App\Http\Middleware;
 use Closure;
 use App\Models\User;
 use App\Models\Store;
+use App\Models\PageView;
 use App\Enums\CacheName;
+use App\Models\StoreVisitor;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use App\Services\CacheService;
 use App\Services\UssdService;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -30,68 +33,121 @@ class RecordStoreVisit
 
         /** @var User $user */
         $user = Auth::user();
-
-        // Get the resolved store from the route parameter
         $store = $request->route('store');
 
-        // Record the visit if a valid Store instance is found
-        if ($store instanceof Store) {
+        if ($store instanceof Store /* && $request->header('DNT') !== '1' */) {
 
-            //  Handle authenticated user
-            if($user) {
+            // Get or generate session ID
+            $sessionId = $user ? $user->id : ($request->cookie('guest_id') ?? $request->header('X-Guest-ID', Str::uuid()->toString()));
 
-                $cacheManager = (new CacheService(CacheName::STORE_VISIT))->append($user->id)->append($store->id);
+            // Optimize cookie setting
+            if (!$user && !$request->cookie('guest_id')) {
 
-                if(!$cacheManager->has()) {
+                $response->withCookie(new Cookie(
+                    name: 'guest_id',
+                    value: $sessionId,
+                    expire: now()->addDays(30)->getTimestamp(),
+                    path: '/',
+                    domain: null,
+                    secure: config('session.secure', false),
+                    httpOnly: true,
+                    sameSite: 'Lax'
+                ));
 
-                    $user->visitedStores()->syncWithoutDetaching([$store->id => [
-                        'id' => Str::uuid(),
-                        'last_visited_at' => now(),
-                    ]]);
+            }
 
-                    $cacheManager->put(true, now()->addHour());
+            // Validate frontend headers
+            $pageUrl = $request->headers->get('frontend-page-url');
+            $pageName = $request->headers->get('frontend-page-name');
 
-                    //  Forget cache
-                    (new UssdService)->cacheManager($user)->forget();
+            if(!empty($pageName) && !empty($pageUrl)) {
 
-                }
+                // Record page view
+                $cacheManager = (new CacheService(CacheName::PAGE_VIEW))->append($sessionId)->append($store->id)->append($pageName);
 
-            //  Handle unauthenticated user
-            }else{
+                if (!$cacheManager->has()) {
 
-                // Skip tracking if DoNotTrack header is set
-                if ($request->header('DNT') !== '1') {
+                    try {
 
-                    // Get guest_id from cookie or X-Guest-ID header, or generate new UUID
-                    $guestId = $request->cookie('guest_id') ?? $request->header('X-Guest-ID', Str::uuid()->toString());
-
-                    // Set the guest_id cookie in the response (30-day expiration)
-                    $response->withCookie(new Cookie(
-                        name: 'guest_id',
-                        value: $guestId,
-                        expire: now()->addDays(30)->getTimestamp(),
-                        path: '/',
-                        domain: null,
-                        secure: config('session.secure', false),
-                        httpOnly: true,
-                        sameSite: 'Lax'
-                    ));
-
-                    $cacheManager = (new CacheService(CacheName::STORE_VISIT))->append('guest')->append($guestId)->append($store->id);
-
-                    if(!$cacheManager->has()) {
-
-                        $store->visitors()->syncWithoutDetaching([null => [
+                        PageView::create([
                             'id' => Str::uuid(),
-                            'guest_id' => $guestId,
-                            'last_visited_at' => now(),
-                        ]]);
+                            'store_id' => $store->id,
+                            'session_id' => $sessionId,
+                            'url' => $pageUrl,
+                            'name' => $pageName,
+                            'referrer' => $request->header('referer')
+                        ]);
 
                         $cacheManager->put(true, now()->addHour());
 
+                    } catch (\Exception $e) {
+
+                        Log::error('Failed to record page view: ' . $e->getMessage());
+
+                    }
+                }
+
+            }
+
+            // Record store visit
+            if ($user) {
+
+                $cacheManager = (new CacheService(CacheName::STORE_VISIT))->append($user->id)->append($store->id);
+
+                if (!$cacheManager->has()) {
+
+                    try {
+
+                        StoreVisitor::updateOrCreate(
+                            [
+                                'store_id' => $store->id,
+                                'user_id' => $user->id,
+                                'guest_id' => null
+                            ],
+                            [
+                                'id' => Str::uuid(),
+                                'last_visited_at' => now()
+                            ]
+                        );
+
+                        $cacheManager->put(true, now()->addHour());
+
+                        (new UssdService)->cacheManager($user)->forget();
+
+                    } catch (\Exception $e) {
+                        Log::error('Failed to record store visit: ' . $e->getMessage());
                     }
 
                 }
+
+            } else {
+
+                $cacheManager = (new CacheService(CacheName::STORE_VISIT))->append('guest')->append($sessionId)->append($store->id);
+
+                if (!$cacheManager->has()) {
+
+                    try {
+
+                        StoreVisitor::updateOrCreate(
+                            [
+                                'store_id' => $store->id,
+                                'guest_id' => $sessionId,
+                                'user_id' => null
+                            ],
+                            [
+                                'id' => Str::uuid(),
+                                'last_visited_at' => now()
+                            ]
+                        );
+
+                        $cacheManager->put(true, now()->addHour());
+
+                    } catch (\Exception $e) {
+                        Log::error('Failed to record store visit: ' . $e->getMessage());
+                    }
+
+                }
+
             }
 
         }

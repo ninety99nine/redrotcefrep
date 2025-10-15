@@ -64,7 +64,7 @@
             }
         },
         methods: {
-            isEmpty: isEmpty,
+            isEmpty,
             async createOrder() {
 
                 try {

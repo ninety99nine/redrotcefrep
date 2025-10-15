@@ -7,7 +7,7 @@
 
         <div class="relative bg-white/80 p-4 rounded-md">
 
-            <h1 class="text-lg text-gray-700 font-semibold mb-4">Categories</h1>
+            <h1 class="text-lg font-semibold mb-4">Categories</h1>
 
             <!-- Categories Table -->
             <Table
@@ -503,9 +503,9 @@
             },
         },
         methods: {
-            isNotEmpty: isNotEmpty,
-            formattedDatetime: formattedDatetime,
-            formattedRelativeDate: formattedRelativeDate,
+            isNotEmpty,
+            formattedDatetime,
+            formattedRelativeDate,
             prepareColumns() {
                 const columnNames = ['Name', 'Description', 'Visibility', 'Products', 'Created Date'];
                 const defaultColumnNames  = ['Name', 'Visibility', 'Products', 'Created Date'];

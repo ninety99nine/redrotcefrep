@@ -258,7 +258,7 @@
             }
         },
         methods: {
-            isNotEmpty: isNotEmpty,
+            isNotEmpty,
             onToggleExpansion(index) {
                 for (let i = 0; i < this.designCards.length; i++) {
                     if(i === index) {

@@ -148,7 +148,7 @@
             }
         },
         methods: {
-            formattedDatetime: formattedDatetime,
+            formattedDatetime,
             navigateToPricingPlans() {
                 this.$router.push({
                     name: 'show-pricing-plans',

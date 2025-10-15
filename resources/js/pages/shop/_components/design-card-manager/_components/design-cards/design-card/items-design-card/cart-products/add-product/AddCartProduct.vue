@@ -150,7 +150,7 @@
             },
         },
         methods: {
-            isNotEmpty: isNotEmpty,
+            isNotEmpty,
             onShow() {
                 this.hasLoadedInitialProducts = false;
                 this.selectedProduct = null;

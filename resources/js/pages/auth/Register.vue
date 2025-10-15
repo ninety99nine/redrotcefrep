@@ -130,7 +130,7 @@
             }
         },
         methods: {
-            isEmpty: isEmpty,
+            isEmpty,
             async submit() {
 
                 if (this.loading) return;

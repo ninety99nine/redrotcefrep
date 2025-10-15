@@ -2,7 +2,7 @@
 
     <div class="bg-white rounded-lg p-4 shadow-sm">
 
-        <h1 class="text-lg text-gray-700 font-semibold mb-4">Products</h1>
+        <h1 class="text-lg font-semibold mb-4">Products</h1>
 
         <!-- Order Products (Loading Placeholder) -->
         <div v-if="isLoadingStore || isLoadingOrder || (isEditting && !hasOrder)" class="space-y-2">

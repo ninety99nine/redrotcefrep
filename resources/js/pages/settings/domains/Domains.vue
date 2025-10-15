@@ -201,7 +201,7 @@
             }
         },
         methods: {
-            formattedDatetime: formattedDatetime,
+            formattedDatetime,
             setup() {
                 if (this.store) {
                     this.showDomains();

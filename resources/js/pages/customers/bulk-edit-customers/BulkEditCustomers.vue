@@ -7,7 +7,7 @@
 
         <div class="relative bg-white/80 p-4 rounded-md">
 
-            <h1 class="text-lg text-gray-700 font-semibold mb-4">Bulk Edit</h1>
+            <h1 class="text-lg font-semibold mb-4">Bulk Edit</h1>
 
             <!-- Customers Table -->
             <Table
@@ -452,7 +452,7 @@
             },
         },
         methods: {
-            isNotEmpty: isNotEmpty,
+            isNotEmpty,
             prepareColumns() {
                 const columnNames = ['First Name', 'Last Name', 'Mobile', 'Email', 'Birthday', 'Notes', 'Referral Code'];
                 const defaultColumnNames  = ['First Name', 'Last Name', 'Mobile', 'Email', 'Birthday', 'Notes', 'Referral Code'];

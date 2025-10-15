@@ -7,7 +7,7 @@
 
                 <div class="border-b border-gray-300 rounded-l-md mb-4">
 
-                    <h1 class="text-lg text-gray-700 font-semibold mb-4">Design</h1>
+                    <h1 class="text-lg font-semibold mb-4">Design</h1>
 
                     <div class="flex items-center justify-between space-x-8">
 
@@ -62,8 +62,7 @@
                     { label: 'Storefront', value: 'edit-storefront'},
                     { label: 'Checkout', value: 'edit-checkout'},
                     { label: 'Payment', value: 'edit-payment'},
-                    { label: 'Menu', value: 'edit-menu'},
-                    { label: 'Appearance', value: 'edit-appearance'},
+                    { label: 'Menu', value: 'edit-menu'}
                 ]
             }
         },

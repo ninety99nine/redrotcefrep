@@ -7,7 +7,7 @@
 
         <div class="relative bg-white/80 p-4 rounded-md">
 
-            <h1 class="text-lg text-gray-700 font-semibold mb-4">Orders</h1>
+            <h1 class="text-lg font-semibold mb-4">Orders</h1>
 
             <!-- Orders Table -->
             <Table
@@ -828,9 +828,9 @@
             },
         },
         methods: {
-            isNotEmpty: isNotEmpty,
-            formattedDatetime: formattedDatetime,
-            formattedRelativeDate: formattedRelativeDate,
+            isNotEmpty,
+            formattedDatetime,
+            formattedRelativeDate,
             prepareColumns() {
                 const columnNames = ['Number', 'Customer', 'Summary', 'Status', 'Payment Status', 'Collection Status', 'Grand Total', 'Paid', 'Outstanding', 'Customer Note', 'Created Date'];
                 const defaultColumnNames  = ['Number', 'Customer', 'Summary', 'Status', 'Grand Total', 'Created Date'];

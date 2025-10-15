@@ -73,7 +73,9 @@
             <!-- Copy & Share Link -->
             <div class="bg-white space-y-4 py-3 px-4 shadow-sm rounded-xl transition-all duration-300 border border-transparent hover:border-gray-300 hover:shadow-lg relative">
 
-                <div class="flex items-center gap-8">
+                <div
+                    v-if="store"
+                    class="flex items-center gap-8">
 
                     <!-- Link Icon -->
                     <Link size="24"></Link>
@@ -220,7 +222,13 @@
             store() {
                 return this.storeState.store;
             },
+            isLoadingStore() {
+                return this.storeState.isLoadingStore;
+            },
             socialPlatforms() {
+
+                if(!this.store) return [];
+
                 return [
                     {
                         name: 'Facebook',
@@ -267,9 +275,13 @@
                         link: `https://t.me/share/url?url=${encodeURIComponent(this.store.web_link)}`
                     }
                 ];
+
             }
         },
         methods: {
+            visitCanva() {
+                window.open('https://www.canva.com/templates/?query=qr-code', '_blank');
+            },
             async navigateToShowDomains() {
                 await this.$router.push({
                     name: 'show-domains',

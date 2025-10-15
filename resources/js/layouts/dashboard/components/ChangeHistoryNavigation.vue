@@ -112,7 +112,7 @@
             },
         },
         methods: {
-            formattedRelativeDate: formattedRelativeDate,
+            formattedRelativeDate,
             hideDropdown() {
                 this.$refs.dropdown.hideDropdown();
             },

@@ -135,7 +135,7 @@
             },
         },
         methods: {
-            isNotEmpty: isNotEmpty,
+            isNotEmpty,
             onShow() {
                 this.hasLoadedInitialPromotions = false;
                 this.lastSearchTerm = null;

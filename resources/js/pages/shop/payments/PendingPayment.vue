@@ -327,7 +327,7 @@
             }
         },
         methods: {
-            isNotEmpty: isNotEmpty,
+            isNotEmpty,
             setup() {
                 if(this.store && this.order) {
                     this.generateQRCode();

@@ -72,7 +72,7 @@
             }
         },
         methods: {
-            isNotEmpty: isNotEmpty,
+            isNotEmpty,
         }
     }
 </script>

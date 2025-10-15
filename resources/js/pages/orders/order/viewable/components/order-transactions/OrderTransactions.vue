@@ -289,7 +289,7 @@
             }
         },
         methods: {
-            isEmpty: isEmpty,
+            isEmpty,
             reset() {
                 this.form.photo = [];
                 this.form.amount = '0.00';

@@ -286,8 +286,8 @@
             }
         },
         methods: {
-            isEmpty: isEmpty,
-            isNotEmpty: isNotEmpty,
+            isEmpty,
+            isNotEmpty,
             async goBack() {
                 if(this.viewMode === 'search') {
                     this.navigateToShowDomains();

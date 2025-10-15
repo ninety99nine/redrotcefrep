@@ -374,7 +374,7 @@
             }
         },
         methods: {
-            isNotEmpty: isNotEmpty,
+            isNotEmpty,
             openDropdown() {
                 if (this.disabled) return;
                 if (!this.isOpen) {

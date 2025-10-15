@@ -121,8 +121,8 @@
             },
         },
         methods: {
-            isEmpty: isEmpty,
-            isNotEmpty: isNotEmpty,
+            isEmpty,
+            isNotEmpty,
             prepareEmail() {
                 this.body = this.generateBody();
                 this.subject = this.generateSubject();

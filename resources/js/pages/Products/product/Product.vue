@@ -1008,7 +1008,7 @@
             }
         },
         methods: {
-            isEmpty: isEmpty,
+            isEmpty,
             goBack() {
                 this.navigateToProducts();
             },

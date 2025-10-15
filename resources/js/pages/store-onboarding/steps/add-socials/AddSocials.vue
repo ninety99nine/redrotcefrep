@@ -179,8 +179,8 @@
             }
         },
         methods: {
-            isEmpty: isEmpty,
-            isNotEmpty: isNotEmpty,
+            isEmpty,
+            isNotEmpty,
             hasMatchingPlatformValidationError(name) {
                 return this.designCardPlatformValidationErrors.some(validationError => validationError.name === name);
             },

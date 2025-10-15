@@ -55,7 +55,7 @@
             }
         },
         methods: {
-            isEmpty: isEmpty,
+            isEmpty,
             setup() {
                 if(this.store) {
                     this.storeState.setStoreForm(this.store, true);

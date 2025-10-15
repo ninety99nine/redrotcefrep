@@ -312,7 +312,7 @@
             }
         },
         methods: {
-            isNotEmpty: isNotEmpty,
+            isNotEmpty,
             refresh() {
                 if(!this.localIsLoading) this.$emit('refresh');
             },

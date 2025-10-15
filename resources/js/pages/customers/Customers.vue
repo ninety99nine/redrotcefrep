@@ -7,7 +7,7 @@
 
         <div class="relative bg-white/80 p-4 rounded-md">
 
-            <h1 class="text-lg text-gray-700 font-semibold mb-4">Customers</h1>
+            <h1 class="text-lg font-semibold mb-4">Customers</h1>
 
             <!-- Customers Table -->
             <Table
@@ -677,10 +677,10 @@
             },
         },
         methods: {
-            isNotEmpty: isNotEmpty,
-            formattedDate: formattedDate,
-            formattedDatetime: formattedDatetime,
-            formattedRelativeDate: formattedRelativeDate,
+            isNotEmpty,
+            formattedDate,
+            formattedDatetime,
+            formattedRelativeDate,
             prepareColumns() {
                 const columnNames = ['Name', 'Mobile', 'Email', 'Birthday', 'Notes', 'Orders', 'Total Spend', 'Total Avg Spend', 'Last Order Date', 'Referral Code', 'Created Date'];
                 const defaultColumnNames  = ['Name', 'Mobile', 'Email', 'Orders', 'Total Spend', 'Created Date'];

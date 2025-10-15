@@ -320,8 +320,8 @@
             }
         },
         methods: {
-            isEmpty: isEmpty,
-            isNotEmpty: isNotEmpty,
+            isEmpty,
+            isNotEmpty,
             setup() {
                 this.domainState.setDomainForm(null, true);
 

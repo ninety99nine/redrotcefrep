@@ -260,7 +260,7 @@
             }
         },
         methods: {
-            isNotEmpty: isNotEmpty,
+            isNotEmpty,
             setup() {
                 if(this.store) {
                     if(!this.hasCategories) this.showCategories();

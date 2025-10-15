@@ -138,7 +138,7 @@
             },
         },
         methods: {
-            isNotEmpty: isNotEmpty,
+            isNotEmpty,
             onShow() {
                 this.hasLoadedInitialCustomers = false;
                 this.lastSearchTerm = null;

@@ -288,8 +288,8 @@
             },
         },
         methods: {
-            formattedDatetime: formattedDatetime,
-            formattedRelativeDate: formattedRelativeDate,
+            formattedDatetime,
+            formattedRelativeDate,
             setup() {
                 if(this.store && this.order) {
                     this.generateQRCode();

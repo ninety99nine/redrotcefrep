@@ -25,6 +25,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
 use App\Http\Resources\StoreResource;
 use App\Http\Resources\StoreResources;
+use Illuminate\Http\Request;
 
 class StoreService extends BaseService
 {
@@ -95,6 +96,7 @@ class StoreService extends BaseService
         $permissions = [
             'manage store',
             'view orders', 'manage orders',
+            'view reviews', 'manage reviews',
             'view products', 'manage products',
             'view customers', 'manage customers',
             'view promotions', 'manage promotions',
@@ -175,6 +177,9 @@ class StoreService extends BaseService
                     ->with($this->getRequestRelationships())
                     ->withCount($this->getRequestCountableRelationships())
                     ->firstOrFail();
+
+        // Set the resolved store as the 'store' route parameter for use by the RecordStoreVisit middleware
+        request()->route()->setParameter('store', $store);
 
         return $this->showResource($store);
     }

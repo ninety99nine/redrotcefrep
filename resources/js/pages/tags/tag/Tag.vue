@@ -223,7 +223,7 @@
             },
         },
         methods: {
-            isEmpty: isEmpty,
+            isEmpty,
             goBack() {
                 this.navigateToTags();
             },

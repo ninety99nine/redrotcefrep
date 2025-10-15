@@ -131,8 +131,8 @@
             }
         },
         methods: {
-            isEmpty: isEmpty,
-            isNotEmpty: isNotEmpty,
+            isEmpty,
+            isNotEmpty,
             syncWithAlias() {
                 if(this.aliasModified == false) {
                     this.form.alias = this.form.name;

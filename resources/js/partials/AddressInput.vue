@@ -369,7 +369,7 @@
             },
         },
         methods: {
-            isNotEmpty: isNotEmpty,
+            isNotEmpty,
             showModal() {
                 this.step = 1;
                 this.copyOriginalForm();

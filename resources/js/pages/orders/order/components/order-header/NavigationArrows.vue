@@ -99,7 +99,7 @@
             }
         },
         methods: {
-            isNotEmpty: isNotEmpty,
+            isNotEmpty,
             onView(direction) {
 
                 let currentIndex = this.pagination.data.findIndex(orderId => orderId === this.order.id);

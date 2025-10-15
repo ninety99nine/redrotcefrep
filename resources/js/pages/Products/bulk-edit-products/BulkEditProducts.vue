@@ -7,7 +7,7 @@
 
         <div class="relative bg-white/80 p-4 rounded-md">
 
-            <h1 class="text-lg text-gray-700 font-semibold mb-4">Bulk Edit</h1>
+            <h1 class="text-lg font-semibold mb-4">Bulk Edit</h1>
 
             <!-- Products Table -->
             <Table
@@ -996,7 +996,7 @@
             },
         },
         methods: {
-            isNotEmpty: isNotEmpty,
+            isNotEmpty,
             async setTags() {
                 if(!this.store || this.tags.length) return;
                 this.tagOptions = this.store.product_tags.map((tag) => {

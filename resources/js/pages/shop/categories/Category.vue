@@ -217,7 +217,7 @@
             }
         },
         methods: {
-            isNotEmpty: isNotEmpty,
+            isNotEmpty,
             setup() {
                 if (this.store) {
                     if (!this.category) this.showCategory();

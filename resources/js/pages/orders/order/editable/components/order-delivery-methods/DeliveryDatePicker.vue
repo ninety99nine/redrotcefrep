@@ -124,7 +124,7 @@
             },
         },
         methods: {
-            formattedDate: formattedDate,
+            formattedDate,
             setIsLoading(status) {
                 this.isLoading = status;
                 this.$emit('isLoading', status);

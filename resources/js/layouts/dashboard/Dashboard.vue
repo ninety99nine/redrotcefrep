@@ -230,6 +230,9 @@
                                 <!-- Reviews Icon -->
                                 <Star v-else-if="navMenu.name == 'Reviews'" size="20"></Star>
 
+                                <!-- Analytics Icon -->
+                                <ChartArea v-else-if="navMenu.name == 'Analytics'" size="20"></ChartArea>
+
                                 <!-- Transactions Icon -->
                                 <Banknote v-else-if="navMenu.name == 'Transactions'" size="20"></Banknote>
 
@@ -318,12 +321,12 @@
     import StoreLogo from '@Components/StoreLogo.vue';
     import Notifications from '@Layouts/dashboard/components/Notifications.vue';
     import ChangeHistoryNavigation from '@Layouts/dashboard/components/ChangeHistoryNavigation.vue';
-    import { Box, Star, Menu, Files, Megaphone, House, Inbox, Rocket, LogOut, MoveLeft, UserRound, UsersRound, Banknote, Settings, ExternalLink, ChevronUp, ChevronDown, Smartphone, WandSparkles, TicketPercent } from 'lucide-vue-next';
+    import { Box, Star, Menu, Files, Megaphone, House, Inbox, Rocket, LogOut, ChartArea, MoveLeft, UserRound, UsersRound, Banknote, Settings, ExternalLink, ChevronUp, ChevronDown, Smartphone, WandSparkles, TicketPercent } from 'lucide-vue-next';
 
     export default {
         inject: ['uiState', 'formState', 'authState', 'storeState', 'notificationState', 'changeHistoryState'],
         components: {
-            Box, Star, Menu, Files, Megaphone, House, Inbox, Rocket, LogOut, UserRound, UsersRound, Banknote, Settings, ExternalLink, ChevronUp, ChevronDown, Smartphone, WandSparkles, TicketPercent,
+            Box, Star, Menu, Files, Megaphone, House, Inbox, Rocket, LogOut, ChartArea, UserRound, UsersRound, Banknote, Settings, ExternalLink, ChevronUp, ChevronDown, Smartphone, WandSparkles, TicketPercent,
             Logo, Loader, Button, Dropdown, Skeleton, StoreLogo, Notifications, ChangeHistoryNavigation
         },
         data() {
@@ -485,6 +488,10 @@
                                     associatedRouteNames: ['create-categories', 'edit-category']
                                 },
                                 {
+                                    name: 'Import',
+                                    routeName: 'import-products'
+                                },
+                                {
                                     name: 'Bulk Edit',
                                     routeName: 'bulk-edit-products'
                                 },
@@ -504,6 +511,10 @@
                                     associatedRouteNames: ['create-customer-tag', 'edit-customer-tag']
                                 },
                                 {
+                                    name: 'Import',
+                                    routeName: 'import-customers'
+                                },
+                                {
                                     name: 'Bulk Edit',
                                     routeName: 'bulk-edit-customers'
                                 },
@@ -515,7 +526,11 @@
                                 {
                                     name: 'All',
                                     routeName: 'show-promotions',
-                                    associatedRouteNames: ['create-promotion', 'edit-promotion']
+                                    associatedRouteNames: ['create-promotion', 'edit-promotion',]
+                                },
+                                {
+                                    name: 'Import',
+                                    routeName: 'import-promotions'
                                 },
                                 {
                                     name: 'Bulk Edit',
@@ -526,6 +541,15 @@
                         {
                             name: 'Marketing',
                             routeName: 'show-marketing'
+                        },
+                        {
+                            name: 'Reviews',
+                            routeName: 'show-reviews',
+                            associatedRouteNames: ['create-review', 'edit-review']
+                        },
+                        {
+                            name: 'Analytics',
+                            routeName: 'show-analytics'
                         },
                         {
                             name: 'Design',

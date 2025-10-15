@@ -4,7 +4,7 @@
         <img :src="'/images/clouds.png'" class="absolute bottom-0">
 
         <div class="relative bg-white/80 p-4 rounded-md">
-            <h1 class="text-lg text-gray-700 font-semibold mb-4">Bulk Edit Promotions</h1>
+            <h1 class="text-lg font-semibold mb-4">Bulk Edit Promotions</h1>
 
             <!-- Promotions Table -->
             <Table
@@ -916,7 +916,7 @@
             },
         },
         methods: {
-            isNotEmpty: isNotEmpty,
+            isNotEmpty,
             prepareColumns() {
                 const columnNames = [
                     'Name', 'Description', 'Active', 'Discount', 'Free Delivery', 'Code', 'Minimum Grand Total',
