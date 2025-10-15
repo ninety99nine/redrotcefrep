@@ -4,8 +4,10 @@ namespace App\Enums;
 
 enum AnalyticsType: string
 {
+    case TOP_PAGES = 'top_pages';
     case PAGE_VIEWS = 'page_views';
     case STORE_VISITORS = 'store_visitors';
+
 
     /**
      * Get all enum values.

@@ -12,6 +12,24 @@ use Illuminate\Support\Facades\DB;
 class AnalyticService extends BaseService
 {
     /**
+     * Determine the interval based on the date range.
+     *
+     * @param Carbon $startDate
+     * @param Carbon $endDate
+     * @return string
+     */
+    protected function determineInterval(Carbon $startDate, Carbon $endDate): string
+    {
+        if ($startDate->isSameMonth($endDate)) {
+            return 'daily';
+        } elseif ($startDate->isSameYear($endDate)) {
+            return 'monthly';
+        } else {
+            return 'yearly';
+        }
+    }
+
+    /**
      * Show analytics.
      *
      * @param array $data
@@ -19,11 +37,11 @@ class AnalyticService extends BaseService
      */
     public function showAnalytics(array $data): array
     {
-        $interval = $data['interval'];
         $type = AnalyticsType::from($data['type']);
         $store = Store::findOrFail($data['store_id']);
         $endDate = Carbon::parse($data['end_date'])->endOfDay();
         $startDate = Carbon::parse($data['start_date'])->startOfDay();
+        $interval = $this->determineInterval($startDate, $endDate);
 
         switch ($type) {
             case AnalyticsType::PAGE_VIEWS:
@@ -38,9 +56,28 @@ class AnalyticService extends BaseService
                 $data = $this->aggregateByInterval($query, $interval, 'last_visited_at', 'distinct COALESCE(user_id, guest_id)');
                 break;
 
+            case AnalyticsType::TOP_PAGES:
+                $data = PageView::where('store_id', $store->id)
+                    ->whereBetween('created_at', [$startDate, $endDate])
+                    ->select('name')
+                    ->selectRaw('COUNT(*) as count')
+                    ->groupBy('name')
+                    ->orderByDesc('count')
+                    ->limit(10)
+                    ->get()
+                    ->mapWithKeys(function ($item) {
+                        return [$item->name => $item->count];
+                    })
+                    ->toArray();
+                break;
+
             default:
                 $data = [];
                 break;
+        }
+
+        if ($type !== AnalyticsType::TOP_PAGES) {
+            $data = $this->fillMissingDates($data, $startDate, $endDate, $interval);
         }
 
         return [
@@ -62,8 +99,8 @@ class AnalyticService extends BaseService
     {
         $dateFormat = match ($interval) {
             'daily' => '%d %b %Y',    // e.g., "04 Jan 2025"
-            'weekly' => '%Y-W%V',     // e.g., "2025-W01"
-            'monthly' => '%b',        // e.g., "Jan"
+            'monthly' => '%b %Y',     // e.g., "Jan 2025"
+            'yearly' => '%Y',         // e.g., "2025"
             default => '%d %b %Y'
         };
 
@@ -73,41 +110,40 @@ class AnalyticService extends BaseService
             ->groupBy('date')
             ->orderBy('date')
             ->get()
-            ->mapWithKeys(function ($item) use ($interval) {
+            ->mapWithKeys(function ($item) {
                 return [$item->date => $item->count];
             })
             ->toArray();
 
-        return $this->fillMissingDates($results, $query->getModel()->newQuery()->min($dateColumn), Carbon::now(), $interval);
+        return $results;
     }
 
     /**
      * Fill missing dates with zero counts.
      *
      * @param array $data
-     * @param string|null $startDate
+     * @param Carbon $startDate
      * @param Carbon $endDate
      * @param string $interval
      * @return array
      */
-    protected function fillMissingDates(array $data, ?string $startDate, Carbon $endDate, string $interval): array
+    protected function fillMissingDates(array $data, Carbon $startDate, Carbon $endDate, string $interval): array
     {
-        $start = $startDate ? Carbon::parse($startDate) : $endDate->copy()->subDays(30);
         $dates = [];
-        $current = $start->copy();
+        $current = $startDate->copy();
 
         while ($current <= $endDate) {
             $key = match ($interval) {
-                'daily' => $current->format('d M Y'),    // e.g., "04 Jan 2025" (using full month name for readability)
-                'weekly' => $current->format('Y-W'),     // e.g., "2025-W01"
-                'monthly' => $current->format('M'),      // e.g., "Jan" (short month name)
-                default => $current->format('d M Y')
+                'daily' => $current->startOfDay()->format('d M Y'),    // e.g., "04 Jan 2025"
+                'monthly' => $current->startOfMonth()->format('M Y'),    // e.g., "Jan 2025"
+                'yearly' => $current->startOfYear()->format('Y'),       // e.g., "2025"
+                default => $current->startOfDay()->format('d M Y')
             };
             $dates[$key] = $data[$key] ?? 0;
             match ($interval) {
                 'daily' => $current->addDay(),
-                'weekly' => $current->addWeek(),
                 'monthly' => $current->addMonth(),
+                'yearly' => $current->addYear(),
                 default => $current->addDay()
             };
         }
