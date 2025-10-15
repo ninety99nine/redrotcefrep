@@ -6,6 +6,7 @@ use App\Models\Store;
 use App\Models\PageView;
 use App\Models\StoreVisitor;
 use App\Enums\AnalyticsType;
+use App\Models\Order;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 
@@ -53,7 +54,7 @@ class AnalyticService extends BaseService
             case AnalyticsType::STORE_VISITORS:
                 $query = StoreVisitor::where('store_id', $store->id)
                     ->whereBetween('last_visited_at', [$startDate, $endDate]);
-                $data = $this->aggregateByInterval($query, $interval, 'last_visited_at', 'distinct COALESCE(user_id, guest_id)');
+                $data = $this->aggregateByInterval($query, $interval, 'last_visited_at', 'COUNT(DISTINCT COALESCE(user_id, guest_id))');
                 break;
 
             case AnalyticsType::TOP_PAGES:
@@ -71,19 +72,77 @@ class AnalyticService extends BaseService
                     ->toArray();
                 break;
 
+            case AnalyticsType::ORDERS_OVER_TIME:
+                $query = Order::where('store_id', $store->id)
+                    ->whereBetween('created_at', [$startDate, $endDate])
+                    ->where('status', '!=', 'cancelled');
+                $data = $this->aggregateByInterval($query, $interval, 'created_at');
+                break;
+
+            case AnalyticsType::SALES_OVER_TIME:
+                $query = Order::where('store_id', $store->id)
+                    ->whereBetween('created_at', [$startDate, $endDate])
+                    ->whereIn('payment_status', ['paid', 'partially paid'])
+                    ->where('status', '!=', 'cancelled');
+                $data = $this->aggregateByInterval($query, $interval, 'created_at', 'SUM(grand_total)');
+                break;
+
+            case AnalyticsType::AVERAGE_ORDER_VALUE:
+                $query = Order::where('store_id', $store->id)
+                    ->whereBetween('created_at', [$startDate, $endDate])
+                    ->whereIn('payment_status', ['paid', 'partially paid']);
+                $data = $this->aggregateByInterval($query, $interval, 'created_at', 'SUM(grand_total) / COUNT(*)');
+                break;
+
+            case AnalyticsType::DELIVERY_BY_ORDERS:
+                $data = Order::where('store_id', $store->id)
+                    ->whereBetween('created_at', [$startDate, $endDate])
+                    ->where('status', '!=', 'cancelled')
+                    ->whereNotNull('delivery_method_name')
+                    ->select('delivery_method_name')
+                    ->selectRaw('COUNT(*) as count')
+                    ->groupBy('delivery_method_name')
+                    ->orderByDesc('count')
+                    ->limit(10)
+                    ->get()
+                    ->mapWithKeys(function ($item) {
+                        return [$item->delivery_method_name ?? 'Unknown' => $item->count];
+                    })
+                    ->toArray();
+                break;
+
+            case AnalyticsType::DELIVERY_BY_DELIVERY_TIME:
+                $data = Order::where('store_id', $store->id)
+                    ->whereBetween('created_at', [$startDate, $endDate])
+                    ->where('status', '!=', 'cancelled')
+                    ->whereNotNull('delivery_timeslot')
+                    ->select('delivery_timeslot')
+                    ->selectRaw('COUNT(*) as count')
+                    ->groupBy('delivery_timeslot')
+                    ->orderByDesc('count')
+                    ->limit(10)
+                    ->get()
+                    ->mapWithKeys(function ($item) {
+                        return [$item->delivery_timeslot ?? 'Unknown' => $item->count];
+                    })
+                    ->toArray();
+                break;
+
             default:
                 $data = [];
                 break;
         }
 
-        if ($type !== AnalyticsType::TOP_PAGES) {
+        if ($type !== AnalyticsType::TOP_PAGES && $type !== AnalyticsType::DELIVERY_BY_ORDERS && $type !== AnalyticsType::DELIVERY_BY_DELIVERY_TIME) {
             $data = $this->fillMissingDates($data, $startDate, $endDate, $interval);
         }
 
-        return [
+        $response = [
             'labels' => array_keys($data),
             'values' => array_values($data)
         ];
+
+        return $response;
     }
 
     /**
@@ -104,9 +163,12 @@ class AnalyticService extends BaseService
             default => '%d %b %Y'
         };
 
+        // Use the provided countColumn directly, or default to COUNT(*)
+        $aggregation = $countColumn ?? 'COUNT(*)';
+
         $results = $query
             ->selectRaw("DATE_FORMAT({$dateColumn}, '{$dateFormat}') as date")
-            ->selectRaw($countColumn ? "COUNT({$countColumn}) as count" : 'COUNT(*) as count')
+            ->selectRaw("{$aggregation} as count")
             ->groupBy('date')
             ->orderBy('date')
             ->get()

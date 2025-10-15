@@ -30,7 +30,7 @@
         <div v-if="!store || isLoadingAnalytics" class="text-center">Loading...</div>
 
         <!-- Dynamic Charts -->
-        <div v-else class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div v-else class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div v-for="chart in chartConfigs" :key="chart.type" class="bg-white rounded-lg space-y-4 p-4">
                 <h2 class="text-sm font-bold mb-2">{{ chart.title }}</h2>
                 <component
@@ -61,12 +61,6 @@ export default {
             isLoadingAnalytics: false,
             end_date: this.getDefaultEndDate(),
             start_date: this.getDefaultStartDate(),
-            // Configuration for all charts
-            chartConfigs: [
-                { type: 'store_visitors', title: 'Store Visitors', xLabel: 'Date', yLabel: 'Visitors', dataKey: 'visits', chartComponent: 'LineChart' },
-                { type: 'page_views', title: 'Page Views', xLabel: 'Date', yLabel: 'Views', dataKey: 'views', chartComponent: 'LineChart' },
-                { type: 'top_pages', title: 'Top 10 Pages Viewed', xLabel: 'Page Name', yLabel: 'View Count', dataKey: 'views', chartComponent: 'BarChart' },
-            ],
         };
     },
     watch: {
@@ -86,6 +80,18 @@ export default {
                 end_date: this.end_date,
             };
         },
+        chartConfigs() {
+            return [
+                { type: 'store_visitors', title: 'Store Visitors', xLabel: 'Date', yLabel: 'Visitors', dataKey: 'visits', chartComponent: 'LineChart' },
+                { type: 'page_views', title: 'Page Views', xLabel: 'Date', yLabel: 'Views', dataKey: 'views', chartComponent: 'LineChart' },
+                { type: 'orders_over_time', title: 'Orders Over Time', xLabel: 'Date', yLabel: 'Orders', dataKey: 'orders', chartComponent: 'LineChart' },
+                { type: 'sales_over_time', title: 'Sales Over Time', xLabel: 'Date', yLabel: 'Sales ('+this.store.currency+')', dataKey: 'sales', chartComponent: 'LineChart' },
+                { type: 'top_pages', title: 'Top Pages Viewed', xLabel: 'Page Name', yLabel: 'Views', dataKey: 'views', chartComponent: 'BarChart' },
+                { type: 'average_order_value', title: 'Average Order Value', xLabel: 'Date', yLabel: 'AOV ('+this.store.currency+')', dataKey: 'aov', chartComponent: 'LineChart' },
+                { type: 'delivery_by_orders', title: 'Top Delivery Methods', xLabel: 'Delivery Method', yLabel: 'Orders', dataKey: 'orders', chartComponent: 'BarChart' },
+                { type: 'delivery_by_delivery_time', title: 'Top Delivery Time Slots', xLabel: 'Delivery Time Slot', yLabel: 'Order Count', dataKey: 'orders', chartComponent: 'BarChart' },
+            ];
+        }
     },
     methods: {
         getDefaultStartDate() {
@@ -171,10 +177,10 @@ export default {
                             ? (ctx) => this.createGradient(ctx.chart?.ctx, ctx.chart?.chartArea)
                             : ['#165dfc'],
                         borderColor: '#165dfc',
+                        // tension: chartType === 'LineChart' ? 0.3 : 0,
                         borderWidth: chartType === 'LineChart' ? 2 : 0,
                         fill: chartType === 'LineChart' ? true : false,
-                        tension: chartType === 'LineChart' ? 0.3 : 0,
-                        pointHitRadius: chartType === 'LineChart' ? 10 : 0, // Fix hitRadius issue
+                        pointHitRadius: chartType === 'LineChart' ? 10 : 0,
                     },
                 ],
             };
