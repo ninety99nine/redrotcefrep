@@ -3,16 +3,17 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Relations\belongsTo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\Concerns\AsPivot;
 
 class StoreFollower extends Model
 {
-    use HasFactory, HasUuids, AsPivot;
+    use HasFactory, AsPivot;
 
     protected $table = 'store_follower';
+
+    protected $primaryKey = ['store_id', 'user_id'];
 
     /**
      * The attributes that are mass assignable.
