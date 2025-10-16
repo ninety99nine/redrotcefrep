@@ -13,8 +13,6 @@ class StoreUser extends Model
 
     protected $table = 'store_user';
 
-    protected $primaryKey = ['store_id', 'user_id'];
-
     /**
      * The attributes that are mass assignable.
      *

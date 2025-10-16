@@ -13,8 +13,6 @@ class StoreFollower extends Model
 
     protected $table = 'store_follower';
 
-    protected $primaryKey = ['store_id', 'user_id'];
-
     /**
      * The attributes that are mass assignable.
      *
