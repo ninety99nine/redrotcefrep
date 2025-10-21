@@ -30,6 +30,7 @@ use App\Observers\ProductObserver;
 use App\Models\AutoBillingSchedule;
 use App\Listeners\RoleEventListener;
 use App\Models\AiAssistantTokenUsage;
+use App\Models\User;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\ServiceProvider;
@@ -88,6 +89,12 @@ class AppServiceProvider extends ServiceProvider
      */
     private function explicitRouteModelBiniding()
     {
+        // Bind User model
+        Route::bind('user', function ($value) {
+            $allowedRoutes = ['show.user',];
+            return $this->applyEagerLoading(User::query(), $allowedRoutes)->findOrFail($value);
+        });
+
         // Bind Store model
         Route::bind('store', function ($value) {
             $allowedRoutes = ['show.store'];

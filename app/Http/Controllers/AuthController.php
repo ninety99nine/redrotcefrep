@@ -2,20 +2,21 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Http\Request;
 use App\Services\AuthService;
 use App\Http\Resources\UserResource;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Support\Facades\Session;
-use Laravel\Socialite\Facades\Socialite;
 use App\Http\Requests\Auth\LoginRequest;
 use App\Http\Requests\Auth\LogoutRequest;
 use App\Http\Requests\Auth\RegisterRequest;
+use App\Http\Requests\Auth\VerifyEmailRequest;
 use App\Http\Requests\Auth\ShowAuthUserRequest;
 use App\Http\Requests\Auth\ResetPasswordRequest;
 use App\Http\Requests\Auth\ValidateTokenRequest;
 use App\Http\Requests\Auth\SetupPasswordRequest;
 use App\Http\Requests\Auth\UpdateAuthUserRequest;
 use App\Http\Requests\Auth\ForgotPasswordRequest;
+use App\Http\Requests\Auth\ResendVerificationRequest;
 use App\Http\Requests\Auth\ShowSocialLoginLinksRequest;
 use App\Http\Requests\Auth\ShowTermsAndConditionsRequest;
 
@@ -42,15 +43,9 @@ class AuthController extends Controller
      * @param LoginRequest $request
      * @return array
      */
-    public function login(LoginRequest $request)
+    public function login(LoginRequest $request): array
     {
-        $credentials = $request->validated();
-        $token = $this->service->login($credentials);
-
-        return [
-            'token' => $token,
-            'message' => 'Login successful'
-        ];
+        return $this->service->login($request->validated());
     }
 
     /**
@@ -59,15 +54,9 @@ class AuthController extends Controller
      * @param RegisterRequest $request
      * @return array
      */
-    public function register(RegisterRequest $request)
+    public function register(RegisterRequest $request): array
     {
-        $data = $request->validated();
-        $token = $this->service->register($data);
-
-        return [
-            'token' => $token,
-            'message' => 'Login successful'
-        ];
+        return $this->service->register($request->validated());
     }
 
     /**
@@ -76,14 +65,9 @@ class AuthController extends Controller
      * @param ForgotPasswordRequest $request
      * @return array
      */
-    public function forgotPassword(ForgotPasswordRequest $request)
+    public function forgotPassword(ForgotPasswordRequest $request): array
     {
-        $data = $request->validated();
-        $this->service->sendPasswordResetLink($data['email']);
-
-        return [
-            'message' => 'A password reset link has been sent to your email.'
-        ];
+        return $this->service->sendPasswordResetLink($request->validated());
     }
 
     /**
@@ -92,14 +76,9 @@ class AuthController extends Controller
      * @param ValidateTokenRequest $request
      * @return array
      */
-    public function validateToken(ValidateTokenRequest $request)
+    public function validateToken(ValidateTokenRequest $request): array
     {
-        $data = $request->validated();
-        $this->service->validateToken($data['email'], $data['token']);
-
-        return [
-            'message' => 'Token is valid.'
-        ];
+        return $this->service->validateToken($request->validated());
     }
 
     /**
@@ -108,14 +87,31 @@ class AuthController extends Controller
      * @param ResetPasswordRequest $request
      * @return array
      */
-    public function resetPassword(ResetPasswordRequest $request)
+    public function resetPassword(ResetPasswordRequest $request): array
     {
-        $data = $request->validated();
-        $this->service->resetPassword($data['email'], $data['token'], $data['password']);
+        return $this->service->resetPassword($request->validated());
+    }
 
-        return [
-            'message' => 'Password reset successfully. Please log in with your new password.'
-        ];
+    /**
+     * Verify email using a token.
+     *
+     * @param VerifyEmailRequest $request
+     * @return array
+     */
+    public function verifyEmail(VerifyEmailRequest $request): array
+    {
+        return $this->service->verifyEmail($request->validated());
+    }
+
+    /**
+     * Resend email verification.
+     *
+     * @param ResendVerificationRequest $request
+     * @return array
+     */
+    public function resendEmailVerification(ResendVerificationRequest $request): array
+    {
+        return $this->service->resendEmailVerification($request->validated());
     }
 
     /**
@@ -124,58 +120,9 @@ class AuthController extends Controller
      * @param SetupPasswordRequest $request
      * @return array
      */
-    public function setupPassword(SetupPasswordRequest $request)
+    public function setupPassword(SetupPasswordRequest $request): array
     {
-        $data = $request->validated();
-        $token = $this->service->setupPassword($data['email'], $data['token'], $data['password']);
-
-        return [
-            'token' => $token,
-            'message' => 'Password set successfully. You are now logged in.'
-        ];
-    }
-
-    /**
-     * Perform user logout.
-     *
-     * @param LogoutRequest $request
-     * @return array
-     */
-    public function logout(LogoutRequest $request)
-    {
-        $this->service->logout();
-
-        return [
-            'message' => 'Logged out successfully'
-        ];
-    }
-
-    /**
-     * Show authenticated user.
-     *
-     * @param ShowAuthUserRequest $request
-     * @return UserResource
-     */
-    public function showAuthUser(ShowAuthUserRequest $request): UserResource
-    {
-        return new UserResource($request->user());
-    }
-
-    /**
-     * Update authenticated user.
-     *
-     * @param UpdateAuthUserRequest $request
-     * @return array
-     */
-    public function updateAuthUser(UpdateAuthUserRequest $request)
-    {
-        $user = $request->user();
-        $data = $request->validated();
-        $this->service->updateAuthUser($user, $data);
-
-        return [
-            'message' => 'Account updated successfully.'
-        ];
+        return $this->service->setupPassword($request->validated());
     }
 
     /**
@@ -184,7 +131,7 @@ class AuthController extends Controller
      * @param ShowTermsAndConditionsRequest $request
      * @return array
      */
-    public function showTermsAndConditions(ShowTermsAndConditionsRequest $request)
+    public function showTermsAndConditions(ShowTermsAndConditionsRequest $request): array
     {
         return $this->service->showTermsAndConditions();
     }
@@ -195,7 +142,7 @@ class AuthController extends Controller
      * @param ShowSocialLoginLinksRequest $request
      * @return array
      */
-    public function showSocialLoginLinks(ShowSocialLoginLinksRequest $request)
+    public function showSocialLoginLinks(ShowSocialLoginLinksRequest $request): array
     {
         return $this->service->showSocialLoginLinks();
     }
@@ -203,15 +150,12 @@ class AuthController extends Controller
     /**
      * Redirect the user to the Google authentication page.
      *
+     * @param Request $request
      * @return RedirectResponse
      */
-    public function redirectToGoogle(): RedirectResponse
+    public function redirectToGoogle(Request $request): RedirectResponse
     {
-        $storeId = request()->query('store_id');
-        if ($storeId) {
-            Session::put('social_login_store_id', $storeId);
-        }
-        return Socialite::driver('google')->redirect();
+        return $this->service->redirectToGoogle($request->query('store_id'));
     }
 
     /**
@@ -227,15 +171,12 @@ class AuthController extends Controller
     /**
      * Redirect the user to the Facebook authentication page.
      *
+     * @param Request $request
      * @return RedirectResponse
      */
-    public function redirectToFacebook(): RedirectResponse
+    public function redirectToFacebook(Request $request): RedirectResponse
     {
-        $storeId = request()->query('store_id');
-        if ($storeId) {
-            Session::put('social_login_store_id', $storeId);
-        }
-        return Socialite::driver('facebook')->redirect();
+        return $this->service->redirectToFacebook($request->query('store_id'));
     }
 
     /**
@@ -251,15 +192,12 @@ class AuthController extends Controller
     /**
      * Redirect the user to the LinkedIn authentication page.
      *
+     * @param Request $request
      * @return RedirectResponse
      */
-    public function redirectToLinkedIn(): RedirectResponse
+    public function redirectToLinkedIn(Request $request): RedirectResponse
     {
-        $storeId = request()->query('store_id');
-        if ($storeId) {
-            Session::put('social_login_store_id', $storeId);
-        }
-        return Socialite::driver('linkedin-openid')->redirect();
+        return $this->service->redirectToLinkedIn($request->query('store_id'));
     }
 
     /**
@@ -270,5 +208,38 @@ class AuthController extends Controller
     public function handleLinkedInCallback(): RedirectResponse
     {
         return $this->service->handleLinkedInCallback();
+    }
+
+    /**
+     * Show authenticated user.
+     *
+     * @param ShowAuthUserRequest $request
+     * @return UserResource
+     */
+    public function showAuthUser(ShowAuthUserRequest $request): UserResource
+    {
+        return $this->service->showAuthUser($request->user());
+    }
+
+    /**
+     * Update authenticated user.
+     *
+     * @param UpdateAuthUserRequest $request
+     * @return array
+     */
+    public function updateAuthUser(UpdateAuthUserRequest $request): array
+    {
+        return $this->service->updateAuthUser($request->user(), $request->validated());
+    }
+
+    /**
+     * Perform user logout.
+     *
+     * @param LogoutRequest $request
+     * @return array
+     */
+    public function logout(LogoutRequest $request): array
+    {
+        return $this->service->logout($request->validated());
     }
 }

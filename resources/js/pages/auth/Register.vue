@@ -98,85 +98,82 @@
 </template>
 
 <script>
+import axios from 'axios';
+import Logo from '@Partials/Logo.vue';
+import Input from '@Partials/Input.vue';
+import Button from '@Partials/Button.vue';
+import { isEmpty } from '@Utils/stringUtils';
+import VueSlideUpDown from 'vue-slide-up-down';
+import SocialLinks from '@Pages/auth/components/SocialLinks.vue';
 
-    import axios from 'axios';
-    import Logo from '@Partials/Logo.vue';
-    import Input from '@Partials/Input.vue';
-    import Button from '@Partials/Button.vue';
-    import { isEmpty } from '@Utils/stringUtils';
-    import VueSlideUpDown from 'vue-slide-up-down';
-    import SocialLinks from '@Pages/auth/components/SocialLinks.vue';
+export default {
+    name: 'Register',
+    components: { Logo, Input, Button, SocialLinks, VueSlideUpDown },
+    inject: ['formState', 'notificationState'], // Removed authState
+    data() {
+        return {
+            form: {
+                email: '',
+                password: '',
+                last_name: '',
+                first_name: '',
+                confirm_password: ''
+            },
+            loading: false,
+            currentYear: new Date().getFullYear()
+        };
+    },
+    computed: {
+        expand() {
+            return this.isEmpty(this.form.first_name) && this.isEmpty(this.form.last_name);
+        }
+    },
+    methods: {
+        isEmpty,
+        async submit() {
+            if (this.loading) return;
 
-    export default {
-        name: 'Register',
-        components: { Logo, Input, Button, SocialLinks, VueSlideUpDown },
-        inject: ['authState', 'formState', 'notificationState'],
-        data() {
-            return {
-                form: {
-                    email: '',
-                    password: '',
-                    last_name: '',
-                    first_name: '',
-                    confirm_password: ''
-                },
-                loading: false,
-                currentYear: new Date().getFullYear()
-            };
-        },
-        computed: {
-            expand() {
-                return this.isEmpty(this.form.first_name) && this.isEmpty(this.form.last_name);
+            this.formState.hideFormErrors();
+
+            if (this.isEmpty(this.form.first_name)) {
+                this.formState.setFormError('first_name', 'Enter your first name');
+            } else if (this.isEmpty(this.form.last_name)) {
+                this.formState.setFormError('last_name', 'Enter your last name');
+            } else if (this.isEmpty(this.form.email)) {
+                this.formState.setFormError('email', 'Enter your email');
+            } else if (this.isEmpty(this.form.password)) {
+                this.formState.setFormError('password', 'Enter your password');
+            } else if (this.isEmpty(this.form.confirm_password)) {
+                this.formState.setFormError('confirm_password', 'Confirm your password');
+            } else if (this.form.password != this.form.confirm_password) {
+                this.formState.setFormError('password', 'Passwords do not match');
             }
-        },
-        methods: {
-            isEmpty,
-            async submit() {
 
-                if (this.loading) return;
+            if (this.formState.hasErrors) {
+                return;
+            }
 
-                this.formState.hideFormErrors();
+            this.loading = true;
 
-                if (this.isEmpty(this.form.first_name)) {
-                    this.formState.setFormError('first_name', 'Enter your first name');
-                }else if (this.isEmpty(this.form.last_name)) {
-                    this.formState.setFormError('last_name', 'Enter your last name');
-                }else if (this.isEmpty(this.form.email)) {
-                    this.formState.setFormError('email', 'Enter your email');
-                } else if (this.isEmpty(this.form.password)) {
-                    this.formState.setFormError('password', 'Enter your password');
-                } else if (this.isEmpty(this.form.confirm_password)) {
-                    this.formState.setFormError('confirm_password', 'Confirm your password');
-                } else if (this.form.password != this.form.confirm_password) {
-                    this.formState.setFormError('password', 'Passwords do not match');
-                }
+            try {
+                await axios.post('/api/auth/register', this.form);
 
-                if (this.formState.hasErrors) {
-                    return;
-                }
+                this.notificationState.showSuccessNotification('Registration successful! Please check your email to verify your account.');
 
-                this.loading = true;
-
-                try {
-
-                    const response = await axios.post('/api/auth/register', this.form);
-
-                    const token = response.data.token;
-                    this.authState.setTokenOnRequest(token);
-                    this.authState.setTokenOnLocalStorage(token);
-
-                    this.$router.push({ name: 'show-stores' });
-                    this.notificationState.showSuccessNotification('Account created!');
-
-                } catch (error) {
-                    const message = error?.response?.data?.message || error?.message || 'Something went wrong while signing up';
-                    this.notificationState.showWarningNotification(message);
-                    this.formState.setServerFormErrors(error);
-                    console.error('Failed to sign up:', error);
-                } finally {
-                    this.loading = false;
-                }
+                // Redirect to verify-email route with email
+                this.$router.push({
+                    name: 'verify-email',
+                    query: { email: this.form.email, type: 'registration email' }
+                });
+            } catch (error) {
+                const message = error?.response?.data?.message || error?.message || 'Something went wrong while signing up';
+                this.notificationState.showWarningNotification(message);
+                this.formState.setServerFormErrors(error);
+                console.error('Failed to sign up:', error);
+            } finally {
+                this.loading = false;
             }
         }
-    };
+    }
+};
 </script>

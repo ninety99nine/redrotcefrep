@@ -35,6 +35,11 @@ const routes = [
                 component: () => import('@Pages/auth/ResetPassword.vue'),
             },
             {
+                path: 'verify-email',
+                name: 'verify-email',
+                component: () => import('@Pages/auth/VerifyEmail.vue'),
+            },
+            {
                 path: 'social-login',
                 name: 'social-login',
                 component: () => import('@Pages/auth/SocialLogin.vue'),

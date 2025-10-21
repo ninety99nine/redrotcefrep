@@ -20,6 +20,7 @@ use App\Enums\InsightCategory;
 use App\Enums\PricingPlanType;
 use App\Enums\UploadFolderName;
 use App\Enums\PaymentMethodType;
+use App\Enums\TagType;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
@@ -80,6 +81,7 @@ class StoreService extends BaseService
             Tag::firstOrCreate([
                 'name' => $tagName,
                 'store_id' => $store->id,
+                'type' => TagType::PRODUCT->value,
             ]);
         }
 

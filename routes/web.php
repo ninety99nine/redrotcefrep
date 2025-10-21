@@ -14,11 +14,15 @@ Route::prefix('auth')->group(function () {
     Route::get('/linkedin/callback', [AuthController::class, 'handleLinkedInCallback'])->name('social.auth.linkedin.callback');
 });
 
-// Routes for custom domains
-Route::domain('{domain}')->middleware(['resolve.store.by.domain', 'record.store.visit'])->group(function () {
-    Route::get('/manifest.json', [PWAController::class, 'manifest'])->name('domain.pwa.manifest');
-    Route::get('/{any?}', [AppController::class, 'render'])->where('any', '.*')->name('domain.shop.render');
-});
+// CUSTOM DOMAIN ROUTES (ONLY FOR NON-LOCALHOST)
+$host = Request::getHost();
+
+if (!in_array($host, ['localhost', '127.0.0.1', 'host.docker.internal'])) {
+    Route::domain('{domain}')->middleware(['resolve.store.by.domain', 'record.store.visit'])->group(function () {
+        Route::get('/manifest.json', [PWAController::class, 'manifest'])->name('domain.pwa.manifest');
+        Route::get('/{any?}', [AppController::class, 'render'])->where('any', '.*')->name('domain.shop.render');
+    });
+}
 
 // Routes for alias-based storefronts
 Route::prefix('{alias}')->middleware('record.store.visit')->group(function () {

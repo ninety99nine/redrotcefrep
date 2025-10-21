@@ -15,8 +15,8 @@ class RegisterRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'first_name' => ['required', 'string', 'max:20'],
-            'last_name' => ['required', 'string', 'max:20'],
+            'first_name' => ['required', 'string', 'min:3', 'max:20'],
+            'last_name' => ['required', 'string', 'min:3', 'max:20'],
             'email' => ['required_without:mobile_number', 'nullable', 'email', 'unique:users,email'],
             'mobile_number' => ['required_without:email', 'nullable', 'phone:INTERNATIONAL', 'unique:users,mobile_number'],
             'password' => ['required', 'string', Password::min(6)],
@@ -29,9 +29,11 @@ class RegisterRequest extends FormRequest
         return [
             'first_name.required' => 'The first name is required.',
             'first_name.string' => 'The first name must be a string.',
+            'first_name.min' => 'The first name must be at least 3 characters or more.',
             'first_name.max' => 'The first name must not exceed 20 characters.',
             'last_name.required' => 'The last name is required.',
             'last_name.string' => 'The last name must be a string.',
+            'last_name.min' => 'The last name must be at least 3 characters or more.',
             'last_name.max' => 'The last name must not exceed 20 characters.',
             'email.required_without' => 'The email is required when mobile number is not provided.',
             'email.email' => 'Please provide a valid email address.',

@@ -870,7 +870,7 @@
     import SelectTags from '@Partials/SelectTags.vue';
     import { VueDraggableNext } from 'vue-draggable-next';
     import BackdropLoader from '@Partials/BackdropLoader.vue';
-    import DataCollectionFields from '@Pages/Products/product/data-collection-fields/DataCollectionFields.vue';
+    import DataCollectionFields from '@Pages/products/product/data-collection-fields/DataCollectionFields.vue';
     import { Move, X, Plus, Image, Split, Trash2, MoveLeft, ArrowDownUp, ChevronUp, ChevronDown } from 'lucide-vue-next';
 
     export default {

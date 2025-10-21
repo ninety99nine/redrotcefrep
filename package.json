@@ -23,7 +23,7 @@
         "@revolist/vue3-datagrid": "^4.16.0",
         "@vue-flow/core": "^1.45.0",
         "@vuepic/vue-datepicker": "^11.0.2",
-        "chart.js": "^3.9.1",
+        "chart.js": "^4.4.0",
         "dayjs": "^1.11.13",
         "deep-diff": "^1.0.2",
         "dompurify": "^3.2.6",
