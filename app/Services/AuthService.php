@@ -837,7 +837,9 @@ class AuthService extends BaseService
      */
     public function logout(array $data): array
     {
-        Auth::user()->currentAccessToken()?->delete();
+        /** @var User $user */
+        $user = Auth::user();
+        $user->currentAccessToken()?->delete();
 
         return [
             'message' => 'Logged out successfully'
