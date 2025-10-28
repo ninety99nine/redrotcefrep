@@ -89,6 +89,17 @@ class PricingPlanPolicy extends BasePolicy
     }
 
     /**
+     * Determine whether the user can verify payment for any pricing plans.
+     *
+     * @param User $user
+     * @return bool
+     */
+    public function verifyAny(User $user): bool
+    {
+        return true;
+    }
+
+    /**
      * Determine whether the user can pay for the pricing plan.
      *
      * @param User $user

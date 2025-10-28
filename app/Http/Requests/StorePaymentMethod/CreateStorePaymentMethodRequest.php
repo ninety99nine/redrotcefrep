@@ -33,6 +33,8 @@ class CreateStorePaymentMethodRequest extends FormRequest
             'position' => ['nullable', 'integer', 'min:0', 'max:255'],
             'store_id' => ['required', 'uuid'],
             'payment_method_id' => ['required', 'uuid'],
+            'logo' => ['nullable', 'file', 'mimes:jpeg,png,jpg,gif,webp,svg', 'max:5120'],
+            'photo' => ['nullable', 'file', 'mimes:jpeg,png,jpg,gif,webp,svg', 'max:5120'],
         ];
     }
 }

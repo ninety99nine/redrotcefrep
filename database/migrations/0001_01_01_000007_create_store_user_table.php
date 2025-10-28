@@ -11,6 +11,7 @@ return new class extends Migration
         Schema::create('store_user', function (Blueprint $table) {
             $table->foreignUuid('store_id')->constrained()->cascadeOnDelete();
             $table->foreignUuid('user_id')->constrained()->cascadeOnDelete();
+            $table->boolean('creator')->default(false);
             $table->timestamps();
         });
     }

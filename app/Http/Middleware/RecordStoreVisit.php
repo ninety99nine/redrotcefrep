@@ -57,10 +57,10 @@ class RecordStoreVisit
             }
 
             // Validate frontend headers
-            $pageUrl = $request->headers->get('frontend-page-url');
             $pageName = $request->headers->get('frontend-page-name');
+            $pageUrl = $request->headers->get('frontend-page-url') ?? null;
 
-            if(!empty($pageName) && !empty($pageUrl)) {
+            if(!empty($pageName)) {
 
                 // Record page view
                 $cacheManager = (new CacheService(CacheName::PAGE_VIEW))->append($sessionId)->append($store->id)->append($pageName);
@@ -71,10 +71,10 @@ class RecordStoreVisit
 
                         PageView::create([
                             'id' => Str::uuid(),
-                            'store_id' => $store->id,
-                            'session_id' => $sessionId,
                             'url' => $pageUrl,
                             'name' => $pageName,
+                            'store_id' => $store->id,
+                            'session_id' => $sessionId,
                             'referrer' => $request->header('referer')
                         ]);
 
@@ -87,63 +87,63 @@ class RecordStoreVisit
                     }
                 }
 
-            }
+                // Record store visit
+                if ($user) {
 
-            // Record store visit
-            if ($user) {
+                    $cacheManager = (new CacheService(CacheName::STORE_VISIT))->append($user->id)->append($store->id);
 
-                $cacheManager = (new CacheService(CacheName::STORE_VISIT))->append($user->id)->append($store->id);
+                    if (!$cacheManager->has()) {
 
-                if (!$cacheManager->has()) {
+                        try {
 
-                    try {
+                            StoreVisitor::updateOrCreate(
+                                [
+                                    'store_id' => $store->id,
+                                    'user_id' => $user->id,
+                                    'guest_id' => null
+                                ],
+                                [
+                                    'id' => Str::uuid(),
+                                    'last_visited_at' => now()
+                                ]
+                            );
 
-                        StoreVisitor::updateOrCreate(
-                            [
-                                'store_id' => $store->id,
-                                'user_id' => $user->id,
-                                'guest_id' => null
-                            ],
-                            [
-                                'id' => Str::uuid(),
-                                'last_visited_at' => now()
-                            ]
-                        );
+                            $cacheManager->put(true, now()->addHour());
 
-                        $cacheManager->put(true, now()->addHour());
+                            (new UssdService)->cacheManager($user)->forget();
 
-                        (new UssdService)->cacheManager($user)->forget();
+                        } catch (\Exception $e) {
+                            Log::error('Failed to record store visit: ' . $e->getMessage());
+                        }
 
-                    } catch (\Exception $e) {
-                        Log::error('Failed to record store visit: ' . $e->getMessage());
                     }
 
-                }
+                } else {
 
-            } else {
+                    $cacheManager = (new CacheService(CacheName::STORE_VISIT))->append('guest')->append($sessionId)->append($store->id);
 
-                $cacheManager = (new CacheService(CacheName::STORE_VISIT))->append('guest')->append($sessionId)->append($store->id);
+                    if (!$cacheManager->has()) {
 
-                if (!$cacheManager->has()) {
+                        try {
 
-                    try {
+                            StoreVisitor::updateOrCreate(
+                                [
+                                    'store_id' => $store->id,
+                                    'guest_id' => $sessionId,
+                                    'user_id' => null
+                                ],
+                                [
+                                    'id' => Str::uuid(),
+                                    'last_visited_at' => now()
+                                ]
+                            );
 
-                        StoreVisitor::updateOrCreate(
-                            [
-                                'store_id' => $store->id,
-                                'guest_id' => $sessionId,
-                                'user_id' => null
-                            ],
-                            [
-                                'id' => Str::uuid(),
-                                'last_visited_at' => now()
-                            ]
-                        );
+                            $cacheManager->put(true, now()->addHour());
 
-                        $cacheManager->put(true, now()->addHour());
+                        } catch (\Exception $e) {
+                            Log::error('Failed to record store visit: ' . $e->getMessage());
+                        }
 
-                    } catch (\Exception $e) {
-                        Log::error('Failed to record store visit: ' . $e->getMessage());
                     }
 
                 }

@@ -153,7 +153,7 @@
 
                                 <!-- Customer -->
                                 <td v-else-if="column.name == 'Customer'" class="whitespace-nowrap align-top pr-4 py-4 text-sm">
-                                    <div class="w-40">
+                                    <div class="w-24 truncate">
                                         <span v-if="order.customer_name">{{  order.customer_name }}</span>
                                         <NoDataPlaceholder v-else></NoDataPlaceholder>
                                     </div>
@@ -833,7 +833,7 @@
             formattedRelativeDate,
             prepareColumns() {
                 const columnNames = ['Number', 'Customer', 'Summary', 'Status', 'Payment Status', 'Collection Status', 'Grand Total', 'Paid', 'Outstanding', 'Customer Note', 'Created Date'];
-                const defaultColumnNames  = ['Number', 'Customer', 'Summary', 'Status', 'Grand Total', 'Created Date'];
+                const defaultColumnNames  = ['Number', 'Customer', 'Summary', 'Status', 'Payment Status', 'Created Date'];
 
                 return columnNames.map(name => ({
                     name,

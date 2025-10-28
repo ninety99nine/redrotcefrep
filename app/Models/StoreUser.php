@@ -14,12 +14,24 @@ class StoreUser extends Model
     protected $table = 'store_user';
 
     /**
+     * The attributes that should be cast.
+     *
+     * @var array
+     */
+    protected function casts(): array
+    {
+        return [
+            'creator' => 'boolean'
+        ];
+    }
+
+    /**
      * The attributes that are mass assignable.
      *
      * @var array
      */
     protected $fillable = [
-        'user_id', 'store_id', 'created_at', 'updated_at'
+        'user_id', 'store_id', 'creator', 'created_at', 'updated_at'
     ];
 
     /**

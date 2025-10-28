@@ -1,6 +1,6 @@
 <template>
 
-    <div class="min-h-screen flex flex-col items-center justify-center py-20">
+    <div class="flex flex-col items-center justify-center pb-40">
 
         <div class="w-full max-w-lg">
 

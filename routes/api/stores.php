@@ -27,6 +27,7 @@ Route::middleware(['auth:sanctum'])
             Route::post('/follow', 'followStore')->name('follow.store');
             Route::post('/unfollow', 'unfollowStore')->name('unfollow.store');
             Route::get('/insights', 'showStoreInsights')->name('show.store.insights');
+            Route::get('/basic-insights', 'showStoreBasicInsights')->name('show.store.basic.insights');
 
             Route::withoutMiddleware(['auth:sanctum', 'store.permission'])->group(function () {
                 Route::get('/qr-code', 'showStoreQrCode')->name('show.store.qr.code');

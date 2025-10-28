@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\PricingPlan;
 
+use App\Models\PricingPlan;
 use Illuminate\Foundation\Http\FormRequest;
 
 class VerifyPricingPlanPaymentRequest extends FormRequest
@@ -13,7 +14,7 @@ class VerifyPricingPlanPaymentRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return $this->user()->can('pay', $this->route('pricingPlan'));
+        return $this->user()->can('verifyAny', PricingPlan::class);
     }
 
     /**

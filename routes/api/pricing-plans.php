@@ -10,12 +10,12 @@ Route::middleware(['auth:sanctum'])
         Route::get('/', 'showPricingPlans')->name('show.pricing.plans');
         Route::post('/', 'createPricingPlan')->name('create.pricing.plan');
         Route::delete('/', 'deletePricingPlans')->name('delete.pricing.plans');
+        Route::post('/verify-payment/{transaction}', 'verifyPricingPlanPayment')->name('verify.pricing.plan.payment');
 
         Route::prefix('{pricingPlan}')->group(function () {
             Route::get('/', 'showPricingPlan')->name('show.pricing.plan');
             Route::put('/', 'updatePricingPlan')->name('update.pricing.plan');
             Route::delete('/', 'deletePricingPlan')->name('delete.pricing.plan');
             Route::post('/pay', 'payPricingPlan')->name('pay.pricing.plan');
-            Route::post('/verify-payment/{transaction}', 'verifyPricingPlanPayment')->name('verify.pricing.plan.payment');
         });
     });

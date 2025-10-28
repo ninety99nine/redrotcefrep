@@ -16,6 +16,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use App\Http\Resources\UserResource;
 use App\Enums\EmailVerificationType;
+use App\Mail\TeamMemberInvitation;
 use App\Mail\VerifyRegistrationEmail;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Session;
@@ -866,9 +867,10 @@ class AuthService extends BaseService
      *
      * @param User $user
      * @param EmailVerificationType $emailVerificationType
+     * @param string|null $storeId
      * @return void
      */
-    private function sendEmailVerification(User $user, EmailVerificationType $emailVerificationType): void
+    public function sendEmailVerification(User $user, EmailVerificationType $emailVerificationType, string|null $storeId = null): void
     {
         $token = Str::random(60);
 
@@ -886,10 +888,12 @@ class AuthService extends BaseService
                           '&email=' . urlencode($user->email) .
                           '&type=' . $emailVerificationType->value;
 
-        if($emailVerificationType == EmailVerificationType::REGISTRATION_EMAIL) {
+        if ($emailVerificationType == EmailVerificationType::REGISTRATION_EMAIL) {
             Mail::to($user->email)->send(new VerifyRegistrationEmail($user->email, $user->first_name, $verificationUrl));
-        }else{
+        } elseif ($emailVerificationType == EmailVerificationType::UPDATED_EMAIL) {
             Mail::to($user->email)->send(new VerifyUpdatedEmail($user->email, $user->first_name, $verificationUrl));
+        } elseif ($emailVerificationType == EmailVerificationType::INVITED_EMAIL) {
+            Mail::to($user->email)->send(new TeamMemberInvitation($user->email, $user->first_name, $storeId, $verificationUrl));
         }
     }
 }

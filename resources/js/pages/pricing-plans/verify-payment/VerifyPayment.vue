@@ -265,7 +265,7 @@
                         store_id: this.store.id
                     };
 
-                    const response = await axios.post(`/api/pricing-plans/${this.pricingPlan.id}/pay/verify/${transactionId}`, data);
+                    const response = await axios.post(`/api/pricing-plans/verify-payment/${transactionId}`, data);
                     this.notificationState.showSuccessNotification('Payment verified!');
                     this.transaction = response.data;
 

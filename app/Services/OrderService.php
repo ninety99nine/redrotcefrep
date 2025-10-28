@@ -92,6 +92,8 @@ class OrderService extends BaseService
     public function showOrderStatusCounts(array $data): array
     {
         $storeId = $data['store_id'];
+        $endDate = $data['end_date'] ?? null;
+        $startDate = $data['start_date'] ?? null;
         $store = $storeId ? Store::find($storeId) : null;
         $placedByUserId = $data['placed_by_user_id'] ?? null;
 
@@ -105,7 +107,7 @@ class OrderService extends BaseService
             CAST(SUM(CASE WHEN payment_status = ? THEN 1 ELSE 0 END) AS UNSIGNED) as paid_count,
             CAST(SUM(CASE WHEN payment_status = ? THEN 1 ELSE 0 END) AS UNSIGNED) as unpaid_count,
             CAST(SUM(CASE WHEN payment_status = ? THEN 1 ELSE 0 END) AS UNSIGNED) as partially_paid_count,
-            CAST(SUM(CASE WHEN payment_status = ? THEN 1 ELSE 0 END) AS UNSIGNED) as WAITING_CONFIRMATION_count
+            CAST(SUM(CASE WHEN payment_status = ? THEN 1 ELSE 0 END) AS UNSIGNED) as waiting_confirmation_count
         ', [
             OrderStatus::WAITING->value,
             OrderStatus::CANCELLED->value,
@@ -119,24 +121,26 @@ class OrderService extends BaseService
         ]);
 
         if($store) $query->where('store_id', $storeId);
+        if($endDate) $query->whereDate('created_at', '<=', $endDate);
+        if($startDate) $query->whereDate('created_at', '>=', $startDate);
         if($placedByUserId) $query->where('placed_by_user_id', $placedByUserId);
 
         $result = $query->first();
 
         return [
-            'total_orders' => $result->total_orders,
+            'total_orders' => $result->total_orders ?? 0,
             'status_counts' => [
-                'waiting' => $result->waiting_count,
-                'completed' => $result->completed_count,
-                'on_its_way' => $result->on_its_way_count,
-                'ready_for_pickup' => $result->ready_for_pickup_count,
-                'cancelled' => $result->cancelled_count,
+                'waiting' => $result->waiting_count ?? 0,
+                'completed' => $result->completed_count ?? 0,
+                'on_its_way' => $result->on_its_way_count ?? 0,
+                'ready_for_pickup' => $result->ready_for_pickup_count ?? 0,
+                'cancelled' => $result->cancelled_count ?? 0,
             ],
             'payment_status_counts' => [
-                'paid' => $result->paid_count,
-                'unpaid' => $result->unpaid_count,
-                'partially_paid' => $result->partially_paid_count,
-                'WAITING_CONFIRMATION' => $result->WAITING_CONFIRMATION_count,
+                'paid' => $result->paid_count ?? 0,
+                'unpaid' => $result->unpaid_count ?? 0,
+                'partially_paid' => $result->partially_paid_count ?? 0,
+                'waiting_confirmation' => $result->waiting_confirmation_count ?? 0,
             ]
         ];
 

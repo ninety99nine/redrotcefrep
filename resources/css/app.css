@@ -52,6 +52,7 @@
     border: 1px solid #e5e5e5;
 }
 
+/*
 .dp__calendar_row {
     @apply m-0!;
 }
@@ -87,6 +88,11 @@
 .dp__cell_inner.dp__active_date {
     @apply bg-blue-500 text-white;
 }
+
+.dp__cell_inner.dp__range_between {
+    @apply bg-gray-500 text-white;
+}
+*/
 
 /* Animated Gradient Border Effect - Part 1: Define border angle */
 @property --border-angle {

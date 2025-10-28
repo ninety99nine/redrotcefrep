@@ -423,6 +423,16 @@ class Store extends Model
         return $this->hasOne(Domain::class)->where('status', DomainStatus::CONNECTED->value);
     }
 
+    /**
+     * Get page views.
+     *
+     * @return HasMany
+     */
+    public function pageViews(): HasMany
+    {
+        return $this->hasMany(PageView::class);
+    }
+
     protected $appends = [
         'web_link', 'ussd_shortcode'
     ];

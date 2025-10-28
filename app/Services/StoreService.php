@@ -612,6 +612,50 @@ class StoreService extends BaseService
         return ['insights' => $insights];
     }
 
+
+    /**
+     * Show store basic insights.
+     *
+     * @param Store $store
+     * @param array $data
+     * @return array
+     */
+    public function showStoreBasicInsights(Store $store, array $data): array
+    {
+        $startDate = $data['start_date'] ?? now()->subtract(7);
+        $endDate = $data['end_date'] ?? now();
+
+        // Initialize query builders
+        $ordersQuery = $store->orders();
+        $viewsQuery = $store->pageViews();
+
+        // Apply date range filter if provided
+        if ($startDate) {
+            $viewsQuery->whereDate('created_at', '>=', $startDate);
+            $ordersQuery->whereDate('created_at', '>=', $startDate);
+        }
+
+        if ($endDate) {
+            $viewsQuery->whereDate('created_at', '<=', $endDate);
+            $ordersQuery->whereDate('created_at', '<=', $endDate);
+        }
+
+        // Calculate total views
+        $totalViews = $viewsQuery->count();
+
+        // Calculate total orders
+        $totalOrders = $ordersQuery->count();
+
+        // Calculate total sales (sum of grand_total)
+        $totalSales = $ordersQuery->sum('grand_total');
+
+        return [
+            'total_views' => $totalViews,
+            'total_orders' => $totalOrders,
+            'total_sales' => MoneyService::convertToMoneyFormat($totalSales, $store->currency)
+        ];
+    }
+
     /**
      * Show store QR code.
      *

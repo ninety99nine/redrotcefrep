@@ -68,6 +68,7 @@
         <div>
 
             <VueDatePicker
+                :range="range"
                 :is-24="is24"
                 :id="uniqueId"
                 :format="format"
@@ -76,6 +77,7 @@
                 :min-time="minTime"
                 :max-time="maxTime"
                 :disabled="disabled"
+                :auto-apply="autoApply"
                 :model-type="modelType"
                 :year-range="yearRange"
                 :start-time="startTime"
@@ -123,7 +125,6 @@
     import '@vuepic/vue-datepicker/dist/main.css';
     import VueDatePicker from '@vuepic/vue-datepicker';
     import capitalize from '@Directives/capitalize.js';
-    import { formattedDate } from '@Utils/dateUtils.js';
     import { generateUniqueId } from '@Utils/generalUtils.js';
 
     export default {
@@ -131,7 +132,7 @@
         components: { Popover, Tooltip, VueDatePicker },
         props: {
             modelValue: {
-                type: [String, null]
+                type: [String, Array, null]
             },
             label: {
                 type: [String, null],
@@ -195,6 +196,14 @@
             modelType: {
                 type: String,
                 default: 'yyyy-MM-dd'     //  yyyy-MM-dd HH:mm
+            },
+            range: {
+                type: Boolean,
+                default: false
+            },
+            autoApply: {
+                type: Boolean,
+                default: true
             },
             minDate: {
                 type: [String, null],

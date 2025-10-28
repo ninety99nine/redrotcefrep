@@ -16,6 +16,7 @@ use App\Http\Requests\Store\DeleteStoreRequest;
 use App\Http\Requests\Store\DeleteStoresRequest;
 use App\Http\Requests\Store\ShowStoreByAliasRequest;
 use App\Http\Requests\Store\ShowStoreInsightsRequest;
+use App\Http\Requests\Store\ShowStoreBasicInsightsRequest;
 
 class StoreController extends Controller
 {
@@ -148,6 +149,18 @@ class StoreController extends Controller
     public function showStoreInsights(ShowStoreInsightsRequest $request, Store $store): array
     {
         return $this->service->showStoreInsights($store, $request->validated());
+    }
+
+    /**
+     * Show store basic insights.
+     *
+     * @param ShowStoreBasicInsightsRequest $request
+     * @param Store $store
+     * @return array
+     */
+    public function showStoreBasicInsights(ShowStoreBasicInsightsRequest $request, Store $store): array
+    {
+        return $this->service->showStoreBasicInsights($store, $request->validated());
     }
 
     /**

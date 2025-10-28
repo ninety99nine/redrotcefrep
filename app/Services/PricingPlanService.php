@@ -282,12 +282,11 @@ class PricingPlanService extends BaseService
     /**
      * Verify pricing plan payment.
      *
-     * @param PricingPlan $pricingPlan
      * @param Transaction $transaction
      * @return TransactionResource
      * @throws Exception
      */
-    public function verifyPricingPlanPayment(PricingPlan $pricingPlan, Transaction $transaction): TransactionResource
+    public function verifyPricingPlanPayment(Transaction $transaction): TransactionResource
     {
         try {
 
@@ -296,6 +295,7 @@ class PricingPlanService extends BaseService
 
             if (!$transaction->isPaid()) {
 
+                $pricingPlan = $transaction->owner;
                 $paymentMethod = $transaction->paymentMethod;
 
                 if (!$paymentMethod) {

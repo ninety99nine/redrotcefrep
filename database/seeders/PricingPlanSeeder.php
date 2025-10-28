@@ -187,7 +187,7 @@ class PricingPlanSeeder extends Seeder
 
             //  Store Plans
             [
-                'name' => 'Basic',
+                'name' => 'Basic Plan',
                 'price' => 5.00,
                 'currency' => 'USD',
                 'discount_percentage_rate' => 0,
@@ -212,7 +212,7 @@ class PricingPlanSeeder extends Seeder
                 ]
             ],
             [
-                'name' => 'Basic',
+                'name' => 'Basic Plan',
                 'price' => 60.00,
                 'currency' => 'USD',
                 'discount_percentage_rate' => 0,
@@ -237,7 +237,7 @@ class PricingPlanSeeder extends Seeder
                 ]
             ],
             [
-                'name' => 'Premium',
+                'name' => 'Premium Plan',
                 'price' => 15.00,
                 'currency' => 'USD',
                 'discount_percentage_rate' => 0,
@@ -267,7 +267,7 @@ class PricingPlanSeeder extends Seeder
                 ]
             ],
             [
-                'name' => 'Premium',
+                'name' => 'Premium Plan',
                 'price' => 180.00,
                 'currency' => 'USD',
                 'discount_percentage_rate' => 0,
@@ -299,7 +299,7 @@ class PricingPlanSeeder extends Seeder
 
             //  AI Assistant Plans
             [
-                'name' => 'Basic',
+                'name' => 'Basic Plan',
                 'price' => 5.00,
                 'currency' => 'USD',
                 'discount_percentage_rate' => 0,

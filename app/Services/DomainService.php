@@ -214,13 +214,12 @@ class DomainService extends BaseService
 
             if (!$transaction->isPaid()) {
 
+                $domain = $transaction->owner;
                 $paymentMethod = $transaction->paymentMethod;
 
                 if (!$paymentMethod) {
                     throw new Exception('The transaction payment method does not exist');
                 }
-
-                $domain = $transaction->owner;
 
                 if (!$domain || $transaction->owner_type !== 'domain') {
                     throw new Exception('The transaction is not associated with a domain');

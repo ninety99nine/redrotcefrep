@@ -94,6 +94,7 @@ class CreateStoreRequest extends FormRequest
             'google_analytics_id' => ['nullable', 'string', 'max:20', 'regex:/^G-[A-Z0-9]+$/'],
             'meta_pixel_id' => ['nullable', 'string', 'max:20', 'regex:/^[0-9]+$/'],
             'tiktok_pixel_id' => ['nullable', 'string', 'max:20', 'regex:/^[A-Z0-9]+$/'],
+            'logo' => ['nullable', 'file', 'mimes:jpeg,png,jpg,gif,webp,svg', 'max:5120']
         ];
     }
 
@@ -219,6 +220,9 @@ class CreateStoreRequest extends FormRequest
             'tiktok_pixel_id.string' => 'The TikTok Pixel ID must be a string.',
             'tiktok_pixel_id.max' => 'The TikTok Pixel ID must not exceed 20 characters.',
             'tiktok_pixel_id.regex' => 'The TikTok Pixel ID must be an alphanumeric string.',
+            'logo.file' => 'The logo must be a valid file.',
+            'logo.mimes' => 'The logo must be a JPEG, PNG, JPG, GIF, or SVG.',
+            'logo.max' => 'The logo size must not exceed 5MB.'
         ];
     }
 }

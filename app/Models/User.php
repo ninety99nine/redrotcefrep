@@ -58,9 +58,9 @@ class User extends Authenticatable
      */
     public function stores(): BelongsToMany
     {
-        return $this->belongsToMany(Store::class, 'store_follower')
-                    ->using(StoreFollower::class)
-                    ->as('store_follower')
+        return $this->belongsToMany(Store::class, 'store_user')
+                    ->using(StoreUser::class)
+                    ->as('store_user')
                     ->withTimestamps();
     }
 

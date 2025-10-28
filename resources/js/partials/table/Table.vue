@@ -17,7 +17,7 @@
                 :placeholder="searchPlaceholder">
             </Input>
 
-            <div v-if="pagination" class="flex justify-center items-center space-x-4">
+            <div class="flex justify-center items-center space-x-4">
 
                 <!-- Filter Drawer Button -->
                 <FilterDrawer ref="filterDrawer" :resource="resource" :filterExpressions="filterExpressions" @updatedFilters="updatedFilters"></FilterDrawer>

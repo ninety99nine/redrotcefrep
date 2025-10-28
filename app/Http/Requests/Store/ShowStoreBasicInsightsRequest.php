@@ -1,11 +1,10 @@
 <?php
 
-namespace App\Http\Requests\Order;
+namespace App\Http\Requests\Store;
 
-use App\Models\Order;
 use Illuminate\Foundation\Http\FormRequest;
 
-class ShowOrderStatusCountsRequest extends FormRequest
+class ShowStoreBasicInsightsRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -14,7 +13,7 @@ class ShowOrderStatusCountsRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return $this->user()->can('viewAny', Order::class);
+        return $this->user()->can('view', $this->route('store'));
     }
 
     /**
@@ -25,10 +24,8 @@ class ShowOrderStatusCountsRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'store_id' => ['sometimes', 'uuid'],
             'end_date' => ['nullable', 'date'],
-            'start_date' => ['nullable', 'date'],
-            'placed_by_user_id' => ['nullable', 'uuid'],
+            'start_date' => ['nullable', 'date']
         ];
     }
 
@@ -39,9 +36,6 @@ class ShowOrderStatusCountsRequest extends FormRequest
      */
     public function messages(): array
     {
-        return [
-            'store_id.uuid' => 'The store ID must be a valid UUID.',
-            'placed_by_user_id.uuid' => 'The placed by user ID must be a valid UUID.'
-        ];
+        return [];
     }
 }

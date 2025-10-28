@@ -69,6 +69,18 @@ class PricingPlanController extends Controller
     }
 
     /**
+     * Verify pricing plan payment.
+     *
+     * @param VerifyPricingPlanPaymentRequest $request
+     * @param Transaction $transaction
+     * @return TransactionResource
+     */
+    public function verifyPricingPlanPayment(VerifyPricingPlanPaymentRequest $request, Transaction $transaction): TransactionResource
+    {
+        return $this->service->verifyPricingPlanPayment($transaction);
+    }
+
+    /**
      * Show pricing plan.
      *
      * @param ShowPricingPlanRequest $request
@@ -114,18 +126,5 @@ class PricingPlanController extends Controller
     public function payPricingPlan(PayPricingPlanRequest $request, PricingPlan $pricingPlan): TransactionResource|array
     {
         return $this->service->payPricingPlan($pricingPlan, $request->validated());
-    }
-
-    /**
-     * Verify pricing plan payment.
-     *
-     * @param VerifyPricingPlanPaymentRequest $request
-     * @param PricingPlan $pricingPlan
-     * @param Transaction $transaction
-     * @return TransactionResource
-     */
-    public function verifyPricingPlanPayment(VerifyPricingPlanPaymentRequest $request, PricingPlan $pricingPlan, Transaction $transaction): TransactionResource
-    {
-        return $this->service->verifyPricingPlanPayment($pricingPlan, $transaction);
     }
 }

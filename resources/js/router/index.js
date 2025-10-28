@@ -94,13 +94,13 @@ const routes = [
                                         path: '',
                                         name: 'show-shop-payment-methods',
                                         component: () => import('@Pages/shop/payments/PaymentMethods.vue'),
-                                        meta: { title: 'Payment methods' }
+                                        meta: { title: 'Payment options' }
                                     },
                                     {
                                         path: ':store_payment_method_id',
                                         name: 'show-shop-payment-method',
                                         component: () => import('@Pages/shop/payments/PaymentMethod.vue'),
-                                        meta: { title: 'Payment method' }
+                                        meta: { title: 'Payment option' }
                                     },
                                     {
                                         path: 'pending',
@@ -631,7 +631,27 @@ const routes = [
                                 component: () => import('@Pages/settings/domains/Domain.vue')
                             }
                         ]
-                    }
+                    },
+                    {
+                        path: 'team-members',
+                        children: [
+                            {
+                                path: '',
+                                name: 'show-team-members',
+                                component: () => import('@Pages/team-members/TeamMembers.vue')
+                            },
+                            {
+                                path: 'add',
+                                name: 'add-team-member',
+                                component: () => import('@Pages/team-members/team-member/TeamMember.vue')
+                            },
+                            {
+                                path: ':user_id',
+                                name: 'edit-team-member',
+                                component: () => import('@Pages/team-members/team-member/TeamMember.vue')
+                            }
+                        ]
+                    },
                 ]
             },
             {
@@ -674,13 +694,20 @@ const router = createRouter({
 
 // Axios interceptor to add custom headers
 axios.interceptors.request.use(config => {
+
     /**
      *  Headers to capture and send page views to the backend.
      */
     const currentRoute = router.currentRoute.value;
-    config.headers['frontend-page-url'] = currentRoute.fullPath || '/';
-    config.headers['frontend-page-name'] = currentRoute.meta?.title || currentRoute.name || 'Unknown Page';
+
+    if(currentRoute.meta?.title) {
+        config.headers['frontend-page-name'] = currentRoute.meta.title;
+        config.headers['frontend-page-url'] = currentRoute.fullPath || '/';
+
+    }
+
     return config;
+
 });
 
 router.beforeEach(async (to, from, next) => {

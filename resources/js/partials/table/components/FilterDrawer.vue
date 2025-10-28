@@ -206,7 +206,6 @@ export default {
             showMore: false,
             localFilters: null,
             filterDrawer: null,
-            originalFilters: null,
             isLoadingFilters: false,
             lastEmittedFilters: null,
         };
@@ -321,35 +320,60 @@ export default {
                 this.lastEmittedFilters = cloneDeep(filters);
             }
         },
-        applyFilterExpressions() {
-            this.filterExpressions.forEach((filterExpression) => {
+        applyFilterExpressions(localFilters) {
+
+            for (let index = 0; index < this.filterExpressions.length; index++) {
+
+                const filterExpression = this.filterExpressions[index];
                 const parts = filterExpression.split(':');
+
                 const target = parts[0]; // e.g., 'country'
                 const operator = parts[1]; // e.g., 'eq'
                 const value = parts[2]; // e.g., 'US'
                 const value2 = parts[3] ?? null; // e.g., 'US,CA' for 'in'
 
-                const matchingFilter = this.localFilters.find(filter => filter.target === target);
-                if (matchingFilter) {
-                    matchingFilter.options.forEach((option) => {
-                        if (option.value === operator) {
-                            option.active = true;
-                            if (matchingFilter.type === 'date' && value && dayjs(value).isValid()) {
-                                option.value = dayjs(value).format('DD MMM YYYY');
-                                if (value2 && dayjs(value2).isValid()) {
-                                    option.value2 = dayjs(value2).format('DD MMM YYYY');
+                for (let index2 = 0; index2 < localFilters.length; index2++) {
+
+                    const localFilter = localFilters[index2];
+
+                    if(localFilter.target == target) {
+
+                        localFilters[index2].active = true;
+
+                        for (let index3 = 0; index3 < localFilter.options.length; index3++) {
+
+                            const option = localFilter.options[index3];
+
+                            if (option.value === value) {
+
+                                localFilters[index2].options[index3].active = true;
+
+                                if (localFilter.type === 'date' && value && dayjs(value).isValid()) {
+
+                                    localFilters[index2].options[index3].value = dayjs(value).format('DD MMM YYYY');
+
+                                    if (value2 && dayjs(value2).isValid()) {
+                                        localFilters[index2].options[index3].value2 = dayjs(value2).format('DD MMM YYYY');
+                                    }
+
+                                } else if (['in', 'not_in'].includes(operator)) {
+                                    localFilters[index2].options[index3].value = value.split(',')[0];
+                                    localFilters[index2].options[index3].value2 = value;
+                                } else {
+                                    localFilters[index2].options[index3].value = value;
+                                    localFilters[index2].options[index3].value2 = value2;
                                 }
-                            } else if (['in', 'not_in'].includes(operator)) {
-                                option.value = value.split(',')[0];
-                                option.value2 = value;
-                            } else {
-                                option.value = value;
-                                option.value2 = value2;
+
                             }
+
                         }
-                    });
+
+                    }
+
                 }
-            });
+            }
+
+            return localFilters;
         },
         filtersHaveChanged(filter1, filter2) {
             var a = cloneDeep(filter1);
@@ -384,7 +408,7 @@ export default {
             }
         },
         clearFilters() {
-            this.localFilters = cloneDeep(this.originalFilters);
+            this.localFilters = null;
         },
         async getFilters() {
             try {
@@ -396,7 +420,8 @@ export default {
                     }
                 };
                 const response = await axios.get('/api/filters', config);
-                this.localFilters = response.data.map(filter => {
+
+                const localFilters = response.data.map(filter => {
                     return {
                         ...filter,
                         active: false,
@@ -423,8 +448,9 @@ export default {
                         })
                     };
                 });
-                this.originalFilters = cloneDeep(this.localFilters);
-                this.applyFilterExpressions();
+
+                this.localFilters = this.applyFilterExpressions(localFilters);
+
             } catch (error) {
                 const message = error?.response?.data?.message || error?.message || 'Something went wrong while fetching the filter options';
                 this.notificationState.showWarningNotification(message);

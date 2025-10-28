@@ -5,7 +5,7 @@
         <!-- Notifications -->
         <Notifications></Notifications>
 
-        <nav class="select-none fixed top-0 z-30 w-full bg-white border-b border-gray-200">
+        <nav :class="['select-none fixed top-0 z-30 w-full', { 'bg-white border-b border-gray-200' : !isOnboarding }]">
 
             <div class="px-3 py-3 lg:px-5 lg:pl-3">
 
@@ -42,7 +42,7 @@
 
                             </template>
 
-                            <template v-else>
+                            <template v-else-if="!isOnboarding">
 
                                 <!-- Application Logo -->
                                 <Logo
@@ -66,7 +66,7 @@
                     <template v-else>
 
                         <div
-                            v-if="authUser"
+                            v-if="authUser && !isOnboarding"
                             class="flex w-full justify-center items-center">
                             <div
                                 @click.stop="navigateToManageStores"
@@ -95,7 +95,9 @@
 
                             <div class="flex items-center ms-3">
 
-                                <Dropdown dropdownClasses="w-72">
+                                <Dropdown
+                                    position="left"
+                                    dropdownClasses="w-72">
 
                                     <template #trigger="props">
 
@@ -199,7 +201,7 @@
                         v-for="(navMenu, index) in navMenus">
 
                         <div
-                            @click="() => navMenuHasChildren(navMenu) ? toggleNavMenuExpansion(index) : navigateToNavRoute(navMenu)"
+                            @click.stop="() => navMenuHasChildren(navMenu) ? toggleNavMenuExpansion(index) : navigateToNavRoute(navMenu)"
                             :class="[{ 'bg-gray-100' : isActiveNavMenu(navMenu) && !navMenuHasChildren(navMenu) }, 'cursor-pointer py-2.5 px-4 text-gray-900 hover:bg-gray-100 group']">
 
                             <div class="flex items-center text-gray-700">
@@ -236,9 +238,6 @@
                                 <!-- Transactions Icon -->
                                 <Banknote v-else-if="navMenu.name == 'Transactions'" size="20"></Banknote>
 
-                                <!-- Team Members Icon -->
-                                <UsersRound v-else-if="navMenu.name == 'Team Members'" size="20"></UsersRound>
-
                                 <!-- Pages Icon -->
                                 <Files v-else-if="navMenu.name == 'Pages'" size="20"></Files>
 
@@ -263,14 +262,13 @@
 
                         </div>
 
-                        <template v-if="navMenuHasChildren(navMenu) && hasExpandedNavMenu(navMenu)">
-
+                        <VueSlideUpDown v-if="navMenuHasChildren(navMenu)" :active="navMenuHasChildren(navMenu) && hasExpandedNavMenu(navMenu)">
                             <template
-                                :key="index"
-                                v-for="(navMenuChild, index) in navMenu.children">
+                                :key="index2"
+                                v-for="(navMenuChild, index2) in navMenu.children">
 
                                 <div
-                                    @click="navigateToNavRoute(navMenuChild)"
+                                    @click.stop="navigateToNavRoute(navMenuChild, index)"
                                     :class="[{ 'bg-gray-100' : isActiveNavMenu(navMenuChild) }, 'cursor-pointer pl-8 py-1 text-gray-900 hover:bg-gray-100 group']">
 
                                     <span :class="[{ 'text-gray-900' : isActiveNavMenu(navMenuChild) }, 'font-normal text-sm ms-3 text-gray-500 group-hover:text-gray-900']">{{ navMenuChild.name }}</span>
@@ -278,8 +276,7 @@
                                 </div>
 
                             </template>
-
-                        </template>
+                        </VueSlideUpDown>
 
                         <div v-if="['Team Members', 'Subscriptions'].includes(navMenu.name)" class="border-t border-gray-300 border-dashed pt-2 mt-2"></div>
 
@@ -318,16 +315,17 @@
     import Button from '@Partials/Button.vue';
     import Dropdown from '@Partials/Dropdown.vue';
     import Skeleton from '@Partials/Skeleton.vue';
+    import VueSlideUpDown from 'vue-slide-up-down';
     import StoreLogo from '@Components/StoreLogo.vue';
     import Notifications from '@Layouts/dashboard/components/Notifications.vue';
     import ChangeHistoryNavigation from '@Layouts/dashboard/components/ChangeHistoryNavigation.vue';
-    import { Box, Star, Menu, Files, Megaphone, House, Inbox, Rocket, LogOut, ChartArea, MoveLeft, UserRound, UsersRound, Banknote, Settings, ExternalLink, ChevronUp, ChevronDown, Smartphone, WandSparkles, TicketPercent } from 'lucide-vue-next';
+    import { Box, Star, Menu, Files, Megaphone, House, Inbox, Rocket, LogOut, ChartArea, MoveLeft, UserRound, Banknote, Settings, ExternalLink, ChevronUp, ChevronDown, Smartphone, WandSparkles, TicketPercent } from 'lucide-vue-next';
 
     export default {
         inject: ['uiState', 'formState', 'authState', 'storeState', 'notificationState', 'changeHistoryState'],
         components: {
-            Box, Star, Menu, Files, Megaphone, House, Inbox, Rocket, LogOut, ChartArea, UserRound, UsersRound, Banknote, Settings, ExternalLink, ChevronUp, ChevronDown, Smartphone, WandSparkles, TicketPercent,
-            Logo, Loader, Button, Dropdown, Skeleton, StoreLogo, Notifications, ChangeHistoryNavigation
+            Box, Star, Menu, Files, Megaphone, House, Inbox, Rocket, LogOut, ChartArea, UserRound, Banknote, Settings, ExternalLink, ChevronUp, ChevronDown, Smartphone, WandSparkles, TicketPercent,
+            Logo, Loader, Button, Dropdown, Skeleton, VueSlideUpDown, StoreLogo, Notifications, ChangeHistoryNavigation
         },
         data() {
             return {
@@ -349,13 +347,10 @@
             }
         },
         watch: {
-            '$route.params.store_id'(newValue, oldValue) {
-                if(this.storeId) this.showStore();
+            storeId() {
+                this.showStore();
             },
-            '$route.query.store_id'(newValue, oldValue) {
-                if(this.storeId) this.showStore();
-            },
-            '$route.meta.settings'() {
+            '$route'() {
                 this.navMenus = this.buildNavMenus();
             }
         },
@@ -400,8 +395,28 @@
             hasExpandedNavMenu(navMenu) {
                 return navMenu.expanded;
             },
+            expandNavMenu(index) {
+                for (let i = 0; i < this.navMenus.length; i++) {
+                    if(i == index) {
+                        this.navMenus[i].expanded = true;
+                    }else{
+                        this.navMenus[i].expanded = false;
+                    }
+                }
+            },
             toggleNavMenuExpansion(index) {
-                this.navMenus[index].expanded = !this.navMenus[index].expanded;
+                for (let i = 0; i < this.navMenus.length; i++) {
+                    if(i == index) {
+                        this.navMenus[i].expanded = !this.navMenus[i].expanded;
+                    }else{
+                        this.navMenus[i].expanded = false;
+                    }
+                }
+            },
+            collapseAllNavMenus() {
+                for (let i = 0; i < this.navMenus.length; i++) {
+                    this.navMenus[i].expanded = false;
+                }
             },
             buildNavMenus() {
 
@@ -436,10 +451,16 @@
                         {
                             name: 'Domains',
                             routeName: 'show-domains',
+                            associatedRouteNames: ['edit-domain', 'buy-domain', 'add-domain'],
                         },
                         {
                             name: 'Billing',
                             routeName: 'show-billing-settings',
+                        },
+                        {
+                            name: 'Team',
+                            routeName: 'show-team-members',
+                            associatedRouteNames: ['edit-team-member', 'add-team-member'],
                         },
                         {
                             name: 'SEO',
@@ -526,7 +547,7 @@
                                 {
                                     name: 'All',
                                     routeName: 'show-promotions',
-                                    associatedRouteNames: ['create-promotion', 'edit-promotion',]
+                                    associatedRouteNames: ['create-promotion', 'edit-promotion']
                                 },
                                 {
                                     name: 'Import',
@@ -553,7 +574,8 @@
                         },
                         {
                             name: 'Design',
-                            routeName: 'edit-storefront'
+                            routeName: 'edit-storefront',
+                            associatedRouteNames: ['edit-checkout', 'edit-payment', 'edit-menu']
                         },
                         {
                             name: 'Settings',
@@ -623,7 +645,13 @@
                     params: { store_id: this.store.id }
                 })
             },
-            navigateToNavRoute(navMenu) {
+            navigateToNavRoute(navMenu, index = null) {
+                if(index == null) {
+                    this.collapseAllNavMenus();
+                }else{
+                    this.expandNavMenu(index);
+                }
+
                 if(['show-store-home'].includes(navMenu.routeName)) {
                     this.$router.push({
                         name: navMenu.routeName,
