@@ -1,5 +1,5 @@
 <template>
-    <img :class="height" :src="`/images/logo-black-transparent.png`" alt="Perfect Order Logo">
+    <img :class="height" :src="`/images/logo-black-transparent.png`" :alt="`${appName} Logo`">
 </template>
 
 <script>
@@ -8,6 +8,11 @@ export default {
         height: {
             type: String,
             default: 'h-16'
+        }
+    },
+    data() {
+        return {
+            appName: import.meta.env.VITE_APP_NAME
         }
     }
 };

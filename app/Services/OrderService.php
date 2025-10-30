@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use Exception;
+use App\Models\User;
 use App\Models\Order;
 use App\Models\Store;
 use App\Jobs\SendSms;
@@ -16,12 +17,18 @@ use App\Models\Transaction;
 use App\Models\OrderProduct;
 use Barryvdh\DomPDF\Facade\Pdf;
 use App\Models\DeliveryAddress;
+use App\Enums\PaymentMethodType;
 use App\Enums\OrderPaymentStatus;
+use App\Enums\TransactionFailureType;
+use App\Models\StorePaymentMethod;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Resources\OrderResource;
 use App\Services\ShoppingCartService;
 use App\Http\Resources\OrderResources;
+use App\Enums\TransactionPaymentStatus;
+use App\Enums\TransactionVerificationType;
+use App\Http\Resources\TransactionResource;
 use Illuminate\Database\Eloquent\Collection;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use \Symfony\Component\HttpFoundation\BinaryFileResponse;
@@ -81,69 +88,6 @@ class OrderService extends BaseService
 
         $query = $query->when(!request()->has('_sort'), fn($query) => $query->latest());
         return $this->setQuery($query)->getOutput();
-    }
-
-    /**
-     * Show order status counts.
-     *
-     * @param array $data
-     * @return array
-     */
-    public function showOrderStatusCounts(array $data): array
-    {
-        $storeId = $data['store_id'];
-        $endDate = $data['end_date'] ?? null;
-        $startDate = $data['start_date'] ?? null;
-        $store = $storeId ? Store::find($storeId) : null;
-        $placedByUserId = $data['placed_by_user_id'] ?? null;
-
-        $query = DB::table('orders')->selectRaw('
-            COUNT(*) as total_orders,
-            CAST(SUM(CASE WHEN status = ? THEN 1 ELSE 0 END) AS UNSIGNED) as waiting_count,
-            CAST(SUM(CASE WHEN status = ? THEN 1 ELSE 0 END) AS UNSIGNED) as cancelled_count,
-            CAST(SUM(CASE WHEN status = ? THEN 1 ELSE 0 END) AS UNSIGNED) as completed_count,
-            CAST(SUM(CASE WHEN status = ? THEN 1 ELSE 0 END) AS UNSIGNED) as on_its_way_count,
-            CAST(SUM(CASE WHEN status = ? THEN 1 ELSE 0 END) AS UNSIGNED) as ready_for_pickup_count,
-            CAST(SUM(CASE WHEN payment_status = ? THEN 1 ELSE 0 END) AS UNSIGNED) as paid_count,
-            CAST(SUM(CASE WHEN payment_status = ? THEN 1 ELSE 0 END) AS UNSIGNED) as unpaid_count,
-            CAST(SUM(CASE WHEN payment_status = ? THEN 1 ELSE 0 END) AS UNSIGNED) as partially_paid_count,
-            CAST(SUM(CASE WHEN payment_status = ? THEN 1 ELSE 0 END) AS UNSIGNED) as waiting_confirmation_count
-        ', [
-            OrderStatus::WAITING->value,
-            OrderStatus::CANCELLED->value,
-            OrderStatus::COMPLETED->value,
-            OrderStatus::ON_ITS_WAY->value,
-            OrderStatus::READY_FOR_PICKUP->value,
-            OrderPaymentStatus::PAID->value,
-            OrderPaymentStatus::UNPAID->value,
-            OrderPaymentStatus::PARTIALLY_PAID->value,
-            OrderPaymentStatus::WAITING_CONFIRMATION->value,
-        ]);
-
-        if($store) $query->where('store_id', $storeId);
-        if($endDate) $query->whereDate('created_at', '<=', $endDate);
-        if($startDate) $query->whereDate('created_at', '>=', $startDate);
-        if($placedByUserId) $query->where('placed_by_user_id', $placedByUserId);
-
-        $result = $query->first();
-
-        return [
-            'total_orders' => $result->total_orders ?? 0,
-            'status_counts' => [
-                'waiting' => $result->waiting_count ?? 0,
-                'completed' => $result->completed_count ?? 0,
-                'on_its_way' => $result->on_its_way_count ?? 0,
-                'ready_for_pickup' => $result->ready_for_pickup_count ?? 0,
-                'cancelled' => $result->cancelled_count ?? 0,
-            ],
-            'payment_status_counts' => [
-                'paid' => $result->paid_count ?? 0,
-                'unpaid' => $result->unpaid_count ?? 0,
-                'partially_paid' => $result->partially_paid_count ?? 0,
-                'waiting_confirmation' => $result->waiting_confirmation_count ?? 0,
-            ]
-        ];
-
     }
 
     /**
@@ -294,6 +238,139 @@ class OrderService extends BaseService
         }, 'name.pdf');
     }
 
+
+    /**
+     * Show order status counts.
+     *
+     * @param array $data
+     * @return array
+     */
+    public function showOrderStatusCounts(array $data): array
+    {
+        $storeId = $data['store_id'];
+        $endDate = $data['end_date'] ?? null;
+        $startDate = $data['start_date'] ?? null;
+        $store = $storeId ? Store::find($storeId) : null;
+        $placedByUserId = $data['placed_by_user_id'] ?? null;
+
+        $query = DB::table('orders')->selectRaw('
+            COUNT(*) as total_orders,
+            CAST(SUM(CASE WHEN status = ? THEN 1 ELSE 0 END) AS UNSIGNED) as waiting_count,
+            CAST(SUM(CASE WHEN status = ? THEN 1 ELSE 0 END) AS UNSIGNED) as cancelled_count,
+            CAST(SUM(CASE WHEN status = ? THEN 1 ELSE 0 END) AS UNSIGNED) as completed_count,
+            CAST(SUM(CASE WHEN status = ? THEN 1 ELSE 0 END) AS UNSIGNED) as on_its_way_count,
+            CAST(SUM(CASE WHEN status = ? THEN 1 ELSE 0 END) AS UNSIGNED) as ready_for_pickup_count,
+            CAST(SUM(CASE WHEN payment_status = ? THEN 1 ELSE 0 END) AS UNSIGNED) as paid_count,
+            CAST(SUM(CASE WHEN payment_status = ? THEN 1 ELSE 0 END) AS UNSIGNED) as unpaid_count,
+            CAST(SUM(CASE WHEN payment_status = ? THEN 1 ELSE 0 END) AS UNSIGNED) as partially_paid_count,
+            CAST(SUM(CASE WHEN payment_status = ? THEN 1 ELSE 0 END) AS UNSIGNED) as waiting_confirmation_count
+        ', [
+            OrderStatus::WAITING->value,
+            OrderStatus::CANCELLED->value,
+            OrderStatus::COMPLETED->value,
+            OrderStatus::ON_ITS_WAY->value,
+            OrderStatus::READY_FOR_PICKUP->value,
+            OrderPaymentStatus::PAID->value,
+            OrderPaymentStatus::UNPAID->value,
+            OrderPaymentStatus::PARTIALLY_PAID->value,
+            OrderPaymentStatus::WAITING_CONFIRMATION->value,
+        ]);
+
+        if($store) $query->where('store_id', $storeId);
+        if($endDate) $query->whereDate('created_at', '<=', $endDate);
+        if($startDate) $query->whereDate('created_at', '>=', $startDate);
+        if($placedByUserId) $query->where('placed_by_user_id', $placedByUserId);
+
+        $result = $query->first();
+
+        return [
+            'total_orders' => $result->total_orders ?? 0,
+            'status_counts' => [
+                'waiting' => $result->waiting_count ?? 0,
+                'completed' => $result->completed_count ?? 0,
+                'on_its_way' => $result->on_its_way_count ?? 0,
+                'ready_for_pickup' => $result->ready_for_pickup_count ?? 0,
+                'cancelled' => $result->cancelled_count ?? 0,
+            ],
+            'payment_status_counts' => [
+                'paid' => $result->paid_count ?? 0,
+                'unpaid' => $result->unpaid_count ?? 0,
+                'partially_paid' => $result->partially_paid_count ?? 0,
+                'waiting_confirmation' => $result->waiting_confirmation_count ?? 0,
+            ]
+        ];
+
+    }
+
+    /**
+     * Verify order payment.
+     *
+     * @param Transaction $transaction
+     * @return TransactionResource
+     * @throws Exception
+     */
+    public function verifyOrderPayment(Transaction $transaction): TransactionResource
+    {
+        try {
+
+            $transaction = $transaction->load(['owner', 'storePaymentMethod', 'paymentMethod']);
+
+            if (!$transaction->isPaid()) {
+
+                $order = $transaction->owner;
+                $paymentMethod = $transaction->paymentMethod;
+                $storePaymentMethod = $transaction->storePaymentMethod;
+
+                if (!$order || $transaction->owner_type !== 'order') {
+                    throw new Exception('The transaction is not associated with an order');
+                }
+
+                if (!$paymentMethod) {
+                    throw new Exception('The transaction payment method does not exist');
+                }
+
+                if ($paymentMethod->type == PaymentMethodType::DPO->value) {
+
+                    if($storePaymentMethod->configs['account_type'] === 'personal') {
+                        $companyToken = $storePaymentMethod->configs['company_token'];
+                    }else{
+                        $companyToken = config('app.dpo_company_token');
+                    }
+
+                    $transactionToken = $transaction->metadata['dpo_transaction_token'];
+                    $metadata = DirectPayOnlineService::verifyPayment($companyToken, $transactionToken);
+
+                    $transaction->update([
+                        'failure_type' => null,
+                        'failure_reason' => null,
+                        'payment_status' => TransactionPaymentStatus::PAID->value,
+                        'metadata' => array_merge($transaction->metadata, $metadata)
+                    ]);
+
+                    $order = $this->updateOrderAmountBalance($order);
+
+                    $this->addOrderComment($order, $transaction->amount->amount_with_currency.' paid using '.$storePaymentMethod->custom_name);
+
+                } else {
+                    throw new Exception('The ' . $paymentMethod->name . ' payment method cannot be used to verify transaction payment');
+                }
+            }
+
+            return (new TransactionService)->showResource($transaction);
+
+        } catch (Exception $e) {
+
+            $transaction->update([
+                'failure_reason' => $e->getMessage(),
+                'payment_status' => TransactionPaymentStatus::FAILED_PAYMENT->value,
+                'failure_type' => TransactionFailureType::PAYMENT_VERIFICATION_FAILED->value
+            ]);
+
+            throw $e;
+
+        }
+    }
+
     /**
      * Show order.
      *
@@ -395,6 +472,77 @@ class OrderService extends BaseService
             return ['message' => 'Order deleted'];
         } else {
             throw new Exception('Order delete unsuccessful');
+        }
+    }
+
+    /**
+     * Pay order.
+     *
+     * @param Order $order
+     * @param array $data
+     * @return array
+     * @throws Exception
+     */
+    public function payOrder(Order $order, array $data): array
+    {
+        try{
+
+            $user = Auth::user() ?? null;
+            $storePaymentMethodId = $data['store_payment_method_id'] ?? null;
+
+            $storePaymentMethod = StorePaymentMethod::with(['store', 'paymentMethod'])->find($storePaymentMethodId);
+            $paymentMethod = $storePaymentMethod->paymentMethod;
+            $store = $storePaymentMethod->store;
+
+            if (!$storePaymentMethod) {
+                throw new Exception('The store payment method is required');
+            }else if (!$storePaymentMethod->active) {
+                throw new Exception('The ' . $storePaymentMethod->name . ' payment method has been deactivated');
+            }else if ($storePaymentMethod->requires_verification) {
+                throw new Exception('The ' . $storePaymentMethod->name . ' payment method has not been verified');
+            }
+
+            $transactionPayload = $this->prepareTransactionPayload($user, $order, $storePaymentMethod);
+            $transaction = Transaction::create($transactionPayload);
+
+            $transaction->setRelation('owner', $order);
+            $transaction->setRelation('store', $store);
+            $transaction->setRelation('requestedByUser', $user);
+            $transaction->setRelation('storePaymentMethod', $storePaymentMethod);
+
+            if ($paymentMethod->type == PaymentMethodType::DPO->value) {
+
+                if($storePaymentMethod->configs['account_type'] === 'personal') {
+                    $companyToken = $storePaymentMethod->configs['company_token'];
+                }else{
+                    $companyToken = config('app.dpo_company_token');
+                }
+
+                $dpoPaymentLinkPayload = $this->prepareDpoPaymentLinkPayload($transaction);
+                $metadata = DirectPayOnlineService::createPaymentLink($companyToken, $dpoPaymentLinkPayload);
+
+                $transaction->update(['metadata' => $metadata]);
+
+                return [
+                    'successful' => true,
+                    'message' => 'The DPO link successfully created',
+                    'transaction' => (new TransactionService())->showResource($transaction)
+                ];
+
+            }
+
+            return [
+                'successful' => false,
+                'message' => 'The store payment method is not supported'
+            ];
+
+        } catch (Exception $e) {
+
+            return [
+                'successful' => false,
+                'message' => $e->getMessage()
+            ];
+
         }
     }
 
@@ -994,5 +1142,86 @@ class OrderService extends BaseService
         ]);
 
         return $order;
+    }
+
+    /**
+     * Prepare transaction payload.
+     *
+     * @param User|null $user
+     * @param Order $order
+     * @param StorePaymentMethod $storePaymentMethod
+     * @return array
+     */
+    private function prepareTransactionPayload(User|null $user, Order $order, StorePaymentMethod $storePaymentMethod): array
+    {
+        return [
+            'percentage' => 100,
+            'store_id' => $order->store_id,
+            'owner_type' => 'order',
+            'owner_id' => $order->id,
+            'requested_by_user_id' => $user?->id,
+            'currency' => $order->currency,
+            'amount' => $order->grand_total->amount,
+            'store_payment_method_id' => $storePaymentMethod->id,
+            'description' => 'Payment for Order #'.$order->number,
+            'payment_method_id' => $storePaymentMethod->paymentMethod->id,
+            'payment_status' => TransactionPaymentStatus::PENDING_PAYMENT->value,
+            'verification_type' => TransactionVerificationType::AUTOMATIC->value
+        ];
+    }
+
+    /**
+     * Prepare DPO payment link payload.
+     *
+     * @param Transaction $transaction
+     * @return array
+     */
+    public function prepareDpoPaymentLinkPayload(Transaction $transaction): array
+    {
+        $order = $transaction->owner;
+        $store = $transaction->store;
+        $companyAccRef = $order->number;
+        $customerPhone = $customerCountry = $customerDialCode = null;
+
+        $redirectUrl = config('app.url').'/'.$store->alias.'/orders/'.$order->id.'/verify-payment?transaction_id='.$transaction->id;
+
+        $customerEmail = $order->customer_email;
+
+        if ($order->customer_mobile_number) {
+            $customerCountry = $customerDialCode = $order->customer_mobile_number->getCountry();
+            $customerPhone = PhoneNumberService::getNationalPhoneNumberWithoutSpaces($order->customer_mobile_number);
+        }
+
+        $metadata = [
+            'Order ID' => $order->id,
+            'Store ID' => $order->store_id,
+            'Transaction ID' => $transaction->id,
+        ];
+
+        return [
+            'ptl' => 24,
+            'ptlType' => 'hours',
+            'companyRefUnique' => 1,
+            'metadata' => $metadata,
+            'customerEmail' => $customerEmail,
+            'companyRef' => $transaction->id,
+            'companyAccRef' => $companyAccRef,
+            'customerPhone' => $customerPhone,
+            'customerCountry' => $customerCountry,
+            'customerLastName' => $order->customer_last_name,
+            'customerDialCode' => $customerDialCode,
+            'customerFirstName' => $order->customer_first_name,
+            'emailTransaction' => !empty($customerEmail),
+            'paymentCurrency' => $order->currency,
+            'paymentAmount' => $order->grand_total->amount,
+            'backURL' => url()->previous(),
+            'redirectURL' => $redirectUrl,
+            'services' => [
+                [
+                    'serviceDescription' => 'Payment for Order #'.$order->number,
+                    'serviceDate' => now()->format('Y/m/d H:i')
+                ]
+            ]
+        ];
     }
 }

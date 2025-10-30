@@ -1,10 +1,10 @@
 @component('mail::message')
 
 <div style="text-align: center; margin-bottom: 20px;">
-    <img src="{{ asset('images/logo-black-transparent.png') }}" alt="Perfect Order Logo" style="max-width: 150px; height: auto;" />
+    <img src="{{ asset('images/logo-black-transparent.png') }}" alt="{{ config('app.name') }} Logo" style="max-width: 150px; height: auto;" />
 </div>
 
-# Welcome to Perfect Order, {{ $firstName }}!
+# Welcome to {{ config('app.name') }}, {{ $firstName }}!
 
 We’re thrilled to have you on board. Your account has been successfully created.
 
@@ -20,6 +20,6 @@ If you have any questions, feel free to contact our support team.
 
 Thanks,
 <br>
-Perfect Order
+{{ config('app.name') }}
 
 @endcomponent

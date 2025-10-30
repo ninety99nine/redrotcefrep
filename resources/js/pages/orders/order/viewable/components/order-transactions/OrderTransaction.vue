@@ -8,7 +8,7 @@
 
                 <div class="flex items-center space-x-2">
                     <Banknote size="20" class="text-gray-400 flex-shrink-0"></Banknote>
-                    <p class="font-semibold text-sm">{{ transaction.description }}</p>
+                    <p class="font-semibold text-sm">{{ transaction.store_payment_method ? transaction.store_payment_method.custom_name : transaction.description }}</p>
                 </div>
 
                 <div class="flex items-center space-x-2 whitespace-nowrap">

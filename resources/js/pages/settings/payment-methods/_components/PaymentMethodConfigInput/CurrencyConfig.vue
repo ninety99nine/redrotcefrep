@@ -7,6 +7,7 @@
         :allowedCurrencies="paymentMethod.currencies"
         :description="configSchemaEntity.description"
         :popoverContent="configSchemaEntity.description_info"
+        :errorText="formState.getFormError(configSchemaEntity.attribute)"
         :secondaryLabel="configSchemaEntity.optional ? '(optional)' : null"
         :externalLinkUrl="configSchemaEntity.learn_more ? configSchemaEntity.learn_more.href : null"
         :externalLinkName="configSchemaEntity.learn_more ? configSchemaEntity.learn_more.label : null">
@@ -19,6 +20,7 @@
     import SelectCurrency from '@Partials/SelectCurrency.vue';
 
     export default {
+        inject: ['formState'],
         components: { SelectCurrency },
         props: {
             modelValue: {

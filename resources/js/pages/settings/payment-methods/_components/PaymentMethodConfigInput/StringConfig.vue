@@ -7,14 +7,15 @@
         :placeholder="configSchemaEntity.placeholder"
         :description="configSchemaEntity.description"
         :popoverContent="configSchemaEntity.description_info"
+        :errorText="formState.getFormError(configSchemaEntity.attribute)"
         :secondaryLabel="configSchemaEntity.optional ? '(optional)' : null"
         :externalLinkUrl="configSchemaEntity.learn_more ? configSchemaEntity.learn_more.href : null"
         :externalLinkName="configSchemaEntity.learn_more ? configSchemaEntity.learn_more.label : null">
 
         <template #prefix>
-                <span class="leading-4 text-gray-400 text-sm">
-                    {{ configSchemaEntity.prefix }}
-                </span>
+            <span class="leading-4 text-gray-400 text-sm">
+                {{ configSchemaEntity.prefix }}
+            </span>
         </template>
 
     </Input>
@@ -26,6 +27,7 @@
     import Input from '@Partials/Input.vue';
 
     export default {
+        inject: ['formState'],
         components: { Input },
         props: {
             modelValue: {

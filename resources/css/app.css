@@ -234,3 +234,13 @@
 .markdown-content a {
   @apply underline text-blue-500;
 }
+
+.fade-1-enter-active,
+.fade-1-leave-active {
+  transition: opacity 0.5s ease;
+}
+
+.fade-1-enter-from,
+.fade-1-leave-to {
+  opacity: 0;
+}

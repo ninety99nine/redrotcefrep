@@ -163,6 +163,46 @@ class DirectPayOnlineService
     }
 
     /**
+     * Check if the company token is valid
+     *
+     * @param string $companyToken
+     * @return array
+     * @throws \Exception
+     */
+    public static function checkCompanyToken(string $companyToken): array
+    {
+        $client = new Client();
+
+        $dummyTransactionToken = '1234';
+
+        $response = $client->post('https://secure.3gdirectpay.com/API/v6/', [
+            'headers' => [
+                'Content-Type' => 'application/xml',
+            ],
+            'body' => self::prepareVerifyTokenXMLTag($companyToken, $dummyTransactionToken)
+        ]);
+
+        $xmlResponse = simplexml_load_string($response->getBody());
+        $result = (string) $xmlResponse->Result;
+
+        if(in_array($result, ['801', '802'])) {
+
+            return [
+                'valid' => false,
+                'message' => 'Company token is not valid'
+            ];
+
+        }else{
+
+            return [
+                'valid' => true,
+                'message' => 'Company token is valid'
+            ];
+
+        }
+    }
+
+    /**
      * Prepare create token XML tag
      *
      * @param string $companyToken

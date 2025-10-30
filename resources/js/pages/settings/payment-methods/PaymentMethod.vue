@@ -27,6 +27,10 @@
                 </div>
 
                 <Skeleton v-if="isLoadingStore || isLoadingStorePaymentMethod || isLoadingPaymentMethod" width="w-16" height="h-4" rounded="rounded-full" :shine="true" class="flex-shrink-0"></Skeleton>
+
+                <!-- Requires Verification Status -->
+                <Pill v-else-if="storePaymentMethod && storePaymentMethod.requires_verification" type="warning" size="xs">Requires verification</Pill>
+
                 <Switch
                     v-else
                     size="xs"
@@ -124,7 +128,9 @@
 
                 </template>
 
-                <div class="border-t border-gray-200 border-dashed space-y-4 mt-4 pt-4">
+                <div
+                    v-if="paymentMethod && !paymentMethod.automated_verification"
+                    class="border-t border-gray-200 border-dashed space-y-4 mt-4 pt-4">
 
                     <!-- Instructions -->
                     <Input
@@ -165,6 +171,61 @@
                         @change="storePaymentMethodState.saveStateDebounced('Mark as paid upon customer confirmation changed')"
                         inputDescription="This will automatically update the payment status to 'Paid' once the customer confirms their payment. This feature is ideal if you trust your customers and wish to streamline the payment process.">
                     </Input>
+
+                </div>
+
+                <div
+                    class="space-y-4 border-t border-gray-300 border-dashed mt-4 pt-4"
+                    v-if="storePaymentMethod && storePaymentMethod.requires_verification">
+
+                    <Alert
+                        type="warning"
+                        :dismissable="false"
+                        title="Activation Pending">
+
+                        <template #description>
+
+                            <p class="text-xs text-justify">
+                                To activate this payment method so that <span class="font-bold">{{ appName }}</span> collects payments on your behalf, our team needs to verify your business. Please contact us via <span @click="openWhatsappGroup" class="font-bold cursor-pointer hover:underline">WhatsApp</span> to provide documents confirming your business's legitimacy and refund policy. Include your Store ID, found below.
+                            </p>
+
+                        </template>
+
+                    </Alert>
+
+                    <div class="space-y-2">
+                        <p class="text-sm font-medium text-gray-900">Store ID</p>
+                        <Copy :text="store.id"></Copy>
+                    </div>
+
+                    <!-- New WhatsApp Group Chat Preview Section -->
+                    <div class="bg-white p-4 shadow-sm rounded-xl">
+
+                        <div class="flex items-end justify-between mb-4">
+
+                            <div>
+                                <h2 class="font-semibold">Activate Now</h2>
+                                <h3 class="text-sm text-gray-500">Lets activate {{ storePaymentMethod.custom_name }} for you</h3>
+                            </div>
+
+                            <Button
+                                size="xs"
+                                type="success"
+                                :action="openWhatsappGroup">
+                                <div class="flex items-center space-x-1">
+                                    <WhatsappIcon size="w-4 h-4" color="#ffffff" class="mx-2"></WhatsappIcon>
+                                    <span class="text-xs">Send Whatsapp</span>
+                                </div>
+                            </Button>
+
+                        </div>
+
+                        <!-- Render animated messages -->
+                        <div class="border border-gray-200 rounded-lg overflow-hidden">
+                            <WhatsappMessage :messages="mockMessages" :animate="true" :loopAnimation="true" class="h-80" />
+                        </div>
+
+                    </div>
 
                 </div>
 
@@ -209,13 +270,19 @@
 
 <script>
 
+    import dayjs from 'dayjs';
+    import Copy from '@Partials/Copy.vue';
+    import Pill from '@Partials/Pill.vue';
     import Modal from '@Partials/Modal.vue';
+    import Alert from '@Partials/Alert.vue';
     import Input from '@Partials/Input.vue';
     import Switch from '@Partials/Switch.vue';
     import Button from '@Partials/Button.vue';
     import Skeleton from '@Partials/Skeleton.vue';
+    import WhatsappIcon from '@Partials/WhatsappIcon.vue';
     import { Info, Trash2, MoveLeft } from 'lucide-vue-next';
     import { isEmpty, capitalize } from '@Utils/stringUtils.js';
+    import WhatsappMessage from '@Partials/WhatsappMessage.vue';
     import EmailConfig from '@Pages/settings/payment-methods/_components/PaymentMethodConfigInput/EmailConfig.vue';
     import ImageConfig from '@Pages/settings/payment-methods/_components/PaymentMethodConfigInput/ImageConfig.vue';
     import SelectConfig from '@Pages/settings/payment-methods/_components/PaymentMethodConfigInput/SelectConfig.vue';
@@ -223,19 +290,20 @@
     import ContentConfig from '@Pages/settings/payment-methods/_components/PaymentMethodConfigInput/ContentConfig.vue';
     import CurrencyConfig from '@Pages/settings/payment-methods/_components/PaymentMethodConfigInput/CurrencyConfig.vue';
     import MobileNumberConfig from '@Pages/settings/payment-methods/_components/PaymentMethodConfigInput/MobileNumberConfig.vue';
-import cloneDeep from 'lodash.clonedeep';
 
     export default {
-        inject: ['formState', 'storeState', 'storePaymentMethodState', 'changeHistoryState', 'notificationState'],
+        inject: ['formState', 'authState', 'storeState', 'storePaymentMethodState', 'changeHistoryState', 'notificationState'],
         components: {
-            Info, Modal, Input, Switch, Button, Skeleton, EmailConfig, ImageConfig, SelectConfig,
-            StringConfig, ContentConfig, CurrencyConfig, MobileNumberConfig
+            Copy, Pill, Info, Modal, Alert, Input, Switch, Button, Skeleton, WhatsappIcon, WhatsappMessage, EmailConfig,
+            ImageConfig, SelectConfig, StringConfig, ContentConfig, CurrencyConfig, MobileNumberConfig
         },
         data() {
             return {
                 Trash2,
                 MoveLeft,
-                isLoadingPaymentMethod: false
+                isLoadingPaymentMethod: false,
+                appName: import.meta.env.VITE_APP_NAME,
+                whatsappGroupLink: import.meta.env.VITE_WHATSAPP_GROUP_LINK,
             }
         },
         watch: {
@@ -246,6 +314,9 @@ import cloneDeep from 'lodash.clonedeep';
             }
         },
         computed: {
+            authUser() {
+                return this.authState.user;
+            },
             store() {
                 return this.storeState.store;
             },
@@ -281,7 +352,68 @@ import cloneDeep from 'lodash.clonedeep';
             },
             checkIfPaymentMethodConfigSchemaEntityPassesCondition() {
                 return this.storePaymentMethodState.checkIfPaymentMethodConfigSchemaEntityPassesCondition;
-            }
+            },
+            mockMessages() {
+                return [
+                    {
+                        sender: 'You',
+                        text: `Hello, I would like to activate *${this.storePaymentMethod.custom_name}* for *${this.store.name}* so that we can take payments`,
+                        timestamp: dayjs().subtract(7, 'minute').format('HH:mm'),
+                        isOwnMessage: true
+                    },
+                    {
+                        sender: 'Support Team',
+                        text: `Hi ${this.authUser.first_name || 'there'}! Could you share your company profile and refund policy with us`,
+                        timestamp: dayjs().subtract(6, 'minute').format('HH:mm'),
+                        isOwnMessage: false,
+                        nameColor: '#165dfc'
+                    },
+                    {
+                        sender: 'You',
+                        text: 'Here is our company profile 👆',
+                        timestamp: dayjs().subtract(5, 'minute').format('HH:mm'),
+                        isOwnMessage: true,
+                        attachments: [
+                            { name: 'CompanyProfile.pdf', pages: 3, size: 950 }
+                        ]
+                    },
+                    {
+                        sender: 'You',
+                        text: 'Here is our refund policy 👆',
+                        timestamp: dayjs().subtract(4, 'minute').format('HH:mm'),
+                        isOwnMessage: true,
+                        attachments: [
+                            { name: 'RefundPolicy.pdf', pages: 1, size: 325 }
+                        ]
+                    },
+                    {
+                        sender: 'Support Team',
+                        text: `Great! Can you share the store ID from your dashboard`,
+                        timestamp: dayjs().subtract(3, 'minute').format('HH:mm'),
+                        isOwnMessage: false,
+                        nameColor: '#165dfc'
+                    },
+                    {
+                        sender: 'You',
+                        text: `It's ${this.store.id}`,
+                        timestamp: dayjs().subtract(2, 'minute').format('HH:mm'),
+                        isOwnMessage: true
+                    },
+                    {
+                        sender: 'Support Team',
+                        text: `*${this.storePaymentMethod.custom_name}* is now activated to take payments for *${this.store.name}* 👏`,
+                        timestamp: dayjs().subtract(1, 'minute').format('HH:mm'),
+                        isOwnMessage: false,
+                        nameColor: '#165dfc'
+                    },
+                    {
+                        sender: 'You',
+                        text: 'Thank you 🙏',
+                        timestamp: dayjs().format('HH:mm'),
+                        isOwnMessage: true
+                    },
+                ];
+            },
         },
         methods: {
             isEmpty,
@@ -309,6 +441,9 @@ import cloneDeep from 'lodash.clonedeep';
                     }
                 });
             },
+            openWhatsappGroup() {
+                window.open(this.whatsappGroupLink, "_blank");
+            },
             async showPaymentMethod() {
                 try {
 
@@ -331,6 +466,11 @@ import cloneDeep from 'lodash.clonedeep';
                     this.notificationState.showWarningNotification(message);
                     this.formState.setServerFormErrors(error);
                     console.error('Failed to fetch payment method:', error);
+
+                    if (error.response?.status === 404) {
+                        await this.navigateToShowPaymentMethods();
+                    }
+
                 } finally {
                     this.isLoadingPaymentMethod = false;
                 }
@@ -360,6 +500,10 @@ import cloneDeep from 'lodash.clonedeep';
                     this.notificationState.showWarningNotification(message);
                     this.formState.setServerFormErrors(error);
                     console.error('Failed to fetch store payment method:', error);
+
+                    if (error.response?.status === 404) {
+                        await this.navigateToShowPaymentMethods();
+                    }
                 } finally {
                     this.storePaymentMethodState.isLoadingStorePaymentMethod = false;
                 }

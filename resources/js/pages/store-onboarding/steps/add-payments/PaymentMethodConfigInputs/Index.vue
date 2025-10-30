@@ -85,13 +85,13 @@
 
     import { Info } from 'lucide-vue-next';
     import Input from '@Partials/Input.vue';
-    import EmailConfig from '@Pages/store-onboarding/steps/add-payments/PaymentMethodConfigInputs/PaymentMethodConfigInput/EmailConfig.vue';
-    import ImageConfig from '@Pages/store-onboarding/steps/add-payments/PaymentMethodConfigInputs/PaymentMethodConfigInput/ImageConfig.vue';
-    import SelectConfig from '@Pages/store-onboarding/steps/add-payments/PaymentMethodConfigInputs/PaymentMethodConfigInput/SelectConfig.vue';
-    import StringConfig from '@Pages/store-onboarding/steps/add-payments/PaymentMethodConfigInputs/PaymentMethodConfigInput/StringConfig.vue';
-    import ContentConfig from '@Pages/store-onboarding/steps/add-payments/PaymentMethodConfigInputs/PaymentMethodConfigInput/ContentConfig.vue';
-    import CurrencyConfig from '@Pages/store-onboarding/steps/add-payments/PaymentMethodConfigInputs/PaymentMethodConfigInput/CurrencyConfig.vue';
-    import MobileNumberConfig from '@Pages/store-onboarding/steps/add-payments/PaymentMethodConfigInputs/PaymentMethodConfigInput/MobileNumberConfig.vue';
+    import EmailConfig from '@Pages/settings/payment-methods/_components/PaymentMethodConfigInput/EmailConfig.vue';
+    import ImageConfig from '@Pages/settings/payment-methods/_components/PaymentMethodConfigInput/ImageConfig.vue';
+    import SelectConfig from '@Pages/settings/payment-methods/_components/PaymentMethodConfigInput/SelectConfig.vue';
+    import StringConfig from '@Pages/settings/payment-methods/_components/PaymentMethodConfigInput/StringConfig.vue';
+    import ContentConfig from '@Pages/settings/payment-methods/_components/PaymentMethodConfigInput/ContentConfig.vue';
+    import CurrencyConfig from '@Pages/settings/payment-methods/_components/PaymentMethodConfigInput/CurrencyConfig.vue';
+    import MobileNumberConfig from '@Pages/settings/payment-methods/_components/PaymentMethodConfigInput/MobileNumberConfig.vue';
 
     export default {
         components: {

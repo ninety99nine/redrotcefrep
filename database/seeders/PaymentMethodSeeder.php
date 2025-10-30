@@ -2011,6 +2011,44 @@ class PaymentMethodSeeder extends Seeder
                     'UG', // Uganda
                     'ZM', // Zambia
                     'ZW'  // Zimbabwe
+                ],
+                'config_schema' => [
+                    [
+                        'type' => 'select',
+                        'label' => 'DPO Account Selection',
+                        'attribute' => 'account_type',
+                        'default' => 'personal',
+                        'description' => 'Choose whether to use your own DPO account or let us manage payments through our DPO account.',
+                        'options' => [
+                            ['label' => 'My DPO Account', 'value' => 'personal'],
+                            ['label' => config('app.name') . ' Managed Account', 'value' => 'managed']
+                        ],
+                        'validation_rules' => $selectValidationRules('DPO Account Selection')
+                    ],
+                    [
+                        'type' => 'content',
+                        'condition' => ['account_type=managed'],
+                        'content' => [
+                            [
+                                'text' => 'This means that ' . config('app.name') . ' will collect payments on your behalf and settle them into your bank account based on our settlement period.'
+                            ]
+                        ]
+                    ],
+                    [
+                        'type' => 'string',
+                        'label' => 'Company Token',
+                        'attribute' => 'company_token',
+                        'placeholder' => 'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx',
+                        'description' => 'Provided by DPO after creating your DPO account.',
+                        'condition' => ['account_type=personal'],
+                        'learn_more' => [
+                            'label' => 'Sign up',
+                            'href' => 'https://dpogroup.com/get-started-2/'
+                        ],
+                        'validation_rules' => [
+                            'required' => [true, 'The DPO Company Token is required']
+                        ]
+                    ]
                 ]
             ],
 

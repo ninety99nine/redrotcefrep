@@ -87,7 +87,7 @@
 
                 </div>
 
-                <p class="text-sm text-center text-gray-500 mb-16">© {{ currentYear }} Perfect Order. All rights reserved.</p>
+                <p class="text-sm text-center text-gray-500 mb-16">© {{ currentYear }} {{ appName }}. All rights reserved.</p>
 
             </div>
 
@@ -133,7 +133,8 @@
                     }
                 ],
                 loading: false,
-                currentYear: new Date().getFullYear()
+                currentYear: new Date().getFullYear(),
+                appName: import.meta.env.VITE_APP_NAME
             };
         },
         computed: {

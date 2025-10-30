@@ -5,11 +5,13 @@ namespace App\Services;
 use Exception;
 use App\Models\Store;
 use App\Enums\Association;
+use Illuminate\Support\Arr;
 use App\Models\PaymentMethod;
 use App\Enums\UploadFolderName;
 use App\Enums\PaymentMethodType;
 use App\Models\StorePaymentMethod;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\ValidationException;
 use App\Http\Resources\StorePaymentMethodResource;
 use App\Http\Resources\StorePaymentMethodResources;
 
@@ -49,6 +51,8 @@ class StorePaymentMethodService extends BaseService
     public function createStorePaymentMethod(array $data): array
     {
         $paymentMethod = PaymentMethod::find($data['payment_method_id']);
+
+        $this->handleDPOIntegration($data, $paymentMethod);
 
         $data['configs'] = $data['configs'] ? collect($data['configs'])->reject(function ($value, $key) {
             return in_array($key, ['logo', 'photo']);
@@ -186,6 +190,12 @@ class StorePaymentMethodService extends BaseService
      */
     public function updateStorePaymentMethod(StorePaymentMethod $storePaymentMethod, array $data): array
     {
+        $paymentMethod = PaymentMethod::find($storePaymentMethod->payment_method_id);
+
+        if(isset($data['configs']) && !empty($data['configs'])) {
+            $this->handleDPOIntegration($data, $paymentMethod);
+        }
+
         $data['configs'] = $data['configs'] ? collect($data['configs'])->reject(function ($value, $key) {
             return in_array($key, ['logo', 'photo']);
         })->toArray() : null;
@@ -236,6 +246,56 @@ class StorePaymentMethodService extends BaseService
             return ['message' => 'Store Payment Method deleted'];
         } else {
             throw new Exception('Store Payment Method delete unsuccessful');
+        }
+    }
+
+    /**
+     * Handle Direct Pay Online integration.
+     *
+     * @param array $data
+     * @param PaymentMethod $paymentMethod
+     * @return void
+     * @throws ValidationException|Exception
+     */
+    private function handleDPOIntegration(array &$data, PaymentMethod $paymentMethod): void
+    {
+        if($paymentMethod->type == 'dpo') {
+
+            $accountType = $data['configs']['account_type'] ?? null;
+
+            if(empty($accountType)) {
+                throw ValidationException::withMessages([
+                    'account_type' => 'The DPO account type must be one of: ' . Arr::join(['"personal"', '"managed"'], ', ', ' or '),
+                ]);
+            }
+
+            if($accountType == 'personal') {
+
+                $companyToken = $data['configs']['company_token'] ?? null;
+
+                if(empty($companyToken)) {
+                    throw ValidationException::withMessages([
+                        'company_token' => 'The DPO company token is required'
+                    ]);
+                }
+
+                $result = DirectPayOnlineService::checkCompanyToken($companyToken);
+
+                if(!$result['valid']) {
+                    throw ValidationException::withMessages([
+                        'company_token' => $result['message']
+                    ]);
+                }
+
+                $data['requires_verification'] = false;
+
+            }else{
+
+                $data['configs']['company_token'] = null;
+                $data['requires_verification'] = true;
+
+            }
+
         }
     }
 }

@@ -403,8 +403,9 @@
 
                     let config = {
                         params: {
+                            match_store_country: 1,
                             store_id: this.store.id,
-                            association: 'unassociated'
+                            association: 'unassociated',
                         }
                     };
 

@@ -112,7 +112,7 @@
                     </div>
                 </div>
 
-                <p class="text-sm text-center text-gray-500">© {{ currentYear }} Perfect Order. All rights reserved.</p>
+                <p class="text-sm text-center text-gray-500">© {{ currentYear }} {{ appName }}. All rights reserved.</p>
             </div>
         </div>
 
@@ -152,7 +152,8 @@ export default {
             resendTimer: null,
             resendCountdown: 0,
             resendDelays: [30, 120, 300, 600],
-            verificationType: 'registration email' // Default to registration
+            verificationType: 'registration email', // Default to registration
+            appName: import.meta.env.VITE_APP_NAME
         };
     },
     computed: {

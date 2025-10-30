@@ -256,10 +256,8 @@
             }
         },
         watch: {
-            store(newValue, oldValue) {
-                if(!oldValue && newValue) {
-                    this.showTransactions();
-                }
+            store() {
+                this.setup();
             },
         },
         computed: {
@@ -290,6 +288,11 @@
         },
         methods: {
             isEmpty,
+            setup() {
+                if(this.store) {
+                    this.showTransactions();
+                }
+            },
             reset() {
                 this.form.photo = [];
                 this.form.amount = '0.00';
@@ -314,7 +317,7 @@
                         params: {
                             order_id: this.orderId,
                             store_id: this.store.id,
-                            _relationships: ['photo'].join(',')
+                            _relationships: ['photo', 'storePaymentMethod'].join(',')
                         }
                     };
 
@@ -439,6 +442,9 @@
                 }
 
             }
+        },
+        created() {
+            this.setup();
         }
     };
 

@@ -64,7 +64,7 @@ export const useStorePaymentMethodStore = defineStore('storePaymentMethod', {
                         value = storePaymentMethod?.photo ? [storePaymentMethod.photo] : [];
                     } else {
                         // For other types, use existing config value or null
-                        value = storePaymentMethod?.configs?.[configSchema.attribute] ?? null;
+                        value = storePaymentMethod?.configs?.[configSchema.attribute] ?? configSchema.default ?? null;
                     }
 
                     return {

@@ -193,8 +193,11 @@
 
                     <div class="flex items-center space-x-4">
 
+                        <!-- Requires Verification Status -->
+                        <Pill v-if="storePaymentMethod.requires_verification" type="warning" size="xs">Requires verification</Pill>
+
                         <!-- Active Status -->
-                        <Pill :type="storePaymentMethod.active ? 'success' : 'warning'" size="xs">{{ storePaymentMethod.active ? 'active' : 'inactive'}}</Pill>
+                        <Pill v-else :type="storePaymentMethod.active ? 'success' : 'warning'" size="xs">{{ storePaymentMethod.active ? 'active' : 'inactive'}}</Pill>
 
                         <!-- Delete Button -->
                         <Button

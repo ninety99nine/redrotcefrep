@@ -28,6 +28,7 @@ return new class extends Migration
             $table->foreignUuid('requested_by_user_id')->nullable();
             $table->enum('verification_type', TransactionVerificationType::values());
             $table->foreignUuid('manually_verified_by_user_id')->nullable();
+            $table->foreignUuid('store_payment_method_id')->nullable();
             $table->foreignUuid('payment_method_id')->nullable();
             $table->boolean('created_using_auto_billing')->default(0);
             $table->foreignUuid('customer_id')->nullable();
@@ -48,6 +49,7 @@ return new class extends Migration
             $table->foreign('ai_assistant_id')->references('id')->on('ai_assistants')->nullOnDelete();
             $table->foreign('payment_method_id')->references('id')->on('payment_methods')->nullOnDelete();
             $table->foreign('manually_verified_by_user_id')->references('id')->on('users')->nullOnDelete();
+            $table->foreign('store_payment_method_id')->references('id')->on('store_payment_methods')->nullOnDelete();
         });
     }
 

@@ -8,6 +8,7 @@
         :label="configSchemaEntity.label"
         @retryUploads="(files) => uploadImages"
         @retryUpload="(file, fileIndex) => uploadImages(fileIndex)"
+        :errorText="formState.getFormError(configSchemaEntity.attribute)"
         :secondaryLabel="configSchemaEntity.optional ? '(optional)' : null"
         :mimeTypes="configSchemaEntity.validation_rules.mime_types[0] ?? ['image/*']">
     </Input>
@@ -19,6 +20,7 @@
     import Input from '@Partials/Input.vue';
 
     export default {
+        inject: ['formState'],
         components: { Input },
         props: {
             modelValue: {

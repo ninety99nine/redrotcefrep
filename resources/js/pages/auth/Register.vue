@@ -77,7 +77,7 @@
 
                 <SocialLinks class="mb-6"></SocialLinks>
 
-                <p class="text-sm text-center text-gray-500">© {{ currentYear }} Perfect Order. All rights reserved.</p>
+                <p class="text-sm text-center text-gray-500">© {{ currentYear }} {{ appName }}. All rights reserved.</p>
 
             </div>
 
@@ -120,7 +120,8 @@ export default {
                 confirm_password: ''
             },
             loading: false,
-            currentYear: new Date().getFullYear()
+            currentYear: new Date().getFullYear(),
+                appName: import.meta.env.VITE_APP_NAME
         };
     },
     computed: {

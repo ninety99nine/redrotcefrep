@@ -5,6 +5,7 @@
         :label="configSchemaEntity.label"
         :description="configSchemaEntity.description"
         :popoverContent="configSchemaEntity.description_info"
+        :errorText="formState.getFormError(configSchemaEntity.attribute)"
         :secondaryLabel="configSchemaEntity.optional ? '(optional)' : null"
         :externalLinkUrl="configSchemaEntity.learn_more ? configSchemaEntity.learn_more.href : null"
         :externalLinkName="configSchemaEntity.learn_more ? configSchemaEntity.learn_more.label : null">
@@ -17,6 +18,7 @@
     import Input from '@Partials/Input.vue';
 
     export default {
+        inject: ['formState'],
         components: { Input },
         props: {
             modelValue: {

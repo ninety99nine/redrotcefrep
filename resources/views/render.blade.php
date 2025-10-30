@@ -14,7 +14,7 @@
     <link rel="icon" type="image/svg+xml" href="/favicon/favicon.svg" />
     <link rel="shortcut icon" href="/favicon/favicon.ico" />
     <link rel="apple-touch-icon" sizes="180x180" href="/favicon/apple-touch-icon.png" />
-    <meta name="apple-mobile-web-app-title" content="Perfect Order" />
+    <meta name="apple-mobile-web-app-title" content="{{ config('app.name') }}" />
 
     <!-- Dynamic Manifest Link - For Progressive Web App (PWA) -->
     @if (isset($meta) && !empty($meta) && !empty($meta['alias']))

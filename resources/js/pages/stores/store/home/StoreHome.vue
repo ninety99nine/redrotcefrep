@@ -4,7 +4,7 @@
 
         <h1 class="flex items-center justify-between space-x-2 text-xl text-gray-700 font-semibold mb-6">
             <div v-if="store"
-                class="flex items-center">
+                class="flex items-center space-x-2">
                 <span>👋</span>
                 <span>Welcome back, {{ authUser ? authUser.first_name : '' }}</span>
             </div>
@@ -177,13 +177,18 @@
                             size="xs"
                             type="success"
                             :action="openWhatsappGroup">
-                            <span>Join Our Whatsapp</span>
+                            <div class="flex items-center space-x-1">
+                                <WhatsappIcon size="w-4 h-4" color="#ffffff" class="mx-2"></WhatsappIcon>
+                                <span class="text-xs">Join Our Whatsapp</span>
+                            </div>
                         </Button>
 
                     </div>
 
                     <!-- Render animated messages -->
-                    <WhatsappMessage :messages="mockMessages" :animate="true" :loopAnimation="true" class="h-80" />
+                    <div class="border border-gray-200 rounded-lg overflow-hidden">
+                        <WhatsappMessage :messages="mockMessages" :animate="true" :loopAnimation="true" class="h-80" />
+                    </div>
 
                 </div>
 
@@ -264,7 +269,7 @@
 
                     <div>
                         <h2 class="font-semibold mb-2">Join Live Onboarding Session</h2>
-                        <h3 class="text-sm text-gray-500 mb-4">Explore key features and get your questions answered on our live session</h3>
+                        <h3 class="text-sm text-gray-500 mb-4">Explore key features and get your questions answered on our upcoming live session</h3>
                     </div>
 
                     <div class="flex items-center justify-center relative mb-4">
@@ -306,13 +311,14 @@ import Button from '@Partials/Button.vue';
 import Tooltip from '@Partials/Tooltip.vue';
 import Skeleton from '@Partials/Skeleton.vue';
 import Datepicker from '@Partials/Datepicker.vue';
+import WhatsappIcon from '@Partials/WhatsappIcon.vue';
 import WhatsappMessage from '@Partials/WhatsappMessage.vue';
 import { Box, Plus, Inbox, Zap, Megaphone, UsersRound, CreditCard, HandCoins, CalendarDays } from 'lucide-vue-next';
 
 export default {
     inject: ['formState', 'authState', 'storeState', 'notificationState'],
     components: {
-        Box, Inbox, UsersRound, CreditCard, HandCoins, Button, Tooltip, Skeleton, Datepicker, WhatsappMessage
+        Box, Inbox, UsersRound, CreditCard, HandCoins, Button, Tooltip, Skeleton, Datepicker, WhatsappIcon, WhatsappMessage
     },
     data() {
         return {
@@ -328,19 +334,47 @@ export default {
             basicInsights: null,
             isLoadingOrderStatusCounts: false,
             isLoadingStoreBasicInsights: false,
+            whatsappGroupLink: import.meta.env.VITE_WHATSAPP_GROUP_LINK,
             platforms: [
                 { name: 'whatsapp', link: 'https://chat.whatsapp.com/FR9xLOjlcIs6KO0uHiLnTc' },
                 { name: 'instagram', link: 'https://www.instagram.com/perfect_order_botswana' },
                 { name: 'facebook', link: 'https://web.facebook.com/profile.php?id=61552503999976' },
             ],
             mockMessages: [
-                { sender: 'Support Team', text: 'Hello everyone! Our support team is here to help with your e-commerce platform questions. Feel free to ask! 😊', timestamp: dayjs().subtract(6, 'minute').format('HH:mm'), isOwnMessage: false },
-                { sender: 'You', text: 'Hi, how do I add a discount code to my store?', timestamp: dayjs().subtract(5, 'minute').format('HH:mm'), isOwnMessage: true },
-                { sender: 'Support Team', text: 'Great question! In your dashboard, go to *Settings > Discounts*, click *Create Discount*, and set the code, amount, and conditions. Check [this guide](https://yourstore.com/docs/discounts) for details.', timestamp: dayjs().subtract(4, 'minute').format('HH:mm'), isOwnMessage: false },
-                { sender: 'Emma', text: 'I’m struggling with setting up shipping options. Any tips?', timestamp: dayjs().subtract(3, 'minute').format('HH:mm'), isOwnMessage: false },
-                { sender: 'Support Team', text: 'Hi Emma! Navigate to *Settings > Shipping*, and add zones with rates. You can set flat rates or weight-based shipping. See [Shipping Setup](https://yourstore.com/docs/shipping) for a step-by-step. Let us know if you need more help!', timestamp: dayjs().subtract(2, 'minute').format('HH:mm'), isOwnMessage: false },
-                { sender: 'You', text: 'Thanks! Can I also track my store’s analytics?', timestamp: dayjs().subtract(1, 'minute').format('HH:mm'), isOwnMessage: true },
-                { sender: 'Support Team', text: 'Absolutely! Go to *Analytics* in your dashboard, select a date range, and view total views, orders, and sales. Try it out and let us know if you have questions!', timestamp: dayjs().format('HH:mm'), isOwnMessage: false }
+                {
+                    sender: 'Support Team',
+                    text: 'Hello everyone! Our support team is here to help with your e-commerce platform questions. Feel free to ask! 😊', timestamp: dayjs().subtract(6, 'minute').format('HH:mm'),
+                    isOwnMessage: false,
+                    nameColor: '#165dfc'
+                },
+                {
+                    sender: 'You', text: 'Hi, how do I add a discount code to my store?', timestamp: dayjs().subtract(5, 'minute').format('HH:mm'),
+                    isOwnMessage: true
+                },
+                {
+                    sender: 'Support Team', text: 'Great question! In your dashboard, go to *Settings > Discounts*, click *Create Discount*, and set the code, amount, and conditions. Check [this guide](https://yourstore.com/docs/discounts) for details.', timestamp: dayjs().subtract(4, 'minute').format('HH:mm'),
+                    isOwnMessage: false,
+                    nameColor: '#165dfc'
+                },
+                {
+                    sender: 'Emma', text: 'I’m struggling with setting up shipping options. Any tips?', timestamp: dayjs().subtract(3, 'minute').format('HH:mm'),
+                    isOwnMessage: false,
+                    nameColor: '#dc16fc'
+                },
+                {
+                    sender: 'Support Team', text: 'Hi Emma! Navigate to *Settings > Shipping*, and add zones with rates. You can set flat rates or weight-based shipping. See [Shipping Setup](https://yourstore.com/docs/shipping) for a step-by-step. Let us know if you need more help!', timestamp: dayjs().subtract(2, 'minute').format('HH:mm'),
+                    isOwnMessage: false,
+                    nameColor: '#165dfc'
+                },
+                {
+                    sender: 'You', text: 'Thanks! Can I also track my store’s analytics?', timestamp: dayjs().subtract(1, 'minute').format('HH:mm'),
+                    isOwnMessage: true
+                },
+                {
+                    sender: 'Support Team', text: 'Absolutely! Go to *Analytics* in your dashboard, select a date range, and view total views, orders, and sales. Try it out and let us know if you have questions!', timestamp: dayjs().format('HH:mm'),
+                    isOwnMessage: false,
+                    nameColor: '#165dfc'
+                }
             ]
         };
     },
@@ -423,8 +457,7 @@ export default {
             });
         },
         openWhatsappGroup() {
-            const whatsappUrl = `https://chat.whatsapp.com/FR9xLOjlcIs6KO0uHiLnTc`;
-            window.open(whatsappUrl, "_blank");
+            window.open(this.whatsappGroupLink, "_blank");
         },
         getIcon(index) {
             const icons = [Box, UsersRound, CreditCard];

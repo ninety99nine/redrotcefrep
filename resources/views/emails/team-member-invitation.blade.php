@@ -1,14 +1,14 @@
 @component('mail::message')
 
 <div style="text-align: center; margin-bottom: 20px;">
-    <img src="{{ asset('images/logo-black-transparent.png') }}" alt="Perfect Order Logo" style="max-width: 150px; height: auto;" />
+    <img src="{{ asset('images/logo-black-transparent.png') }}" alt="{{ config('app.name') }} Logo" style="max-width: 150px; height: auto;" />
 </div>
 
 # You’ve Been Invited to Join {{ $storeName }}!
 
 Hello {{ $firstName ?: 'there' }},
 
-You’ve been invited to join the team for **{{ $storeName }}** on Perfect Order. To get started, please verify your email address to activate your account.
+You’ve been invited to join the team for **{{ $storeName }}** on {{ config('app.name') }}. To get started, please verify your email address to activate your account.
 
 **Email:** {{ $email }}
 
@@ -20,6 +20,6 @@ If you did not expect this invitation, please ignore this email or contact our s
 
 Thanks,
 <br>
-Perfect Order
+{{ config('app.name') }}
 
 @endcomponent

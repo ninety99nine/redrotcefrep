@@ -14,9 +14,10 @@ return new class extends Migration
         Schema::create('store_payment_method', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->boolean('active')->default(0);
-            $table->string('custom_name', 20)->nullable();
+            $table->string('custom_name', 40)->nullable();
             $table->string('instruction')->nullable();
             $table->json('configs')->nullable();
+            $table->boolean('requires_verification')->default(0);
             $table->boolean('require_proof_of_payment')->default(0);
             $table->boolean('enable_contact_seller_before_payment')->default(1);
             $table->boolean('mark_as_paid_on_customer_confirmation')->default(0);

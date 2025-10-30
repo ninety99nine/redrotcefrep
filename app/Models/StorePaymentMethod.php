@@ -27,7 +27,8 @@ class StorePaymentMethod extends Model
      */
     protected $casts = [
         'active' => 'boolean',
-        'configs' => JsonArray::class
+        'configs' => JsonArray::class,
+        'requires_verification' => 'boolean',
     ];
 
     /**
@@ -38,7 +39,8 @@ class StorePaymentMethod extends Model
     protected $fillable = [
         'id', 'active', 'custom_name', 'instruction', 'configs', 'require_proof_of_payment',
         'enable_contact_seller_before_payment', 'mark_as_paid_on_customer_confirmation',
-        'position', 'store_id', 'payment_method_id', 'created_at', 'updated_at'
+        'position', 'store_id', 'payment_method_id', 'requires_verification',
+        'created_at', 'updated_at'
     ];
 
     /**

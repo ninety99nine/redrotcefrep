@@ -116,6 +116,12 @@ const routes = [
                                     }
                                 ]
                             },
+                            {
+                                path: 'verify-payment',
+                                name: 'verify-shop-payment',
+                                component: () => import('@Pages/shop/payments/VerifyPayment.vue'),
+                                meta: { title: 'Verifying Payment' }
+                            },
                         ]
                     }
                 ]

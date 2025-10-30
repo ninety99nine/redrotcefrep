@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Http\Requests\Domain;
+namespace App\Http\Requests\Order;
 
 use App\Models\Domain;
 use Illuminate\Foundation\Http\FormRequest;
 
-class VerifyDomainPaymentRequest extends FormRequest
+class VerifyOrderPaymentRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -14,7 +14,7 @@ class VerifyDomainPaymentRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return $this->user()->can('create', Domain::class);
+        return true;
     }
 
     /**

@@ -149,178 +149,196 @@
 
                 <div>
 
-                    <div class="bg-white border border-gray-100 p-4 shadow-sm rounded-xl space-y-4">
+                    <template v-if="automatedVerification">
 
-                        <div
-                            class="flex items-center space-x-2">
+                        <Button
+                            size="lg"
+                            type="primary"
+                            :action="payOrder"
+                            buttonClass="w-full"
+                            :disabled="isConvertingCurrency"
+                            :loading="isGeneratingPaymentLink">
+                            <span>{{ isConvertingCurrency ? 'Converting Currency' : 'Pay' }}</span>
+                        </Button>
 
-                            <div class="w-8 h-8 bg-gray-100 border border-gray-300 rounded-full flex items-center justify-center">
-                                <span class="text-sm text-black font-bold">1</span>
-                            </div>
+                    </template>
 
-                            <Skeleton v-if="isCheckingIfPhotoIsQrCode" width="w-1/3" :shine="true"></Skeleton>
+                    <template v-else-if="manualVerification">
 
-                            <template v-else-if="paymentLink">
-                                <span class="text-sm">Click to Pay or Scan QR code</span>
-                            </template>
-
-                            <template v-else-if="qrCodeString || (photo && photoIsQrCode)">
-                                <span class="text-sm">Scan QR code to Pay</span>
-                            </template>
-
-                            <template v-else-if="paymentMethod.type == 'bank transfer'">
-                                <span class="text-sm">Send money to this account</span>
-                            </template>
-
-                            <template v-else>
-                                <span class="text-sm">Follow instructions to make payment</span>
-                            </template>
-
-                        </div>
-
-                        <template v-if="paymentLink">
-
-                            <Button
-                                size="lg"
-                                type="primary"
-                                buttonClass="w-full"
-                                :action="payViaLink"
-                                :disabled="isConvertingCurrency">
-                                <span>{{ isConvertingCurrency ? 'Converting Currency' : 'Pay' }}</span>
-                            </Button>
-
-                            <template v-if="paymentLinkQrCode">
-
-                                <div
-                                    @click="toggleQrCode"
-                                    class="w-1/2 mx-auto flex items-center justify-center space-x-2 bg-gray-50 border border-gray-300 rounded-full p-1 cursor-pointer hover:bg-gray-100 active:opacity-80 active:scale-95 transition-all">
-                                    <svg class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 4.875c0-.621.504-1.125 1.125-1.125h4.5c.621 0 1.125.504 1.125 1.125v4.5c0 .621-.504 1.125-1.125 1.125h-4.5A1.125 1.125 0 0 1 3.75 9.375v-4.5ZM3.75 14.625c0-.621.504-1.125 1.125-1.125h4.5c.621 0 1.125.504 1.125 1.125v4.5c0 .621-.504 1.125-1.125 1.125h-4.5a1.125 1.125 0 0 1-1.125-1.125v-4.5ZM13.5 4.875c0-.621.504-1.125 1.125-1.125h4.5c.621 0 1.125.504 1.125 1.125v4.5c0 .621-.504 1.125-1.125 1.125h-4.5A1.125 1.125 0 0 1 13.5 9.375v-4.5Z" />
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 6.75h.75v.75h-.75v-.75ZM6.75 16.5h.75v.75h-.75v-.75ZM16.5 6.75h.75v.75h-.75v-.75ZM13.5 13.5h.75v.75h-.75v-.75ZM13.5 19.5h.75v.75h-.75v-.75ZM19.5 13.5h.75v.75h-.75v-.75ZM19.5 19.5h.75v.75h-.75v-.75ZM16.5 16.5h.75v.75h-.75v-.75Z" />
-                                    </svg>
-                                    <span class="text-xs"> Scan QR Code to Pay</span>
-                                </div>
-
-                                <img v-if="showQrCode" :src="paymentLinkQrCode" alt="QR Code" class="border border-gray-300 rounded-lg shadow mx-auto" />
-
-                            </template>
-
-                        </template>
-
-                        <div
-                            class="relative"
-                            v-else-if="qrCode || photo">
-
-                            <img v-if="qrCodeLogo" class="w-10 h-10 bg-white rounded-md p-1 absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2" :src="`/images/qr-code-logos/${qrCodeLogo}.png`">
-                            <img :src="qrCode || photo.path" alt="QR Code" :class="['mx-auto', {'border border-gray-300 rounded-lg shadow max-w-60' : qrCode || photoIsQrCode}]" />
-
-                        </div>
-
-                        <div
-                            class="space-y-4"
-                            v-else-if="supportsDialCode">
-
-                            <template v-if="simplifiedDialCode">
-                                <p class="text-sm">Dial <span @click="dialToPay" class="font-semibold text-blue-700 hover:text-blue-500 cursor-pointer underline"><code>{{ simplifiedDialCode }}</code></span> on {{ storePaymentMethod.custom_name }}, Choose 'Send money' or 'Merchant Payment', Enter phone number or merchant code, input amount, and Confirm with your PIN.</p>
-                            </template>
-                            <template v-else>
-                                <p class="text-sm">Dial on {{ storePaymentMethod.custom_name }}, Choose 'Send money' or 'Merchant Payment', Enter phone number or merchant code, input amount, and Confirm with your PIN.</p>
-                            </template>
-
-                            <Button
-                                size="lg"
-                                type="primary"
-                                :action="dialToPay"
-                                buttonClass="w-full"
-                                v-if="simplifiedDialCode"
-                                :disabled="isConvertingCurrency">
-                                <span>{{ isConvertingCurrency ? 'Converting Currency' : 'Dial to Pay' }}</span>
-                            </Button>
-
-                        </div>
-
-                        <div
-                            class="bg-gray-50 text-sm border border-gray-300 p-4 rounded-xl space-y-4"
-                            v-if="additionalFields.length || storePaymentMethod.instruction">
+                        <div class="bg-white border border-gray-100 p-4 shadow-sm rounded-xl space-y-4">
 
                             <div
-                                :key="index"
-                                class="flex items-center justify-between"
-                                v-for="(additionalField, index) in additionalFields">
+                                class="flex items-center space-x-2">
 
-                                <span>{{ additionalField.label }}</span>
+                                <div class="w-8 h-8 bg-gray-100 border border-gray-300 rounded-full flex items-center justify-center">
+                                    <span class="text-sm text-black font-bold">1</span>
+                                </div>
 
-                                <div class="flex items-center space-x-1">
+                                <Skeleton v-if="isCheckingIfPhotoIsQrCode" width="w-1/3" :shine="true"></Skeleton>
 
-                                    <Copy
-                                        :showText="false"
-                                        :text="additionalField.value">
+                                <template v-else-if="paymentLink">
+                                    <span class="text-sm">Click to Pay or Scan QR code</span>
+                                </template>
 
-                                        <template #trigger>
-                                            <div class="flex items-center space-x-1.5">
-                                                <CopyIcon size="16" class="shrink-0"></CopyIcon>
-                                                <span>{{ additionalField.displayValue ?? additionalField.value }}</span>
-                                            </div>
-                                        </template>
+                                <template v-else-if="qrCodeString || (photo && photoIsQrCode)">
+                                    <span class="text-sm">Scan QR code to Pay</span>
+                                </template>
 
-                                    </Copy>
+                                <template v-else-if="paymentMethod.type == 'bank transfer'">
+                                    <span class="text-sm">Send money to this account</span>
+                                </template>
 
+                                <template v-else>
+                                    <span class="text-sm">Follow instructions to make payment</span>
+                                </template>
+
+                            </div>
+
+                            <template v-if="paymentLink">
+
+                                <Button
+                                    size="lg"
+                                    type="primary"
+                                    buttonClass="w-full"
+                                    :action="payViaLink"
+                                    :disabled="isConvertingCurrency">
+                                    <span>{{ isConvertingCurrency ? 'Converting Currency' : 'Pay' }}</span>
+                                </Button>
+
+                                <template v-if="paymentLinkQrCode">
+
+                                    <div
+                                        @click="toggleQrCode"
+                                        class="w-1/2 mx-auto flex items-center justify-center space-x-2 bg-gray-50 border border-gray-300 rounded-full p-1 cursor-pointer hover:bg-gray-100 active:opacity-80 active:scale-95 transition-all">
+                                        <svg class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 4.875c0-.621.504-1.125 1.125-1.125h4.5c.621 0 1.125.504 1.125 1.125v4.5c0 .621-.504 1.125-1.125 1.125h-4.5A1.125 1.125 0 0 1 3.75 9.375v-4.5ZM3.75 14.625c0-.621.504-1.125 1.125-1.125h4.5c.621 0 1.125.504 1.125 1.125v4.5c0 .621-.504 1.125-1.125 1.125h-4.5a1.125 1.125 0 0 1-1.125-1.125v-4.5ZM13.5 4.875c0-.621.504-1.125 1.125-1.125h4.5c.621 0 1.125.504 1.125 1.125v4.5c0 .621-.504 1.125-1.125 1.125h-4.5A1.125 1.125 0 0 1 13.5 9.375v-4.5Z" />
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 6.75h.75v.75h-.75v-.75ZM6.75 16.5h.75v.75h-.75v-.75ZM16.5 6.75h.75v.75h-.75v-.75ZM13.5 13.5h.75v.75h-.75v-.75ZM13.5 19.5h.75v.75h-.75v-.75ZM19.5 13.5h.75v.75h-.75v-.75ZM19.5 19.5h.75v.75h-.75v-.75ZM16.5 16.5h.75v.75h-.75v-.75Z" />
+                                        </svg>
+                                        <span class="text-xs"> Scan QR Code to Pay</span>
+                                    </div>
+
+                                    <img v-if="showQrCode" :src="paymentLinkQrCode" alt="QR Code" class="border border-gray-300 rounded-lg shadow mx-auto" />
+
+                                </template>
+
+                            </template>
+
+                            <div
+                                class="relative"
+                                v-else-if="qrCode || photo">
+
+                                <img v-if="qrCodeLogo" class="w-10 h-10 bg-white rounded-md p-1 absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2" :src="`/images/qr-code-logos/${qrCodeLogo}.png`">
+                                <img :src="qrCode || photo.path" alt="QR Code" :class="['mx-auto', {'border border-gray-300 rounded-lg shadow max-w-60' : qrCode || photoIsQrCode}]" />
+
+                            </div>
+
+                            <div
+                                class="space-y-4"
+                                v-else-if="supportsDialCode">
+
+                                <template v-if="simplifiedDialCode">
+                                    <p class="text-sm">Dial <span @click="dialToPay" class="font-semibold text-blue-700 hover:text-blue-500 cursor-pointer underline"><code>{{ simplifiedDialCode }}</code></span> on {{ storePaymentMethod.custom_name }}, Choose 'Send money' or 'Merchant Payment', Enter phone number or merchant code, input amount, and Confirm with your PIN.</p>
+                                </template>
+                                <template v-else>
+                                    <p class="text-sm">Dial on {{ storePaymentMethod.custom_name }}, Choose 'Send money' or 'Merchant Payment', Enter phone number or merchant code, input amount, and Confirm with your PIN.</p>
+                                </template>
+
+                                <Button
+                                    size="lg"
+                                    type="primary"
+                                    :action="dialToPay"
+                                    buttonClass="w-full"
+                                    v-if="simplifiedDialCode"
+                                    :disabled="isConvertingCurrency">
+                                    <span>{{ isConvertingCurrency ? 'Converting Currency' : 'Dial to Pay' }}</span>
+                                </Button>
+
+                            </div>
+
+                            <div
+                                class="bg-gray-50 text-sm border border-gray-300 p-4 rounded-xl space-y-4"
+                                v-if="additionalFields.length || storePaymentMethod.instruction">
+
+                                <div
+                                    :key="index"
+                                    class="flex items-center justify-between"
+                                    v-for="(additionalField, index) in additionalFields">
+
+                                    <span>{{ additionalField.label }}</span>
+
+                                    <div class="flex items-center space-x-1">
+
+                                        <Copy
+                                            :showText="false"
+                                            :text="additionalField.value">
+
+                                            <template #trigger>
+                                                <div class="flex items-center space-x-1.5">
+                                                    <CopyIcon size="16" class="shrink-0"></CopyIcon>
+                                                    <span>{{ additionalField.displayValue ?? additionalField.value }}</span>
+                                                </div>
+                                            </template>
+
+                                        </Copy>
+
+                                    </div>
+
+                                </div>
+
+                                <div v-if="storePaymentMethod.instruction" class="bg-gray-50 text-sm border-t border-dashed pt-4">
+                                    <p>{{ storePaymentMethod.instruction }}</p>
                                 </div>
 
                             </div>
 
-                            <div v-if="storePaymentMethod.instruction" class="bg-gray-50 text-sm border-t border-dashed pt-4">
-                                <p>{{ storePaymentMethod.instruction }}</p>
+                        </div>
+
+                        <div class="flex justify-center">
+                            <div class="border-l-4 border-dashed border-gray-100 h-4"></div>
+                        </div>
+
+                        <div class="bg-white border border-gray-100 p-4 shadow-sm rounded-xl space-y-4">
+
+                            <div class="flex space-x-2">
+
+                                <div class="w-8 h-8 bg-gray-100 border border-gray-300 rounded-full flex items-center justify-center">
+                                    <span class="text-sm text-black font-bold">2</span>
+                                </div>
+
+                                <div>
+                                    <p class="text-sm">Did you pay?</p>
+                                    <p class="text-xs text-gray-500">Let us know so that we confirm your payment on our side</p>
+                                </div>
+
+                            </div>
+
+                            <div class="space-y-2">
+
+                                <Button
+                                    size="md"
+                                    type="success"
+                                    buttonClass="w-full"
+                                    :action="navigateToShowShopConfirmingPayment">
+                                    <span>I have paid</span>
+                                </Button>
+
+                                <div class="py-2 flex items-center text-xs text-gray-400 uppercase before:flex-1 before:border-t before:border-gray-200 before:me-6 after:flex-1 after:border-t after:border-gray-200 after:ms-6">
+                                    Or
+                                </div>
+
+                                <Button
+                                    size="md"
+                                    type="light"
+                                    buttonClass="w-full"
+                                    :action="navigateToShowShopPendingPayment">
+                                    <span>Contact us before paying</span>
+                                </Button>
+
                             </div>
 
                         </div>
 
-                    </div>
-
-                    <div class="flex justify-center">
-                        <div class="border-l-4 border-dashed border-gray-100 h-4"></div>
-                    </div>
-
-                    <div class="bg-white border border-gray-100 p-4 shadow-sm rounded-xl space-y-4">
-
-                        <div class="flex space-x-2">
-
-                            <div class="w-8 h-8 bg-gray-100 border border-gray-300 rounded-full flex items-center justify-center">
-                                <span class="text-sm text-black font-bold">2</span>
-                            </div>
-
-                            <div>
-                                <p class="text-sm">Did you pay?</p>
-                                <p class="text-xs text-gray-500">Let us know so that we confirm your payment on our side</p>
-                            </div>
-
-                        </div>
-
-                        <div class="space-y-2">
-
-                            <Button
-                                size="md"
-                                type="success"
-                                buttonClass="w-full"
-                                :action="navigateToShowShopConfirmingPayment">
-                                <span>I have paid</span>
-                            </Button>
-
-                            <div class="py-2 flex items-center text-xs text-gray-400 uppercase before:flex-1 before:border-t before:border-gray-200 before:me-6 after:flex-1 after:border-t after:border-gray-200 after:ms-6">
-                                Or
-                            </div>
-
-                            <Button
-                                size="md"
-                                type="light"
-                                buttonClass="w-full"
-                                :action="navigateToShowShopPendingPayment">
-                                <span>Contact us before paying</span>
-                            </Button>
-
-                        </div>
-
-                    </div>
+                    </template>
 
                 </div>
 
@@ -358,6 +376,7 @@
                 paymentLinkQrCode: null,
                 storePaymentMethod: null,
                 isConvertingCurrency: false,
+                isGeneratingPaymentLink: false,
                 isCheckingIfPhotoIsQrCode: false,
                 isLoadingStorePaymentMethod: false,
             }
@@ -424,6 +443,12 @@
             paymentMethod() {
                 return this.storePaymentMethod.payment_method;
             },
+            manualVerification() {
+                return !this.automatedVerification;
+            },
+            automatedVerification() {
+                return this.paymentMethod.automated_verification;
+            },
             photo() {
                 return this.storePaymentMethod?.photo;
             },
@@ -469,7 +494,6 @@
                 const type = this.paymentMethod.type;
                 const orderNumber = this.order.number;
                 const configs = this.storePaymentMethod.configs;
-
 
                 if (type === 'paypal me') {
 
@@ -2009,6 +2033,42 @@
                 } finally {
                     this.isLoadingStorePaymentMethod = false;
                 }
+            },
+            async payOrder() {
+
+                try {
+
+                    if(this.isGeneratingPaymentLink) return;
+
+                    this.isGeneratingPaymentLink = true;
+
+                    let data = {
+                        'store_payment_method_id': this.storePaymentMethod.id
+                    };
+
+                    const response = await axios.post(`/api/orders/${this.order.id}/pay`, data);
+
+                    const successful = response.data.successful;
+
+                    if(successful) {
+
+                        const dpoPaymentUrl = response.data.transaction.metadata.dpo_payment_url;
+                        window.location.href = dpoPaymentUrl;
+
+                    }else{
+                        const message = response.data.message;
+                        this.notificationState.showWarningNotification(message);
+                    }
+
+                } catch (error) {
+                    const message = error?.response?.data?.message || error?.message || 'Something went wrong while paying';
+                    this.notificationState.showWarningNotification(message);
+                    this.formState.setServerFormErrors(error);
+                    console.error('Failed to pay:', error);
+                } finally {
+                    this.isGeneratingPaymentLink = false;
+                }
+
             }
         },
         created() {

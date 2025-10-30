@@ -1,7 +1,7 @@
 @component('mail::message')
 
 <div style="text-align: center; margin-bottom: 20px;">
-    <img src="{{ asset('images/logo-black-transparent.png') }}" alt="Perfect Order Logo" style="max-width: 150px; height: auto;" />
+    <img src="{{ asset('images/logo-black-transparent.png') }}" alt="{{ config('app.name') }} Logo" style="max-width: 150px; height: auto;" />
 </div>
 
 # Reset Your Password
@@ -18,6 +18,6 @@ If you did not request a password reset, please ignore this email.
 
 Thanks,
 <br>
-Perfect Order
+{{ config('app.name') }}
 
 @endcomponent

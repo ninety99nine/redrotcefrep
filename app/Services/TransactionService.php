@@ -65,9 +65,13 @@ class TransactionService extends BaseService
 
         if($data['owner_type'] == 'order') {
 
+            $user = Auth::user();
             $orderService = new OrderService;
             $order = Order::find($data['owner_id']);
             $orderService->updateOrderAmountBalance($order);
+
+            $comment = $transaction->amount->amount_with_currency.' payment added'. (!empty($user->name) ? (' by '.$user->name) : '');
+            $orderService->addOrderComment($order, $comment);
 
         }
 
@@ -155,9 +159,13 @@ class TransactionService extends BaseService
 
         if($transaction->owner_type == 'order') {
 
+            $user = Auth::user();
             $orderService = new OrderService;
             $order = Order::find($transaction->owner_id);
             $orderService->updateOrderAmountBalance($order);
+
+            $comment = $transaction->amount->amount_with_currency.' payment removed'. (!empty($user->name) ? (' by '.$user->name) : '');
+            $orderService->addOrderComment($order, $comment);
 
         }
 

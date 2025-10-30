@@ -210,25 +210,19 @@ class DomainService extends BaseService
     {
         try {
 
-            $transaction = $transaction->load(['owner', 'store', 'paymentMethod', 'requestedByUser']);
+            $transaction = $transaction->load(['owner', 'paymentMethod']);
 
             if (!$transaction->isPaid()) {
 
                 $domain = $transaction->owner;
                 $paymentMethod = $transaction->paymentMethod;
 
-                if (!$paymentMethod) {
-                    throw new Exception('The transaction payment method does not exist');
-                }
-
                 if (!$domain || $transaction->owner_type !== 'domain') {
                     throw new Exception('The transaction is not associated with a domain');
                 }
 
-                $store = $transaction->store;
-
-                if (!$store) {
-                    throw new Exception('The store does not exist');
+                if (!$paymentMethod) {
+                    throw new Exception('The transaction payment method does not exist');
                 }
 
                 if ($paymentMethod->type == PaymentMethodType::DPO->value) {

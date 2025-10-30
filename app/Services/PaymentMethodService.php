@@ -21,6 +21,7 @@ class PaymentMethodService extends BaseService
     public function showPaymentMethods(array $data): PaymentMethodResources|array
     {
         $storeId = $data['store_id'] ?? null;
+        $matchStoreCountry = $data['match_store_country'] ?? false;
         $automatedVerification = $data['automated_verification'] ?? null;
 
         if($storeId) {
@@ -33,7 +34,6 @@ class PaymentMethodService extends BaseService
                 $existingPaymentMethodTypes = $store->paymentMethods()->pluck('type');
 
                 $excludeTypes = [
-                    PaymentMethodType::DPO->value,
                     ...$existingPaymentMethodTypes,
                     PaymentMethodType::ORANGE_AIRTIME->value
                 ];
@@ -50,7 +50,24 @@ class PaymentMethodService extends BaseService
                 $query = $query->where('automated_verification', $automatedVerification);
             }
 
-            return $this->setQuery($query->when(!request()->has('_sort'), fn($query) => $query->orderBy('position')))->getOutput();
+            if ($matchStoreCountry) {
+                $query = $query->whereRaw('JSON_CONTAINS(countries, ?) OR countries IS NULL', [json_encode($store->country)]);
+            }
+
+            /**
+             * Sort by ranking the query results if no '_sort' parameter is provided in the request.
+             *
+             * Ranking logic:
+             *
+             * 1. Automated Verification (Highest Priority): Payment methods that are automated are ranked first.
+             * 2. Store Country Inclusion (Second Priority): Payment methods where the store's country is in the 'countries' JSON array are ranked second.
+             * 3. Position (Tiebreaker): Payment methods where the 'position' places them higher are ranked third (lower position ranks higher).
+             */
+            return $this->setQuery($query->when(!request()->has('_sort'), fn($query) => $query->orderByRaw("
+                automated_verification DESC,
+                CASE WHEN JSON_CONTAINS(countries, ?) THEN 1 ELSE 0 END DESC,
+                position ASC
+            ", [json_encode($store->country)])))->getOutput();
 
         }else{
 

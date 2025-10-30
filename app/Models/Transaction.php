@@ -43,8 +43,9 @@ class Transaction extends Model
      */
     protected $fillable = [
         'payment_status','failure_type','failure_reason','description','currency','amount','percentage',
-        'metadata','requested_by_user_id','verification_type','manually_verified_by_user_id','payment_method_id',
-        'created_using_auto_billing','customer_id','store_id','ai_assistant_id','owner_id','owner_type',
+        'metadata','requested_by_user_id','verification_type','manually_verified_by_user_id',
+        'store_payment_method_id','payment_method_id','created_using_auto_billing',
+        'customer_id','store_id','ai_assistant_id','owner_id','owner_type',
     ];
 
     /**
@@ -78,6 +79,16 @@ class Transaction extends Model
     public function paymentMethod(): BelongsTo
     {
         return $this->belongsTo(PaymentMethod::class);
+    }
+
+    /**
+     * Get store payment method.
+     *
+     * @return BelongsTo
+     */
+    public function storePaymentMethod(): BelongsTo
+    {
+        return $this->belongsTo(StorePaymentMethod::class);
     }
 
     /**

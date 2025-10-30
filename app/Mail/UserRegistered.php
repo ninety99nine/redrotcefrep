@@ -24,7 +24,7 @@ class UserRegistered extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Welcome to Perfect Order!',
+            subject: 'Welcome to '.config('app.name').'!',
         );
     }
 

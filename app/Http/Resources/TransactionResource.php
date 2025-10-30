@@ -44,6 +44,7 @@ class TransactionResource extends JsonResource
             'created_at' => $this->created_at->toDateTimeString(),
             'updated_at' => $this->updated_at->toDateTimeString(),
             'requested_by_user_id' => $this->requested_by_user_id,
+            'store_payment_method_id' => $this->store_payment_method_id,
             'created_using_auto_billing' => $this->created_using_auto_billing,
             'manually_verified_by_user_id' => $this->manually_verified_by_user_id,
 
@@ -57,6 +58,7 @@ class TransactionResource extends JsonResource
             'media_files' => MediaFileResource::collection($this->whenLoaded('mediaFiles')),
             'payment_method' => PaymentMethodResource::make($this->whenLoaded('paymentMethod')),
             'manually_verified_by_user' => UserResource::make($this->whenLoaded('manuallyVerifiedByUser')),
+            'store_payment_method' => StorePaymentMethodResource::make($this->whenLoaded('storePaymentMethod')),
         ];
     }
 
@@ -67,6 +69,10 @@ class TransactionResource extends JsonResource
      */
     private function getOwnerResource()
     {
+        if ($this->owner_type === 'order') {
+            return OrderResource::make($this->owner);
+        }
+
         if ($this->owner_type === 'store') {
             return StoreResource::make($this->owner);
         }

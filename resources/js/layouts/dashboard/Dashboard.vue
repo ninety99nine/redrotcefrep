@@ -672,6 +672,7 @@
             async showStore(silentUpdate = false) {
                 try {
 
+                    if(!this.storeId) return;
                     if(!silentUpdate) this.storeState.isLoadingStore = true;
 
                     let config = {

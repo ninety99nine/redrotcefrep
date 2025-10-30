@@ -22,7 +22,7 @@
         <!-- Header -->
         <header class="p-4 pb-8 flex justify-between items-center gap-x-2">
             <h1 class="w-full flex-none font-semibold text-xl px-2.5 truncate">
-                {{ organization ? organization.name : 'Perfect Order' }}
+                {{ organization ? organization.name : appName}}
             </h1>
             <div class="lg:hidden -me-2">
                 <!-- Close Button -->
@@ -164,6 +164,7 @@ export default {
                     ]
                 },
             ],
+            appName: import.meta.env.VITE_APP_NAME
         };
     },
     computed: {

@@ -1,15 +1,49 @@
 <template>
-    <div ref="chatContainer" class="bg-[#efe9e0] rounded-lg p-4 space-y-4 overflow-y-auto pb-8">
+    <div ref="chatContainer" class="bg-[#efe9e0] p-4 space-y-4 overflow-y-auto pb-8">
         <div v-for="(msg, index) in displayedMessages" :key="index"
              :class="['flex mb-4 animate-slide-in', msg.isOwnMessage ? 'justify-end' : 'justify-start']">
             <div :class="[
-                'p-3 rounded-lg max-w-xs shadow-md relative',
-                msg.isOwnMessage ? 'bg-[#d0fecf]' : 'bg-white'
+                'p-2.5 rounded-lg max-w-xs shadow-md relative',
+                msg.isOwnMessage ? 'bg-[#d9fdd3]' : 'bg-white'
             ]">
+
+                <!-- Attachments -->
+                <div
+                    v-if="msg.attachments && msg.attachments.length"
+                    class="bg-[#d5f4cf] rounded-sm mt-2 space-y-2 p-4 mb-2">
+
+                    <div
+                       class="flex items-center space-x-2 text-xs"
+                       v-for="(attachment, attIndex) in msg.attachments" :key="attIndex">
+
+                        <svg class="h-10" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" x="0px" y="0px" viewBox="0 0 100 125" style="enable-background:new 0 0 100 100;" xml:space="preserve">
+                            <g>
+                                <g>
+                                    <path fill="#e7000b" d="M83.7,26.3c0-0.8-0.3-1.6-0.9-2.2L66,6.1c-0.6-0.7-1.5-1-2.4-1h-42c-2.9,0-5.3,2.4-5.3,5.3v79.3c0,2.9,2.4,5.3,5.3,5.3    h56.9c2.9,0,5.3-2.4,5.3-5.3L83.7,26.3z M36.7,71.3h-2.6v3.5c0,0.8-0.4,1.2-1.2,1.2h-1.4c-0.8,0-1.2-0.4-1.2-1.2V62.1    c0-0.8,0.4-1.2,1.2-1.2h5.1c2.9,0,4.9,2.1,4.9,5.2S39.6,71.3,36.7,71.3z M50.2,75.9H46c-0.8,0-1.2-0.4-1.2-1.2V62.1    c0-0.8,0.4-1.2,1.2-1.2h4.2c4.7,0,7.7,2.8,7.7,7.5S54.9,75.9,50.2,75.9z M70.7,62.9c0,0.8-0.4,1.2-1.2,1.2h-4.4v3.1h3.4    c0.8,0,1.2,0.4,1.2,1.2v0.8c0,0.8-0.4,1.2-1.2,1.2h-3.4v4.4c0,0.8-0.4,1.2-1.2,1.2h-1.4c-0.8,0-1.2-0.4-1.2-1.2V62.1    c0-0.8,0.4-1.2,1.2-1.2h6.9c0.8,0,1.2,0.4,1.2,1.2V62.9z M79.1,27.3h-11c-2.9,0-5.3-2.4-5.3-5.3V10.2c0-0.3,0.4-0.4,0.6-0.2    l16,16.7C79.5,26.9,79.4,27.3,79.1,27.3z"/>
+                                    <path fill="#e7000b" d="M36,64.1h-1.9v4.1h1.8c1.3,0,1.9-0.9,1.9-2.1S37.2,64.1,36,64.1z"/>
+                                    <path fill="#e7000b" d="M50,64.1h-1.5v8.7H50c2.5,0,4.1-1.5,4.1-4.4C54.1,65.5,52.5,64.1,50,64.1z"/>
+                                </g>
+                            </g>
+                        </svg>
+                        <div>
+                            <p>{{ attachment.name || 'Attachment' }}</p>
+                            <p class="text-gray-500 space-x-1">
+                                <span>{{ `${attachment.pages || 1} ${(attachment.pages || 1) == 1 ? 'page' : 'pages'}` }}</span>
+                                <span>•</span>
+                                <span>{{ `${attachment.size || '250'} KB` }}</span>
+                            </p>
+                        </div>
+
+                    </div>
+
+                </div>
+
                 <!-- Sender name (for group chat, non-own messages) -->
-                <div v-if="!msg.isOwnMessage" class="text-xs font-semibold text-gray-600">{{ msg.sender }}</div>
+                <div v-if="!msg.isOwnMessage" class="text-xs font-semibold mb-1" :style="{ color: msg.nameColor || '#000000' }">{{ msg.sender }}</div>
+
                 <!-- Render message with markdown formatting -->
-                <div class="text-sm text-gray-700 pb-4 break-words whitespace-pre-wrap" v-html="formatMessage(msg.text)"></div>
+                <div class="text-xs text-gray-700 pb-4 break-words whitespace-pre-wrap" v-html="formatMessage(msg.text)"></div>
+
                 <!-- Timestamp and read receipt -->
                 <div class="absolute bottom-1 right-2 flex items-center space-x-1">
                     <span class="text-xs text-gray-500">{{ msg.timestamp }}</span>
@@ -17,10 +51,14 @@
                         <path d="M5.03033 11.4697C4.73744 11.1768 4.26256 11.1768 3.96967 11.4697C3.67678 11.7626 3.67678 12.2374 3.96967 12.5303L5.03033 11.4697ZM8.5 16L7.96967 16.5303C8.26256 16.8232 8.73744 16.8232 9.03033 16.5303L8.5 16ZM17.0303 8.53033C17.3232 8.23744 17.3232 7.76256 17.0303 7.46967C16.7374 7.17678 16.2626 7.17678 15.9697 7.46967L17.0303 8.53033ZM9.03033 11.4697C8.73744 11.1768 8.26256 11.1768 7.96967 11.4697C7.67678 11.7626 7.67678 12.2374 7.96967 12.5303L9.03033 11.4697ZM12.5 16L11.9697 16.5303C12.2626 16.8232 12.7374 16.8232 13.0303 16.5303L12.5 16ZM21.0303 8.53033C21.3232 8.23744 21.3232 7.76256 21.0303 7.46967C20.7374 7.17678 20.2626 7.17678 19.9697 7.46967L21.03033 8.53033ZM3.96967 12.5303L7.96967 16.5303L9.03033 15.4697L5.03033 11.4697L3.96967 12.5303ZM9.03033 16.5303L17.0303 8.53033L15.9697 7.46967L7.96967 15.4697L9.03033 16.5303ZM7.96967 12.5303L11.9697 16.5303L13.0303 15.4697L9.03033 11.4697L7.96967 12.5303ZM13.0303 16.5303L21.0303 8.53033L19.9697 7.46967L11.9697 15.4697L13.0303 16.5303Z" fill="#027bfc"/>
                     </svg>
                 </div>
+
             </div>
         </div>
         <!-- Typing indicator -->
-        <div v-show="isTyping" class="flex items-center space-x-2 p-3 bg-[#efe9e0] rounded-lg">
+        <div v-show="isTyping" :class="[
+            'flex items-center space-x-2 p-3 bg-[#efe9e0] rounded-lg',
+            typingSender === 'you are' ? 'justify-end' : 'justify-start'
+        ]">
             <span class="text-sm text-gray-500">{{ typingSender }} typing</span>
             <div class="flex space-x-1">
                 <div class="w-1 h-1 bg-gray-400 rounded-full animate-bounce" style="animation-delay: 0s"></div>
@@ -46,7 +84,20 @@ export default {
                 'timestamp' in msg &&
                 typeof msg.timestamp === 'string' &&
                 'isOwnMessage' in msg &&
-                typeof msg.isOwnMessage === 'boolean'
+                typeof msg.isOwnMessage === 'boolean' &&
+                (!('nameColor' in msg) || typeof msg.nameColor === 'string') &&
+                (!('attachments' in msg) || (
+                    Array.isArray(msg.attachments) &&
+                    msg.attachments.every(att =>
+                        typeof att === 'object' &&
+                        'name' in att &&
+                        typeof att.name === 'string' &&
+                        'pages' in att &&
+                        typeof att.pages === 'number' &&
+                        'size' in att &&
+                        typeof att.size === 'number'
+                    )
+                ))
             )
         },
         animate: {
@@ -59,7 +110,7 @@ export default {
         },
         delayBeforeLoop: {
             type: Number,
-            default: 5
+            default: 7
         },
         typingDuration: {
             type: Number,
