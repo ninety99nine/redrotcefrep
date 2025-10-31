@@ -49,7 +49,7 @@ return new class extends Migration
             $table->foreign('ai_assistant_id')->references('id')->on('ai_assistants')->nullOnDelete();
             $table->foreign('payment_method_id')->references('id')->on('payment_methods')->nullOnDelete();
             $table->foreign('manually_verified_by_user_id')->references('id')->on('users')->nullOnDelete();
-            $table->foreign('store_payment_method_id')->references('id')->on('store_payment_methods')->nullOnDelete();
+            $table->foreign('store_payment_method_id')->references('id')->on('store_payment_method')->nullOnDelete();
         });
     }
 
