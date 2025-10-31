@@ -1,6 +1,6 @@
 <template>
 
-    <div class="lg:max-w-6xl max-w-xl mx-auto grid grid-cols-1 lg:grid-cols-2 lg:divide-x lg:divide-gray-300">
+    <div class="lg:max-w-6xl max-w-xl mx-auto grid grid-cols-1 lg:grid-cols-2 lg:divide-x lg:divide-black/20">
 
         <div class="lg:p-8 px-4 pt-8">
 

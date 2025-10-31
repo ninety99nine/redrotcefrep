@@ -169,43 +169,56 @@
             <div class="w-full md:w-3/4 lg:w-1/2">
 
                 <table class="w-full text-sm">
-
+                <tbody>
                     <tr class="border-b border-gray-300 border-dashed">
-                        <td class="text-right py-1">Subtotal:</td>
-                        <td v-if="isLoadingStore || isLoadingOrder || !hasOrder" class="w-24 pl-4"><Skeleton width="w-full" :shine="true"></Skeleton></td>
-                        <td v-else class="text-right py-1">{{ order.subtotal.amount_with_currency }}</td>
+                    <td class="text-right py-1">Subtotal:</td>
+                    <td v-if="isLoadingStore || isLoadingOrder || !hasOrder" class="w-24 pl-4">
+                        <Skeleton width="w-full" :shine="true"></Skeleton>
+                    </td>
+                    <td v-else class="text-right py-1">{{ order.subtotal.amount_with_currency }}</td>
                     </tr>
 
                     <tr
-                        class="border-b border-gray-300 border-dashed"
-                        v-if="isLoadingStore || isLoadingOrder || !hasOrder || (order && order.discount_total.amount > 0)">
-                        <td class="text-right py-1">Discount:</td>
-                        <td v-if="isLoadingStore || isLoadingOrder || !hasOrder" class="w-24 pl-4"><Skeleton width="w-full" :shine="true"></Skeleton></td>
-                        <td v-else class="text-right py-1">{{ order.discount_total.amount_with_currency }}</td>
+                    class="border-b border-gray-300 border-dashed"
+                    v-if="isLoadingStore || isLoadingOrder || !hasOrder || (order && order.discount_total.amount > 0)"
+                    >
+                    <td class="text-right py-1">Discount:</td>
+                    <td v-if="isLoadingStore || isLoadingOrder || !hasOrder" class="w-24 pl-4">
+                        <Skeleton width="w-full" :shine="true"></Skeleton>
+                    </td>
+                    <td v-else class="text-right py-1">{{ order.discount_total.amount_with_currency }}</td>
                     </tr>
 
                     <tr
-                        class="border-b border-gray-300 border-dashed"
-                        v-if="isLoadingStore || isLoadingOrder || !hasOrder || (order && order.vat_amount > 0)">
-                        <td class="text-right py-1">Tax {{ isLoadingOrder ? '' : `(${order?.vat_rate ?? '_'}%)` }}:</td>
-                        <td v-if="isLoadingStore || isLoadingOrder || !hasOrder" class="w-24 pl-4"><Skeleton width="w-full" :shine="true"></Skeleton></td>
-                        <td v-else class="text-right py-1">{{ order.vat_amount.amount_with_currency }}</td>
+                    class="border-b border-gray-300 border-dashed"
+                    v-if="isLoadingStore || isLoadingOrder || !hasOrder || (order && order.vat_amount > 0)"
+                    >
+                    <td class="text-right py-1">Tax {{ isLoadingOrder ? '' : `(${order?.vat_rate ?? '_'})` }}:</td>
+                    <td v-if="isLoadingStore || isLoadingOrder || !hasOrder" class="w-24 pl-4">
+                        <Skeleton width="w-full" :shine="true"></Skeleton>
+                    </td>
+                    <td v-else class="text-right py-1">{{ order.vat_amount.amount_with_currency }}</td>
                     </tr>
 
                     <tr
-                        class="border-b border-gray-300 border-dashed"
-                        v-if="isLoadingStore || isLoadingOrder || !hasOrder || (order && order.fee_total.amount > 0)">
-                        <td class="text-right py-1">Additional Fees:</td>
-                        <td v-if="isLoadingStore || isLoadingOrder || !hasOrder" class="w-24 pl-4"><Skeleton width="w-full" :shine="true"></Skeleton></td>
-                        <td v-else class="text-right py-1">{{ order.fee_total.amount_with_currency }}</td>
+                    class="border-b border-gray-300 border-dashed"
+                    v-if="isLoadingStore || isLoadingOrder || !hasOrder || (order && order.fee_total.amount > 0)"
+                    >
+                    <td class="text-right py-1">Additional Fees:</td>
+                    <td v-if="isLoadingStore || isLoadingOrder || !hasOrder" class="w-24 pl-4">
+                        <Skeleton width="w-full" :shine="true"></Skeleton>
+                    </td>
+                    <td v-else class="text-right py-1">{{ order.fee_total.amount_with_currency }}</td>
                     </tr>
 
                     <tr class="text-base font-bold border-b border-gray-300 border-dashed">
-                        <td class="text-right py-2">Grand Total:</td>
-                        <td v-if="isLoadingStore || isLoadingOrder || !hasOrder" class="w-24 pl-4"><Skeleton width="w-full" :shine="true"></Skeleton></td>
-                        <td v-else class="text-right py-2">{{ order.grand_total.amount_with_currency }}</td>
+                    <td class="text-right py-2">Grand Total:</td>
+                    <td v-if="isLoadingStore || isLoadingOrder || !hasOrder" class="w-24 pl-4">
+                        <Skeleton width="w-full" :shine="true"></Skeleton>
+                    </td>
+                    <td v-else class="text-right py-2">{{ order.grand_total.amount_with_currency }}</td>
                     </tr>
-
+                </tbody>
                 </table>
 
             </div>

@@ -3,19 +3,23 @@
     <div :class="{ 'flex flex-col items-center space-y-2' : showButton }">
 
         <div
-            @click="triggerFileUpload"
-            :class="[size, 'bg-gray-200 rounded-full flex items-center justify-center cursor-pointer active:scale-95 transition-all relative group']">
+            @click="editable ? triggerFileUpload() : null"
+            :class="[size, { 'cursor-pointer active:scale-95 transition-all relative group' : editable }, 'bg-gray-200 rounded-full flex items-center justify-center']">
 
-            <!-- Uploading -->
-            <div v-if="isUploadingAny" class="absolute inset-0 text-white bg-blue-500/80 bg-opacity-50 flex items-center justify-center rounded-full transition-opacity">
-                <RefreshCw size="16" class="animate-spin"></RefreshCw>
-            </div>
+            <template v-if="editable">
 
-            <!-- Edit Icon on Hover -->
-            <div class="absolute inset-0 text-white bg-black/80 bg-opacity-50 flex items-center justify-center rounded-full opacity-0 group-hover:opacity-100 transition-opacity">
-                <RefreshCw v-if="filePath" size="16"></RefreshCw>
-                <Plus v-else size="16"></Plus>
-            </div>
+                <!-- Uploading -->
+                <div v-if="isUploadingAny" class="absolute inset-0 text-white bg-blue-500/80 bg-opacity-50 flex items-center justify-center rounded-full transition-opacity">
+                    <RefreshCw size="16" class="animate-spin"></RefreshCw>
+                </div>
+
+                <!-- Edit Icon on Hover -->
+                <div class="absolute inset-0 text-white bg-black/80 bg-opacity-50 flex items-center justify-center rounded-full opacity-0 group-hover:opacity-100 transition-opacity">
+                    <RefreshCw v-if="filePath" size="16"></RefreshCw>
+                    <Plus v-else size="16"></Plus>
+                </div>
+
+            </template>
 
             <!-- Store Logo -->
             <img :src="filePath ? filePath : '/images/logo-black-transparent.png'" alt="Store Logo" class="w-full h-full rounded-full" />
@@ -67,6 +71,10 @@
             uploading: {
                 type: Boolean,
                 default: false
+            },
+            editable: {
+                type: Boolean,
+                default: true
             }
         },
         emits: ['selectedFile'],

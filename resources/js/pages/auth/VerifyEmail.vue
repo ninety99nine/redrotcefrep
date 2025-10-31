@@ -1,6 +1,6 @@
 <template>
     <div class="min-h-screen grid grid-cols-1 lg:grid-cols-2 transition-opacity opacity-100 duration-750 lg:grow starting:opacity-0">
-        <div class="flex items-center justify-center p-6 bg-gradient-to-b from-blue-100 to-white-100">
+        <div class="flex items-center justify-center p-6 bg-linear-to-b from-blue-100 to-white-100">
             <div class="w-full max-w-md">
                 <Logo height="h-20 mx-auto mb-4"></Logo>
 

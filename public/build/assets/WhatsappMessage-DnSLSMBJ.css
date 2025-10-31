@@ -1,0 +1,1 @@
+.animate-slide-in[data-v-6c07e7ec]{animation:slideIn-6c07e7ec .5s ease-in-out}@keyframes slideIn-6c07e7ec{0%{transform:translateY(20px);opacity:0}to{transform:translateY(0);opacity:1}}.animate-bounce[data-v-6c07e7ec]{animation:bounce-6c07e7ec .75s infinite}@keyframes bounce-6c07e7ec{0%,to{transform:translateY(0)}50%{transform:translateY(-5px)}}

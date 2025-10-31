@@ -37,7 +37,7 @@
 
 <script>
 
-    import debounce from 'lodash/debounce';
+    import debounce from 'lodash.debounce';
     import Skeleton from '@Partials/Skeleton.vue';
     import Datepicker from '@Partials/Datepicker.vue';
     import ShineEffect from '@Partials/ShineEffect.vue';

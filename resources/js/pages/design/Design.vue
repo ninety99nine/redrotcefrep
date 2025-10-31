@@ -34,9 +34,9 @@
 
             </div>
 
-            <div class="flex-grow">
+            <div class="grow">
                 <div class="mockup-phone bg-white scale-75 overflow-hidden border-8 border-slate-900 rounded-4xl fixed top-8 right-8 shadow-lg shadow-gray-500">
-                    <div class="w-[360px] h-[800px] overflow-y-auto text-gray-700">
+                    <div class="w-[360px] h-[800px] overflow-y-auto text-gray-700" :style="{ backgroundColor: store?.bg_color }">
                         <router-view name="preview"></router-view>
                     </div>
                 </div>

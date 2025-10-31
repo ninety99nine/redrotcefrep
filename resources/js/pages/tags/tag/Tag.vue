@@ -128,7 +128,7 @@
 
     import Input from '@Partials/Input.vue';
     import Modal from '@Partials/Modal.vue';
-    import cloneDeep from 'lodash/cloneDeep';
+    import cloneDeep from 'lodash.cloneDeep';
     import Button from '@Partials/Button.vue';
     import Loader from '@Partials/Loader.vue';
     import Popover from '@Partials/Popover.vue';

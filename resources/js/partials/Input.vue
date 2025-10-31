@@ -459,7 +459,7 @@
     import { v4 as uuidv4 } from 'uuid';
     import Copy from '@Partials/Copy.vue';
     import debounce from 'lodash.debounce';
-    import cloneDeep from 'lodash/cloneDeep';
+    import cloneDeep from 'lodash.cloneDeep';
     import Button from '@Partials/Button.vue';
     import Popover from '@Partials/Popover.vue';
     import Tooltip from '@Partials/Tooltip.vue';

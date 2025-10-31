@@ -40,7 +40,7 @@
 
 <script>
 
-    import debounce from 'lodash/debounce';
+    import debounce from 'lodash.debounce';
     import OrderFees from '@Pages/orders/order/editable/components/order-fees/OrderFees.vue';
     import OrderBasics from '@Pages/orders/order/editable/components/order-basics/OrderBasics.vue';
     import OrderTotals from '@Pages/orders/order/editable/components/order-totals/OrderTotals.vue';

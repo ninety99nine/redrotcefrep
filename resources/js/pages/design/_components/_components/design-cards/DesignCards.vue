@@ -14,11 +14,12 @@
             @change="designState.saveStateDebounced('Design card moved')">
 
             <template
-                :key="designCard?.id ?? designCard.temporary_id"
+                :key="index"
                 v-for="(designCard, index) in designState.designForm.design_cards">
 
                 <div
                     v-if="!designCard.hasOwnProperty('delete')"
+                    :key="designCard.id"
                     class="group w-full bg-gray-50 border border-gray-300 rounded-lg relative">
 
                     <div
@@ -187,7 +188,7 @@
 
     import { v4 as uuidv4 } from 'uuid';
     import Pill from '@Partials/Pill.vue';
-    import cloneDeep from 'lodash/cloneDeep';
+    import cloneDeep from 'lodash.cloneDeep';
     import Tooltip from '@Partials/Tooltip.vue';
     import VueSlideUpDown from 'vue-slide-up-down';
     import { isNotEmpty } from '@Utils/stringUtils';

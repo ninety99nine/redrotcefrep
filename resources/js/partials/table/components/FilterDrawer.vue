@@ -173,10 +173,10 @@
 
 <script>
 import dayjs from 'dayjs';
-import isEqual from 'lodash/isEqual';
+import isEqual from 'lodash.isEqual';
 import Pill from '@Partials/Pill.vue';
 import Input from '@Partials/Input.vue';
-import cloneDeep from 'lodash/cloneDeep';
+import cloneDeep from 'lodash.cloneDeep';
 import Button from '@Partials/Button.vue';
 import Drawer from '@Partials/Drawer.vue';
 import Loader from '@Partials/Loader.vue';

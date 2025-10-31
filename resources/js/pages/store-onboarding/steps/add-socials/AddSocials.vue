@@ -110,9 +110,9 @@
 </template>
 
 <script>
-    import isEqual from 'lodash/isEqual';
+    import isEqual from 'lodash.isEqual';
     import Input from '@Partials/Input.vue';
-    import cloneDeep from 'lodash/cloneDeep';
+    import cloneDeep from 'lodash.cloneDeep';
     import Button from '@Partials/Button.vue';
     import Switch from '@Partials/Switch.vue';
     import { isEmpty } from '@Utils/stringUtils';

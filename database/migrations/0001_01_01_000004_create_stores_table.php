@@ -18,6 +18,7 @@ return new class extends Migration
             $table->uuid('id')->primary();
             $table->string('name');
             $table->string('description', 120)->nullable();
+            $table->string('bg_color', 7)->nullable();
             $table->boolean('online')->default(true);
             $table->string('offline_message', 120)->default('We are currently offline');
             $table->string('alias')->unique();

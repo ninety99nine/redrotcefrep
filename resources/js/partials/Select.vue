@@ -121,6 +121,9 @@
                     <!-- Dropdown Options -->
                     <div v-if="isOpen" class="w-full absolute z-20 mt-1 select-none bg-white border border-gray-300 rounded-md shadow-lg overflow-hidden">
 
+                        <!-- Footer Slot -->
+                        <slot v-if="$slots.header" name="header"></slot>
+
                         <!-- Search Input (Fixed) -->
                         <div v-if="search" class="px-3 py-2 border-b border-gray-200 bg-white">
                             <Input
@@ -166,6 +169,9 @@
                         <div v-if="filteredOptions.length === 0" class="text-center px-4 py-2 text-gray-500 text-sm">
                             {{ noResultsText }}
                         </div>
+
+                        <!-- Footer Slot -->
+                        <slot v-if="$slots.footer" name="footer"></slot>
 
                     </div>
 

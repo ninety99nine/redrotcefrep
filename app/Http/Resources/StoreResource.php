@@ -28,6 +28,7 @@ class StoreResource extends JsonResource
             'currency' => $this->currency,
             'language' => $this->language,
             'web_link' => $this->web_link,
+            'bg_color' => $this->bg_color,
             'description' => $this->description,
             'opening_hours' => $this->opening_hours,
             'offer_rewards' => $this->offer_rewards,

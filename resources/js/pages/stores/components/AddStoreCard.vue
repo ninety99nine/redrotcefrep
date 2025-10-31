@@ -28,7 +28,8 @@
         methods: {
             navigateToCreateStore() {
                 this.$router.push({
-                    name: 'create-store'
+                    name: 'create-store',
+                    query: { can_go_back: this.hasStores ? 1 : 0 }
                 });
             }
         }

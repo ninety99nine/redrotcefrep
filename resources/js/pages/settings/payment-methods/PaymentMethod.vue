@@ -347,12 +347,6 @@
             isDeletingStorePaymentMethod() {
                 return this.storePaymentMethodState.isDeletingStorePaymentMethod;
             },
-            getPaymentMethodFirstValidationError() {
-                return this.storePaymentMethodState.getPaymentMethodFirstValidationError;
-            },
-            checkIfPaymentMethodConfigSchemaEntityPassesCondition() {
-                return this.storePaymentMethodState.checkIfPaymentMethodConfigSchemaEntityPassesCondition;
-            },
             mockMessages() {
                 return [
                     {
@@ -443,6 +437,12 @@
             },
             openWhatsappGroup() {
                 window.open(this.whatsappGroupLink, "_blank");
+            },
+            getPaymentMethodFirstValidationError(configSchemaEntity, configs) {
+                return this.storePaymentMethodState.getPaymentMethodFirstValidationError(configSchemaEntity, configs);
+            },
+            checkIfPaymentMethodConfigSchemaEntityPassesCondition(configSchemaEntity, configs) {
+                return this.storePaymentMethodState.checkIfPaymentMethodConfigSchemaEntityPassesCondition(configSchemaEntity, configs);
             },
             async showPaymentMethod() {
                 try {

@@ -27,7 +27,7 @@
             borderBottom: `${designCard.metadata.design.b_border ?? 0}px solid ${designCard.metadata.design.border_color ?? '#000000'}`,
         }">
 
-        <StoreLogo size="w-20 h-20" :showButton="false"></StoreLogo>
+        <StoreLogo size="w-20 h-20" :editable="false" :showButton="false"></StoreLogo>
 
     </div>
 

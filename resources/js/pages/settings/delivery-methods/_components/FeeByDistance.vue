@@ -177,10 +177,10 @@
 
 <script>
 
-    import isEqual from 'lodash/isEqual';
+    import isEqual from 'lodash.isEqual';
     import Pill from '@Partials/Pill.vue';
     import Input from '@Partials/Input.vue';
-    import cloneDeep from 'lodash/cloneDeep';
+    import cloneDeep from 'lodash.cloneDeep';
     import Button from '@Partials/Button.vue';
     import Skeleton from '@Partials/Skeleton.vue';
     import ErrorText from '@Partials/ErrorText.vue';

@@ -100,7 +100,7 @@
 
     import Pill from '@Partials/Pill.vue';
     import Input from '@Partials/Input.vue';
-    import cloneDeep from 'lodash/cloneDeep';
+    import cloneDeep from 'lodash.cloneDeep';
     import Button from '@Partials/Button.vue';
     import Drawer from '@Partials/Drawer.vue';
     import Switch from '@Partials/Switch.vue';

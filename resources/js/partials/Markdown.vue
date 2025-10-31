@@ -1,5 +1,5 @@
 <template>
-    <div class="whitespace-pre-line" v-html="renderMarkdown(text)"></div>
+    <div class="markdown-content whitespace-pre-line" v-html="renderMarkdown(text)"></div>
 </template>
 
 <script>

@@ -2,9 +2,9 @@
 
     <div class="select-none pt-24 px-20 pb-40">
 
-        <h1 class="flex items-center justify-between space-x-2 text-xl text-gray-700 font-semibold mb-6">
+        <h1 class="flex items-center justify-between space-x-2 text-3xl text-gray-700 font-semibold mb-6">
             <div v-if="store"
-                class="flex items-center space-x-2">
+                class="flex items-center space-x-4">
                 <span>👋</span>
                 <span>Welcome back, {{ authUser ? authUser.first_name : '' }}</span>
             </div>

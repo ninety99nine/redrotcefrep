@@ -9,7 +9,7 @@
 
 <script>
 
-    import debounce from 'lodash/debounce';
+    import debounce from 'lodash.debounce';
     import Notifications from '@Layouts/shop/components/Notifications.vue';
 
     export default {
@@ -121,6 +121,8 @@
 
                     this.storeState.setStore(response.data);
 
+                    document.body.style.backgroundColor = this.store.bg_color;
+
                     if(this.orderId) {
                         await this.showOrder();
                     }else{
@@ -206,6 +208,9 @@
         },
         beforeUnmount() {
             this.orderState.resetOrderForm();
+        },
+        unmounted() {
+            document.body.style.backgroundColor = null;
         },
         created() {
             if(this.store) {

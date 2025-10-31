@@ -201,7 +201,7 @@
     import { Clock } from 'lucide-vue-next';
     import Input from '@Partials/Input.vue';
     import Modal from '@Partials/Modal.vue';
-    import cloneDeep from 'lodash/cloneDeep';
+    import cloneDeep from 'lodash.cloneDeep';
     import Tooltip from '@Partials/Tooltip.vue';
 
     export default {

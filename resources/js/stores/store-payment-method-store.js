@@ -43,7 +43,7 @@ export const useStorePaymentMethodStore = defineStore('storePaymentMethod', {
 
             // Initialize storePaymentMethodForm with defaults
             this.storePaymentMethodForm = {
-                configs: storePaymentMethod?.configs ?? {},
+                configs: {},
                 active: storePaymentMethod?.active ?? true,
                 instruction: storePaymentMethod?.instruction ?? null,
                 custom_name: storePaymentMethod?.custom_name ?? paymentMethod?.name ?? '',

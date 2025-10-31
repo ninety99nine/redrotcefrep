@@ -3,7 +3,7 @@
         <!-- Clouds Image -->
         <img :src="'/images/clouds.png'" class="absolute bottom-0">
 
-        <div class="relative bg-white/80 p-4 rounded-md">
+        <div class="relative bg-white/80 p-4 rounded-md mb-60">
             <h1 class="text-lg font-semibold mb-4">Bulk Edit Promotions</h1>
 
             <!-- Promotions Table -->
@@ -755,7 +755,7 @@
 
 <script>
     import axios from 'axios';
-    import isEqual from 'lodash/isEqual';
+    import isEqual from 'lodash.isEqual';
     import Input from '@Partials/Input.vue';
     import Modal from '@Partials/Modal.vue';
     import Loader from '@Partials/Loader.vue';

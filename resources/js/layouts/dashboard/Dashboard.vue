@@ -1,6 +1,6 @@
 <template>
 
-    <div class="w-full bg-gradient-to-b from-blue-100 to-blue-50 min-h-screen overflow-x-hidden">
+    <div class="w-full bg-linear-to-b from-blue-100 to-blue-50 min-h-screen overflow-x-hidden">
 
         <!-- Notifications -->
         <Notifications></Notifications>
@@ -26,9 +26,31 @@
 
                                 <!-- Store Name -->
                                 <Skeleton v-if="isLoadingStore" width="w-32" :shine="true"></Skeleton>
-                                <a v-else :href="this.store.web_link" target="_blank" class="cursor-pointer active:scale-95 transition-all duration-250">
-                                    <h2 class="text-xl font-semibold">{{ store.name }}</h2>
-                                </a>
+                                <Select
+                                    v-else
+                                    class="w-48"
+                                    :search="false"
+                                    :options="storeOptions"
+                                    v-model="selectedStoreId">
+
+                                    <template #footer>
+
+                                        <div class="border-t border-dashed border-gray-300 pt-2 m-2">
+
+                                            <Button
+                                                size="xs"
+                                                type="light"
+                                                :leftIcon="Plus"
+                                                buttonClass="w-full"
+                                                :action="navigateToCreateStore">
+                                                <span class="ml-1">Create New Store</span>
+                                            </Button>
+
+                                        </div>
+
+                                    </template>
+
+                                </Select>
 
                                 <!-- Visit Store Icon -->
                                 <Skeleton v-if="isLoadingStore" width="w-8" :shine="true"></Skeleton>
@@ -47,7 +69,7 @@
                                 <!-- Application Logo -->
                                 <Logo
                                     height="h-10"
-                                    @click.stop="navigateToManageStores"
+                                    @click.stop="navigateToShowStores"
                                     class="cursor-pointer hover:shadow-sm active:scale-95 transition-all duration-250">
                                 </Logo>
 
@@ -69,7 +91,7 @@
                             v-if="authUser && !isOnboarding"
                             class="flex w-full justify-center items-center">
                             <div
-                                @click.stop="navigateToManageStores"
+                                @click.stop="navigateToShowStores"
                                 class="cursor-pointer animated-border-blue rounded-full overflow-hidden hover:shadow-sm active:scale-95 transition-all duration-250">
                                 <h2 class="py-2 px-8 text-xs text-blue-500 bg-blue-50 font-semibold whitespace-nowrap truncate">
                                     Helping {{ authUser.first_name }} sell better
@@ -82,7 +104,7 @@
                             <div v-if="storeMode" class="flex items-center space-x-4">
 
                                 <!-- Manage Stores -->
-                                <Button :action="navigateToManageStores" type="light" size="sm" :skeleton="isLoadingStore" icon="refresh">
+                                <Button :action="navigateToShowStores" type="light" size="sm" :skeleton="isLoadingStore" icon="refresh">
                                     <span>Manage Stores</span>
                                 </Button>
 
@@ -111,7 +133,7 @@
 
                                     </template>
 
-                                    <template #content>
+                                    <template #content="props">
 
                                         <!-- Profile Menu -->
                                         <div class="max-h-60 overflow-auto">
@@ -142,7 +164,7 @@
                                                     :key="index"
                                                     v-for="(navMenu, index) in profileNavMenus">
 
-                                                    <div @click="navMenu.name == 'Sign Out' ? logout() : navigateToNavRoute(navMenu)" class="cursor-pointer flex space-x-2 items-center py-3 px-4 text-gray-900 hover:bg-gray-100 group">
+                                                    <div @click="(event) => navMenu.name == 'Sign Out' ? logout() : navMenu.action(props.toggleDropdown(event))" class="cursor-pointer flex space-x-2 items-center py-3 px-4 text-gray-900 hover:bg-gray-100 group">
 
                                                         <Loader v-if="navMenu.name == 'Sign Out' && isLoggingOut"></Loader>
 
@@ -312,6 +334,7 @@
 
     import Logo from '@Partials/Logo.vue';
     import Loader from '@Partials/Loader.vue';
+    import Select from '@Partials/Select.vue';
     import Button from '@Partials/Button.vue';
     import Dropdown from '@Partials/Dropdown.vue';
     import Skeleton from '@Partials/Skeleton.vue';
@@ -319,24 +342,28 @@
     import StoreLogo from '@Components/StoreLogo.vue';
     import Notifications from '@Layouts/dashboard/components/Notifications.vue';
     import ChangeHistoryNavigation from '@Layouts/dashboard/components/ChangeHistoryNavigation.vue';
-    import { Box, Star, Menu, Files, Megaphone, House, Inbox, Rocket, LogOut, ChartArea, MoveLeft, UserRound, Banknote, Settings, ExternalLink, ChevronUp, ChevronDown, Smartphone, WandSparkles, TicketPercent } from 'lucide-vue-next';
+    import { Plus, Box, Star, Menu, Files, Megaphone, House, Inbox, Rocket, LogOut, ChartArea, MoveLeft, UserRound, Banknote, Settings, ExternalLink, ChevronUp, ChevronDown, Smartphone, WandSparkles, TicketPercent } from 'lucide-vue-next';
 
     export default {
         inject: ['uiState', 'formState', 'authState', 'storeState', 'notificationState', 'changeHistoryState'],
         components: {
             Box, Star, Menu, Files, Megaphone, House, Inbox, Rocket, LogOut, ChartArea, UserRound, Banknote, Settings, ExternalLink, ChevronUp, ChevronDown, Smartphone, WandSparkles, TicketPercent,
-            Logo, Loader, Button, Dropdown, Skeleton, VueSlideUpDown, StoreLogo, Notifications, ChangeHistoryNavigation
+            Logo, Loader, Select, Button, Dropdown, Skeleton, VueSlideUpDown, StoreLogo, Notifications, ChangeHistoryNavigation
         },
         data() {
             return {
+                Plus,
                 Menu,
                 MoveLeft,
+                stores: [],
                 ExternalLink,
                 navMenus: [],
+                isLoadingStores: true,
+                selectedStoreId: null,
                 profileNavMenus: [
                     {
                         name: 'Manage Stores',
-                        routeName: 'show-stores',
+                        action: this.navigateToShowStores
                     },
                     {
                         name: 'Sign Out',
@@ -352,7 +379,12 @@
             },
             '$route'() {
                 this.navMenus = this.buildNavMenus();
-            }
+            },
+            selectedStoreId(newValue, oldValue) {
+                if(oldValue) {
+                    this.navigateToShowStoreHome(newValue);
+                }
+            },
         },
         computed: {
             store() {
@@ -378,6 +410,14 @@
             },
             duplicateOrderId() {
                 return this.$route.query.duplicate_order_id;
+            },
+            storeOptions() {
+                return this.stores.map((store) => {
+                    return {
+                        value: store.id,
+                        label: store.name
+                    }
+                });
             }
         },
         methods: {
@@ -628,9 +668,22 @@
 
                 return navMenus;
             },
-            navigateToManageStores() {
+            navigateToShowStoreHome(storeId) {
+                this.$router.push({
+                    name: 'show-store-home',
+                    params: { store_id: storeId }
+                })
+            },
+            navigateToShowStores(toggleDropdown = null) {
                 this.$router.push({
                     name: 'show-stores'
+                });
+                if(toggleDropdown) toggleDropdown();
+            },
+            navigateToCreateStore() {
+                this.$router.push({
+                    name: 'create-store',
+                    query: { can_go_back: 1 }
                 });
             },
             navigateToPricingPlans() {
@@ -669,10 +722,38 @@
                     window.open(this.store.web_link, '_blank');
                 }
             },
+            async showStores() {
+                try {
+
+                    this.isLoadingStores = true;
+
+                    let config = {
+                        params: {
+                            association: 'team member'
+                        }
+                    };
+
+                    const response = await axios.get('/api/stores', config);
+
+                    this.pagination = response.data;
+                    this.stores = this.pagination.data;
+
+                } catch (error) {
+                    const message = error?.response?.data?.message || error?.message || 'Something went wrong while fetching stores';
+                    this.notificationState.showWarningNotification(message);
+                    this.formState.setServerFormErrors(error);
+                    console.error('Failed to fetch stores:', error);
+                } finally {
+                    this.isLoadingStores = false;
+                }
+            },
             async showStore(silentUpdate = false) {
                 try {
 
                     if(!this.storeId) return;
+
+                    this.selectedStoreId = this.storeId;
+
                     if(!silentUpdate) this.storeState.isLoadingStore = true;
 
                     let config = {
@@ -722,6 +803,7 @@
             },
         },
         created() {
+            this.showStores();
             if(this.storeId) this.showStore();
             this.navMenus = this.buildNavMenus();
             this.storeState.silentUpdate = () => this.showStore(true);

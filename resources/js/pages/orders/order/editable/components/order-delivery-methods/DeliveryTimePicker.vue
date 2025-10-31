@@ -35,7 +35,7 @@
 <script>
 
     import dayjs from 'dayjs';
-    import debounce from 'lodash/debounce';
+    import debounce from 'lodash.debounce';
     import Select from '@Partials/Select.vue';
     import Skeleton from '@Partials/Skeleton.vue';
     import ShineEffect from '@Partials/ShineEffect.vue';

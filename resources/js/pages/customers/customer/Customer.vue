@@ -197,7 +197,7 @@
 
 <script>
 
-    import isEqual from 'lodash/isEqual';
+    import isEqual from 'lodash.isEqual';
     import Input from '@Partials/Input.vue';
     import Modal from '@Partials/Modal.vue';
     import Button from '@Partials/Button.vue';

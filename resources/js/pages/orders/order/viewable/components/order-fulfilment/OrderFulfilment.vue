@@ -51,7 +51,7 @@
                     <Select
                         :search="true"
                         label="Courier"
-                        :options="couriers"
+                        :options="courierOptions"
                         v-model="orderForm.courier_id"
                         :errorText="formState.getFormError('courier_id')"
                         @change="(courierId) => updateOrder({ courier_id: courierId }, 'courier')">
@@ -70,6 +70,14 @@
                         @blur="(trackingNumber) => updateOrder({ tracking_number: trackingNumber }, 'tracking number')">
                     </Input>
 
+                </div>
+
+                <!-- Remark Textarea -->
+                <div v-if="selectedCourierLink" class="col-span-2 text-sm">
+                    <span >Tracking Page: </span>
+                    <a :href="selectedCourierLink" target="_blank" class="text-blue-500 hover:underline">
+                        {{ selectedCourierLink }}
+                    </a>
                 </div>
 
                 <!-- Remark Textarea -->
@@ -234,6 +242,7 @@
                 ArrowRight,
                 couriers: [],
                 ExternalLink,
+                courierOptions: [],
                 isLoadingCouriers: false
             }
         },
@@ -264,6 +273,28 @@
             },
             deliveryAddress() {
                 return this.order.delivery_address;
+            },
+            selectedCourierLink() {
+                if (!this.orderForm.courier_id || !this.couriers.length) return null;
+
+                const courier = this.couriers.find(c => c.id === this.orderForm.courier_id);
+
+                if (!courier) return null;
+
+                const trackingNumber = this.orderForm.tracking_number;
+                const baseUrl = courier.tracking_page;
+
+                // If no tracking number, just return the courier’s base tracking page
+                if (!trackingNumber) return baseUrl;
+
+                // If base URL already contains query parameters, append with "&"
+                const separator = baseUrl.includes('?') ? '&' : '?';
+
+                if(courier.name == 'DHL Express') {
+                    return `${baseUrl}${separator}tracking-id=${encodeURIComponent(trackingNumber)}`;
+                }else{
+                    return baseUrl;
+                }
             },
             googleMapsUrl() {
                 if (!this.isLoadingOrder && this.deliveryAddress.latitude && this.deliveryAddress.longitude) {
@@ -304,14 +335,16 @@
 
                     const response = await axios.get('/api/couriers', config);
 
-                    this.couriers = response.data.data.map((courier) => {
+                    this.couriers = response.data.data;
+
+                    this.courierOptions = this.couriers.map((courier) => {
                         return {
                             'label': capitalize(courier.name),
                             'value': courier.id
                         }
                     });
 
-                    this.couriers.unshift({
+                    this.courierOptions.unshift({
                         'label': 'None',
                         'value': null
                     });
@@ -338,8 +371,8 @@
 
                     if(type == 'courier') {
                         if(this.orderForm.courier_id) {
-                            const courier = this.couriers.find(courier => courier.value === this.orderForm.courier_id);
-                            this.notificationState.showSuccessNotification(`Courier updated to ${courier.label}`);
+                            const courierOption = this.courierOptions.find(courier => courier.value === this.orderForm.courier_id);
+                            this.notificationState.showSuccessNotification(`Courier updated to ${courierOption.label}`);
                         }else{
                             this.notificationState.showSuccessNotification(`Courier removed`);
                         }

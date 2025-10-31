@@ -46,6 +46,7 @@
         </MyCartButton>
 
         <PlaceOrderButton
+            class="mt-8"
             :placement="placement"
             :designCards="designCards"
             v-else-if="showingCheckout && shoppingCart">

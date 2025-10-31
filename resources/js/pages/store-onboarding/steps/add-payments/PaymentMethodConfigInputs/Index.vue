@@ -51,13 +51,10 @@
                 </CurrencyConfig>
 
                 <ImageConfig
-                    :paymentMethod="paymentMethod"
                     :configSchemaEntity="configSchemaEntity"
                     v-else-if="configSchemaEntity.type == 'image'"
-                    :deletePaymentMethodImage="deletePaymentMethodImage"
                     v-model="paymentMethod.configs[configSchemaEntity.attribute]"
-                    :uploadSinglePaymentMethodImage="uploadSinglePaymentMethodImage"
-                    :getPaymentMethodValidationErrors="getPaymentMethodValidationErrors">
+                    :uploadImages="(fileIndex) => uploadImages(paymentMethod, fileIndex)">
                 </ImageConfig>
 
                 <ContentConfig
@@ -94,6 +91,7 @@
     import MobileNumberConfig from '@Pages/settings/payment-methods/_components/PaymentMethodConfigInput/MobileNumberConfig.vue';
 
     export default {
+        inject: ['storePaymentMethodState'],
         components: {
             Info, Input, EmailConfig, ImageConfig, SelectConfig,
             StringConfig, ContentConfig, CurrencyConfig, MobileNumberConfig
@@ -108,18 +106,17 @@
             deletePaymentMethodImage: {
                 type: Function
             },
-            uploadSinglePaymentMethodImage: {
-                type: Function
-            },
-            getPaymentMethodValidationErrors: {
-                type: Function
-            },
-            getPaymentMethodFirstValidationError: {
-                type: Function
-            },
-            checkIfPaymentMethodConfigSchemaEntityPassesCondition: {
+            uploadImages: {
                 type: Function
             }
+        },
+        methods: {
+            getPaymentMethodFirstValidationError(configSchemaEntity, configs) {
+                return this.storePaymentMethodState.getPaymentMethodFirstValidationError(configSchemaEntity, configs);
+            },
+            checkIfPaymentMethodConfigSchemaEntityPassesCondition(configSchemaEntity, configs) {
+                return this.storePaymentMethodState.checkIfPaymentMethodConfigSchemaEntityPassesCondition(configSchemaEntity, configs);
+            },
         }
     };
   </script>

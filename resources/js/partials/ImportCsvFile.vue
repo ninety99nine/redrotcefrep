@@ -5,7 +5,7 @@
         <!-- Clouds Image -->
         <img :src="'/images/clouds.png'" class="absolute bottom-0">
 
-        <div class="relative bg-white/80 p-4 rounded-md">
+        <div class="relative bg-white/80 p-4 rounded-md mb-60">
 
             <div class="flex items-center space-x-4 mb-4">
 

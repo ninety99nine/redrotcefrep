@@ -212,10 +212,10 @@
 
 <script>
 
-    import isEqual from 'lodash/isEqual';
+    import isEqual from 'lodash.isEqual';
     import Input from '@Partials/Input.vue';
     import Modal from '@Partials/Modal.vue';
-    import cloneDeep from 'lodash/cloneDeep';
+    import cloneDeep from 'lodash.cloneDeep';
     import Button from '@Partials/Button.vue';
     import { isNotEmpty } from '@Utils/stringUtils';
     import GoogleMaps from '@Partials/GoogleMaps.vue';

@@ -134,14 +134,14 @@
 
         </div>
 
-        <div class="flex items-center justify-between space-x-4 border-t border-gray-300 pt-4 mt-4">
+        <div class="flex items-center justify-between space-x-4 border-t border-black/20 pt-4 mt-4">
 
             <span class="text-sm font-bold">Quantity</span>
-            <div class="w-fit text-sm flex items-center border border-gray-300 rounded-full overflow-hidden">
+            <div class="w-fit text-sm flex items-center bg-white border border-black/20 rounded-full overflow-hidden">
 
                 <button
                     @click.stop="decreaseQuantity"
-                    class="px-3 py-1 bg-gray-200 text-gray-700 hover:bg-gray-300 cursor-pointer">
+                    class="px-3 py-1 bg-gray-200 text-gray-700 hover:bg-black/20 cursor-pointer">
                     -
                 </button>
 
@@ -154,7 +154,7 @@
 
                 <button
                     @click.stop="increaseQuantity"
-                    class="px-3 py-1 bg-gray-200 text-gray-700 hover:bg-gray-300 cursor-pointer">
+                    class="px-3 py-1 bg-gray-200 text-gray-700 hover:bg-black/20 cursor-pointer">
                     +
                 </button>
 
@@ -163,7 +163,7 @@
         </div>
 
         <div
-            class="flex justify-center border-b border-gray-300 pb-4 mt-4"
+            class="flex justify-center border-b border-black/20 pb-4 mt-4"
             v-if="orderProduct && (isInspectingShoppingCart || !shouldGoBack)">
 
             <span class="text-lg font-semibold text-gray-900">
@@ -174,7 +174,7 @@
 
         <div
             v-if="hasDataCollectionFields"
-            class="border-t border-gray-300 space-y-4 pt-4 mt-4">
+            class="border-t border-black/20 space-y-4 pt-4 mt-4">
 
             <div
                 :key="index"

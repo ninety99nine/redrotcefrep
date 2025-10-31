@@ -20,8 +20,8 @@
 
 <script>
 
-    import isEqual from 'lodash/isEqual';
-    import cloneDeep from 'lodash/cloneDeep';
+    import isEqual from 'lodash.isEqual';
+    import cloneDeep from 'lodash.cloneDeep';
     import NoDesignCards from '@Pages/design/_components/_components/NoDesignCards.vue';
     import DesignCards from '@Pages/design/_components/_components/design-cards/DesignCards.vue';
     import LoadingDesignCards from '@Pages/design/_components/_components/LoadingDesignCards.vue';
@@ -207,10 +207,11 @@
                             this.notificationState.showSuccessNotification('Store settings updated successfully');
                         } else if (totalUpdated > 0) {
                             this.notificationState.showSuccessNotification(`${totalUpdated} design card${totalUpdated == 1 ? '' : 's'} updated successfully`);
-                            this.changeDesignCardArrangement();
                         }
-                        this.designState.saveOriginalState('Original design');
                     }
+
+                    this.changeDesignCardArrangement();
+                    this.designState.saveOriginalState('Original design');
 
                 } catch (error) {
                     this.notificationState.showWarningNotification('An unexpected error occurred while processing design cards.');
@@ -323,6 +324,8 @@
             async changeDesignCardArrangement() {
 
                 try {
+
+                    console.log('changeDesignCardArrangement');
 
                     if(this.isChangingDesignCardArrangement) return;
 

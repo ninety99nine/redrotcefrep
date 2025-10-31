@@ -34,12 +34,12 @@
                                 <img
                                     alt="Payment Method Logo"
                                     class="h-full object-contain"
-                                    :src="paymentMethod.configs.logo && paymentMethod.configs.logo.path ? paymentMethod.configs.logo.path : paymentMethod.logo"
+                                    :src="paymentMethod.configs.logo?.[0]?.path ?? paymentMethod.image_url"
                                 />
                             </div>
 
                             <!-- Name -->
-                            <span class="text-sm">{{ paymentMethod.type == 'other' && paymentMethod.custom_name ? paymentMethod.custom_name : paymentMethod.name }}</span>
+                            <span class="text-sm">{{ paymentMethod.custom_name }}</span>
 
                         </div>
 
@@ -53,13 +53,10 @@
 
                     <!-- Configurations -->
                     <PaymentMethodConfigInputs
+                        :uploadImages="uploadImages"
                         :paymentMethod="paymentMethod"
                         :paymentMethodIndex="paymentMethodIndex"
-                        :deletePaymentMethodImage="deletePaymentMethodImage"
-                        :uploadSinglePaymentMethodImage="uploadSinglePaymentMethodImage"
-                        :getPaymentMethodValidationErrors="getPaymentMethodValidationErrors"
-                        :getPaymentMethodFirstValidationError="getPaymentMethodFirstValidationError"
-                        :checkIfPaymentMethodConfigSchemaEntityPassesCondition="checkIfPaymentMethodConfigSchemaEntityPassesCondition">
+                        :deletePaymentMethodImage="deletePaymentMethodImage">
                     </PaymentMethodConfigInputs>
 
                 </div>
@@ -186,8 +183,8 @@
 
 <script>
 
-    import isEqual from 'lodash/isEqual';
-    import cloneDeep from 'lodash/cloneDeep';
+    import isEqual from 'lodash.isEqual';
+    import cloneDeep from 'lodash.cloneDeep';
     import Button from '@Partials/Button.vue';
     import Switch from '@Partials/Switch.vue';
     import StoreLogo from '@Components/StoreLogo.vue';
@@ -195,7 +192,7 @@
     import PaymentMethodConfigInputs from '@Pages/store-onboarding/steps/add-payments/PaymentMethodConfigInputs/Index.vue';
 
     export default {
-        inject: ['formState', 'storeState', 'notificationState'],
+        inject: ['formState', 'storeState', 'storePaymentMethodState', 'notificationState'],
         components: { Button, Switch, StoreLogo, MoveRight, Banknote, CloudUpload, ExternalLink, PaymentMethodConfigInputs },
         data() {
             return {
@@ -207,6 +204,7 @@
                 totalCompletedUploads: 0,
                 uploadsFailedBefore: false,
                 originalPaymentMethods: [],
+                totalFailedPaymentMethods: 0,
                 associatedPaymentMethods: [],
                 unassociatedPaymentMethods: [],
                 isSubmittingPaymentMethods: false,
@@ -260,6 +258,9 @@
             hasFailedUploads() {
                 return this.totalFailedUploads > 0;
             },
+            hasFailedPaymentMethods() {
+                return this.totalFailedPaymentMethods > 0;
+            },
             changedPaymentMethods() {
                 return this.paymentMethods.filter((paymentMethod, index) => {
                     return !isEqual(paymentMethod, this.originalPaymentMethods[index]);
@@ -305,6 +306,7 @@
                 this.totalCompletedUploads = 0;
                 this.originalPaymentMethods = [];
                 this.associatedPaymentMethods = [];
+                this.totalFailedPaymentMethods = 0;
                 this.unassociatedPaymentMethods = [];
                 this.isSubmittingPaymentMethods = false;
                 this.isLoadingUnassociatedPaymentMethods = false;
@@ -327,60 +329,41 @@
                     this.pagination = response.data;
                     this.associatedPaymentMethods = this.pagination.data.map((storePaymentMethod) => {
 
-                        const logo = storePaymentMethod.logo;
-                        const photo = storePaymentMethod.photo;
                         const paymentMethod = storePaymentMethod.payment_method;
 
-                        // Create initial config object from config_schema
-                        let configs = Object.fromEntries(
-                            paymentMethod.config_schema
-                                .filter(config_schema => !['content'].includes(config_schema.type))
-                                .map(config_schema => [
-                                    config_schema.attribute,
-                                    config_schema.default ?? null
-                                ])
-                        );
-
-                        // Merge existing configs from storePaymentMethod
-                        configs = { ...configs, ...(storePaymentMethod.configs ?? {}) };
-
                         let result = {
-                            configs: configs,
-                            id: paymentMethod.id,
-                            name: paymentMethod.name,
-                            type: paymentMethod.type,
-                            logo: paymentMethod.image_url,
+                            id: storePaymentMethod.id,
                             active: storePaymentMethod.active,
-                            currencies: paymentMethod.currencies,
+                            image_url: paymentMethod.image_url,
+                            payment_method_id: paymentMethod.id,
                             config_schema: paymentMethod.config_schema,
                             custom_name: storePaymentMethod.custom_name,
-                            store_payment_method_id: storePaymentMethod.id
                         };
 
                         // Iterate through the config_schema and handle image type
-                        paymentMethod.config_schema.forEach(config_schema_entity => {
+                        result.configs = paymentMethod.config_schema.reduce((configs, configSchema) => {
 
-                            if (config_schema_entity.type === 'image' && config_schema_entity.attribute == 'logo') {
+                            let value;
 
-                                result.configs[config_schema_entity.attribute] = {
-                                    id: logo?.id,  //  Not available when the logo has been deleted
-                                    deleting: false,
-                                    path: logo?.path  //  Not available when the logo has been deleted
-                                };
-
-                            }else if (config_schema_entity.type === 'image' && config_schema_entity.attribute == 'photo') {
-
-                                result.configs[config_schema_entity.attribute] = {
-                                    id: photo?.id,  //  Not available when the photo has been deleted
-                                    deleting: false,
-                                    path: photo?.path  //  Not available when the photo has been deleted
-                                };
-
+                            // Handle image types for logo and photo
+                            if (configSchema.type === 'image' && configSchema.attribute === 'logo') {
+                                value = storePaymentMethod?.logo ? [storePaymentMethod.logo] : [];
+                            } else if (configSchema.type === 'image' && configSchema.attribute === 'photo') {
+                                value = storePaymentMethod?.photo ? [storePaymentMethod.photo] : [];
+                            } else {
+                                // For other types, use existing config value or null
+                                value = storePaymentMethod?.configs?.[configSchema.attribute] ?? configSchema.default ?? null;
                             }
 
-                        });
+                            return {
+                                ...configs,
+                                [configSchema.attribute]: value
+                            };
+
+                        }, {});
 
                         return result;
+
                     });
 
                     this.setPaymentMethods();
@@ -405,7 +388,7 @@
                         params: {
                             match_store_country: 1,
                             store_id: this.store.id,
-                            association: 'unassociated',
+                            association: 'unassociated'
                         }
                     };
 
@@ -415,36 +398,35 @@
                     this.unassociatedPaymentMethods = this.pagination.data.map((paymentMethod) => {
 
                         let result = {
+                            id: null,
                             active: false,
-                            id: paymentMethod.id,
-                            name: paymentMethod.name,
-                            type: paymentMethod.type,
-                            logo: paymentMethod.image_url,
                             custom_name: paymentMethod.name,
-                            currencies: paymentMethod.currencies,
+                            image_url: paymentMethod.image_url,
+                            payment_method_id: paymentMethod.id,
                             config_schema: paymentMethod.config_schema,
-                            configs: Object.fromEntries(
-                                paymentMethod.config_schema
-                                    .filter(config_schema => !['content'].includes(config_schema.type))
-                                    .map(config_schema => [
-                                        config_schema.attribute,
-                                        config_schema.default ?? null
-                                    ])
-                            )
-                        }
+                        };
 
                         // Iterate through the config_schema and handle image type
-                        paymentMethod.config_schema.forEach(config_schema_entity => {
+                        result.configs = paymentMethod.config_schema.reduce((configs, configSchema) => {
 
-                            if (config_schema_entity.type === 'image') {
+                            let value;
 
-                                result.configs[config_schema_entity.attribute] = {
-                                    path:  null
-                                };
-
+                            // Handle image types for logo and photo
+                            if (configSchema.type === 'image' && configSchema.attribute === 'logo') {
+                                value = [];
+                            } else if (configSchema.type === 'image' && configSchema.attribute === 'photo') {
+                                value = [];
+                            } else {
+                                // For other types, use existing config value or null
+                                value = configSchema.default ?? null;
                             }
 
-                        });
+                            return {
+                                ...configs,
+                                [configSchema.attribute]: value
+                            };
+
+                        }, {});
 
                         return result;
 
@@ -469,121 +451,11 @@
             setOriginalPaymentMethods() {
                 this.originalPaymentMethods = cloneDeep(this.paymentMethods);
             },
-            getPaymentMethodValidationErrors(configSchemaEntity, configs) {
-                let errors = [];
-
-                // Ensure validation rules exist
-                if (!configSchemaEntity.hasOwnProperty('validation_rules')) {
-                    return errors;
-                }
-
-                const value = configs[configSchemaEntity.attribute];
-
-                // Check for required validation
-                if (configSchemaEntity.validation_rules.hasOwnProperty('required')) {
-                    const [isRequired, message] = configSchemaEntity.validation_rules.required;
-
-                    if (isRequired) {
-                        if (
-                            value === null ||
-                            value === undefined ||
-                            (typeof value === "string" && value.trim() === "") ||
-                            (typeof value === "object" && Object.keys(value).length === 0) ||
-                            (Array.isArray(value) && value.length === 0)
-                        ) {
-                            errors.push(message);
-                        }
-                    }
-                }
-
-                // Check for regex pattern validation (only applicable for string values)
-                if (configSchemaEntity.validation_rules.hasOwnProperty('regex_pattern')) {
-                    const [pattern, message] = configSchemaEntity.validation_rules.regex_pattern;
-
-                    if (typeof value === "string") {
-                        try {
-                            const regex = new RegExp(pattern);
-                            if (!regex.test(value.trim())) {
-                                errors.push(message);
-                            }
-                        } catch (error) {
-                            console.error(`Invalid regex pattern: ${pattern}`);
-                        }
-                    }
-                }
-
-                // Check for QR Code validation
-                if (configSchemaEntity.validation_rules.hasOwnProperty('qr_code')) {
-
-                    const [message] = configSchemaEntity.validation_rules.qr_code;
-
-                    if (value?.path?.startsWith('blob:') && value?.valid_qr === false) {
-                        errors.push(message);
-                    }
-                }
-
-                // Check for MIME Type validation
-                if (configSchemaEntity.validation_rules.hasOwnProperty('mime_types')) {
-                    const [allowedmime_types, message] = configSchemaEntity.validation_rules.mime_types;
-
-                    if (value && value.file_ref) {
-                        const uploadedFileType = value.file_ref.type;
-
-                        if (!allowedmime_types.includes(uploadedFileType)) {
-                            errors.push(message);
-                        }
-                    }
-                }
-
-                // Check for max_size validation
-                if (configSchemaEntity.validation_rules.hasOwnProperty('max_size')) {
-
-                    const [max_size, message] = configSchemaEntity.validation_rules.max_size;
-
-                    if (value?.file_ref && value.file_ref.size > max_size) {
-                        errors.push(message);
-                    }
-                }
-
-                return errors;
-            },
             getPaymentMethodFirstValidationError(configSchemaEntity, configs) {
-                const errors = this.getPaymentMethodValidationErrors(configSchemaEntity, configs);
-                return errors.length ? errors[0] : null;
+                return this.storePaymentMethodState.getPaymentMethodFirstValidationError(configSchemaEntity, configs);
             },
             checkIfPaymentMethodConfigSchemaEntityPassesCondition(configSchemaEntity, configs) {
-
-                if (!configSchemaEntity.hasOwnProperty('condition')) {
-                    // No condition means it's always valid
-                    return true;
-                }
-
-                return configSchemaEntity.condition.every(condition => {
-
-                    // Ensure condition follows 'attribute=value' or 'attribute!=value' format
-                    const match = condition.match(/^([^!=]+)(!=|=)(.+)$/);
-
-                    if (!match) {
-                        console.log(`Invalid condition format: ${condition}`);
-                        return false;
-                    }
-
-                    const [, attribute, operator, expectedValue] = match.map(str => str.trim());
-
-                    // Check if attribute exists in the configs
-                    if (!configs.hasOwnProperty(attribute)) {
-                        return false;
-                    }
-
-                    // Handle equality and inequality conditions
-                    if (operator === '=') {
-                        return configs[attribute] === expectedValue;
-                    } else if (operator === '!=') {
-                        return configs[attribute] !== expectedValue;
-                    }
-
-                    return false;
-                });
+                return this.storePaymentMethodState.checkIfPaymentMethodConfigSchemaEntityPassesCondition(configSchemaEntity, configs);
             },
             async submitPaymentMethods() {
 
@@ -592,10 +464,12 @@
                 // Indicate that payment method submittion is in progress
                 this.isSubmittingPaymentMethods = true;
 
+                this.totalFailedPaymentMethods = 0;
+
                 // Create all store payment methods one by one
                 let storePaymentMethodCreationPromises = this.changedPaymentMethods.map((paymentMethod) => {
 
-                    if(paymentMethod.store_payment_method_id) {
+                    if(paymentMethod.id) {
                         return this.updatePaymentMethod(paymentMethod);
                     }else if(paymentMethod.active) {
                         return this.addPaymentMethod(paymentMethod);
@@ -607,8 +481,8 @@
                 await Promise.allSettled(storePaymentMethodCreationPromises)
                     .then((results) => {
 
-                        let successCount = 0;
                         let errors = [];
+                        let successCount = 0;
 
                         results.forEach((result, index) => {
                             if (result.status === 'fulfilled') {
@@ -620,11 +494,13 @@
                             }
                         });
 
-                        if (successCount) {
-                            if(this.hasAssociatedPaymentMethods) {
-                                this.notificationState.showSuccessNotification('Payment methods updated!');
-                            }else{
-                                this.notificationState.showSuccessNotification('Payment methods added!');
+                        if(!this.hasFailedPaymentMethods) {
+                            if (successCount) {
+                                if(this.hasAssociatedPaymentMethods) {
+                                    this.notificationState.showSuccessNotification('Payment methods updated!');
+                                }else{
+                                    this.notificationState.showSuccessNotification('Payment methods added!');
+                                }
                             }
                         }
 
@@ -642,7 +518,7 @@
                         this.setOriginalPaymentMethods();
                     });
 
-                if (this.totalFailedUploads == 0 || this.uploadsFailedBefore) {
+                if ((!this.hasFailedPaymentMethods && !this.hasFailedUploads) || this.uploadsFailedBefore) {
 
                     this.navigateToAddSocials();
 
@@ -663,23 +539,25 @@
                         store_id: this.store.id,
                         active: paymentMethod.active,
                         configs: paymentMethod.configs,
-                        payment_method_id: paymentMethod.id,
-                        custom_name: paymentMethod.custom_name
+                        custom_name: paymentMethod.custom_name,
+                        payment_method_id: paymentMethod.payment_method_id,
                     };
 
                     const response = await axios.post('/api/store-payment-methods', storePaymentMethodData);
 
                     if(this.totalCompletedSteps < this.totalCompletionSteps) this.totalCompletedSteps++;
                     let createdStorePaymentMethod = response.data.store_payment_method;
-                    paymentMethod.store_payment_method_id = createdStorePaymentMethod.id;
+                    paymentMethod.id = createdStorePaymentMethod.id;
 
-                    await this.uploadStorePaymentMethodImages(paymentMethod);
+                    await this.uploadImages(paymentMethod);
 
                 } catch (error) {
                     const message = error?.response?.data?.message || error?.message || `Something went wrong while creating ${paymentMethod.name}`;
                     this.notificationState.showWarningNotification(message);
                     this.formState.setServerFormErrors(error);
                     console.error('Failed to create store payment method:', error);
+
+                    this.totalFailedPaymentMethods++;
                 }
 
             },
@@ -694,89 +572,109 @@
                         custom_name: paymentMethod.custom_name
                     };
 
-                    await axios.put(`/api/store-payment-methods/${paymentMethod.store_payment_method_id}`, storePaymentMethodData);
+                    await axios.put(`/api/store-payment-methods/${paymentMethod.id}`, storePaymentMethodData);
 
                     if(this.totalCompletedSteps < this.totalCompletionSteps) this.totalCompletedSteps++;
+
+                    await this.uploadImages(paymentMethod);
 
                 } catch (error) {
                     const message = error?.response?.data?.message || error?.message || `Something went wrong while updating ${paymentMethod.name}`;
                     this.notificationState.showWarningNotification(message);
                     this.formState.setServerFormErrors(error);
                     console.error('Failed to update store payment method:', error);
+
+                    this.totalFailedPaymentMethods++;
                 }
             },
-            async uploadStorePaymentMethodImages(paymentMethod) {
+            async uploadImages(paymentMethod, photoIndex = null) {
 
-                let imageUploadPromises = paymentMethod.config_schema
-                    .filter(config_schema => config_schema.type === 'image')
-                    .map(config_schema => {
-                        return this.uploadSinglePaymentMethodImage(paymentMethod, config_schema.attribute);
-                    })
-                    .filter(Boolean);
+                let photos = paymentMethod.config_schema
+                        .filter(configSchema => configSchema.type === 'image')
+                        .map(configSchema => {
+                            if(paymentMethod.configs[configSchema.attribute].length) {
+                                return [configSchema.attribute, paymentMethod.configs[configSchema.attribute][0]];
+                            }
+                            return null;
+                        })
+                        .filter(photo => photo != null);
+
+                let imageUploadPromises = [];
+
+                for (let index = 0; index < photos.length; index++) {
+                    let attribute = photos[index][0];
+                    let photo = photos[index][1];
+
+                    if (photo.id == null && photo.uploading == false && (photo.uploaded === null || photo.uploaded === false)) {
+                        if (photoIndex == null || photoIndex == index) {
+                            imageUploadPromises.push(
+                                this.uploadSingleImage(paymentMethod, attribute, photo, index)
+                            );
+                        }
+                    }
+                }
 
                 if (imageUploadPromises.length === 0) return;
 
                 this.isUploading = true;
                 this.uploadMessage = `Uploading images...`;
 
-                const results = await Promise.allSettled(imageUploadPromises);
-                let failedUploads = results.filter(result => result.status === 'rejected').length;
+                return Promise.allSettled(imageUploadPromises).then((results) => {
+                    let failedUploads = results.filter(result => result.status === 'rejected').length;
 
-                if (failedUploads > 0) {
-                    this.notificationState.showWarningNotification(`⚠️ ${failedUploads} image(s) failed to upload. You can retry manually.`);
-                }
+                    if (failedUploads > 0) {
+                        this.notificationState.showWarningNotification(`⚠️ ${failedUploads} image(s) failed to upload. Try again or change the image.`);
+                    }
 
-                this.isUploading = false;
+                    this.isUploading = false;
+                });
             },
-            async uploadSinglePaymentMethodImage(paymentMethod, attribute, retryCount = 0, error = null) {
+            async uploadSingleImage(paymentMethod, attribute, photo, index, retryCount = 0, error = null) {
 
-                try {
+                try{
 
                     if (retryCount > 2) {
                         console.log(`❌ Image upload for '${paymentMethod.name}' failed after 3 attempts.`);
-                        paymentMethod.configs[attribute].uploaded = false;
-                        paymentMethod.configs[attribute].error_message = error?.response?.data?.message || error?.message || `Something went wrong while uploading ${attribute}`;
+                        photo.uploaded = false;
+                        photo.uploading = false;
+                        photo.error_message = error?.response?.data?.message || error?.message || `Upload failed`;
+
                         return Promise.reject(`Failed after 3 attempts`);
                     }
 
                     let formData = new FormData();
-                    formData.append('return', '1');
+                    formData.append('file', photo.file_ref);
                     formData.append('store_id', this.store.id);
+                    formData.append('mediable_id', paymentMethod.id);
                     formData.append('mediable_type', 'store payment method');
-                    formData.append('file', paymentMethod.configs[attribute].file_ref);
-                    formData.append('mediable_id', paymentMethod.store_payment_method_id);
                     formData.append('upload_folder_name', `store_payment_method_${attribute}`);
 
-                    paymentMethod.configs[attribute].uploading = true;
-                    paymentMethod.configs[attribute].error_message = null;
+                    photo.uploading = true;
+                    photo.error_message = null;
 
                     const config = {
                         headers: { 'Content-Type': 'multipart/form-data' }
                     };
 
                     const response = await axios.post('/api/media-files', formData, config);
+                    const mediaFile = response.data.media_file;
 
-                    if(this.totalCompletedSteps < this.totalCompletionSteps) this.totalCompletedSteps++;
-                    const createdMediaFile = response.data.media_file;
-                    this.totalCompletedUploads++;
-
-                    paymentMethod.configs[attribute] = {
-                        uploaded: true,
-                        deleting: false,
-                        id: createdMediaFile.id,
-                        path: createdMediaFile.path
-                    };
+                    photo.uploaded = true;
+                    photo.uploading = false;
+                    photo.id = mediaFile.id;
+                    photo.path = mediaFile.path;
 
                     console.log(`✅ Image for '${paymentMethod.name}' uploaded successfully.`);
-                    this.uploadMessage = `Uploaded ${this.totalCompletedUploads}/${this.totalUploads} images`;
 
                     return response;
 
                 } catch (error) {
                     console.error(`⚠️ Image upload for '${paymentMethod.name}' attempt ${retryCount + 1} failed.`, error);
-                    await this.uploadSinglePaymentMethodImage(paymentMethod, attribute, retryCount + 1, error);
-                } finally {
-                    paymentMethod.configs[attribute].uploading = false;
+
+                    // Don't retry on 504 or timeout error
+                    if (error.code === 'ECONNABORTED' || error.response?.status === 504) return;
+
+                    return this.uploadSingleImage(paymentMethod, attribute, photo, index, retryCount + 1, error);
                 }
             },
             async deletePaymentMethodImage(paymentMethod, attribute) {
@@ -818,7 +716,7 @@
         },
         beforeRouteLeave(to, from, next) {
 
-            if (this.isSubmittingPaymentMethods || this.isUploading || (this.hasChangedPaymentMethods && this.progressPercentage != 100 && !this.hasFailedUploads)) {
+            if (this.isSubmittingPaymentMethods || this.isUploading || (this.hasChangedPaymentMethods && this.progressPercentage != 100 && !this.hasFailedPaymentMethods && !this.hasFailedUploads)) {
 
                 const answer = window.confirm("You have unsaved changes. Are you sure you want to leave?");
 

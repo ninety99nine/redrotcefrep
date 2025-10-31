@@ -13,85 +13,101 @@
         </div>
 
         <!-- Card -->
-        <div class="w-full max-w-lg bg-white p-8 rounded-2xl shadow-lg">
+        <div class="w-full max-w-lg">
 
-            <!-- Store Logo -->
-            <StoreLogo @selectedFile="handleSelectedFile" :uploading="logo && isCreatingStore" class="flex justify-center mb-4"></StoreLogo>
+            <div class="bg-white p-8 rounded-2xl shadow-lg">
 
-            <!-- Store Form -->
-            <div class="space-y-4 mb-4">
+                <!-- Store Logo -->
+                <StoreLogo @selectedFile="handleSelectedFile" :uploading="logo && isCreatingStore" class="flex justify-center mb-4"></StoreLogo>
 
-                <!-- Name Input -->
-                <Input
-                    type="text"
-                    label="Name"
-                    v-model="form.name"
-                    :showAsterisk="true"
-                    @keyup="syncWithAlias"
-                    placeholder="Baby Cakes 🧁"
-                    autocomplete="organization"
-                    :errorText="formState.getFormError('name')" />
+                <!-- Store Form -->
+                <div class="space-y-4 mb-4">
 
-                <!-- Whatsapp Number Input -->
-                <Input
-                    type="text"
-                    label="WhatsApp Number"
-                    placeholder="+26772000001"
-                    v-model="form.whatsapp_mobile_number"
-                    :errorText="formState.getFormError('whatsapp_mobile_number')"
-                    description="Customers can send orders to this number after shopping">
-                    <template #prefix>
-                        <WhatsappIcon class="mx-2"></WhatsappIcon>
-                    </template>
-                </Input>
+                    <!-- Name Input -->
+                    <Input
+                        type="text"
+                        label="Name"
+                        v-model="form.name"
+                        :showAsterisk="true"
+                        @keyup="syncWithAlias"
+                        placeholder="Baby Cakes 🧁"
+                        autocomplete="organization"
+                        :errorText="formState.getFormError('name')" />
 
-                <!-- Website Link Input -->
-                <Input
-                    type="text"
-                    label="Store Link"
-                    v-model="form.alias"
-                    placeholder="baby-cakes"
-                    @keyup="() => formatAlias(true)"
-                    :errorText="formState.getFormError('alias')"
-                    description="Your store’s shopping link. Custom domains can be set later.">
-                    <template #prefix>
-                        <div class="flex items-center space-x-1 pl-2 rounded-l-md bg-gray-50 text-gray-500 whitespace-nowrap">
-                            <Earth size="18" class="mt-0.5"></Earth>
-                            <span class="text-sm">perfectorder.shop</span>
-                            <span class="text-gray-400 text-sm">/</span>
-                        </div>
-                    </template>
-                </Input>
+                    <!-- Whatsapp Number Input -->
+                    <Input
+                        type="text"
+                        label="WhatsApp Number"
+                        placeholder="+26772000001"
+                        v-model="form.whatsapp_mobile_number"
+                        :errorText="formState.getFormError('whatsapp_mobile_number')"
+                        description="Customers can send orders to this number after shopping">
+                        <template #prefix>
+                            <WhatsappIcon class="mx-2"></WhatsappIcon>
+                        </template>
+                    </Input>
 
-                <!-- Select Country Input -->
-                <SelectCountry
-                    class="w-full"
-                    label="Country"
-                    v-model="form.country"
-                    labelPopoverTitle="What Is This?"
-                    labelPopoverDescription="Your store’s country of operation">
-                </SelectCountry>
+                    <!-- Website Link Input -->
+                    <Input
+                        type="text"
+                        label="Store Link"
+                        v-model="form.alias"
+                        placeholder="baby-cakes"
+                        @keyup="() => formatAlias(true)"
+                        :errorText="formState.getFormError('alias')"
+                        description="Your store’s shopping link. Custom domains can be set later.">
+                        <template #prefix>
+                            <div class="flex items-center space-x-1 pl-2 rounded-l-md bg-gray-50 text-gray-500 whitespace-nowrap">
+                                <Earth size="18" class="mt-0.5"></Earth>
+                                <span class="text-sm">perfectorder.shop</span>
+                                <span class="text-gray-400 text-sm">/</span>
+                            </div>
+                        </template>
+                    </Input>
 
-                <!-- Select Currency Input -->
-                <SelectCurrency
-                    class="w-full"
-                    label="Currency"
-                    v-model="form.currency"
-                    labelPopoverTitle="What Is This?"
-                    labelPopoverDescription="Your store’s currency">
-                </SelectCurrency>
+                    <!-- Select Country Input -->
+                    <SelectCountry
+                        class="w-full"
+                        label="Country"
+                        v-model="form.country"
+                        labelPopoverTitle="What Is This?"
+                        labelPopoverDescription="Your store’s country of operation">
+                    </SelectCountry>
+
+                    <!-- Select Currency Input -->
+                    <SelectCurrency
+                        class="w-full"
+                        label="Currency"
+                        v-model="form.currency"
+                        labelPopoverTitle="What Is This?"
+                        labelPopoverDescription="Your store’s currency">
+                    </SelectCurrency>
+
+                </div>
+
+                <!-- Create Store Button -->
+                <Button
+                    size="lg"
+                    type="primary"
+                    buttonClass="w-full"
+                    :action="createStore"
+                    :loading="isCreatingStore"
+                    :disabled="isCreatingStore">
+                    <span>Create Store</span>
+                </Button>
 
             </div>
 
             <!-- Create Store Button -->
             <Button
                 size="lg"
-                type="primary"
+                class="mt-4"
+                type="light"
+                :leftIcon="MoveLeft"
                 buttonClass="w-full"
-                :action="createStore"
-                :loading="isCreatingStore"
-                :disabled="isCreatingStore">
-                <span>Create Store</span>
+                :disabled="isCreatingStore"
+                :action="navigateToShowStores">
+                <span class="ml-1">Back To Dashboard</span>
             </Button>
 
         </div>
@@ -103,7 +119,7 @@
 <script>
 
     import Input from '@Partials/Input.vue';
-    import { Earth } from 'lucide-vue-next';
+    import { Earth, MoveLeft } from 'lucide-vue-next';
     import Button from '@Partials/Button.vue';
     import StoreLogo from '@Components/StoreLogo.vue';
     import WhatsappIcon from '@Partials/WhatsappIcon.vue';
@@ -118,6 +134,7 @@
         },
         data() {
             return {
+                MoveLeft,
                 form: {
                     name: '',
                     alias: '',
@@ -128,6 +145,11 @@
                 logo: null,
                 aliasModified: false,
                 isCreatingStore: false
+            }
+        },
+        computed: {
+            canGoBack() {
+                return this.$route.query?.can_go_back == 1;
             }
         },
         methods: {
@@ -149,6 +171,11 @@
             },
             handleSelectedFile(file) {
                 this.logo = file;
+            },
+            navigateToShowStores() {
+                this.$router.push({
+                    name: 'show-stores'
+                });
             },
             async createStore() {
 

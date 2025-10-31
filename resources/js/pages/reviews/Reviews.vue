@@ -25,7 +25,7 @@
 
         </div>
 
-        <div class="relative bg-white/80 p-4 rounded-md">
+        <div class="relative bg-white/80 p-4 rounded-md mb-60">
             <h1 class="text-lg font-semibold mb-4">Reviews</h1>
 
             <!-- Reviews Table -->
@@ -334,7 +334,7 @@
 
 <script>
     import axios from 'axios';
-    import isEqual from 'lodash/isEqual';
+    import isEqual from 'lodash.isEqual';
     import Copy from '@Partials/Copy.vue';
     import Pill from '@Partials/Pill.vue';
     import Input from '@Partials/Input.vue';

@@ -91,10 +91,10 @@
 
         <div
             v-else
-            class="flex flex-col items-center justify-center bg-gradient-to-br from-indigo-50 to-purple-50 border border-gray-300 shadow-lg rounded-2xl py-16 px-8 space-y-6">
+            class="flex flex-col items-center justify-center bg-linear-to-br from-indigo-50 to-purple-50 border border-gray-300 shadow-lg rounded-2xl py-16 px-8 space-y-6">
 
             <div class="relative">
-                <div class="bg-gradient-to-br from-white-50 to-indigo-50 text-indigo-500 rounded-full p-2">
+                <div class="bg-linear-to-br from-white-50 to-indigo-50 text-indigo-500 rounded-full p-2">
                     <Truck size="60"></Truck>
                 </div>
                 <div class="absolute inset-0 bg-indigo-300 opacity-20 rounded-full animate-ping"></div>

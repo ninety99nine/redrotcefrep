@@ -29,6 +29,9 @@ class StorePaymentMethod extends Model
         'active' => 'boolean',
         'configs' => JsonArray::class,
         'requires_verification' => 'boolean',
+        'require_proof_of_payment' => 'boolean',
+        'enable_contact_seller_before_payment' => 'boolean',
+        'mark_as_paid_on_customer_confirmation' => 'boolean',
     ];
 
     /**

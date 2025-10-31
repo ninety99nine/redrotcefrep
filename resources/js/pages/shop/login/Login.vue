@@ -2,12 +2,12 @@
 
     <div class="min-h-screen transition-opacity opacity-100 duration-750 lg:grow starting:opacity-0">
 
-        <div class="flex items-center justify-center py-6 bg-gradient-to-b from-blue-100 to-white-100">
+        <div class="flex items-center justify-center py-6 bg-linear-to-b from-blue-100 to-white-100">
 
             <div class="w-full max-w-md">
 
                 <div class="flex justify-center mb-4">
-                    <StoreLogo size="w-20 h-20" :showButton="false"></StoreLogo>
+                    <StoreLogo size="w-20 h-20" :editable="false" :showButton="false"></StoreLogo>
                 </div>
 
                 <div class="bg-white rounded-lg shadow-sm border border-slate-200 p-6 mb-6">

@@ -57,6 +57,7 @@ class CreateStoreRequest extends FormRequest
             'opening_hours.*.hours.*' => ['required_with:opening_hours', 'array'],
             'opening_hours.*.hours.*.*' => ['required_with:opening_hours', 'string', 'regex:/^([01]\d|2[0-3]):[0-5]\d$/'],
             'online' => ['nullable', 'boolean'],
+            'bg_color' => ['nullable', 'string', 'max:7'],
             'offline_message' => ['nullable', 'string', 'max:120'],
             'sms_sender_name' => ['nullable', 'string', 'max:11'],
             'order_number_padding' => ['nullable', 'integer', 'min:0', 'max:5'],

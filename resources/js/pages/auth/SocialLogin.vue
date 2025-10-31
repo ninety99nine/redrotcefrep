@@ -1,6 +1,6 @@
 <template>
 
-    <div class="flex flex-col justify-center items-center w-full bg-gradient-to-b from-blue-100 to-white-100 min-h-screen overflow-x-hidden">
+    <div class="flex flex-col justify-center items-center w-full bg-linear-to-b from-blue-100 to-white-100 min-h-screen overflow-x-hidden">
 
         <div class="flex flex-col justify-center items-center">
 

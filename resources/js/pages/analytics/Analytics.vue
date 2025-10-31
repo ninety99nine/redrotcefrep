@@ -9,8 +9,8 @@
                         v-model="start_date"
                         format="dd MMM yyyy"
                         modelType="yyyy-MM-dd"
-                        @change="fetchAllAnalytics"
                         :enableTimePicker="false"
+                        @change="fetchAllAnalytics"
                         :errorText="formState.getFormError('start_date')">
                     </Datepicker>
                     <span>-</span>
@@ -18,8 +18,8 @@
                         v-model="end_date"
                         format="dd MMM yyyy"
                         modelType="yyyy-MM-dd"
-                        @change="fetchAllAnalytics"
                         :enableTimePicker="false"
+                        @change="fetchAllAnalytics"
                         :errorText="formState.getFormError('end_date')">
                     </Datepicker>
                 </div>
@@ -27,7 +27,9 @@
         </div>
 
         <!-- Loading State -->
-        <div v-if="!store || isLoadingAnalytics" class="text-center">Loading...</div>
+        <div v-if="!store || isLoadingAnalytics" class="flex justify-center mt-10">
+            <Loader></Loader>
+        </div>
 
         <!-- Dynamic Charts -->
         <div v-else class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -45,16 +47,18 @@
 </template>
 
 <script>
+
+import Loader from '@Partials/Loader.vue';
+import { Chart, registerables } from 'chart.js';
 import { LineChart, BarChart } from 'vue-chart-3';
 import Datepicker from '@Partials/Datepicker.vue';
-import { Chart, registerables } from 'chart.js';
 
 Chart.register(...registerables);
 
 export default {
     name: 'Analytics',
     inject: ['formState', 'storeState', 'notificationState'],
-    components: { Datepicker, LineChart, BarChart },
+    components: { Loader, Datepicker, LineChart, BarChart },
     data() {
         return {
             chartData: {}, // Store data for all charts
