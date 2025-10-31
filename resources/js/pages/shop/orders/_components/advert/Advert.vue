@@ -2,7 +2,9 @@
 
     <div class="select-none flex justify-between items-center bg-blue-500 text-white py-2 px-4 mb-4 shadow-sm rounded-xl transition-all duration-300 border border-transparent hover:border-gray-300 hover:shadow-lg active:scale-95 active:shadow-md cursor-pointer group">
 
-        <div class="flex items-center space-x-2">
+        <div
+            @click="navigateToLogin"
+            class="flex items-center space-x-2">
 
             <div
                 class="w-16 h-16 bg-gray-200 flex items-center justify-center rounded-full border-2 border-blue-400">
@@ -38,6 +40,13 @@
         data() {
             return {
                 appName: import.meta.env.VITE_APP_NAME
+            }
+        },
+        methods: {
+            navigateToLogin() {
+                this.$router.push({
+                    name: 'login'
+                })
             }
         }
     };
