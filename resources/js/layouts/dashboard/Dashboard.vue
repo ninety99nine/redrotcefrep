@@ -376,6 +376,7 @@
         watch: {
             storeId() {
                 this.showStore();
+                if(!this.hasStores) this.showStores();
             },
             '$route'() {
                 this.navMenus = this.buildNavMenus();
@@ -410,6 +411,9 @@
             },
             duplicateOrderId() {
                 return this.$route.query.duplicate_order_id;
+            },
+            hasStores() {
+                return this.stores.length > 0;
             },
             storeOptions() {
                 return this.stores.map((store) => {

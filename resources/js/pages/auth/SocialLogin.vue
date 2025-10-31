@@ -8,7 +8,7 @@
             <div class="relative inline-flex items-center justify-center w-28 h-28">
 
                 <!-- Spinning Ring -->
-                <div :class="['absolute inset-0 animate-spin rounded-full border-4 border-gray-300']" :style="'border-top-color:'+borderColor+';'"></div>
+                <div :class="['absolute inset-0 animate-spin rounded-full border-4 border-gray-300']" style="border-top-color:#00a63d;"></div>
 
                 <transition name="fade-1" mode="out-in">
 
@@ -64,25 +64,6 @@
                 provider: this.$route.query.provider,
                 errorDescription: this.$route.query.error_description
             };
-        },
-        computed : {
-            borderColor() {
-                if(this.errorMessage) {
-
-                    return '#e02523';
-
-                }else{
-
-                    const colorMapping = {
-                        'google': '#df4b39',
-                        'linkedin': '#117bb8',
-                        'facebook': '#3f5c9b',
-                    }
-
-                    return colorMapping[this.provider];
-
-                }
-            }
         },
         methods: {
             onLogoLoaded() {
