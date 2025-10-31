@@ -1,6 +1,6 @@
 <template>
 
-    <div class="flex flex-col justify-center items-center w-full bg-linear-to-b from-blue-100 to-white-100 min-h-screen overflow-x-hidden">
+    <div class="flex flex-col justify-center items-center w-full bg-gradient-to-b from-blue-100 to-white-100 min-h-screen overflow-x-hidden">
 
         <div class="flex flex-col justify-center items-center">
 
@@ -8,7 +8,7 @@
             <div class="relative inline-flex items-center justify-center w-28 h-28">
 
                 <!-- Spinning Ring -->
-                <div :class="['absolute inset-0 animate-spin rounded-full border-4 border-gray-300']" style="border-top-color:#00a63d;"></div>
+                <div :class="['absolute inset-0 animate-spin rounded-full border-4 border-gray-300']" :style="'border-top-color:'+borderColor+';'"></div>
 
                 <transition name="fade-1" mode="out-in">
 
@@ -64,6 +64,11 @@
                 provider: this.$route.query.provider,
                 errorDescription: this.$route.query.error_description
             };
+        },
+        computed : {
+            borderColor() {
+                return this.errorMessage ? '#e02523' : '#00a63d';
+            }
         },
         methods: {
             onLogoLoaded() {
