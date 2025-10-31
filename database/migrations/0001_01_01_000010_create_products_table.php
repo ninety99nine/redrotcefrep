@@ -16,7 +16,7 @@ return new class extends Migration
     {
         Schema::create('products', function (Blueprint $table) {
             $table->uuid('id')->primary();
-            $table->string('name', 60)->nullable()->comment('Product name, up to 60 characters to accommodate variant names');
+            $table->string('name', 60)->nullable();
             $table->enum('type', ProductType::values())->default(ProductType::PHYSICAL->value);
             $table->boolean('visible')->default(true);
             $table->timestamp('visibility_expires_at')->nullable();

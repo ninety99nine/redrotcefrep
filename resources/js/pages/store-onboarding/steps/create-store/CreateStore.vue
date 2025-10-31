@@ -106,6 +106,7 @@
                 :leftIcon="MoveLeft"
                 buttonClass="w-full"
                 :disabled="isCreatingStore"
+                v-if="canGoBackToDashboard"
                 :action="navigateToShowStores">
                 <span class="ml-1">Back To Dashboard</span>
             </Button>
@@ -148,7 +149,7 @@
             }
         },
         computed: {
-            canGoBack() {
+            canGoBackToDashboard() {
                 return this.$route.query?.can_go_back == 1;
             }
         },
