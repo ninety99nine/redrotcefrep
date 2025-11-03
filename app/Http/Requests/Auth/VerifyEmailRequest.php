@@ -25,7 +25,7 @@ class VerifyEmailRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'email' => 'required|email|exists:users,email',
+            'email' => 'required|email',
             'token' => 'required|string',
         ];
     }
@@ -40,7 +40,6 @@ class VerifyEmailRequest extends FormRequest
         return [
             'email.required' => 'The email field is required.',
             'email.email' => 'Please provide a valid email address.',
-            'email.exists' => 'The email address does not exist.',
             'token.required' => 'The token is required.'
         ];
     }

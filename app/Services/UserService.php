@@ -110,10 +110,9 @@ class UserService extends BaseService
     {
         $deleted = $user->delete();
 
-        if ($deleted) {
-            return ['message' => 'User deleted'];
-        } else {
-            throw new Exception('User delete unsuccessful');
-        }
+        return [
+            'deleted' => $deleted,
+            'message' => $deleted ? 'User deleted' : 'User delete unsuccessful'
+        ];
     }
 }

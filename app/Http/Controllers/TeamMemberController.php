@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\User;
+use App\Models\StoreUser;
 use App\Services\TeamMemberService;
-use App\Http\Resources\UserResource;
-use App\Http\Resources\UserResources;
+use App\Http\Resources\StoreUserResource;
+use App\Http\Resources\StoreUserResources;
 use App\Http\Requests\TeamMember\AddTeamMemberRequest;
 use App\Http\Requests\TeamMember\ShowTeamMemberRequest;
 use App\Http\Requests\TeamMember\ShowTeamMembersRequest;
@@ -34,9 +34,9 @@ class TeamMemberController extends Controller
      * Show team members.
      *
      * @param ShowTeamMembersRequest $request
-     * @return UserResources|array
+     * @return StoreUserResources|array
      */
-    public function showTeamMembers(ShowTeamMembersRequest $request): UserResources|array
+    public function showTeamMembers(ShowTeamMembersRequest $request): StoreUserResources|array
     {
         return $this->service->showTeamMembers($request->validated());
     }
@@ -60,43 +60,42 @@ class TeamMemberController extends Controller
      */
     public function removeTeamMembers(RemoveTeamMembersRequest $request): array
     {
-        $userIds = request()->input('user_ids', []);
-        return $this->service->removeTeamMembers($userIds);
+        return $this->service->removeTeamMembers($request->validated());
     }
 
     /**
      * Show team member.
      *
      * @param ShowTeamMemberRequest $request
-     * @param User $user
-     * @return UserResource
+     * @param StoreUser $teamMember
+     * @return StoreUserResource
      */
-    public function showTeamMember(ShowTeamMemberRequest $request, User $user): UserResource
+    public function showTeamMember(ShowTeamMemberRequest $request, StoreUser $teamMember): StoreUserResource
     {
-        return $this->service->showTeamMember($user);
+        return $this->service->showTeamMember($teamMember);
     }
 
     /**
      * Update team member.
      *
      * @param UpdateTeamMemberRequest $request
-     * @param User $user
+     * @param StoreUser $teamMember
      * @return array
      */
-    public function updateTeamMember(UpdateTeamMemberRequest $request, User $user): array
+    public function updateTeamMember(UpdateTeamMemberRequest $request, StoreUser $teamMember): array
     {
-        return $this->service->updateTeamMember($user, $request->validated());
+        return $this->service->updateTeamMember($teamMember, $request->validated());
     }
 
     /**
      * Remove team member.
      *
      * @param RemoveTeamMemberRequest $request
-     * @param User $user
+     * @param StoreUser $teamMember
      * @return array
      */
-    public function removeTeamMember(RemoveTeamMemberRequest $request, User $user): array
+    public function removeTeamMember(RemoveTeamMemberRequest $request, StoreUser $teamMember): array
     {
-        return $this->service->removeTeamMember($user);
+        return $this->service->removeTeamMember($teamMember);
     }
 }

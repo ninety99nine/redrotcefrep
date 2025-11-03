@@ -72,29 +72,38 @@ class StoreService extends BaseService
         /** @var User $user */
         $user = Auth::user();
 
-        $store = $user->stores()->create($data);
+        // 1. Create the store
+        $store = Store::create($data);
 
-        // Create default tags
-        $defaultTags = ['popular', 'new'];
-
-        foreach ($defaultTags as $tagName) {
+        // 2. Default tags
+        foreach (['popular', 'new'] as $tagName) {
             Tag::firstOrCreate([
-                'name' => $tagName,
+                'name'     => $tagName,
                 'store_id' => $store->id,
-                'type' => TagType::PRODUCT->value,
+                'type'     => TagType::PRODUCT->value,
             ]);
         }
 
-        // Create default category
+        // 3. Default category
         Category::firstOrCreate([
-            'name' => self::$defaultCategoryName,
-            'store_id' => $store->id
+            'name'     => self::$defaultCategoryName,
+            'store_id' => $store->id,
         ]);
 
-        // Create roles
-        $adminRole = Role::create(['name' => 'admin', 'store_id' => $store->id, 'guard_name' => 'sanctum']);
-        $staffRole = Role::create(['name' => 'staff', 'store_id' => $store->id, 'guard_name' => 'sanctum']);
+        // 4. Create store-scoped roles
+        $adminRole = Role::create([
+            'name'       => 'admin',
+            'store_id'   => $store->id,
+            'guard_name' => 'sanctum',
+        ]);
 
+        $staffRole = Role::create([
+            'name'       => 'staff',
+            'store_id'   => $store->id,
+            'guard_name' => 'sanctum',
+        ]);
+
+        // 5. Global permissions (shared across all stores)
         $permissions = [
             'manage store',
             'view orders', 'manage orders',
@@ -102,66 +111,66 @@ class StoreService extends BaseService
             'view products', 'manage products',
             'view customers', 'manage customers',
             'view promotions', 'manage promotions',
-            'view team members', 'manage team members'
+            'view team members', 'manage team members',
         ];
 
-        // Create permissions
         foreach ($permissions as $permissionName) {
-
             Permission::firstOrCreate([
-                'name' => $permissionName,
-                'guard_name' => 'sanctum'
+                'name'       => $permissionName,
+                'guard_name' => 'sanctum',
             ]);
-
         }
 
-        $adminPermissions = $permissions; // Grant all permissions
-        $staffPermissions = array_diff($permissions, ['manage store', 'manage team members']); // Grant all except these permissions
+        // 6. Assign permissions to roles
+        $adminRole->syncPermissions($permissions);
+        $staffRole->syncPermissions(collect($permissions)->diff(['manage store', 'manage team members'])->all());
 
-        $adminRole->syncPermissions($adminPermissions);
-        $staffRole->syncPermissions($staffPermissions);
+        // 7. Assign as store team member with admin role attached (for per-store accuracy)
+        $store->users()->attach($user->id, [
+            'creator' => true,
+            'joined_at' => now(),
+            'invited_at' => null,
+            'role_id' => $adminRole->id,
+        ]);
 
-        $user->assignRole($adminRole);
+        // 8. Assign as store follower
+        $store->followers()->attach($user->id);
 
-        //  Follow store
-        $user->followedStores()->attach($store->id);
-
-        //  Capture store recent visit
-        $user->visitedStores()->syncWithoutDetaching([$store->id => [
-            'id' => Str::uuid(),
+        // 9. Assign as store visitor
+        $store->visitors()->attach($user->id, [
             'last_visited_at' => now()
-        ]]);
+        ]);
 
-        $isValidUssdRequest = (new UssdService)->isValidUssdRequest();
+        // 10. Offer trial subscription for USSD requests
+        if ((new UssdService)->isValidUssdRequest()) {
 
-        if($isValidUssdRequest) {
+            $pricingPlan = PricingPlan::where('type', PricingPlanType::STORE_SUBSCRIPTION->value)
+                ->supportsUssd()
+                ->active()
+                ->orderBy('price')
+                ->first();
 
-            $pricingPlan = PricingPlan::where('type', PricingPlanType::STORE_SUBSCRIPTION->value)->supportsUssd()->active()->orderBy('price')->first();
-
-            //  Creaate trial store subscription
             (new PricingPlanService)->payPricingPlan($pricingPlan, [
-                'store' => $store,
-                'payment_method_type' => PaymentMethodType::ORANGE_AIRTIME->value
+                'store'               => $store,
+                'payment_method_type' => PaymentMethodType::ORANGE_AIRTIME->value,
             ]);
 
         }
 
-        //  Build the store design cards
-        $this->buildStoreDesignCards($store);
-
-        //  Forget cache
+        // 11. Clear cache
         (new UssdService)->cacheManager($user)->forget();
 
-        // Create store logo if provided
-        if (isset($data['logo']) && !empty($data['logo'])) {
+        // 12. Build design cards
+        $this->buildStoreDesignCards($store);
 
+        // 13. Upload logo if provided
+        if (!empty($data['logo'] ?? null)) {
             (new MediaFileService)->createMediaFile([
-                'file' => $data['logo'],
-                'mediable_type' => 'store',
-                'mediable_id' => $store->id,
-                'upload_folder_name' => UploadFolderName::STORE_LOGO->value
+                'file'              => $data['logo'],
+                'mediable_type'     => 'store',
+                'mediable_id'       => $store->id,
+                'upload_folder_name'=> UploadFolderName::STORE_LOGO->value,
             ]);
-
         }
 
         return $this->showCreatedResource($store);
@@ -272,11 +281,10 @@ class StoreService extends BaseService
 
         }
 
-        if ($deleted) {
-            return ['message' => 'Store deleted'];
-        }else{
-            throw new Exception('Store delete unsuccessful');
-        }
+        return [
+            'deleted' => $deleted,
+            'message' => $deleted ? 'Store deleted' : 'Store delete unsuccessful'
+        ];
     }
 
     /**
@@ -669,6 +677,23 @@ class StoreService extends BaseService
         return response($response->body(), 200)
             ->header('Content-Type', 'image/png')
             ->header('Content-Disposition', 'inline; filename="' . $store->name . ' QR Code.png"');
+    }
+
+    /**
+     * Accept store invitations.
+     *
+     * @param array $data
+     * @return array
+     */
+    public function acceptStoreInvitations(User $user)
+    {
+        DB::table('store_user')->where('email', $user->email)->update([
+            'email' => null,
+            'joined_at' => now(),
+            'first_name' => null,
+            'user_id' => $user->id,
+            'mobile_number' => null,
+        ]);
     }
 
     /**

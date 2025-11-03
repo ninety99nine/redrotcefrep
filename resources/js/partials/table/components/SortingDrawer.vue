@@ -11,6 +11,7 @@
         </Button>
 
         <Drawer
+            contentClass=""
             ref="sortDrawer"
             position="right"
             :showFooter="false"

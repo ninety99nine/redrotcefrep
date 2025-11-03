@@ -120,10 +120,9 @@ class AutoBillingScheduleService extends BaseService
     {
         $deleted = $autoBillingSchedule->delete();
 
-        if ($deleted) {
-            return ['message' => 'Auto billing schedule deleted'];
-        } else {
-            throw new Exception('Auto billing schedule delete unsuccessful');
-        }
+        return [
+            'deleted' => $deleted,
+            'message' => $deleted ? 'Auto billing schedule deleted' : 'Auto billing schedule delete unsuccessful'
+        ];
     }
 }

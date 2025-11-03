@@ -242,11 +242,10 @@ class StorePaymentMethodService extends BaseService
 
         $deleted = $storePaymentMethod->delete();
 
-        if ($deleted) {
-            return ['message' => 'Store Payment Method deleted'];
-        } else {
-            throw new Exception('Store Payment Method delete unsuccessful');
-        }
+        return [
+            'deleted' => $deleted,
+            'message' => $deleted ? 'Store Payment Method deleted' : 'Store Payment Method delete unsuccessful'
+        ];
     }
 
     /**

@@ -13,7 +13,7 @@ class ShowTeamMemberRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return $this->user()->can('view', $this->route('user'));
+        return $this->user()->can('view', $this->route('teamMember'));
     }
 
     /**

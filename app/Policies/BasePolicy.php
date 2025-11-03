@@ -4,6 +4,7 @@ namespace App\Policies;
 
 use App\Models\User;
 use App\Services\AuthService;
+use Illuminate\Support\Facades\DB;
 
 class BasePolicy
 {
@@ -29,11 +30,18 @@ class BasePolicy
      * @param string $ability
      * @return bool
      */
-    protected function isStoreUserWithPermission(User $user, string $ability): bool
+    protected function isStoreUserWithPermission(User $user, string $ability, $storeId = null): bool
     {
-        $storeId = getPermissionsTeamId();  // StorePermission Middleware sets the store id as the team id
-        $isStoreMember = $storeId && $user->stores()->where('stores.id', $storeId)->exists();
+        $storeId = $storeId ?? getPermissionsTeamId();
+        if (!$storeId) return false;
 
-        return $isStoreMember && $user->hasPermissionTo($ability);
+        return DB::table('store_user')
+            ->join('roles', 'store_user.role_id', '=', 'roles.id')
+            ->join('role_has_permissions', 'roles.id', '=', 'role_has_permissions.role_id')
+            ->join('permissions', 'role_has_permissions.permission_id', '=', 'permissions.id')
+            ->where('store_user.user_id', $user->id)
+            ->where('store_user.store_id', $storeId)
+            ->where('permissions.name', $ability)
+            ->exists();
     }
 }

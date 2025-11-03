@@ -1,135 +1,166 @@
 <template>
 
-    <div class="min-h-screen relative">
+    <div class="min-h-screen bg-linear-to-br from-blue-50 via-white to-indigo-50 py-24 px-6">
 
-        <div class="z-10 pt-32 px-20 relative">
+        <div class="max-w-7xl mx-auto">
 
-            <div class="flex flex-col items-center mb-10">
+            <!-- Header -->
+            <div class="text-center mb-8">
 
-                <h1 class="flex justify-center items-center space-x-2 text-xl text-gray-700 font-semibold mb-4">
-                    <Rocket size="24"></Rocket>
-                    <span>Pricing Plans</span>
+                <h1 class="flex items-center justify-center gap-2 text-3xl font-bold text-gray-900 mb-3">
+                    Pricing Plans
                 </h1>
 
-                <p class="w-96 text-sm text-gray-500 text-center">Get the best plan for your store. Pay monthly or annually, with no hidden fees. Start selling instantly!</p>
+                <p class="text-gray-600 max-w-2xl mx-auto text-base">
+                    Choose the perfect plan for your store and start selling instantly!
+                </p>
 
             </div>
 
             <!-- Loader -->
-            <div
-                class="flex justify-center"
-                v-if="isLoadingPricingPlans">
-                <Loader></Loader>
+            <div v-if="isLoadingPricingPlans" class="flex justify-center py-20">
+                <Loader />
             </div>
 
-            <template v-if="!isLoadingPricingPlans">
+            <template v-else>
 
+                <!-- Billing Toggle -->
                 <div class="flex justify-center mb-4">
 
-                    <div class="w-fit flex justify-center items-center bg-white py-0.5 px-1 border border-blue-300 rounded-full mb-4 relative">
+                    <div class="inline-flex bg-gray-100 p-1 rounded-full shadow-inner">
 
-                        <div :class="[isShowingMonthlyPricingPlans ? '-translate-x-12' : 'translate-x-12', 'absolute w-24 bg-blue-500 h-6 rounded-full transition-transform duration-500 ease-in-out']"></div>
-                        <div @click="() => changePricingPlan('monthly')" :class="[isShowingMonthlyPricingPlans ? 'text-white' : 'text-gray-500', 'z-10 py-1 px-4 rounded-full w-24 text-sm text-center cursor-pointer transition-transform duration-500 ease-in-out']">Monthly</div>
-                        <div @click="() => changePricingPlan('annually')" :class="[isShowingAnnualPricingPlans ? 'text-white' : 'text-gray-500', 'z-10 py-1 px-4 rounded-full w-24 text-sm text-center cursor-pointer transition-transform duration-500 ease-in-out']">Annually</div>
+                        <button
+                            @click="() => changePricingPlan('monthly')"
+                            :class="[
+                                'px-6 py-2.5 rounded-full text-sm font-medium transition-all duration-300 flex items-center gap-2',
+                                isShowingMonthlyPricingPlans
+                                    ? 'bg-white text-blue-700 shadow-sm'
+                                    : 'text-gray-600 hover:text-gray-800'
+                            ]">
+                            Monthly
+                        </button>
+
+                        <button
+                            @click="() => changePricingPlan('annually')"
+                            :class="[
+                                'px-6 py-2.5 rounded-full text-sm font-medium transition-all duration-300 flex items-center gap-2',
+                                isShowingAnnualPricingPlans
+                                    ? 'bg-white text-blue-700 shadow-sm'
+                                    : 'text-gray-600 hover:text-gray-800'
+                            ]">
+                            Annually
+                        </button>
 
                     </div>
 
                 </div>
 
-                <div class="flex justify-center mb-8">
-                    <img :src="'/images/store-rooftop.png'" class="w-96">
-                </div>
+                <!-- Pricing Cards -->
+                <div class="flex justify-center gap-6 max-w-6xl mx-auto mb-8">
 
-                <div class="flex justify-center space-x-4 mb-8">
-
+                    <!-- Basic Plan (Only show if no active subscription) -->
                     <div
-                        class="animated-border-blue w-80 bg-white py-4 px-4 shadow-sm rounded-xl">
+                        v-if="!hasActiveSubscription"
+                        class="group relative bg-white border border-gray-200 rounded-2xl p-8 shadow-sm hover:shadow-xl hover:border-gray-300 transition-all duration-300">
 
-                        <h1 class="text-xl text-gray-700 font-bold mb-2">
-                            Free Plan
-                        </h1>
+                        <div class="mb-6">
+                            <h3 class="text-xl font-bold text-gray-900">Basic Plan</h3>
+                            <p class="text-sm text-gray-500 mt-1">Basic store access with limited features</p>
+                        </div>
 
-                        <h2 class="text-gray-500 text-sm mb-4">
-                            Free store access with limited features
-                        </h2>
-
-                        <h2 class="text-3xl text-gray-700 font-bold space-x-1 mb-4">
-                            <span>$0.00</span>
-                            <span class="text-sm text-gray-500 font-normal">/</span>
-                            <span class="text-sm text-gray-500 font-normal">
-                                <template v-if="isShowingMonthlyPricingPlans">month</template>
-                                <template v-else-if="isShowingAnnualPricingPlans">year</template>
+                        <div class="mb-8">
+                            <span class="text-4xl font-bold text-gray-900">$0.00</span>
+                            <span class="text-gray-500 text-sm">
+                            / <template v-if="isShowingMonthlyPricingPlans">month</template>
+                            <template v-else>year</template>
                             </span>
-                        </h2>
+                        </div>
 
-                        <div class="bg-gray-50 border p-4 rounded-lg">
-                            <div
-                                :key="index"
-                                v-for="(feature, index) in freePlanFeatures">
-
-                                <span class="text-gray-500 text-xs">{{ feature }}</span>
-
+                        <div class="space-y-3 mb-8">
+                            <div v-for="(feature, index) in freePlanFeatures" :key="index" class="flex items-center text-sm text-gray-600">
+                            <svg class="w-5 h-5 text-green-500 mr-2 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                            </svg>
+                            {{ feature }}
                             </div>
                         </div>
 
+                        <Button
+                            size="md"
+                            type="outline"
+                            :disabled="true"
+                            buttonClass="w-full">
+                            Current Plan
+                        </Button>
+
                     </div>
 
+                    <!-- Paid Plans -->
                     <div
                         :key="index"
                         v-for="(pricingPlan, index) in filteredPricingPlans"
-                        class="animated-border-blue w-80 bg-white py-4 px-4 shadow-sm rounded-xl">
+                        :class="[
+                            'group relative bg-white rounded-2xl p-8 shadow-sm hover:shadow-xl transition-all duration-300 border',
+                            isCurrentPlan(pricingPlan) ? 'border-blue-500' : 'border-gray-200'
+                        ]">
 
-                        <h1 class="text-xl text-gray-700 font-bold mb-2">
-                            {{ pricingPlan.name }}
-                        </h1>
+                        <!-- Recommended Badge -->
+                        <div
+                            v-if="pricingPlan.metadata?.recommended"
+                            class="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-blue-600 text-white text-xs font-semibold px-3 py-1 rounded-full">
+                            Most Popular
+                        </div>
 
-                        <h2 class="w-4/5 text-gray-500 text-sm mb-4">
-                            {{ pricingPlan.description }}
-                        </h2>
+                        <div class="mb-6">
+                            <h3 class="text-xl font-bold text-gray-900">{{ pricingPlan.name }}</h3>
+                            <p class="text-sm text-gray-500 mt-1 max-w-xs">{{ pricingPlan.description }}</p>
+                        </div>
 
-                        <h2 class="text-3xl text-gray-700 font-bold space-x-1 mb-4">
-                            <span>{{ pricingPlan.price.amount_with_currency }}</span>
-                            <span class="text-sm text-gray-500 font-normal">/</span>
-                            <span class="text-sm text-gray-500 font-normal">
-                                <template v-if="isShowingMonthlyPricingPlans">month</template>
-                                <template v-else-if="isShowingAnnualPricingPlans">year</template>
+                        <div class="mb-8">
+                            <span class="text-4xl font-bold text-gray-900">{{ pricingPlan.price.amount_with_currency }}</span>
+                            <span class="text-gray-500 text-sm">
+                            / <template v-if="isShowingMonthlyPricingPlans">month</template>
+                            <template v-else>year</template>
                             </span>
-                        </h2>
+                        </div>
 
+                        <!-- CTA Button -->
                         <Button
-                            size="sm"
-                            type="primary"
-                            :rightIcon="Rocket"
-                            buttonClass="w-full mb-4"
-                            :loading="pricingPlanIndex == index"
-                            :action="() => payPricingPlan(pricingPlan, index)"
-                            :disabled="isGeneratingPaymentLink && pricingPlanIndex != index">
-                            <span>Subscribe</span>
+                            size="lg"
+                            buttonClass="w-full mb-6"
+                            :type="buttonType(pricingPlan)"
+                            :loading="pricingPlanIndex === index"
+                            :disabled="buttonDisabled(pricingPlan, index)"
+                            :action="() => payPricingPlan(pricingPlan, index)">
+                            <div v-if="pricingPlanIndex === index" class="flex items-center justify-center space-x-2">
+                                <Loader color="border-gray-300" />
+                                <span class="animate-pulse">Preparing payment...</span>
+                            </div>
+                            <template v-else>
+                                {{ buttonText(pricingPlan) }}
+                            </template>
                         </Button>
 
-                        <p v-if="pricingPlanIndex == index" class="animate-pulse text-xs text-center text-blue-500 bg-blue-50 rounded-full p-2 mb-4">
-                            We are preparing your payment...
-                        </p>
-
-                        <div class="bg-green-50 border border-green-500 p-4 rounded-lg">
-                            <div
-                                :key="index"
-                                v-for="(feature, index) in pricingPlan.features">
-
-                                <span class="text-xs">{{ feature }}</span>
-
+                        <!-- Features -->
+                        <div class="space-y-3">
+                            <div v-for="(feature, idx) in pricingPlan.features" :key="idx" class="flex items-center text-sm text-gray-600">
+                            <svg class="w-5 h-5 text-green-500 mr-2 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                            </svg>
+                            {{ feature }}
                             </div>
                         </div>
 
                     </div>
 
                 </div>
+
+                <!-- Join WhatsApp Group -->
+                <JoinOurWhatsappGroup :mockMessages="mockMessages"></JoinOurWhatsappGroup>
 
             </template>
 
         </div>
-
-        <img :src="'/images/clouds.png'" class="absolute top-32">
 
     </div>
 
@@ -137,114 +168,175 @@
 
 <script>
 
-    import { Rocket } from 'lucide-vue-next';
-    import Button from '@Partials/Button.vue';
-    import Loader from '@Partials/Loader.vue';
+import dayjs from 'dayjs';
+import { Rocket } from 'lucide-vue-next';
+import Button from '@Partials/Button.vue';
+import Loader from '@Partials/Loader.vue';
+import JoinOurWhatsappGroup from '@Components/JoinOurWhatsappGroup.vue';
 
-    export default {
-        inject: ['formState', 'storeState', 'notificationState'],
-        components: { Rocket, Button, Loader },
-        data() {
-            return {
-                Rocket,
-                pagination: null,
-                pricingPlans: [],
-                pricingPlanIndex: null,
-                isLoadingPricingPlans: false,
-                isGeneratingPaymentLink: false,
-                activePricingPlan: 'monthly',
-                freePlanFeatures: [
-                    'WhatsApp order form',
-                    'Manual payment methods',
-                    'Up to 20 images'
-                ]
-            };
-        },
-        computed: {
-            store() {
-                return this.storeState.store;
-            },
-            isLoadingStore() {
-                return this.storeState.isLoadingStore;
-            },
-            isShowingMonthlyPricingPlans() {
-                return this.activePricingPlan == 'monthly';
-            },
-            isShowingAnnualPricingPlans() {
-                return this.activePricingPlan == 'annually';
-            },
-            filteredPricingPlans() {
-                if(this.isShowingMonthlyPricingPlans) {
-                    return this.pricingPlans.filter((pricingPlan) => pricingPlan.metadata.store_subscription.frequency == 'month')
-                }else{
-                    return this.pricingPlans.filter((pricingPlan) => pricingPlan.metadata.store_subscription.frequency == 'year')
+export default {
+    inject: ['formState', 'storeState', 'notificationState'],
+    components: { Rocket, Button, Loader, JoinOurWhatsappGroup },
+    data() {
+        return {
+            Rocket,
+            pagination: null,
+            pricingPlans: [],
+            pricingPlanIndex: null,
+            isLoadingPricingPlans: false,
+            isGeneratingPaymentLink: false,
+            activePricingPlan: 'monthly',
+            freePlanFeatures: [
+                'WhatsApp order form',
+                'Manual payment methods',
+                'Up to 20 images'
+            ],
+            mockMessages: [
+                {
+                    sender: 'You',
+                    text: 'What’s the difference between the Basic and Pro plan?',
+                    timestamp: dayjs().subtract(5, 'minute').format('HH:mm'),
+                    isOwnMessage: true
+                },
+                {
+                    sender: 'Support Team',
+                    text: 'Great question! The *Basic Plan* gives you WhatsApp orders and manual payments. The *Premium Plan* adds priority support, unlimited images, and analytics. Check the features list for each plan for full details!',
+                    timestamp: dayjs().subtract(4, 'minute').format('HH:mm'),
+                    isOwnMessage: false,
+                    nameColor: '#165dfc'
+                },
+                {
+                    sender: 'Emma',
+                    text: 'Can I switch from monthly to annual later?',
+                    timestamp: dayjs().subtract(3, 'minute').format('HH:mm'),
+                    isOwnMessage: false,
+                    nameColor: '#dc16fc'
+                },
+                {
+                    sender: 'Support Team',
+                    text: 'Yes, Emma! You can upgrade or change your billing cycle anytime. Just click *Upgrade* or *Downgrade* on any plan. Annual plans save you up to 20%!',
+                    timestamp: dayjs().subtract(2, 'minute').format('HH:mm'),
+                    isOwnMessage: false,
+                    nameColor: '#165dfc'
+                },
+                {
+                    sender: 'You',
+                    text: 'Perfect! I’m ready to upgrade to Pro.',
+                    timestamp: dayjs().subtract(1, 'minute').format('HH:mm'),
+                    isOwnMessage: true
+                },
+                {
+                    sender: 'Support Team',
+                    text: 'Awesome! Click *Upgrade* on the Pro plan card. We’ll prepare your secure payment link in seconds. Let’s get your store growing!',
+                    timestamp: dayjs().format('HH:mm'),
+                    isOwnMessage: false,
+                    nameColor: '#165dfc'
                 }
-            }
+            ]
+        };
+    },
+    computed: {
+        store() {
+            return this.storeState.store;
         },
-        methods: {
-            changePricingPlan(activePricingPlan) {
-                this.activePricingPlan = activePricingPlan;
-            },
-            async showPricingPlans() {
-                try {
-
-                    this.isLoadingPricingPlans = true;
-
-                    let config = {
-                        params: {
-                            'platform': 'web',
-                            'billing_type': 'one time',
-                            'type': 'store subscription',
-                        }
-                    };
-
-                    const response = await axios.get('/api/pricing-plans', config);
-
-                    this.pagination = response.data;
-                    this.pricingPlans = this.pagination.data;
-
-                } catch (error) {
-                    const message = error?.response?.data?.message || error?.message || 'Something went wrong while fetching pricing plans';
-                    this.notificationState.showWarningNotification(message);
-                    this.formState.setServerFormErrors(error);
-                    console.error('Failed to fetch pricing plans:', error);
-                } finally {
-                    this.isLoadingPricingPlans = false;
-                }
-
-            },
-            async payPricingPlan(pricingPlan, index) {
-
-                try {
-
-                    if(this.isGeneratingPaymentLink) return;
-
-                    this.pricingPlanIndex = index;
-                    this.isGeneratingPaymentLink = true;
-
-                    let data = {
-                        store_id: this.store.id,
-                        'payment_method_type': 'dpo'
-                    };
-
-                    const response = await axios.post(`/api/pricing-plans/${pricingPlan.id}/pay`, data);
-                    const dpoPaymentUrl = response.data.metadata.dpo_payment_url;
-                    window.location.href = dpoPaymentUrl;
-
-                } catch (error) {
-                    const message = error?.response?.data?.message || error?.message || 'Something went wrong while subscribing';
-                    this.notificationState.showWarningNotification(message);
-                    this.formState.setServerFormErrors(error);
-                    console.error('Failed to subscribe:', error);
-                } finally {
-                    this.isGeneratingPaymentLink = false;
-                }
-
-            }
+        isLoadingStore() {
+            return this.storeState.isLoadingStore;
         },
-        created() {
-            this.showPricingPlans();
+        activeSubscription() {
+            return this.store?.active_subscription;
+        },
+        currentPricingPlan() {
+            return this.activeSubscription?.pricing_plan;
+        },
+        hasActiveSubscription() {
+            return !!this.activeSubscription;
+        },
+        isShowingMonthlyPricingPlans() {
+            return this.activePricingPlan === 'monthly';
+        },
+        isShowingAnnualPricingPlans() {
+            return this.activePricingPlan === 'annually';
+        },
+        filteredPricingPlans() {
+            const frequency = this.isShowingMonthlyPricingPlans ? 'month' : 'year';
+            return this.pricingPlans.filter(
+                (plan) => plan.metadata?.store_subscription?.frequency === frequency
+            );
         }
-    };
+    },
+    methods: {
+        changePricingPlan(plan) {
+            this.activePricingPlan = plan;
+        },
+        isCurrentPlan(plan) {
+            if (!this.currentPricingPlan) return false;
+            return plan.id === this.currentPricingPlan.id;
+        },
+        buttonText(plan) {
+            if (this.isCurrentPlan(plan)) return 'Current Plan';
+            if (!this.hasActiveSubscription) return 'Subscribe Now';
+            const currentPrice = parseFloat(this.currentPricingPlan.price.amount);
+            const planPrice = parseFloat(plan.price.amount);
+            return planPrice > currentPrice ? 'Upgrade' : 'Downgrade';
+        },
+        buttonType(plan) {
+            if (this.isCurrentPlan(plan)) return 'outline';
+            return 'primary';
+        },
+        buttonDisabled(plan, index) {
+            if (this.isCurrentPlan(plan)) return true;
+            return this.isGeneratingPaymentLink && this.pricingPlanIndex !== index;
+        },
+        async showPricingPlans() {
+            try {
+                this.isLoadingPricingPlans = true;
+                const config = {
+                params: {
+                    platform: 'web',
+                    billing_type: 'one time',
+                    type: 'store subscription',
+                }
+                };
+                const response = await axios.get('/api/pricing-plans', config);
+                this.pagination = response.data;
+                this.pricingPlans = this.pagination.data;
+            } catch (error) {
+                const message = error?.response?.data?.message || error?.message || 'Something went wrong while fetching pricing plans';
+                this.notificationState.showWarningNotification(message);
+                this.formState.setServerFormErrors(error);
+                console.error('Failed to fetch pricing plans:', error);
+            } finally {
+                this.isLoadingPricingPlans = false;
+            }
+        },
+        async payPricingPlan(pricingPlan, index) {
+            if (this.isGeneratingPaymentLink) return;
 
+            try {
+                this.pricingPlanIndex = index;
+                this.isGeneratingPaymentLink = true;
+
+                const data = {
+                store_id: this.store.id,
+                payment_method_type: 'dpo'
+                };
+
+                const response = await axios.post(`/api/pricing-plans/${pricingPlan.id}/pay`, data);
+                const dpoPaymentUrl = response.data.metadata.dpo_payment_url;
+                window.location.href = dpoPaymentUrl;
+            } catch (error) {
+                const message = error?.response?.data?.message || error?.message || 'Something went wrong while subscribing';
+                this.notificationState.showWarningNotification(message);
+                this.formState.setServerFormErrors(error);
+                console.error('Failed to subscribe:', error);
+            } finally {
+                this.isGeneratingPaymentLink = false;
+                this.pricingPlanIndex = null;
+            }
+        }
+    },
+    created() {
+        this.showPricingPlans();
+    }
+};
 </script>

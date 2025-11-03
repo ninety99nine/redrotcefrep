@@ -110,10 +110,9 @@ class CourierService extends BaseService
     {
         $deleted = $courier->delete();
 
-        if ($deleted) {
-            return ['message' => 'Courier deleted'];
-        } else {
-            throw new Exception('Courier delete unsuccessful');
-        }
+        return [
+            'deleted' => $deleted,
+            'message' => $deleted ? 'Courier deleted' : 'Courier delete unsuccessful'
+        ];
     }
 }

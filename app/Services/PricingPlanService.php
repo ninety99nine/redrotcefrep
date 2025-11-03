@@ -148,11 +148,10 @@ class PricingPlanService extends BaseService
     {
         $deleted = $pricingPlan->delete();
 
-        if ($deleted) {
-            return ['message' => 'Pricing plan deleted'];
-        } else {
-            throw new Exception('Pricing plan delete unsuccessful');
-        }
+        return [
+            'deleted' => $deleted,
+            'message' => $deleted ? 'Pricing plan deleted' : 'Pricing plan delete unsuccessful'
+        ];
     }
 
     /**

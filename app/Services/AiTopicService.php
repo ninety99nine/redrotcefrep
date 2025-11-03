@@ -94,10 +94,9 @@ class AiTopicService extends BaseService
     {
         $deleted = $aiTopic->delete();
 
-        if ($deleted) {
-            return ['message' => 'AI topic deleted'];
-        } else {
-            throw new Exception('AI topic delete unsuccessful');
-        }
+        return [
+            'deleted' => $deleted,
+            'message' => $deleted ? 'AI topic deleted' : 'AI topic delete unsuccessful'
+        ];
     }
 }

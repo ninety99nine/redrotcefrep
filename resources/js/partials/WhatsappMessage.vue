@@ -120,6 +120,10 @@ export default {
             type: Number,
             default: 1500
         },
+        userInteruptionDelay: {
+            type: Number,
+            default: 15000
+        },
         scrollDuration: {
             type: Number,
             default: 1000 // Default scroll duration in milliseconds
@@ -127,11 +131,14 @@ export default {
     },
     data() {
         return {
-            displayedMessages: [],
             isTyping: false,
             typingSender: '',
+            scrollTimeout: null,
+            displayedMessages: [],
+            lastUserScrollTime: 0,
             currentMessageIndex: 0,
-            scrollTimeout: null
+            ignoreAutoScrollUntil: 0,
+            isProgrammaticScroll: false
         };
     },
     watch: {
@@ -173,6 +180,10 @@ export default {
             this.$nextTick(() => this.scrollToTop());
         },
         smoothScrollTo(element, targetScrollTop, duration) {
+            if (!element) return;
+
+            this.isProgrammaticScroll = true;  // ← Block user scroll handler
+
             const startScrollTop = element.scrollTop;
             const distance = targetScrollTop - startScrollTop;
             const startTime = performance.now();
@@ -187,6 +198,11 @@ export default {
 
                 if (progress < 1) {
                     requestAnimationFrame(scroll);
+                } else {
+                    // Animation done → re-enable detection
+                    this.$nextTick(() => {
+                        this.isProgrammaticScroll = false;
+                    });
                 }
             };
 
@@ -194,13 +210,35 @@ export default {
         },
         scrollToBottom() {
             if (this.$refs.chatContainer && !this.scrollTimeout) {
+                const now = Date.now();
+                if (now < this.ignoreAutoScrollUntil) {
+                    return; // Skip auto-scroll if within ignore window
+                }
                 const targetScrollTop = this.$refs.chatContainer.scrollHeight - this.$refs.chatContainer.clientHeight;
                 this.smoothScrollTo(this.$refs.chatContainer, targetScrollTop, this.scrollDuration);
             }
         },
         scrollToTop() {
             if (this.$refs.chatContainer) {
+                const now = Date.now();
+                if (now < this.ignoreAutoScrollUntil) {
+                    return; // Skip auto-scroll if within ignore window
+                }
                 this.smoothScrollTo(this.$refs.chatContainer, 0, this.scrollDuration);
+            }
+        },
+        handleUserScroll() {
+            if (this.isProgrammaticScroll) return;
+            if (!this.$refs.chatContainer) return;
+
+            const now = Date.now();
+            this.lastUserScrollTime = now;
+            this.ignoreAutoScrollUntil = now + this.userInteruptionDelay; // Ignore auto-scroll for set duration
+
+            // Clear any existing timeout
+            if (this.scrollTimeout) {
+                clearTimeout(this.scrollTimeout);
+                this.scrollTimeout = null;
             }
         },
         animateMessages() {
@@ -240,9 +278,23 @@ export default {
             }, typingDuration);
         }
     },
+    mounted() {
+        if (this.$refs.chatContainer) {
+            this.$refs.chatContainer.addEventListener('scroll', this.handleUserScroll);
+            // Also capture wheel and touch events to detect any user interaction
+            this.$refs.chatContainer.addEventListener('wheel', this.handleUserScroll, { passive: true });
+            this.$refs.chatContainer.addEventListener('touchstart', this.handleUserScroll, { passive: true });
+        }
+    },
     beforeDestroy() {
         if (this.scrollTimeout) {
             clearTimeout(this.scrollTimeout);
+        }
+        if (this.$refs.chatContainer) {
+            const container = this.$refs.chatContainer;
+            container.removeEventListener('scroll', this.handleUserScroll);
+            container.removeEventListener('wheel', this.handleUserScroll);
+            container.removeEventListener('touchstart', this.handleUserScroll);
         }
         this.resetAnimation();
     }

@@ -3,8 +3,9 @@
 namespace App\Policies;
 
 use App\Models\User;
+use App\Models\StoreUser;
 
-class TeamMemberPolicy extends BasePolicy
+class StoreUserPolicy extends BasePolicy
 {
     /**
      * Grant all permissions to super admins who have roles not tied to any store.
@@ -33,10 +34,10 @@ class TeamMemberPolicy extends BasePolicy
      * Determine whether the user can view the team member.
      *
      * @param User $user
-     * @param User $teamMember
+     * @param StoreUser $teamMember
      * @return bool
      */
-    public function view(User $user, User $teamMember): bool
+    public function view(User $user, StoreUser $teamMember): bool
     {
         return $this->isStoreUserWithPermission($user, 'manage team members');
     }
@@ -56,10 +57,10 @@ class TeamMemberPolicy extends BasePolicy
      * Determine whether the user can update the team member.
      *
      * @param User $user
-     * @param User $teamMember
+     * @param StoreUser $teamMember
      * @return bool
      */
-    public function update(User $user, User $teamMember): bool
+    public function update(User $user, StoreUser $teamMember): bool
     {
         return $this->isStoreUserWithPermission($user, 'manage team members');
     }
@@ -68,10 +69,10 @@ class TeamMemberPolicy extends BasePolicy
      * Determine whether the user can remove the team member.
      *
      * @param User $user
-     * @param User $teamMember
+     * @param StoreUser $teamMember
      * @return bool
      */
-    public function remove(User $user, User $teamMember): bool
+    public function remove(User $user, StoreUser $teamMember): bool
     {
         return $this->isStoreUserWithPermission($user, 'manage team members');
     }

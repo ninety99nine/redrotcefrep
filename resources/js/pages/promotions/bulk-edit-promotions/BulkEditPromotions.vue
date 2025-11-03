@@ -1,9 +1,48 @@
 <template>
-    <div class="pt-24 px-8 relative select-none">
-        <!-- Clouds Image -->
-        <img :src="'/images/clouds.png'" class="absolute bottom-0">
 
-        <div class="relative bg-white/80 p-4 rounded-md mb-60">
+    <div class="pt-24 px-8 relative select-none">
+
+        <!-- No Promotions -->
+        <div
+            v-if="hasInitialResults == false"
+            class="flex flex-col items-center justify-center bg-linear-to-b from-white p-8 rounded-2xl">
+
+            <div class="bg-blue-200 text-blue-900 rounded-full p-10 mt-8 mb-16">
+                <TicketPercent size="40"></TicketPercent>
+            </div>
+
+            <div class="text-center max-w-md">
+
+                <h1 class="text-3xl font-extrabold mb-3">
+                    Bulk Edit Products
+                </h1>
+
+                <p class="text-base leading-relaxed">
+                    Your promotions will appear here for fast bulk editing. Get started by creating your first promotion.
+                </p>
+
+            </div>
+
+            <div class="mt-10">
+
+                <Button
+                    size="lg"
+                    type="primary"
+                    :leftIcon="Plus"
+                    leftIconSize="20"
+                    :skeleton="!store"
+                    :action="onAddPromotion">
+                    <span class="ml-1">Create Promotion</span>
+                </Button>
+
+            </div>
+
+        </div>
+
+        <div
+            v-else
+            class="relative bg-white/80 p-4 rounded-md mb-60">
+
             <h1 class="text-lg font-semibold mb-4">Bulk Edit Promotions</h1>
 
             <!-- Promotions Table -->
@@ -420,26 +459,8 @@
                     </tr>
                 </template>
 
-                <!-- No Promotions -->
-                <template #noResults>
-                    <div class="flex justify-between items-end p-10 bg-blue-50 border-t border-blue-200">
-                        <div>
-                            <h1 class="text-2xl font-bold mb-4">Ready For Your First Promotion?</h1>
-                            <p class="text-sm text-gray-500">Your promotions will appear here once you create them.</p>
-                        </div>
-                        <div>
-                            <!-- Add Button -->
-                            <Button
-                                size="lg"
-                                type="primary"
-                                :leftIcon="Plus"
-                                :action="onAddPromotion">
-                                <span>Add Promotion</span>
-                            </Button>
-                        </div>
-                    </div>
-                </template>
             </Table>
+
         </div>
 
         <!-- Update Promotions -->
@@ -766,12 +787,12 @@
     import Datepicker from '@Partials/Datepicker.vue';
     import SelectTags from '@Partials/SelectTags.vue';
     import { isNotEmpty } from '@Utils/stringUtils';
-    import { Plus, Trash2, RefreshCcw } from 'lucide-vue-next';
+    import { Plus, Trash2, RefreshCcw, TicketPercent } from 'lucide-vue-next';
 
     export default {
         inject: ['formState', 'promotionState', 'storeState', 'changeHistoryState', 'notificationState'],
         components: {
-            Input, Modal, Loader, Button, Select, Dropdown, Table, Datepicker, SelectTags, Plus, Trash2, RefreshCcw
+            TicketPercent, Input, Modal, Loader, Button, Select, Dropdown, Table, Datepicker, SelectTags, Plus, Trash2, RefreshCcw
         },
         data() {
             return {
@@ -786,6 +807,7 @@
                 latestRequestId: 0,
                 filterExpressions: [],
                 sortingExpressions: [],
+                hasInitialResults: null,
                 isDeletingPromotionIds: [],
                 deletablePromotion: null,
                 cancelTokenSource: null,
@@ -1040,6 +1062,10 @@
                     const response = await axios.get(`/api/promotions`, config);
 
                     if (currentRequestId !== this.latestRequestId) return;
+
+                    if(this.pagination == null) {
+                        this.hasInitialResults = response.data.meta.total > 0;
+                    }
 
                     this.pagination = response.data;
                     const promotions = this.pagination.data;

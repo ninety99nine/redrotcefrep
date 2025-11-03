@@ -67,6 +67,7 @@ class AuthService extends BaseService
 
         return [
             'token' => $user->createToken('auth_token')->plainTextToken,
+            'user' => new UserResource($user),
             'message' => 'Login successful'
         ];
     }
@@ -106,6 +107,7 @@ class AuthService extends BaseService
 
             return [
                 'token' => $user->createToken('auth_token')->plainTextToken,
+                'user' => new UserResource($user),
                 'message' => 'Login successful'
             ];
 
@@ -144,7 +146,7 @@ class AuthService extends BaseService
         );
 
         $resetUrl = config('app.url') . '/auth/reset-password?token=' . $token . '&email=' . urlencode($user->email);
-        Mail::to($user->email)->send(new PasswordResetLink($user->email, $resetUrl));
+        Mail::to($user->email)->queue(new PasswordResetLink($user->email, $resetUrl));
 
         return [
             'message' => 'A password reset link has been sent to your email.'
@@ -261,7 +263,7 @@ class AuthService extends BaseService
 
         $user = User::where('email', $email)->first();
 
-        if ($user->email_verified_at) {
+        if ($user && $user->email_verified_at) {
             throw ValidationException::withMessages(['email' => 'This email is already verified.']);
         }
 
@@ -282,9 +284,22 @@ class AuthService extends BaseService
             ]);
         }
 
-        DB::transaction(function () use ($user, $email) {
-            $user->update(['email_verified_at' => now()]);
+        DB::transaction(function () use (&$user, $email) {
+
+            if($user) {
+                $user->update(['email_verified_at' => now()]);
+            }else {
+                $user = User::create([
+                    'email' => $email,
+                    'email_verified_at' => now()
+                ]);
+            }
+
             DB::table('email_verification_tokens')->where('email', $email)->delete();
+
+            //  Accept the store invitations
+            (new StoreService)->acceptStoreInvitations($user);
+
         });
 
         // Generate token for automatic login
@@ -379,6 +394,7 @@ class AuthService extends BaseService
         DB::table('password_reset_tokens')->where('email', $email)->delete();
 
         return [
+            'user' => new UserResource($user),
             'token' => $user->createToken('auth_token')->plainTextToken,
             'message' => 'Password set successfully. You are now logged in.'
         ];
@@ -500,7 +516,7 @@ class AuthService extends BaseService
             );
 
             if ($user->wasRecentlyCreated) {
-                Mail::to($user->email)->send(new UserRegistered($user->email, $user->first_name));
+                Mail::to($user->email)->queue(new UserRegistered($user->email, $user->first_name));
             }
 
             $token = $user->createToken('auth_token')->plainTextToken;
@@ -620,7 +636,7 @@ class AuthService extends BaseService
             );
 
             if ($user->wasRecentlyCreated) {
-                Mail::to($user->email)->send(new UserRegistered($user->email, $user->first_name));
+                Mail::to($user->email)->queue(new UserRegistered($user->email, $user->first_name));
             }
 
             $token = $user->createToken('auth_token')->plainTextToken;
@@ -732,7 +748,7 @@ class AuthService extends BaseService
             );
 
             if ($user->wasRecentlyCreated) {
-                Mail::to($user->email)->send(new UserRegistered($user->email, $user->first_name));
+                Mail::to($user->email)->queue(new UserRegistered($user->email, $user->first_name));
             }
 
             $token = $user->createToken('auth_token')->plainTextToken;
@@ -889,11 +905,11 @@ class AuthService extends BaseService
                           '&type=' . $emailVerificationType->value;
 
         if ($emailVerificationType == EmailVerificationType::REGISTRATION_EMAIL) {
-            Mail::to($user->email)->send(new VerifyRegistrationEmail($user->email, $user->first_name, $verificationUrl));
+            Mail::to($user->email)->queue(new VerifyRegistrationEmail($user->email, $user->first_name, $verificationUrl));
         } elseif ($emailVerificationType == EmailVerificationType::UPDATED_EMAIL) {
-            Mail::to($user->email)->send(new VerifyUpdatedEmail($user->email, $user->first_name, $verificationUrl));
+            Mail::to($user->email)->queue(new VerifyUpdatedEmail($user->email, $user->first_name, $verificationUrl));
         } elseif ($emailVerificationType == EmailVerificationType::INVITED_EMAIL) {
-            Mail::to($user->email)->send(new TeamMemberInvitation($user->email, $user->first_name, $storeId, $verificationUrl));
+            Mail::to($user->email)->sendNow(new TeamMemberInvitation($user->email, $user->first_name, $storeId, $verificationUrl));
         }
     }
 }

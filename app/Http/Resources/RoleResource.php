@@ -3,7 +3,6 @@
 namespace App\Http\Resources;
 
 use Illuminate\Http\Request;
-use App\Services\PhoneNumberService;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class RoleResource extends JsonResource
@@ -24,6 +23,7 @@ class RoleResource extends JsonResource
             'updated_at' => $this->updated_at->toDateTimeString(),
 
             'store' => StoreResource::make($this->whenLoaded('store')),
+            'permissions' => PermissionResource::collection($this->whenLoaded('permissions')),
         ];
     }
 }

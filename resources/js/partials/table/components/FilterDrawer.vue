@@ -11,6 +11,7 @@
         </Button>
 
         <Drawer
+            contentClass=""
             position="right"
             ref="filterDrawer"
             :showFooter="false"

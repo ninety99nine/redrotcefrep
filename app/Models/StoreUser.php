@@ -3,15 +3,23 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Relations\belongsTo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\Concerns\AsPivot;
 
 class StoreUser extends Model
 {
-    use HasFactory, AsPivot;
+    use HasFactory, HasUuids, AsPivot;
 
     protected $table = 'store_user';
+
+    /**
+     * Disable automatic timestamps since this table doesn't have created_at/updated_at columns
+     *
+     * @var bool
+     */
+    public $timestamps = false;
 
     /**
      * The attributes that should be cast.
@@ -21,7 +29,9 @@ class StoreUser extends Model
     protected function casts(): array
     {
         return [
-            'creator' => 'boolean'
+            'creator' => 'boolean',
+            'joined_at' => 'datetime',
+            'invited_at' => 'datetime'
         ];
     }
 
@@ -31,8 +41,19 @@ class StoreUser extends Model
      * @var array
      */
     protected $fillable = [
-        'user_id', 'store_id', 'creator', 'created_at', 'updated_at'
+        'id', 'first_name', 'email', 'mobile_number', 'user_id',
+        'role_id', 'store_id', 'creator', 'invited_at', 'joined_at'
     ];
+
+    /**
+     * Get role.
+     *
+     * @return belongsTo
+     */
+    public function role(): belongsTo
+    {
+        return $this->belongsTo(Role::class);
+    }
 
     /**
      * Get user.

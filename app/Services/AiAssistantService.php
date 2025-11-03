@@ -130,11 +130,10 @@ class AiAssistantService extends BaseService
     {
         $deleted = $aiAssistant->delete();
 
-        if ($deleted) {
-            return ['message' => 'AI Assistant deleted'];
-        } else {
-            throw new Exception('AI Assistant delete unsuccessful');
-        }
+        return [
+            'deleted' => $deleted,
+            'message' => $deleted ? 'AI Assistant deleted' : 'AI Assistant delete unsuccessful'
+        ];
     }
 
     /**

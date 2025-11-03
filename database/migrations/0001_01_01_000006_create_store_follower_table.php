@@ -9,10 +9,9 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('store_follower', function (Blueprint $table) {
-            $table->uuid('store_id');
-            $table->uuid('user_id');
-            $table->foreign('store_id')->references('id')->on('stores')->onDelete('cascade');
-            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
+            $table->uuid('id')->primary();
+            $table->foreignUuid('user_id')->constrained()->cascadeOnDelete();
+            $table->foreignUuid('store_id')->constrained()->cascadeOnDelete();
             $table->timestamps();
         });
     }

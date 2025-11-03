@@ -160,10 +160,9 @@ class ReviewService extends BaseService
     {
         $deleted = $review->delete();
 
-        if ($deleted) {
-            return ['message' => 'Review deleted'];
-        } else {
-            throw new \Exception('Review delete unsuccessful');
-        }
+        return [
+            'deleted' => $deleted,
+            'message' => $deleted ? 'Review deleted' : 'Review delete unsuccessful'
+        ];
     }
 }

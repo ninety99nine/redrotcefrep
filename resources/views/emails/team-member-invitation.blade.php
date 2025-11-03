@@ -8,7 +8,7 @@
 
 Hello {{ $firstName ?: 'there' }},
 
-You’ve been invited to join the team for **{{ $storeName }}** on {{ config('app.name') }}. To get started, please verify your email address to activate your account.
+You’ve been invited to join the team at **{{ $storeName }}** on {{ config('app.name') }}. To get started, please verify your email address to activate your account.
 
 **Email:** {{ $email }}
 

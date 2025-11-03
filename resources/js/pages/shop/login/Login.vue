@@ -176,7 +176,10 @@
 
                     const response = await axios.post('/api/auth/login', this.form);
 
+                    const user = response.data.user;
                     const token = response.data.token;
+
+                    await this.authState.setUser(user);
                     this.authState.setTokenOnRequest(token);
                     this.authState.setTokenOnLocalStorage(token);
 

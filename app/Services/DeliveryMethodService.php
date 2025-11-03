@@ -276,10 +276,9 @@ class DeliveryMethodService extends BaseService
     {
         $deleted = $deliveryMethod->delete();
 
-        if ($deleted) {
-            return ['message' => 'Delivery Method deleted'];
-        } else {
-            throw new Exception('Delivery Method delete unsuccessful');
-        }
+        return [
+            'deleted' => $deleted,
+            'message' => $deleted ? 'Delivery Method deleted' : 'Delivery Method delete unsuccessful'
+        ];
     }
 }

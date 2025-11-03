@@ -1,9 +1,8 @@
 <template>
     <div class="pt-24 px-8 relative select-none">
-        <!-- Clouds Image -->
-        <img :src="'/images/clouds.png'" class="absolute bottom-0">
 
         <div class="relative bg-white/80 p-4 rounded-md mb-60">
+
             <h1 class="text-lg font-semibold mb-4">Team Members</h1>
 
             <!-- Team Members Table -->
@@ -13,9 +12,9 @@
                 :perPage="perPage"
                 @paginate="paginate"
                 resource="team-members"
-                @refresh="showTeamMembers"
                 :searchTerm="searchTerm"
                 :pagination="pagination"
+                @refresh="showTeamMembers"
                 :isLoading="isLoadingTeamMembers"
                 @updatedColumns="updatedColumns"
                 @updatedFilters="updatedFilters"
@@ -98,26 +97,30 @@
                             <template v-if="column.active">
                                 <!-- Name -->
                                 <td v-if="column.name == 'Name'" class="whitespace-nowrap align-center pr-4 py-4 text-sm">
-                                    <span>{{ teamMember.name }}</span>
+                                    <span>{{ teamMember?.user?.name ?? teamMember?.first_name }}</span>
                                 </td>
                                 <!-- Email -->
                                 <td v-else-if="column.name == 'Email'" class="whitespace-nowrap align-center pr-4 py-4 text-sm">
-                                    <span>{{ teamMember.email }}</span>
+                                    <span>{{ teamMember?.user?.email ?? teamMember?.email }}</span>
                                 </td>
                                 <!-- Role -->
                                 <td v-else-if="column.name == 'Role'" class="align-center pr-4 py-4 text-sm">
-                                    <Pill type="light" size="xs">{{ teamMember.roles[0]?.name || 'None' }}</Pill>
+                                    <Pill v-if="teamMember.creator" type="success" size="xs" class="ml-1">creator</Pill>
+                                    <Pill v-else type="light" size="xs">{{ teamMember.role.name }}</Pill>
                                 </td>
-                                <!-- Created Date -->
-                                <td v-else-if="column.name == 'Created Date'" class="whitespace-nowrap align-center pr-4 py-4 text-sm">
-                                    <div class="flex space-x-1 items-center">
-                                        <span>{{ formattedDatetime(teamMember.created_at) }}</span>
+                                <!-- Joined Date -->
+                                <td v-else-if="column.name == 'Joined Date'" class="whitespace-nowrap align-center pr-4 py-4 text-sm">
+                                    <div
+                                        v-if="teamMember.joined_at"
+                                        class="flex space-x-1 items-center">
+                                        <span>{{ formattedDatetime(teamMember.joined_at) }}</span>
                                         <Popover
                                             placement="top"
                                             class="opacity-0 group-hover:opacity-100"
-                                            :content="formattedRelativeDate(teamMember.created_at)">
+                                            :content="formattedRelativeDate(teamMember.joined_at)">
                                         </Popover>
                                     </div>
+                                    <Pill v-else type="warning" size="xs" class="ml-1">invitation sent</Pill>
                                 </td>
                             </template>
                             <!-- Actions -->
@@ -134,29 +137,8 @@
                     </tr>
                 </template>
 
-                <!-- No Team Members -->
-                <template #noResults>
-                    <div class="flex justify-between items-end p-10 bg-blue-50 border-t border-blue-200">
-                        <div>
-                            <h1 class="text-2xl font-bold mb-4">
-                                Ready to Build Your Team?
-                            </h1>
-                            <p class="text-sm text-gray-500">
-                                Your team members will appear here once you add them.
-                            </p>
-                        </div>
-                        <div>
-                            <Button
-                                size="lg"
-                                type="primary"
-                                :leftIcon="Plus"
-                                :action="onAddTeamMember">
-                                <span>Add Team Member</span>
-                            </Button>
-                        </div>
-                    </div>
-                </template>
             </Table>
+
         </div>
 
         <!-- Remove Team Members -->
@@ -188,7 +170,7 @@
             :approveLoading="isRemovingTeamMember(removableTeamMember)">
             <template #content>
                 <p class="text-lg font-bold border-b border-dashed border-gray-200 pb-4 mb-4">Confirm Remove</p>
-                <p v-if="removableTeamMember" class="mb-8">Are you sure you want to remove <span class="font-bold text-black">{{ removableTeamMember.name }}</span>?</p>
+                <p v-if="removableTeamMember" class="mb-8">Are you sure you want to remove <span class="font-bold text-black">{{ removableTeamMember?.user?.name ?? removableTeamMember?.first_name }}</span>?</p>
             </template>
         </Modal>
     </div>
@@ -279,8 +261,8 @@
             formattedDatetime,
             formattedRelativeDate,
             prepareColumns() {
-                const columnNames = ['Name', 'Email', 'Role', 'Created Date'];
-                const defaultColumnNames = ['Name', 'Email', 'Role', 'Created Date'];
+                const columnNames = ['Name', 'Email', 'Role', 'Joined Date'];
+                const defaultColumnNames = ['Name', 'Email', 'Role', 'Joined Date'];
 
                 return columnNames.map(name => ({
                     name,
@@ -304,7 +286,7 @@
                 this.$router.push({
                     name: 'edit-team-member',
                     params: {
-                        user_id: teamMember.id
+                        team_member_id: teamMember.id
                     },
                     query: {
                         store_id: this.store.id,
@@ -365,7 +347,7 @@
                             page: page,
                             per_page: this.perPage,
                             store_id: this.store.id,
-                            _relationships: ['roles'].join(',')
+                            _relationships: ['user', 'role'].join(',')
                         },
                         cancelToken: this.cancelTokenSource.token
                     }
@@ -412,7 +394,7 @@
                     const config = {
                         data: {
                             store_id: this.store.id,
-                            user_ids: teamMemberIds
+                            team_member_ids: teamMemberIds
                         }
                     }
 

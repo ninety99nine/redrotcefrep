@@ -198,25 +198,33 @@
 
         <aside v-if="storeMode" class="select-none fixed top-0 left-0 z-20 w-64 h-screen pt-16 transition-transform -translate-x-full bg-white border-r border-gray-200 sm:translate-x-0">
 
-            <div class="h-full py-6 overflow-y-auto bg-white">
+            <div class="h-full overflow-y-auto bg-white">
 
                 <div class="font-medium">
 
-                    <div v-if="isShowingSettings" class="flex justify-center">
+                    <template v-if="isShowingSettings">
 
-                        <!-- Return to dashboard -->
-                        <Button
-                            size="sm"
-                            type="light"
-                            :leftIcon="MoveLeft"
-                            buttonClass="mb-4 ml-2"
-                            icon="short-left-arrow"
-                            :action="navigateToHome"
-                            :skeleton="isLoadingStore">
-                            <span class="ml-1">Return to dashboard</span>
-                        </Button>
+                        <div class="flex items-center space-x-2 py-2.5 px-6 bg-yellow-100 text-black border-b border-gray-100 mb-4">
+                            <Settings size="16"></Settings>
+                            <span class="text-sm">Settings</span>
+                        </div>
 
-                    </div>
+                        <div class="flex justify-center mb-4">
+
+                            <!-- Return to dashboard -->
+                            <Button
+                                size="sm"
+                                type="light"
+                                :leftIcon="MoveLeft"
+                                buttonClass="w-full"
+                                :action="navigateToHome"
+                                :skeleton="isLoadingStore">
+                                <span class="ml-1">Return to dashboard</span>
+                            </Button>
+
+                        </div>
+
+                    </template>
 
                     <template
                         :key="index"
@@ -764,7 +772,7 @@
                         params: {
                             _relationships: [
                                 'logo', 'seoImage', 'productTags', 'customerTags', 'categories',
-                                'activeSubscription.pricingPlan', 'address'
+                                'myMembership', 'activeSubscription.pricingPlan', 'address'
                             ].join(',')
                         }
                     };

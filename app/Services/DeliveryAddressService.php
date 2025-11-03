@@ -98,10 +98,9 @@ class DeliveryAddressService extends BaseService
     {
         $deleted = $deliveryAddress->delete();
 
-        if ($deleted) {
-            return ['message' => 'Delivery Address deleted'];
-        } else {
-            throw new Exception('Delivery Address delete unsuccessful');
-        }
+        return [
+            'deleted' => $deleted,
+            'message' => $deleted ? 'Delivery Address deleted' : 'Delivery Address delete unsuccessful'
+        ];
     }
 }

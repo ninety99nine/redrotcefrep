@@ -99,10 +99,9 @@ class AiLessonService extends BaseService
     {
         $deleted = $aiLesson->delete();
 
-        if ($deleted) {
-            return ['message' => 'AI lesson deleted'];
-        } else {
-            throw new Exception('AI lesson delete unsuccessful');
-        }
+        return [
+            'deleted' => $deleted,
+            'message' => $deleted ? 'AI lesson deleted' : 'AI lesson delete unsuccessful'
+        ];
     }
 }

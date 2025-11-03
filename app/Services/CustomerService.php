@@ -7,6 +7,7 @@ use App\Models\Tag;
 use App\Models\Store;
 use App\Enums\TagType;
 use League\Csv\Reader;
+use App\Models\Address;
 use App\Models\Customer;
 use App\Enums\Association;
 use Illuminate\Support\Str;
@@ -15,7 +16,6 @@ use App\Http\Resources\CustomerResource;
 use App\Http\Resources\CustomerResources;
 use Illuminate\Database\Eloquent\Builder;
 use App\Http\Requests\Customer\CreateCustomerRequest;
-use App\Models\Address;
 use \Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class CustomerService extends BaseService
@@ -394,11 +394,10 @@ class CustomerService extends BaseService
     {
         $deleted = $customer->delete();
 
-        if ($deleted) {
-            return ['message' => 'Customer deleted'];
-        } else {
-            throw new Exception('Customer delete unsuccessful');
-        }
+        return [
+            'deleted' => $deleted,
+            'message' => $deleted ? 'Customer deleted' : 'Customer delete unsuccessful'
+        ];
     }
 
     /**

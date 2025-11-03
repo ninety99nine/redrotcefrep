@@ -134,10 +134,9 @@ class SubscriptionService extends BaseService
     {
         $deleted = $subscription->delete();
 
-        if ($deleted) {
-            return ['message' => 'Subscription deleted'];
-        } else {
-            throw new Exception('Subscription delete unsuccessful');
-        }
+        return [
+            'deleted' => $deleted,
+            'message' => $deleted ? 'Subscription deleted' : 'Subscription delete unsuccessful'
+        ];
     }
 }

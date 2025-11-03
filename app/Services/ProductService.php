@@ -812,11 +812,10 @@ class ProductService extends BaseService
 
         $deleted = $product->delete();
 
-        if ($deleted) {
-            return ['message' => 'Product deleted'];
-        } else {
-            throw new Exception('Product delete unsuccessful');
-        }
+        return [
+            'deleted' => $deleted,
+            'message' => $deleted ? 'Product deleted' : 'Product delete unsuccessful'
+        ];
     }
 
     /**

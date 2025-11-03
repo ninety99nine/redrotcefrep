@@ -8,14 +8,16 @@
         <div class="flex justify-between items-center space-x-4 mb-4">
 
             <!-- Search Input -->
-            <Input
-                type="search"
-                class="w-full"
-                :debounced="true"
-                v-model="localSearchTerm"
-                @input="onInputSearchTerm"
-                :placeholder="searchPlaceholder">
-            </Input>
+            <div class="w-full md:max-w-sm">
+                <Input
+                    type="search"
+                    class="w-full"
+                    :debounced="true"
+                    v-model="localSearchTerm"
+                    @input="onInputSearchTerm"
+                    :placeholder="searchPlaceholder">
+                </Input>
+            </div>
 
             <div class="flex justify-center items-center space-x-4">
 

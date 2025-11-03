@@ -187,7 +187,7 @@ class PricingPlanSeeder extends Seeder
 
             //  Store Plans
             [
-                'name' => 'Basic Plan',
+                'name' => 'Premium Plan',
                 'price' => 5.00,
                 'currency' => 'USD',
                 'discount_percentage_rate' => 0,
@@ -195,7 +195,7 @@ class PricingPlanSeeder extends Seeder
                 'type' => PricingPlanType::STORE_SUBSCRIPTION,
                 'billing_type' => PricingPlanBillingType::ONE_TIME,
                 'trial_days' => 0,
-                'description' => '1 month basic subscription for store access',
+                'description' => '1 month premium subscription for store access',
                 'supports_web' => true,
                 'supports_mobile' => true,
                 'metadata' => [
@@ -212,7 +212,7 @@ class PricingPlanSeeder extends Seeder
                 ]
             ],
             [
-                'name' => 'Basic Plan',
+                'name' => 'Premium Plan',
                 'price' => 60.00,
                 'currency' => 'USD',
                 'discount_percentage_rate' => 0,
@@ -220,7 +220,7 @@ class PricingPlanSeeder extends Seeder
                 'type' => PricingPlanType::STORE_SUBSCRIPTION,
                 'billing_type' => PricingPlanBillingType::ONE_TIME,
                 'trial_days' => 0,
-                'description' => '1 year basic subscription for store access',
+                'description' => '1 year premium subscription for store access',
                 'supports_web' => true,
                 'supports_mobile' => true,
                 'metadata' => [
@@ -237,7 +237,7 @@ class PricingPlanSeeder extends Seeder
                 ]
             ],
             [
-                'name' => 'Premium Plan',
+                'name' => 'Business Plan',
                 'price' => 15.00,
                 'currency' => 'USD',
                 'discount_percentage_rate' => 0,
@@ -245,7 +245,7 @@ class PricingPlanSeeder extends Seeder
                 'type' => PricingPlanType::STORE_SUBSCRIPTION,
                 'billing_type' => PricingPlanBillingType::ONE_TIME,
                 'trial_days' => 0,
-                'description' => '1 month premium subscription for store access',
+                'description' => '1 month business subscription for store access',
                 'supports_web' => true,
                 'supports_mobile' => true,
                 'metadata' => [
@@ -256,7 +256,7 @@ class PricingPlanSeeder extends Seeder
                     'sms_credits' => 60
                 ],
                 'features' => [
-                    'Everything in Basic, plus:',
+                    'Everything in Premium, plus:',
                     'Card payments (Stripe, PayPal)',
                     'Loyalty and store credits',
                     'Payment proof upload',
@@ -267,7 +267,7 @@ class PricingPlanSeeder extends Seeder
                 ]
             ],
             [
-                'name' => 'Premium Plan',
+                'name' => 'Business Plan',
                 'price' => 180.00,
                 'currency' => 'USD',
                 'discount_percentage_rate' => 0,
@@ -275,7 +275,7 @@ class PricingPlanSeeder extends Seeder
                 'type' => PricingPlanType::STORE_SUBSCRIPTION,
                 'billing_type' => PricingPlanBillingType::ONE_TIME,
                 'trial_days' => 0,
-                'description' => '1 year premium subscription for store access',
+                'description' => '1 year business subscription for store access',
                 'supports_web' => true,
                 'supports_mobile' => true,
                 'metadata' => [
@@ -286,7 +286,7 @@ class PricingPlanSeeder extends Seeder
                     'sms_credits' => 720
                 ],
                 'features' => [
-                    'Everything in Basic, plus:',
+                    'Everything in Premium, plus:',
                     'Card payments (Stripe, PayPal)',
                     'Loyalty and store credits',
                     'Payment proof upload',
@@ -299,7 +299,7 @@ class PricingPlanSeeder extends Seeder
 
             //  AI Assistant Plans
             [
-                'name' => 'Basic Plan',
+                'name' => 'Premium Plan',
                 'price' => 5.00,
                 'currency' => 'USD',
                 'discount_percentage_rate' => 0,
@@ -307,7 +307,7 @@ class PricingPlanSeeder extends Seeder
                 'type' => PricingPlanType::AI_ASSISTANT_SUBSCRIPTION,
                 'billing_type' => PricingPlanBillingType::ONE_TIME,
                 'trial_days' => 0,
-                'description' => '1 month basic subscription for AI Assistant',
+                'description' => '1 month premium subscription for AI Assistant',
                 'supports_web' => true,
                 'supports_mobile' => true,
                 'metadata' => [

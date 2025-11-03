@@ -1,13 +1,47 @@
-resources/js/pages/promotions/Promotions.vue
-
 <template>
 
     <div class="pt-24 px-8 relative select-none">
 
-        <!-- Clouds Image -->
-        <img :src="'/images/clouds.png'" class="absolute bottom-0">
+        <!-- No Promotions -->
+        <div
+            v-if="hasInitialResults == false"
+            class="flex flex-col items-center justify-center bg-linear-to-b from-white p-8 rounded-2xl">
 
-        <div class="relative bg-white/80 p-4 rounded-md mb-60">
+            <div class="bg-blue-200 text-blue-900 rounded-full p-10 mt-8 mb-16">
+                <TicketPercent size="40"></TicketPercent>
+            </div>
+
+            <div class="text-center max-w-md">
+
+                <h1 class="text-3xl font-extrabold mb-3">
+                    Boost Sales with Promotions
+                </h1>
+
+                <p class="text-base leading-relaxed">
+                    Create your first special offer like offering discounts, free products or free delivery to attract more customers.
+                </p>
+
+            </div>
+
+            <div class="mt-10">
+
+                <Button
+                    size="lg"
+                    type="primary"
+                    :leftIcon="Plus"
+                    leftIconSize="20"
+                    :skeleton="!store"
+                    :action="onAddPromotion">
+                    <span class="ml-1">Create Promotion</span>
+                </Button>
+
+            </div>
+
+        </div>
+
+        <div
+            v-else
+            class="relative bg-white/80 p-4 rounded-md mb-60">
 
             <h1 class="text-lg font-semibold mb-4">Promotions</h1>
 
@@ -263,40 +297,6 @@ resources/js/pages/promotions/Promotions.vue
 
                 </template>
 
-                <!-- No Promotions -->
-                <template #noResults>
-
-                    <div class="flex justify-between items-end p-10 bg-blue-50 border-t border-blue-200">
-
-                        <div>
-
-                            <h1 class="text-2xl font-bold mb-4">
-                                No Promotions Yet?
-                            </h1>
-
-                            <p class="text-sm text-gray-500">
-                                Your promotions will appear here once you create them.
-                            </p>
-
-                        </div>
-
-                        <div>
-
-                            <!-- Add Button -->
-                            <Button
-                                size="lg"
-                                type="primary"
-                                :leftIcon="Plus"
-                                :action="onAddPromotion">
-                                <span>Add Promotion</span>
-                            </Button>
-
-                        </div>
-
-                    </div>
-
-                </template>
-
             </Table>
 
         </div>
@@ -548,13 +548,13 @@ resources/js/pages/promotions/Promotions.vue
     import { isNotEmpty } from '@Utils/stringUtils';
     import { VueDraggableNext } from 'vue-draggable-next';
     import NoDataPlaceholder from '@Partials/table/components/NoDataPlaceholder.vue';
-    import { Move, Plus, Trash2, RefreshCcw, ArrowDownToLine } from 'lucide-vue-next';
+    import { Move, Plus, Trash2, TicketPercent, RefreshCcw, ArrowDownToLine } from 'lucide-vue-next';
     import { formattedDate, formattedDatetime, formattedRelativeDate } from '@Utils/dateUtils.js';
 
     export default {
         inject: ['formState', 'storeState', 'notificationState'],
         components: {
-            Move, Pill, Input, Modal, Loader, Button, Switch, Select, Popover, Dropdown, Table, draggable: VueDraggableNext,
+            Move, TicketPercent, Pill, Input, Modal, Loader, Button, Switch, Select, Popover, Dropdown, Table, draggable: VueDraggableNext,
             NoDataPlaceholder
         },
         data() {
@@ -574,11 +574,12 @@ resources/js/pages/promotions/Promotions.vue
                 latestRequestId: 0,
                 exportFormat: 'csv',
                 filterExpressions: [],
-                deletablePromotion: null,
                 sortingExpressions: [],
                 cancelTokenSource: null,
                 exportWithFilters: true,
                 exportWithSorting: true,
+                hasInitialResults: null,
+                deletablePromotion: null,
                 isDeletingPromotionIds: [],
                 isLoadingPromotions: false,
                 isUpdatingPromotions: false,
@@ -810,6 +811,10 @@ resources/js/pages/promotions/Promotions.vue
 
                     // Only process response if it matches the latest request
                     if (currentRequestId !== this.latestRequestId) return;
+
+                    if(this.pagination == null) {
+                        this.hasInitialResults = response.data.meta.total > 0;
+                    }
 
                     this.pagination = response.data;
                     this.promotions = this.pagination.data;

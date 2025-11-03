@@ -4,28 +4,33 @@ namespace App\Services;
 
 use Exception;
 use App\Models\User;
+use App\Models\Role;
 use App\Models\Store;
+use App\Models\StoreUser;
 use Illuminate\Support\Str;
 use App\Enums\EmailVerificationType;
-use App\Http\Resources\UserResource;
-use App\Http\Resources\UserResources;
+use App\Http\Resources\StoreUserResource;
+use App\Http\Resources\StoreUserResources;
 
 class TeamMemberService extends BaseService
 {
-    protected string|null $modelClassName = 'App\Models\User';
-    protected string|null $resourceClassName = 'App\Http\Resources\UserResource';
-    protected string|null $resourceCollectionClassName = 'App\Http\Resources\UserResources';
+    protected string|null $modelClassName = 'App\Models\StoreUser';
+    protected string|null $resourceClassName = 'App\Http\Resources\StoreUserResource';
+    protected string|null $resourceCollectionClassName = 'App\Http\Resources\StoreUserResources';
 
     /**
      * Show team members.
      *
      * @param array $data
-     * @return UserResources|array
+     * @return StoreStoreUserResources|array
      */
-    public function showTeamMembers(array $data): UserResources|array
+    public function showTeamMembers(array $data): StoreUserResources|array
     {
-        $storeId = $data['store_id'] ?? null;
-        $query = User::whereHas('stores', fn($q) => $q->where('store_id', $storeId));
+        $storeId = $data['store_id'];
+
+        $query = StoreUser::where('store_id', $storeId);
+
+        $query = $query->when(!request()->has('_sort'), fn($query) => $query->orderBy('joined_at', 'desc'));
         return $this->setQuery($query)->getOutput();
     }
 
@@ -38,56 +43,70 @@ class TeamMemberService extends BaseService
      */
     public function addTeamMember(array $data): array
     {
-        $store = Store::findOrFail($data['store_id']);
-        $roleId = $store->roles()->first()->id;
-        dd($roleId);
-
         $email = $data['email'];
         $roleId = $data['role_id'];
         $storeId = $data['store_id'];
-
-        $user = User::where('email', $email)->first();
-
-        if (!$user) {
-            $user = User::create([
-                'id' => Str::uuid(),
-                'email' => $email,
-                'first_name' => $data['first_name'] ?? '',
-                'last_name' => $data['last_name'] ?? '',
-                'email_verified_at' => null,
-            ]);
-
-            // Send team member invitation email with verification link
-            $authService = new AuthService();
-            $authService->sendEmailVerification($user, EmailVerificationType::INVITED_EMAIL, $storeId);
-        }
+        $firstName = $data['first_name'] ?? null;
+        $mobileNumber = $data['mobile_number'] ?? null;
 
         $store = Store::findOrFail($storeId);
+        $user = User::where('email', $email)->first();
+        $role = Role::where('store_id', $storeId)->findOrFail($roleId);
 
-        $roleId = $store->roles()->first()->id;
-        $store->users()->syncWithoutDetaching([$user->id => ['role_id' => $roleId]]);
+        if($user) {
+            $storeUser = StoreUser::where('email', $email)->orWhere('user_id', $user->id)->first();
+        }else{
+            $storeUser = StoreUser::where('email', $email)->first();
+        }
 
-        return $this->showCreatedResource($user);
+        if($storeUser) throw new Exception('This team member has already been invited');
+
+        if (!$user) {
+
+            //  Set a temporary user
+            $user = new User([
+                'email' => $email,
+                'first_name' => $firstName
+            ]);
+
+        }
+
+        // Send team member invitation email with verification link
+        $authService = new AuthService();
+        $authService->sendEmailVerification($user, EmailVerificationType::INVITED_EMAIL, $storeId);
+
+        $storeUser = StoreUser::create([
+            'email' => $email,
+            'creator' => false,
+            'joined_at' => null,
+            'invited_at' => now(),
+            'role_id' => $role->id,
+            'store_id' => $store->id,
+            'first_name' => $firstName,
+            'user_id' => $user?->id ?? null,
+            'mobile_number' => $mobileNumber,
+        ]);
+
+        return $this->showCreatedResource($storeUser);
     }
 
     /**
      * Remove team members.
      *
-     * @param array $userIds
+     * @param array $data
      * @return array
      * @throws Exception
      */
-    public function removeTeamMembers(array $userIds): array
+    public function removeTeamMembers(array $data): array
     {
-        $storeId = request()->input('store_id');
-        $store = Store::findOrFail($storeId);
-        $users = $store->users()->whereIn('users.id', $userIds)->get();
+        $teamMemberIds = $data['team_member_ids'];
+        $teamMembers = StoreUser::whereIn('id', $teamMemberIds)->get();
 
-        if ($totalUsers = $users->count()) {
-            foreach ($users as $user) {
-                $this->removeTeamMember($user);
+        if ($totalTeamMembers = $teamMembers->count()) {
+            foreach ($teamMembers as $teamMember) {
+                $this->removeTeamMember($teamMember);
             }
-            return ['message' => $totalUsers . ($totalUsers == 1 ? ' Team member' : ' Team members') . ' removed'];
+            return ['message' => $totalTeamMembers . ($totalTeamMembers == 1 ? ' Team member' : ' Team members') . ' removed'];
         } else {
             throw new Exception('No team members removed');
         }
@@ -96,49 +115,48 @@ class TeamMemberService extends BaseService
     /**
      * Show team member.
      *
-     * @param User $user
-     * @return UserResource
+     * @param StoreUser $teamMember
+     * @return StoreUserResource
      */
-    public function showTeamMember(User $user): UserResource
+    public function showTeamMember(StoreUser $teamMember): StoreUserResource
     {
-        return $this->showResource($user);
+        return $this->showResource($teamMember);
     }
 
     /**
      * Update team member.
      *
-     * @param User $user
+     * @param StoreUser $teamMember
      * @param array $data
      * @return array
      */
-    public function updateTeamMember(User $user, array $data): array
+    public function updateTeamMember(StoreUser $teamMember, array $data): array
     {
-        $storeId = $data['store_id'];
         $roleId = $data['role_id'];
 
-        $store = Store::findOrFail($storeId);
-        $store->users()->syncWithoutDetaching([$user->id => ['role_id' => $roleId]]);
+        $teamMember->update(['role_id' => $roleId]);
 
-        return $this->showUpdatedResource($user);
+        return $this->showUpdatedResource($teamMember);
     }
 
     /**
      * Remove team member.
      *
-     * @param User $user
+     * @param StoreUser $teamMember
      * @return array
      * @throws Exception
      */
-    public function removeTeamMember(User $user): array
+    public function removeTeamMember(StoreUser $teamMember): array
     {
-        $storeId = request()->input('store_id');
-        $store = Store::findOrFail($storeId);
-        $detached = $store->users()->detach($user->id);
-
-        if ($detached) {
-            return ['message' => 'Team member removed'];
-        } else {
-            throw new Exception('Team member removal unsuccessful');
+        if($teamMember->creator) {
+            $deleted = false;
+        }else{
+            $deleted = $teamMember->delete();
         }
+
+        return [
+            'deleted' => $deleted,
+            'message' => $deleted ? 'Team member deleted' : 'Team member delete unsuccessful'
+        ];
     }
 }

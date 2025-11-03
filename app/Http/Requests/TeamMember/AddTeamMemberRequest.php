@@ -2,7 +2,7 @@
 
 namespace App\Http\Requests\TeamMember;
 
-use App\Models\User;
+use App\Models\StoreUser;
 use Illuminate\Foundation\Http\FormRequest;
 
 class AddTeamMemberRequest extends FormRequest
@@ -15,7 +15,7 @@ class AddTeamMemberRequest extends FormRequest
     public function authorize(): bool
     {
         return true;
-        return $this->user()->can('add', User::class);
+        return $this->user()->can('add', StoreUser::class);
     }
 
     /**
@@ -27,7 +27,6 @@ class AddTeamMemberRequest extends FormRequest
     {
         return [
             'first_name' => ['nullable', 'string', 'max:255'],
-            'last_name' => ['nullable', 'string', 'max:255'],
             'email' => ['required', 'email', 'max:255'],
             'role_id' => ['required', 'string'],
             'store_id' => ['required', 'uuid'],
@@ -50,9 +49,7 @@ class AddTeamMemberRequest extends FormRequest
             'store_id.required' => 'The store ID is required.',
             'store_id.uuid' => 'The store ID must be a valid UUID.',
             'first_name.string' => 'The first name must be a string.',
-            'first_name.max' => 'The first name must not exceed 255 characters.',
-            'last_name.string' => 'The last name must be a string.',
-            'last_name.max' => 'The last name must not exceed 255 characters.'
+            'first_name.max' => 'The first name must not exceed 255 characters.'
         ];
     }
 }

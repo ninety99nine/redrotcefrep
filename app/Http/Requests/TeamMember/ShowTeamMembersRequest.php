@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\TeamMember;
 
+use App\Models\StoreUser;
 use Illuminate\Foundation\Http\FormRequest;
 
 class ShowTeamMembersRequest extends FormRequest
@@ -13,7 +14,7 @@ class ShowTeamMembersRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return $this->user()->can('viewAny', \App\Models\User::class);
+        return $this->user()->can('viewAny', StoreUser::class);
     }
 
     /**

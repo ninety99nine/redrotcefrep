@@ -468,11 +468,10 @@ class OrderService extends BaseService
     {
         $deleted = $order->delete();
 
-        if ($deleted) {
-            return ['message' => 'Order deleted'];
-        } else {
-            throw new Exception('Order delete unsuccessful');
-        }
+        return [
+            'deleted' => $deleted,
+            'message' => $deleted ? 'Order deleted' : 'Order delete unsuccessful'
+        ];
     }
 
     /**

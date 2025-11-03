@@ -17,10 +17,14 @@ class SortingService
         switch ($sortResourceType) {
             case SortResourceType::ORDERS:
                 return self::getOrderSorting();
+            case SortResourceType::REVIEWS:
+                return self::getReviewSorting();
             case SortResourceType::PRODUCTS:
                 return self::getProductSorting();
             case SortResourceType::CUSTOMERS:
                 return self::getCustomerSorting();
+            case SortResourceType::PROMOTIONS:
+                return self::getPromotionSorting();
             default:
                 return [];
         }
@@ -93,17 +97,56 @@ class SortingService
     }
 
     /**
+     * Sorting options for reviews.
+     *
+     * @return array
+     */
+    private function getReviewSorting(): array
+    {
+        return collect([
+            [
+                'priority' => true,
+                'label' => 'Rating',
+                'target' => 'rating',
+                'options' => $this->getSortHighestAndLowestOptions()
+            ],
+            [
+                'priority' => true,
+                'label' => 'Created Date',
+                'target' => 'created_at',
+                'options' => $this->getSortEarliestAndOldestOptions()
+            ],
+        ])->filter(fn($filter) => count($filter['options']))->toArray();
+    }
+
+    /**
      * Sorting options for products.
      *
      * @return array
      */
     private function getProductSorting(): array
     {
-        return [
-            'name' => 'Name',
-            'price' => 'Price',
-            'created_at' => 'Created Date',
-        ];
+        return collect([
+            [
+                'label' => 'Regular Price',
+                'target' => 'unit_regular_price',
+                'priority' => true,
+                'options' => $this->getSortHighestAndLowestOptions()
+            ],
+            [
+                'label' => 'Sale Price',
+                'target' => 'unit_sale_price',
+                'priority' => true,
+                'options' => $this->getSortHighestAndLowestOptions()
+            ],
+            [
+                'priority' => true,
+                'label' => 'Created Date',
+                'target' => 'created_at',
+                'priority' => true,
+                'options' => $this->getSortEarliestAndOldestOptions()
+            ],
+        ])->filter(fn($filter) => count($filter['options']))->toArray();
     }
 
     /**
@@ -113,11 +156,49 @@ class SortingService
      */
     private function getCustomerSorting(): array
     {
-        return [
-            'name' => 'Name',
-            'price' => 'Price',
-            'created_at' => 'Created Date',
-        ];
+        return collect([
+            [
+                'priority' => true,
+                'label' => 'Total Orders',
+                'target' => 'total_orders',
+                'options' => $this->getSortHighestAndLowestOptions()
+            ],
+            [
+                'priority' => true,
+                'label' => 'Total Spend',
+                'target' => 'total_spend',
+                'options' => $this->getSortHighestAndLowestOptions()
+            ],
+            [
+                'priority' => true,
+                'label' => 'Average Spend',
+                'target' => 'total_average_spend',
+                'options' => $this->getSortHighestAndLowestOptions()
+            ],
+            [
+                'priority' => true,
+                'label' => 'Created Date',
+                'target' => 'created_at',
+                'options' => $this->getSortEarliestAndOldestOptions()
+            ],
+        ])->filter(fn($filter) => count($filter['options']))->toArray();
+    }
+
+    /**
+     * Sorting options for promotions.
+     *
+     * @return array
+     */
+    private function getPromotionSorting(): array
+    {
+        return collect([
+            [
+                'priority' => true,
+                'label' => 'Created Date',
+                'target' => 'created_at',
+                'options' => $this->getSortEarliestAndOldestOptions()
+            ],
+        ])->filter(fn($filter) => count($filter['options']))->toArray();
     }
 
     /**

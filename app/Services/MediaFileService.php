@@ -150,11 +150,10 @@ class MediaFileService extends BaseService
             AWSService::delete($mediaFile->path);
             $deleted = $mediaFile->delete();
 
-            if ($deleted) {
-                return ['message' => 'Media File deleted'];
-            } else {
-                throw new Exception('Media File delete unsuccessful');
-            }
+            return [
+                'deleted' => $deleted,
+                'message' => $deleted ? 'Media File deleted' : 'Media File delete unsuccessful'
+            ];
 
         });
     }

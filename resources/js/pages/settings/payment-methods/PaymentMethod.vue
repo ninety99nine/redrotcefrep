@@ -198,34 +198,8 @@
                         <Copy :text="store.id"></Copy>
                     </div>
 
-                    <!-- New WhatsApp Group Chat Preview Section -->
-                    <div class="bg-white p-4 shadow-sm rounded-xl">
-
-                        <div class="flex items-end justify-between mb-4">
-
-                            <div>
-                                <h2 class="font-semibold">Activate Now</h2>
-                                <h3 class="text-sm text-gray-500">Lets activate {{ storePaymentMethod.custom_name }} for you</h3>
-                            </div>
-
-                            <Button
-                                size="xs"
-                                type="success"
-                                :action="openWhatsappGroup">
-                                <div class="flex items-center space-x-1">
-                                    <WhatsappIcon size="w-4 h-4" color="#ffffff" class="mx-2"></WhatsappIcon>
-                                    <span class="text-xs">Send Whatsapp</span>
-                                </div>
-                            </Button>
-
-                        </div>
-
-                        <!-- Render animated messages -->
-                        <div class="border border-gray-200 rounded-lg overflow-hidden">
-                            <WhatsappMessage :messages="mockMessages" :animate="true" :loopAnimation="true" class="h-80" />
-                        </div>
-
-                    </div>
+                    <!-- Join WhatsApp Group -->
+                    <JoinOurWhatsappGroup :mockMessages="mockMessages"></JoinOurWhatsappGroup>
 
                 </div>
 
@@ -279,10 +253,9 @@
     import Switch from '@Partials/Switch.vue';
     import Button from '@Partials/Button.vue';
     import Skeleton from '@Partials/Skeleton.vue';
-    import WhatsappIcon from '@Partials/WhatsappIcon.vue';
     import { Info, Trash2, MoveLeft } from 'lucide-vue-next';
     import { isEmpty, capitalize } from '@Utils/stringUtils.js';
-    import WhatsappMessage from '@Partials/WhatsappMessage.vue';
+    import JoinOurWhatsappGroup from '@Components/JoinOurWhatsappGroup.vue';
     import EmailConfig from '@Pages/settings/payment-methods/_components/PaymentMethodConfigInput/EmailConfig.vue';
     import ImageConfig from '@Pages/settings/payment-methods/_components/PaymentMethodConfigInput/ImageConfig.vue';
     import SelectConfig from '@Pages/settings/payment-methods/_components/PaymentMethodConfigInput/SelectConfig.vue';
@@ -294,7 +267,7 @@
     export default {
         inject: ['formState', 'authState', 'storeState', 'storePaymentMethodState', 'changeHistoryState', 'notificationState'],
         components: {
-            Copy, Pill, Info, Modal, Alert, Input, Switch, Button, Skeleton, WhatsappIcon, WhatsappMessage, EmailConfig,
+            Copy, Pill, Info, Modal, Alert, Input, Switch, Button, Skeleton, JoinOurWhatsappGroup, EmailConfig,
             ImageConfig, SelectConfig, StringConfig, ContentConfig, CurrencyConfig, MobileNumberConfig
         },
         data() {
@@ -302,8 +275,7 @@
                 Trash2,
                 MoveLeft,
                 isLoadingPaymentMethod: false,
-                appName: import.meta.env.VITE_APP_NAME,
-                whatsappGroupLink: import.meta.env.VITE_WHATSAPP_GROUP_LINK,
+                appName: import.meta.env.VITE_APP_NAME
             }
         },
         watch: {
@@ -434,9 +406,6 @@
                         store_id: this.store.id
                     }
                 });
-            },
-            openWhatsappGroup() {
-                window.open(this.whatsappGroupLink, "_blank");
             },
             getPaymentMethodFirstValidationError(configSchemaEntity, configs) {
                 return this.storePaymentMethodState.getPaymentMethodFirstValidationError(configSchemaEntity, configs);

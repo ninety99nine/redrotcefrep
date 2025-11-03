@@ -116,10 +116,9 @@ class AddressService extends BaseService
     {
         $deleted = $address->delete();
 
-        if ($deleted) {
-            return ['message' => 'Address deleted'];
-        } else {
-            throw new Exception('Address delete unsuccessful');
-        }
+        return [
+            'deleted' => $deleted,
+            'message' => $deleted ? 'Address deleted' : 'Address delete unsuccessful'
+        ];
     }
 }

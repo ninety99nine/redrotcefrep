@@ -89,6 +89,7 @@ class StoreResource extends JsonResource
             'primary_domain' => DomainResource::make($this->whenLoaded('primaryDomain')),
             'customer_tags' => TagResource::collection($this->whenLoaded('customerTags')),
             'categories' => CategoryResource::collection($this->whenLoaded('categories')),
+            'my_membership' => StoreUserResource::make($this->whenLoaded('myMembership')),
             'media_files' => MediaFileResource::collection($this->whenLoaded('mediaFiles')),
             'active_subscription' => SubscriptionResource::make($this->whenLoaded('activeSubscription')),
 
@@ -102,6 +103,9 @@ class StoreResource extends JsonResource
             'created_orders_count' => $this->whenCounted('createdOrders'),
             'assigned_orders_count' => $this->whenCounted('assignedOrders'),
             'active_subscription_count' => $this->whenCounted('activeSubscription'),
+
+            //  Pivot
+            'store_user' => $this->store_user ? StoreUserResource::make($this->store_user) : null,
         ];
     }
 }

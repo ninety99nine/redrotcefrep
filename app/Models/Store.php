@@ -136,8 +136,8 @@ class Store extends Model
     public function users(): BelongsToMany
     {
         return $this->belongsToMany(User::class, 'store_user')
+                    ->withPivot(['id', 'first_name', 'email', 'mobile_number', 'user_id', 'role_id', 'store_id', 'creator', 'invited_at', 'joined_at'])
                     ->using(StoreUser::class)
-                    ->withTimestamps()
                     ->as('store_user');
     }
 
@@ -207,6 +207,16 @@ class Store extends Model
     public function seoImage(): MorphOne
     {
         return $this->morphOne(MediaFile::class, 'mediable')->where('type', UploadFolderName::STORE_SEO_IMAGE->value);
+    }
+
+    /**
+     * Get roles.
+     *
+     * @return HasMany
+     */
+    public function roles(): HasMany
+    {
+        return $this->hasMany(Role::class);
     }
 
     /**

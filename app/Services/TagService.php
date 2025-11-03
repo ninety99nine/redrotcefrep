@@ -191,10 +191,9 @@ class TagService extends BaseService
     {
         $deleted = $tag->delete();
 
-        if ($deleted) {
-            return ['message' => 'Tag deleted'];
-        } else {
-            throw new Exception('Tag delete unsuccessful');
-        }
+        return [
+            'deleted' => $deleted,
+            'message' => $deleted ? 'Tag deleted' : 'Tag delete unsuccessful'
+        ];
     }
 }

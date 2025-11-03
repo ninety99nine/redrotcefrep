@@ -171,11 +171,10 @@ class PromotionService extends BaseService
     {
         $deleted = $promotion->delete();
 
-        if ($deleted) {
-            return ['message' => 'Promotion deleted'];
-        } else {
-            throw new Exception('Promotion delete unsuccessful');
-        }
+        return [
+            'deleted' => $deleted,
+            'message' => $deleted ? 'Promotion deleted' : 'Promotion delete unsuccessful'
+        ];
     }
 
     /**

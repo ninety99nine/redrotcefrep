@@ -341,11 +341,10 @@ class DomainService extends BaseService
     {
         $deleted = $domain->delete();
 
-        if ($deleted) {
-            return ['message' => 'Domain deleted'];
-        } else {
-            throw new Exception('Domain delete unsuccessful');
-        }
+        return [
+            'deleted' => $deleted,
+            'message' => $deleted ? 'Domain deleted' : 'Domain delete unsuccessful'
+        ];
     }
 
     /**

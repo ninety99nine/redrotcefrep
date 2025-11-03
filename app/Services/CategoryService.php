@@ -272,10 +272,9 @@ class CategoryService extends BaseService
 
         $deleted = $category->delete();
 
-        if ($deleted) {
-            return ['message' => 'Category deleted'];
-        } else {
-            throw new Exception('Category delete unsuccessful');
-        }
+        return [
+            'deleted' => $deleted,
+            'message' => $deleted ? 'Category deleted' : 'Category delete unsuccessful'
+        ];
     }
 }

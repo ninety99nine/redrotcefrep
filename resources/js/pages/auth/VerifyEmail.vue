@@ -289,7 +289,10 @@ export default {
                 this.notificationState.showSuccessNotification('Email verified successfully!');
 
                 // Handle automatic login
+                const user = response.data.user;
                 const token = response.data.token;
+
+                await this.authState.setUser(user);
                 this.authState.setTokenOnRequest(token);
                 this.authState.setTokenOnLocalStorage(token);
 
@@ -349,7 +352,7 @@ export default {
         },
 
         goToDashboard() {
-            this.$router.push({ name: 'dashboard' });
+            this.$router.push({ name: 'show-stores' });
         },
 
         cleanupOldStorage() {

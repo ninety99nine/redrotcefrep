@@ -2,7 +2,6 @@
 
 namespace App\Http\Requests\TeamMember;
 
-use App\Models\User;
 use Illuminate\Foundation\Http\FormRequest;
 
 class UpdateTeamMemberRequest extends FormRequest
@@ -14,7 +13,7 @@ class UpdateTeamMemberRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return $this->user()->can('update', $this->route('user'));
+        return $this->user()->can('update', $this->route('teamMember'));
     }
 
     /**

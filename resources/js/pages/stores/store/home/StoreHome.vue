@@ -2,7 +2,7 @@
 
     <div class="select-none pt-24 px-20 pb-40">
 
-        <h1 class="flex items-center justify-between space-x-2 text-3xl text-gray-700 font-semibold mb-6">
+        <h1 class="flex items-center justify-between space-x-2 text-3xl font-semibold mb-6">
             <div v-if="store"
                 class="flex items-center space-x-4">
                 <span>👋</span>
@@ -163,34 +163,8 @@
 
                 </div>
 
-                <!-- New WhatsApp Group Chat Preview Section -->
-                <div class="bg-white p-4 shadow-sm rounded-xl">
-
-                    <div class="flex items-end justify-between mb-4">
-
-                        <div>
-                            <h2 class="font-semibold mb-2">Join Our Whatsapp Group</h2>
-                            <h3 class="text-sm text-gray-500">Ask questions, get help and grow your business</h3>
-                        </div>
-
-                        <Button
-                            size="xs"
-                            type="success"
-                            :action="openWhatsappGroup">
-                            <div class="flex items-center space-x-1">
-                                <WhatsappIcon size="w-4 h-4" color="#ffffff" class="mx-2"></WhatsappIcon>
-                                <span class="text-xs">Join Our Whatsapp</span>
-                            </div>
-                        </Button>
-
-                    </div>
-
-                    <!-- Render animated messages -->
-                    <div class="border border-gray-200 rounded-lg overflow-hidden">
-                        <WhatsappMessage :messages="mockMessages" :animate="true" :loopAnimation="true" class="h-80" />
-                    </div>
-
-                </div>
+                <!-- Join WhatsApp Group -->
+                <JoinOurWhatsappGroup :mockMessages="mockMessages"></JoinOurWhatsappGroup>
 
             </div>
 
@@ -288,6 +262,7 @@
                         <Button
                             size="xs"
                             type="light"
+                            :action="bookYourSeat"
                             :leftIcon="CalendarDays">
                             <span>Book Your Seat</span>
                         </Button>
@@ -311,14 +286,13 @@ import Button from '@Partials/Button.vue';
 import Tooltip from '@Partials/Tooltip.vue';
 import Skeleton from '@Partials/Skeleton.vue';
 import Datepicker from '@Partials/Datepicker.vue';
-import WhatsappIcon from '@Partials/WhatsappIcon.vue';
-import WhatsappMessage from '@Partials/WhatsappMessage.vue';
+import JoinOurWhatsappGroup from '@Components/JoinOurWhatsappGroup.vue';
 import { Box, Plus, Inbox, Zap, Megaphone, UsersRound, CreditCard, HandCoins, CalendarDays } from 'lucide-vue-next';
 
 export default {
     inject: ['formState', 'authState', 'storeState', 'notificationState'],
     components: {
-        Box, Inbox, UsersRound, CreditCard, HandCoins, Button, Tooltip, Skeleton, Datepicker, WhatsappIcon, WhatsappMessage
+        Box, Inbox, UsersRound, CreditCard, HandCoins, Button, Tooltip, Skeleton, Datepicker, JoinOurWhatsappGroup
     },
     data() {
         return {
@@ -334,7 +308,7 @@ export default {
             basicInsights: null,
             isLoadingOrderStatusCounts: false,
             isLoadingStoreBasicInsights: false,
-            whatsappGroupLink: import.meta.env.VITE_WHATSAPP_GROUP_LINK,
+            bookYourSeatLink: import.meta.env.VITE_BOOK_YOUR_SEAT_LINK,
             platforms: [
                 { name: 'whatsapp', link: 'https://chat.whatsapp.com/FR9xLOjlcIs6KO0uHiLnTc' },
                 { name: 'instagram', link: 'https://www.instagram.com/perfect_order_botswana' },
@@ -456,8 +430,10 @@ export default {
                 }
             });
         },
-        openWhatsappGroup() {
-            window.open(this.whatsappGroupLink, "_blank");
+        bookYourSeat() {
+            if (this.store.web_link) {
+                window.open(this.bookYourSeatLink, '_blank');
+            }
         },
         getIcon(index) {
             const icons = [Box, UsersRound, CreditCard];

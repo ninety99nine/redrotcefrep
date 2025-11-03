@@ -9,10 +9,20 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('store_user', function (Blueprint $table) {
-            $table->foreignUuid('store_id')->constrained()->cascadeOnDelete();
-            $table->foreignUuid('user_id')->constrained()->cascadeOnDelete();
+            $table->uuid('id')->primary();
+            $table->string('first_name')->nullable();
+            $table->string('email')->nullable();
+            $table->string('mobile_number', 20)->nullable();
+            $table->foreignUuid('user_id')->nullable();
+            $table->foreignUuid('role_id');
+            $table->foreignUuid('store_id');
             $table->boolean('creator')->default(false);
-            $table->timestamps();
+            $table->timestamp('invited_at')->nullable();
+            $table->timestamp('joined_at')->nullable();
+
+            $table->foreign('user_id')->references('id')->on('users')->nullOnDelete();
+            $table->foreign('role_id')->references('id')->on('roles')->cascadeOnDelete();
+            $table->foreign('store_id')->references('id')->on('stores')->cascadeOnDelete();
         });
     }
 

@@ -30,6 +30,7 @@ use App\Observers\ProductObserver;
 use App\Models\AutoBillingSchedule;
 use App\Listeners\RoleEventListener;
 use App\Models\AiAssistantTokenUsage;
+use App\Models\StoreUser;
 use App\Models\User;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Event;
@@ -99,6 +100,12 @@ class AppServiceProvider extends ServiceProvider
         Route::bind('store', function ($value) {
             $allowedRoutes = ['show.store'];
             return $this->applyEagerLoading(Store::query(), $allowedRoutes)->findOrFail($value);
+        });
+
+        // Bind StoreUser model
+        Route::bind('teamMember', function ($value) {
+            $allowedRoutes = ['show.team.member'];
+            return $this->applyEagerLoading(StoreUser::query(), $allowedRoutes)->findOrFail($value);
         });
 
         // Bind StoreQuota model

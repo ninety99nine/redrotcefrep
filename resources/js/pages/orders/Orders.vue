@@ -1,11 +1,50 @@
 <template>
 
-    <div class="pt-24 px-8 relative select-none">
+    <div class="pt-24 px-8 select-none">
 
-        <!-- Clouds Image -->
-        <img :src="'/images/clouds.png'" class="absolute bottom-0">
+        <!-- No Orders -->
+        <template v-if="hasInitialResults == false">
 
-        <div class="relative bg-white/80 p-4 rounded-md mb-60">
+        <div class="flex flex-col items-center justify-center bg-linear-to-b from-white p-8 rounded-2xl mb-20">
+
+            <div class="bg-blue-200 text-blue-900 rounded-full p-10 mt-8 mb-16">
+                <Inbox size="40"></Inbox>
+            </div>
+
+            <div class="text-center max-w-md">
+
+                <h1 class="text-3xl font-extrabold mb-3">
+                    Start Receiving Orders
+                </h1>
+
+                <p class="text-base leading-relaxed">
+                    Your orders will appear here once customers start shopping. You can also create a new order
+                </p>
+
+            </div>
+
+            <div class="mt-10">
+
+                <Button
+                    size="lg"
+                    type="primary"
+                    :leftIcon="Plus"
+                    leftIconSize="20"
+                    :skeleton="!store"
+                    :action="onAddOrder">
+                    <span class="ml-1">Create New Order</span>
+                </Button>
+
+            </div>
+
+        </div>
+
+        <!-- Join WhatsApp Group -->
+        <JoinOurWhatsappGroup :mockMessages="mockMessages" class="max-w-lg mx-auto mb-40"></JoinOurWhatsappGroup>
+
+        </template>
+
+        <div v-else class="relative bg-white/80 p-4 rounded-md mb-60">
 
             <h1 class="text-lg font-semibold mb-4">Orders</h1>
 
@@ -275,40 +314,6 @@
                         </template>
 
                     </tr>
-
-                </template>
-
-                <!-- No Orders -->
-                <template #noResults>
-
-                    <div class="flex justify-between items-end p-10 bg-blue-50 border-t border-blue-200">
-
-                        <div>
-
-                            <h1 class="text-2xl font-bold mb-4">
-                                Ready For Your First Sale?
-                            </h1>
-
-                            <p class="text-sm text-gray-500">
-                                Your orders will appear here once customers start shopping.
-                            </p>
-
-                        </div>
-
-                        <div>
-
-                            <!-- Add Button -->
-                            <Button
-                                size="lg"
-                                type="primary"
-                                :leftIcon="Plus"
-                                :action="onAddOrder">
-                                <span>Add Order</span>
-                            </Button>
-
-                        </div>
-
-                    </div>
 
                 </template>
 
@@ -651,6 +656,7 @@
 
 <script>
 
+    import dayjs from 'dayjs';
     import axios from 'axios';
     import isEqual from 'lodash.isEqual';
     import Input from '@Partials/Input.vue';
@@ -664,18 +670,20 @@
     import Table from '@Partials/table/Table.vue';
     import { isNotEmpty } from '@Utils/stringUtils';
     import { VueDraggableNext } from 'vue-draggable-next';
+    import WhatsappMessage from '@Partials/WhatsappMessage.vue';
+    import JoinOurWhatsappGroup from '@Components/JoinOurWhatsappGroup.vue';
     import Status from '@Pages/orders/order/components/order-header/Status.vue';
     import { formattedDatetime, formattedRelativeDate } from '@Utils/dateUtils.js';
     import NoDataPlaceholder from '@Partials/table/components/NoDataPlaceholder.vue';
     import PaymentStatus from '@Pages/orders/order/components/order-header/PaymentStatus.vue';
     import CollectionStatus from '@Pages/orders/order/components/order-header/CollectionStatus.vue';
-    import { Move, Info, Plus, Trash2, Printer, RefreshCcw, ArrowDownToLine } from 'lucide-vue-next';
+    import { Move, Info, Plus, Trash2, Inbox, Printer, RefreshCcw, ArrowDownToLine } from 'lucide-vue-next';
 
     export default {
         inject: ['formState', 'storeState', 'notificationState'],
         components: {
-            Move, Info, Input, Modal, Loader, Button, Switch, Select, Popover, Dropdown, Table, draggable: VueDraggableNext,
-            Status, NoDataPlaceholder, PaymentStatus, CollectionStatus
+            Move, Info, Inbox, Input, Modal, Loader, Button, Switch, Select, Popover, Dropdown, Table, draggable: VueDraggableNext,
+            WhatsappMessage, JoinOurWhatsappGroup, Status, NoDataPlaceholder, PaymentStatus, CollectionStatus
         },
         data() {
             return {
@@ -703,6 +711,7 @@
                 isDeletingOrderIds: [],
                 isLoadingOrders: false,
                 cancelTokenSource: null,
+                hasInitialResults: null,
                 isUpdatingOrders: false,
                 exportWithFilters: true,
                 exportWithSorting: true,
@@ -792,6 +801,42 @@
                         action: this.showDeleteOrdersModal,
                     }
                 ],
+                mockMessages: [
+                    {
+                        sender: 'Support Team',
+                        text: 'Hello everyone! Our support team is here to help with your e-commerce platform questions. Feel free to ask! 😊', timestamp: dayjs().subtract(6, 'minute').format('HH:mm'),
+                        isOwnMessage: false,
+                        nameColor: '#165dfc'
+                    },
+                    {
+                        sender: 'You', text: 'Hi, how do I add a discount code to my store?', timestamp: dayjs().subtract(5, 'minute').format('HH:mm'),
+                        isOwnMessage: true
+                    },
+                    {
+                        sender: 'Support Team', text: 'Great question! In your dashboard, go to *Settings > Discounts*, click *Create Discount*, and set the code, amount, and conditions. Check [this guide](https://yourstore.com/docs/discounts) for details.', timestamp: dayjs().subtract(4, 'minute').format('HH:mm'),
+                        isOwnMessage: false,
+                        nameColor: '#165dfc'
+                    },
+                    {
+                        sender: 'Emma', text: 'I’m struggling with setting up shipping options. Any tips?', timestamp: dayjs().subtract(3, 'minute').format('HH:mm'),
+                        isOwnMessage: false,
+                        nameColor: '#dc16fc'
+                    },
+                    {
+                        sender: 'Support Team', text: 'Hi Emma! Navigate to *Settings > Shipping*, and add zones with rates. You can set flat rates or weight-based shipping. See [Shipping Setup](https://yourstore.com/docs/shipping) for a step-by-step. Let us know if you need more help!', timestamp: dayjs().subtract(2, 'minute').format('HH:mm'),
+                        isOwnMessage: false,
+                        nameColor: '#165dfc'
+                    },
+                    {
+                        sender: 'You', text: 'Thanks! Can I also track my store’s analytics?', timestamp: dayjs().subtract(1, 'minute').format('HH:mm'),
+                        isOwnMessage: true
+                    },
+                    {
+                        sender: 'Support Team', text: 'Absolutely! Go to *Analytics* in your dashboard, select a date range, and view total views, orders, and sales. Try it out and let us know if you have questions!', timestamp: dayjs().format('HH:mm'),
+                        isOwnMessage: false,
+                        nameColor: '#165dfc'
+                    }
+                ]
             }
         },
         watch: {
@@ -973,6 +1018,10 @@
 
                     // Only process response if it matches the latest request
                     if (currentRequestId !== this.latestRequestId) return;
+
+                    if(this.pagination == null) {
+                        this.hasInitialResults = response.data.meta.total > 0;
+                    }
 
                     this.pagination = response.data;
                     this.orders = this.pagination.data;

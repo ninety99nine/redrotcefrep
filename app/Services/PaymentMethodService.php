@@ -148,10 +148,9 @@ class PaymentMethodService extends BaseService
     {
         $deleted = $paymentMethod->delete();
 
-        if ($deleted) {
-            return ['message' => 'Payment Method deleted'];
-        } else {
-            throw new Exception('Payment Method delete unsuccessful');
-        }
+        return [
+            'deleted' => $deleted,
+            'message' => $deleted ? 'Payment Method deleted' : 'Payment Method delete unsuccessful'
+        ];
     }
 }

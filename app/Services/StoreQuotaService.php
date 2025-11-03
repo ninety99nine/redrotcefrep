@@ -95,10 +95,9 @@ class StoreQuotaService extends BaseService
     {
         $deleted = $storeQuota->delete();
 
-        if ($deleted) {
-            return ['message' => 'Store quota deleted'];
-        } else {
-            throw new Exception('Store quota delete unsuccessful');
-        }
+        return [
+            'deleted' => $deleted,
+            'message' => $deleted ? 'Store quota deleted' : 'Store quota delete unsuccessful'
+        ];
     }
 }

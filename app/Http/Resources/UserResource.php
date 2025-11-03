@@ -34,6 +34,9 @@ class UserResource extends JsonResource
             'ai_messages' => AiMessageResource::collection($this->whenLoaded('aiMessages')),
             'visited_stores' => StoreResource::collection($this->whenLoaded('visitedStores')),
             'followed_stores' => StoreResource::collection($this->whenLoaded('followedStores')),
+
+            //  Pivot
+            'store_user' => $this->store_user ? StoreUserResource::make($this->store_user) : null,
         ];
     }
 }

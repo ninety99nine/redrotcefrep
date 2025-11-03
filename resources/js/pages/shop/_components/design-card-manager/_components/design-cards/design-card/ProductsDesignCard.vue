@@ -225,9 +225,12 @@
                     }
 
                 } catch (error) {
-                    const message = error?.response?.data?.message || error?.message || 'Something went wrong while fetching category';
-                    this.notificationState.showWarningNotification(message);
-                    this.formState.setServerFormErrors(error);
+                    if(error.status != 404) {
+                        const message = error?.response?.data?.message || error?.message || 'Something went wrong while fetching category';
+                        this.notificationState.showWarningNotification(message);
+                        this.formState.setServerFormErrors(error);
+                    }
+                    console.error('Failed to fetch category:', error);
                 } finally {
                     if(this.categoryId == this.lastCategoryId) {
                         this.isLoadingCategory = false;

@@ -169,11 +169,10 @@ class TransactionService extends BaseService
 
         }
 
-        if ($deleted) {
-            return ['message' => 'Transaction deleted'];
-        } else {
-            throw new Exception('Transaction delete unsuccessful');
-        }
+        return [
+            'deleted' => $deleted,
+            'message' => $deleted ? 'Transaction deleted' : 'Transaction delete unsuccessful'
+        ];
     }
 
     /**

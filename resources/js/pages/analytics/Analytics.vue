@@ -32,7 +32,7 @@
         </div>
 
         <!-- Dynamic Charts -->
-        <div v-else class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             <div v-for="chart in chartConfigs" :key="chart.type" class="bg-white rounded-lg space-y-4 p-4">
                 <h2 class="text-sm font-bold mb-2">{{ chart.title }}</h2>
                 <component

@@ -160,7 +160,10 @@
                 try {
                     const response = await axios.post('/api/auth/setup-password', this.form);
 
+                    const user = response.data.user;
                     const token = response.data.token;
+
+                    await this.authState.setUser(user);
                     this.authState.setTokenOnRequest(token);
                     this.authState.setTokenOnLocalStorage(token);
 

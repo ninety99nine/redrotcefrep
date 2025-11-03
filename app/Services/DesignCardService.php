@@ -565,11 +565,10 @@ class DesignCardService extends BaseService
 
         $deleted = $designCard->delete();
 
-        if ($deleted) {
-            return ['message' => 'Design Card deleted'];
-        } else {
-            throw new Exception('Design Card delete unsuccessful');
-        }
+        return [
+            'deleted' => $deleted,
+            'message' => $deleted ? 'Design Card deleted' : 'Design Card delete unsuccessful'
+        ];
     }
 
     /**

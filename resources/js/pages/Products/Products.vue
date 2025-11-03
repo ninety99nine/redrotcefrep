@@ -2,10 +2,46 @@
 
     <div class="pt-24 px-8 relative select-none">
 
-        <!-- Clouds Image -->
-        <img :src="'/images/clouds.png'" class="absolute bottom-0">
+        <!-- No Products -->
+        <div
+            v-if="hasInitialResults == false"
+            class="flex flex-col items-center justify-center bg-linear-to-b from-white p-8 rounded-2xl">
 
-        <div class="relative bg-white/80 p-4 rounded-md mb-60">
+            <div class="bg-blue-200 text-blue-900 rounded-full p-10 mt-8 mb-16">
+                <Box size="40"></Box>
+            </div>
+
+            <div class="text-center max-w-md">
+
+                <h1 class="text-3xl font-extrabold mb-3">
+                    Start Adding Products
+                </h1>
+
+                <p class="text-base leading-relaxed">
+                Your products will appear here once you add them. Get started by creating your first product.
+                </p>
+
+            </div>
+
+            <div class="mt-10">
+
+                <Button
+                    size="lg"
+                    type="primary"
+                    :leftIcon="Plus"
+                    leftIconSize="20"
+                    :skeleton="!store"
+                    :action="onAddProduct">
+                    <span class="ml-1">Create New Product</span>
+                </Button>
+
+            </div>
+
+        </div>
+
+        <div
+            v-else
+            class="relative bg-white/80 p-4 rounded-md mb-60">
 
             <h1 class="text-lg font-semibold mb-4">Products</h1>
 
@@ -374,40 +410,6 @@
 
                 </template>
 
-                <!-- No Products -->
-                <template #noResults>
-
-                    <div class="flex justify-between items-end p-10 bg-blue-50 border-t border-blue-200">
-
-                        <div>
-
-                            <h1 class="text-2xl font-bold mb-4">
-                                Ready For Your First Sale?
-                            </h1>
-
-                            <p class="text-sm text-gray-500">
-                                Your products will appear here once products start shopping.
-                            </p>
-
-                        </div>
-
-                        <div>
-
-                            <!-- Add Button -->
-                            <Button
-                                size="lg"
-                                type="primary"
-                                :leftIcon="Plus"
-                                :action="onAddProduct">
-                                <span>Add Product</span>
-                            </Button>
-
-                        </div>
-
-                    </div>
-
-                </template>
-
             </Table>
 
         </div>
@@ -678,12 +680,12 @@
     import { VueDraggableNext } from 'vue-draggable-next';
     import { formattedDatetime, formattedRelativeDate } from '@Utils/dateUtils.js';
     import NoDataPlaceholder from '@Partials/table/components/NoDataPlaceholder.vue';
-    import { Move, Info, Plus, Trash2, RefreshCcw, ArrowDownToLine } from 'lucide-vue-next';
+    import { Move, Info, Plus, Trash2, Box, RefreshCcw, ArrowDownToLine } from 'lucide-vue-next';
 
     export default {
         inject: ['formState', 'storeState', 'notificationState'],
         components: {
-            Move, Info, Pill, Input, Modal, Loader, Button, Switch, Select, Popover, Dropdown, Table,
+            Move, Info, Box, Pill, Input, Modal, Loader, Button, Switch, Select, Popover, Dropdown, Table,
             SelectTags, draggable: VueDraggableNext, NoDataPlaceholder
         },
         data() {
@@ -709,10 +711,11 @@
                 filterExpressions: [],
                 deletableProduct: null,
                 sortingExpressions: [],
-                isDeletingProductIds: [],
                 cancelTokenSource: null,
                 exportWithFilters: true,
                 exportWithSorting: true,
+                hasInitialResults: null,
+                isDeletingProductIds: [],
                 isLoadingProducts: false,
                 isUpdatingProducts: false,
                 isExportingProducts: false,
@@ -998,6 +1001,10 @@
 
                     // Only process response if it matches the latest request
                     if (currentRequestId !== this.latestRequestId) return;
+
+                    if(this.pagination == null) {
+                        this.hasInitialResults = response.data.meta.total > 0;
+                    }
 
                     this.pagination = response.data;
                     this.products = this.pagination.data;

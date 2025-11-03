@@ -644,17 +644,17 @@ const routes = [
                             {
                                 path: '',
                                 name: 'show-team-members',
-                                component: () => import('@Pages/team-members/TeamMembers.vue')
+                                component: () => import('@Pages/settings/team-members/TeamMembers.vue')
                             },
                             {
                                 path: 'add',
                                 name: 'add-team-member',
-                                component: () => import('@Pages/team-members/team-member/TeamMember.vue')
+                                component: () => import('@Pages/settings/team-members/team-member/TeamMember.vue')
                             },
                             {
-                                path: ':user_id',
+                                path: ':team_member_id',
                                 name: 'edit-team-member',
-                                component: () => import('@Pages/team-members/team-member/TeamMember.vue')
+                                component: () => import('@Pages/settings/team-members/team-member/TeamMember.vue')
                             }
                         ]
                     },

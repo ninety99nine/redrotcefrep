@@ -36,16 +36,10 @@ export const useTeamMemberStore = defineStore('teamMember', {
         },
         setTeamMemberForm(teamMember = null, isAdding = false) {
             this.teamMemberForm = {
-                id: teamMember?.id ?? null,
-                email: teamMember?.email ?? null,
-                name: teamMember?.name ?? (teamMember?.first_name && teamMember?.last_name ? `${teamMember.first_name} ${teamMember.last_name}`.trim() : null),
-                role_id: teamMember?.roles?.[0]?.name ?? null,
+                role_id: teamMember?.role?.id ?? null,
+                email: teamMember?.user?.email ?? teamMember?.email ?? null,
+                first_name: teamMember?.user?.first_name ?? teamMember?.first_name ?? null
             };
-
-            if (isAdding) {
-                this.teamMemberForm.email = '';
-                this.teamMemberForm.role_id = '';
-            }
 
             this.saveOriginalState('Original team member');
         },

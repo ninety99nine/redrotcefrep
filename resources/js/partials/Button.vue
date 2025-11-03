@@ -88,7 +88,7 @@
             },
             rounded: {
                 type: String,
-                default: 'rounded-lg',
+                default: 'rounded-2xl',
             },
             wrapperClass: {
                 type: String,

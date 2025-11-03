@@ -326,11 +326,10 @@ class WorkflowService extends BaseService
     {
         $deleted = $workflow->delete();
 
-        if ($deleted) {
-            return ['message' => 'Workflow deleted'];
-        } else {
-            throw new Exception('Workflow delete unsuccessful');
-        }
+        return [
+            'deleted' => $deleted,
+            'message' => $deleted ? 'Workflow deleted' : 'Workflow delete unsuccessful'
+        ];
     }
 }
 ?>

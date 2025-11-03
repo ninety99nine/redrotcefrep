@@ -11,6 +11,7 @@
         </Button>
 
         <Drawer
+            contentClass=""
             position="right"
             ref="columnsDrawer"
             :showFooter="false"

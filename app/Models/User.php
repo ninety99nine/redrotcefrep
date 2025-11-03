@@ -59,9 +59,9 @@ class User extends Authenticatable
     public function stores(): BelongsToMany
     {
         return $this->belongsToMany(Store::class, 'store_user')
+                    ->withPivot(['id', 'first_name', 'email', 'mobile_number', 'user_id', 'role_id', 'store_id', 'creator', 'invited_at', 'joined_at'])
                     ->using(StoreUser::class)
-                    ->as('store_user')
-                    ->withTimestamps();
+                    ->as('store_user');
     }
 
     /**

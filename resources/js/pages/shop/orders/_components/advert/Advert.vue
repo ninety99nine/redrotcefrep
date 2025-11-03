@@ -1,9 +1,10 @@
 <template>
 
-    <div class="select-none flex justify-between items-center bg-blue-500 text-white py-2 px-4 mb-4 shadow-sm rounded-xl transition-all duration-300 border border-transparent hover:border-gray-300 hover:shadow-lg active:scale-95 active:shadow-md cursor-pointer group">
+    <div
+        @click="navigateToLogin"
+        class="select-none flex justify-between items-center bg-blue-500 text-white py-2 px-4 mb-4 shadow-sm rounded-xl transition-all duration-300 border border-transparent hover:border-gray-300 hover:shadow-lg active:scale-95 active:shadow-md cursor-pointer group">
 
         <div
-            @click="navigateToLogin"
             class="flex items-center space-x-2">
 
             <div
@@ -44,6 +45,7 @@
         },
         methods: {
             navigateToLogin() {
+                console.log('asd');
                 this.$router.push({
                     name: 'login'
                 })

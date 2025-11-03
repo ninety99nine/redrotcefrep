@@ -36,10 +36,14 @@ class FilterService
         switch ($filterResourceType) {
             case FilterResourceType::ORDERS:
                 return self::getOrderFilters();
+            case FilterResourceType::REVIEWS:
+                return self::getReviewFilters();
             case FilterResourceType::PRODUCTS:
                 return self::getProductFilters();
             case FilterResourceType::CUSTOMERS:
                 return self::getCustomerFilters();
+            case FilterResourceType::PROMOTIONS:
+                return self::getPromotionFilters();
             default:
                 return [];
         }
@@ -180,19 +184,70 @@ class FilterService
     }
 
     /**
+     * Get filters for reviews.
+     *
+     * @return array
+     */
+    private function getReviewFilters(): array
+    {
+        return collect([
+            [
+                'priority' => true,
+                'label' => 'Rating',
+                'target' => 'rating',
+                'type' => 'money',
+                'options' => self::getNumberOperatorOptions()
+            ],
+            [
+                'priority' => true,
+                'label' => 'Created date',
+                'target' => 'created_at',
+                'type' => 'date',
+                'options' => self::getNumberOperatorOptions()
+            ],
+        ])->filter(fn($filter) => count($filter['options']))->values()->toArray();
+    }
+
+    /**
      * Get filters for produts.
      *
      * @return array
      */
     private function getProductFilters(): array
     {
-        return [
-            'created_at' => [
+        return collect([
+            [
+                'priority' => true,
+                'label' => 'Visibility',
+                'type' => 'checkboxes',
+                'target' => 'visible',
+                'options' => array_map(fn($visibility) => [
+                    'label' => $visibility[0],
+                    'value' => $visibility[1]
+                ], [['Visible', 1], ['Hidden', 0]])
+            ],
+            [
+                'priority' => true,
+                'label' => 'Regular Price',
+                'target' => 'unit_regular_price',
+                'type' => 'money',
+                'options' => self::getNumberOperatorOptions()
+            ],
+            [
+                'priority' => true,
+                'label' => 'Sale Price',
+                'target' => 'unit_sale_price',
+                'type' => 'money',
+                'options' => self::getNumberOperatorOptions()
+            ],
+            [
+                'priority' => true,
                 'label' => 'Created date',
+                'target' => 'created_at',
                 'type' => 'date',
                 'options' => self::getNumberOperatorOptions()
-            ]
-        ];
+            ],
+        ])->filter(fn($filter) => count($filter['options']))->values()->toArray();
     }
 
     /**
@@ -202,13 +257,54 @@ class FilterService
      */
     private function getCustomerFilters(): array
     {
-        return [
-            'created_at' => [
+        return collect([
+            [
+                'priority' => true,
+                'label' => 'Total Orders',
+                'target' => 'total_orders',
+                'type' => 'number',
+                'options' => self::getNumberOperatorOptions()
+            ],
+            [
+                'priority' => true,
+                'label' => 'Total Spend',
+                'target' => 'total_spend',
+                'type' => 'money',
+                'options' => self::getNumberOperatorOptions()
+            ],
+            [
+                'priority' => true,
+                'label' => 'Average Spend',
+                'target' => 'total_average_spend',
+                'type' => 'money',
+                'options' => self::getNumberOperatorOptions()
+            ],
+            [
+                'priority' => true,
                 'label' => 'Created date',
+                'target' => 'created_at',
                 'type' => 'date',
                 'options' => self::getNumberOperatorOptions()
-            ]
-        ];
+            ],
+        ])->filter(fn($filter) => count($filter['options']))->values()->toArray();
+    }
+
+    /**
+     * Get filters for promotions.
+     *
+     * @return array
+     */
+    private function getPromotionFilters(): array
+    {
+        return collect([
+            [
+                'priority' => true,
+                'label' => 'Created date',
+                'target' => 'created_at',
+                'type' => 'date',
+                'options' => self::getNumberOperatorOptions()
+            ],
+        ])->filter(fn($filter) => count($filter['options']))->values()->toArray();
     }
 
     /**

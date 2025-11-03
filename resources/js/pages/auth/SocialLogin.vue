@@ -84,9 +84,10 @@
                     }
                 }, 1000);
             },
-            completeSocialLogin() {
+            async completeSocialLogin() {
                 this.authState.setTokenOnRequest(this.token);
                 this.authState.setTokenOnLocalStorage(this.token);
+                await this.authState.fetchUser();
 
                 if(this.storeId) {
                     this.$router.push({

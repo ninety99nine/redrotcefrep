@@ -201,11 +201,10 @@ class AiMessageService extends BaseService
     {
         $deleted = $aiMessage->delete();
 
-        if ($deleted) {
-            return ['message' => 'AI Message deleted'];
-        } else {
-            throw new Exception('AI Message delete unsuccessful');
-        }
+        return [
+            'deleted' => $deleted,
+            'message' => $deleted ? 'AI message deleted' : 'AI message delete unsuccessful'
+        ];
     }
 
     /**

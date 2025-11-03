@@ -2,7 +2,7 @@
 
 namespace App\Http\Requests\TeamMember;
 
-use App\Models\User;
+use App\Models\StoreUser;
 use Illuminate\Foundation\Http\FormRequest;
 
 class RemoveTeamMembersRequest extends FormRequest
@@ -14,7 +14,7 @@ class RemoveTeamMembersRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return $this->user()->can('removeAny', User::class);
+        return $this->user()->can('removeAny', StoreUser::class);
     }
 
     /**
@@ -25,8 +25,8 @@ class RemoveTeamMembersRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'user_ids' => ['required', 'array', 'min:1'],
-            'user_ids.*' => ['uuid'],
+            'team_member_ids' => ['required', 'array', 'min:1'],
+            'team_member_ids.*' => ['uuid'],
             'store_id' => ['required', 'uuid']
         ];
     }
@@ -39,10 +39,10 @@ class RemoveTeamMembersRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'user_ids.required' => 'The user IDs are required.',
-            'user_ids.array' => 'The user IDs must be an array.',
-            'user_ids.min' => 'At least one user ID is required.',
-            'user_ids.*.uuid' => 'Each user ID must be a valid UUID.',
+            'team_member_ids.required' => 'The team member IDs are required.',
+            'team_member_ids.array' => 'The team member IDs must be an array.',
+            'team_member_ids.min' => 'At least one team member ID is required.',
+            'team_member_ids.*.uuid' => 'Each team member ID must be a valid UUID.',
             'store_id.required' => 'The store ID is required.',
             'store_id.uuid' => 'The store ID must be a valid UUID.'
         ];

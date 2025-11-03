@@ -13,7 +13,7 @@ class RemoveTeamMemberRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return $this->user()->can('remove', $this->route('user'));
+        return $this->user()->can('remove', $this->route('teamMember'));
     }
 
     /**

@@ -94,13 +94,14 @@ class AiAssistantTokenUsageService extends BaseService
     public function deleteAiAssistantTokenUsage(AiAssistantTokenUsage $aiAssistantTokenUsage): array
     {
         return DB::transaction(function () use ($aiAssistantTokenUsage) {
+
             $deleted = $aiAssistantTokenUsage->delete();
 
-            if ($deleted) {
-                return ['message' => 'AI Assistant Token Usage deleted'];
-            } else {
-                throw new Exception('AI Assistant Token Usage delete unsuccessful');
-            }
+            return [
+                'deleted' => $deleted,
+                'message' => $deleted ? 'AI Assistant Token Usage deleted' : 'AI Assistant Token Usage delete unsuccessful'
+            ];
+
         });
     }
 }

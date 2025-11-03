@@ -2,8 +2,42 @@
 
     <div class="pt-24 px-8 relative select-none">
 
-        <!-- Clouds Image -->
-        <img :src="'/images/clouds.png'" class="absolute bottom-0">
+        <!-- No Reviews -->
+        <div
+            v-if="hasInitialResults == false"
+            class="flex flex-col items-center justify-center bg-linear-to-b from-white p-8 rounded-2xl mb-8">
+
+            <div class="bg-blue-200 text-blue-900 rounded-full p-10 mt-8 mb-16">
+                <Star size="40"></Star>
+            </div>
+
+            <div class="text-center max-w-lg">
+
+                <h1 class="text-3xl font-extrabold mb-3">
+                Build Trust with Reviews
+                </h1>
+
+                <p class="text-base leading-relaxed">
+                Customer feedback will show up here as they share their experience. Start by adding a review or inviting your first happy customer.
+                </p>
+
+            </div>
+
+            <div class="mt-10">
+
+                <Button
+                size="lg"
+                type="primary"
+                :leftIcon="Plus"
+                leftIconSize="20"
+                :skeleton="!store"
+                :action="onAddReview">
+                <span class="ml-1">Add Review</span>
+                </Button>
+
+            </div>
+
+        </div>
 
         <div class="relative bg-white p-4 rounded-md mb-4">
 
@@ -25,7 +59,10 @@
 
         </div>
 
-        <div class="relative bg-white/80 p-4 rounded-md mb-60">
+        <div
+            v-if="hasInitialResults != false"
+            class="relative bg-white/80 p-4 rounded-md mb-60">
+
             <h1 class="text-lg font-semibold mb-4">Reviews</h1>
 
             <!-- Reviews Table -->
@@ -204,28 +241,6 @@
                     </tr>
                 </template>
 
-                <!-- No Reviews -->
-                <template #noResults>
-                    <div class="flex justify-between items-end p-10 bg-blue-50 border-t border-blue-200">
-                        <div>
-                            <h1 class="text-2xl font-bold mb-4">
-                                No Reviews Yet?
-                            </h1>
-                            <p class="text-sm text-gray-500">
-                                Your reviews will appear here once they are created.
-                            </p>
-                        </div>
-                        <div>
-                            <Button
-                                size="lg"
-                                type="primary"
-                                :leftIcon="Plus"
-                                :action="onAddReview">
-                                <span>Add Review</span>
-                            </Button>
-                        </div>
-                    </div>
-                </template>
             </Table>
         </div>
 
@@ -362,10 +377,10 @@
                 Trash2,
                 RefreshCcw,
                 ExternalLink,
-                ArrowDownToLine,
-                visible: true,
                 reviews: [],
                 perPage: '15',
+                visible: true,
+                ArrowDownToLine,
                 checkedRows: [],
                 pagination: null,
                 searchTerm: null,
@@ -375,6 +390,7 @@
                 filterExpressions: [],
                 deletableReview: null,
                 sortingExpressions: [],
+                hasInitialResults: null,
                 cancelTokenSource: null,
                 exportWithFilters: true,
                 exportWithSorting: true,
@@ -533,13 +549,19 @@
                 this.showReviews();
             },
             async showReviews(page = 1) {
+
                 const currentRequestId = ++this.latestRequestId;
+
                 try {
+
                     this.isLoadingReviews = true;
+
                     if (this.cancelTokenSource) {
                         this.cancelTokenSource.cancel('Request superseded by a newer one');
                     }
+
                     this.cancelTokenSource = axios.CancelToken.source();
+
                     let config = {
                         params: {
                             page: page,
@@ -549,21 +571,33 @@
                         },
                         cancelToken: this.cancelTokenSource.token
                     };
+
                     if(this.hasSearchTerm) config.params['search'] = this.searchTerm;
+
                     if(this.hasFilterExpressions) {
                         config.params['_filters'] = this.filterExpressions.join('|');
                     }
+
                     if(this.hasSortingExpressions) {
                         config.params['_sort'] = this.sortingExpressions.join('|');
                     }
+
                     const response = await axios.get(`/api/reviews`, config);
+
                     if (currentRequestId !== this.latestRequestId) return;
+
+                    if(this.pagination == null) {
+                        this.hasInitialResults = response.data.meta.total > 0;
+                    }
+
                     this.pagination = response.data;
                     this.reviews = this.pagination.data;
+
                     this.checkedRows = this.reviews.reduce((acc, review) => {
                         acc[review.id] = false;
                         return acc;
                     }, {});
+
                 } catch (error) {
                     if (axios.isCancel(error)) return;
                     if (currentRequestId !== this.latestRequestId) return;

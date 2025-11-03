@@ -135,10 +135,9 @@ class OrderCommentService extends BaseService
 
         $deleted = $orderComment->delete();
 
-        if ($deleted) {
-            return ['message' => 'Order comment deleted'];
-        } else {
-            throw new Exception('Order comment delete unsuccessful');
-        }
+        return [
+            'deleted' => $deleted,
+            'message' => $deleted ? 'Order comment deleted' : 'Order comment delete unsuccessful'
+        ];
     }
 }
