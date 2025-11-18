@@ -31,6 +31,10 @@ class JsonArray implements CastsAttributes
      */
     public function set($model, string $key, $value, array $attributes): ?string
     {
-        return $value !== null ? json_encode($value) : null;
+        if(empty($value)) {
+            return null;
+        }else{
+            return json_encode($value);
+        }
     }
 }

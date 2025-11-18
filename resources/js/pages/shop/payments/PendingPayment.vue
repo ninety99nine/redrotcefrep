@@ -35,9 +35,9 @@
             </div>
             <p class="text-xl font-semibold text-center mb-2">Pending Payment</p>
             <p class="text-sm text-gray-500 text-center mb-8">
-                Your payment is pending, let us know how we can help.
+                Your order has been received but is pending payment.
                 <br/>
-                Send us a message to stay in touch.
+                Send us a message to make your payment now.
             </p>
 
             <template v-if="clicked">

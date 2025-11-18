@@ -71,7 +71,6 @@ export const useDeliveryMethodStore = defineStore('deliveryMethod', {
                 free_delivery_minimum_grand_total: deliveryMethod?.free_delivery_minimum_grand_total?.amount_without_currency ?? '0.00',
             };
 
-
             if(this.deliveryMethodForm.operational_hours.length == 0) {
 
                 for (let index = 0; index < 7; index++) {

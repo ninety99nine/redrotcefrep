@@ -34,6 +34,8 @@ class OrderResource extends JsonResource
             'vat_rate' => $this->vat_rate,
             'vat_amount' => $this->vat_amount,
             'fee_total' => $this->fee_total,
+            'delivery_name' => $this->delivery_name,
+            'delivery_fee' => $this->delivery_fee,
             'adjustment_total' => $this->adjustment_total,
             'grand_total' => $this->grand_total,
             'payment_status' => $this->payment_status,

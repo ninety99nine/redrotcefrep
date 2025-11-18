@@ -557,7 +557,8 @@
                     this.setup();
                 }
             },
-            'deliveryMethodForm.fee_type'(newValue) {
+            'deliveryMethodForm.fee_type'(newValue, oldValue) {
+
                 if(['fee by distance', 'fee by postal code'].includes(newValue)) {
 
                     this.lastAskForAnAddressValue = this.deliveryMethodForm.ask_for_an_address;
@@ -568,8 +569,13 @@
 
                 }else{
 
-                    this.deliveryMethodForm.ask_for_an_address = this.lastAskForAnAddressValue;
-                    this.deliveryMethodForm.pin_location_on_map = this.lastPinLocationOnMapValue;
+                    if(this.lastAskForAnAddressValue != null) {
+                        this.deliveryMethodForm.ask_for_an_address = this.lastAskForAnAddressValue;
+                    }
+
+                    if(this.lastPinLocationOnMapValue != null) {
+                        this.deliveryMethodForm.pin_location_on_map = this.lastPinLocationOnMapValue;
+                    }
 
                 }
             }
@@ -735,7 +741,6 @@
                     const deliveryMethod = response.data.delivery_method;
 
                     this.deliveryMethodState.setDeliveryMethod(deliveryMethod);
-                    await this.uploadImages();
 
                     this.notificationState.showSuccessNotification(`Delivery method updated`);
                     this.deliveryMethodState.saveOriginalState('Original delivery method');

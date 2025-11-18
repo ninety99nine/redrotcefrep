@@ -45,7 +45,6 @@
         },
         methods: {
             navigateToLogin() {
-                console.log('asd');
                 this.$router.push({
                     name: 'login'
                 })

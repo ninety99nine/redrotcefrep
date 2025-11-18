@@ -34,9 +34,9 @@
             </div>
             <p class="text-xl font-semibold text-center mb-2">Confirming Payment</p>
             <p class="text-sm text-gray-500 text-center mb-8">
-                Our team will confirm your payment and process your order.
+                Your order has been received and our team is confirming your payment.
                 <br/>
-                Send us a message to stay in touch.
+                Send us a message to keep up with your order.
             </p>
 
             <template v-if="clicked">

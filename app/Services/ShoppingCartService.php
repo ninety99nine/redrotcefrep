@@ -19,8 +19,8 @@ use Illuminate\Support\Collection;
 use App\Services\PercentageService;
 use App\Enums\DeliveryMethodFeeType;
 use Illuminate\Support\Facades\Http;
-use App\Enums\DeliveryMethodScheduleType;
 use Illuminate\Support\Facades\Auth;
+use App\Enums\DeliveryMethodScheduleType;
 use Illuminate\Validation\ValidationException;
 
 class ShoppingCartService
@@ -38,8 +38,10 @@ class ShoppingCartService
     public $currency = null;
     public $association = null;
     public $discountTotal = 0;
+    public $deliveryFee = 0;
     public $cartProducts = [];
     public $tipFlatRate = null;
+    public $deliveryName = null;
     public $adjustmentTotal = 0;
     public $cartPromotions = [];
     public $shoppingCart = null;
@@ -102,7 +104,8 @@ class ShoppingCartService
         $this->setCartFees();
         $this->setPromotionCode();
         $this->setCartTipRate();
-        $this->setAdjustment();
+        $this->setDeliveryTotal();
+        $this->setAdjustmentTotal();
         $this->setAddress();
 
         $this->setExistingCustomerStatus();
@@ -252,11 +255,24 @@ class ShoppingCartService
     }
 
     /**
-     * Set adjustment.
+     * Set delivery total.
      *
      * @return void
      */
-    private function setAdjustment(): void
+    private function setDeliveryTotal(): void
+    {
+        if($this->isTeamMember) {
+            $this->deliveryName = request()->filled('delivery_name') ? (float) request()->input('delivery_name') : null;
+            $this->deliveryFee = request()->filled('delivery_amount') ? (float) request()->input('delivery_amount') : 0;
+        }
+    }
+
+    /**
+     * Set adjustment total.
+     *
+     * @return void
+     */
+    private function setAdjustmentTotal(): void
     {
         if($this->isTeamMember) {
             $this->adjustmentTotal = request()->filled('adjustment') ? (float) request()->input('adjustment') : 0;
@@ -335,6 +351,7 @@ class ShoppingCartService
         $subtotal = MoneyService::convertToMoneyFormat($this->subtotal, $this->currency);
         $feeTotal = MoneyService::convertToMoneyFormat($this->feeTotal, $this->currency);
         $grandTotal = MoneyService::convertToMoneyFormat($this->grandTotal, $this->currency);
+        $deliveryFee = MoneyService::convertToMoneyFormat($this->deliveryFee, $this->currency);
         $discountTotal = MoneyService::convertToMoneyFormat($this->discountTotal, $this->currency);
         $adjustmentTotal = MoneyService::convertToMoneyFormat($this->adjustmentTotal, $this->currency);
         $subtotalAfterDiscount = MoneyService::convertToMoneyFormat($this->subtotalAfterDiscount, $this->currency);
@@ -350,6 +367,11 @@ class ShoppingCartService
                     'rate' => $vatRate,
                     'amount' => $vat
                 ],
+                'delivery' => [
+                    'name' => $this->deliveryName,
+                    'fee' => $deliveryFee
+                ],
+                'tip_amount' => null,
                 'fees' => $this->fees,
                 'fee_total' => $feeTotal,
                 'adjustment_total' => $adjustmentTotal,
@@ -2228,14 +2250,19 @@ class ShoppingCartService
     {
         foreach($this->deliveryMethods as $key => $deliveryMethod) {
 
-            if(!$this->deliveryMethodOptions[$key]['is_available']) return;
-            if(!$deliveryMethod->charge_fee) return;
+            $chargeFee = $deliveryMethod->charge_fee;
+            $isSelected = $this->deliveryMethodOptions[$key]['is_selected'];
+            $isAvailable = $this->deliveryMethodOptions[$key]['is_available'];
 
-            $this->handleDeliveryFlatFee($deliveryMethod, $this->deliveryMethodOptions[$key]);
-            $this->handleDeliveryFeeByWeight($deliveryMethod, $this->deliveryMethodOptions[$key]);
-            $this->handleDeliveryPercentageFee($deliveryMethod, $this->deliveryMethodOptions[$key]);
-            $this->handleDeliveryFeeByDistance($deliveryMethod, $this->deliveryMethodOptions[$key]);
-            $this->handleDeliveryFeeByPostalCode($deliveryMethod, $this->deliveryMethodOptions[$key]);
+            if($isSelected && $isAvailable && $chargeFee) {
+
+                $this->handleDeliveryFlatFee($deliveryMethod, $this->deliveryMethodOptions[$key]);
+                $this->handleDeliveryFeeByWeight($deliveryMethod, $this->deliveryMethodOptions[$key]);
+                $this->handleDeliveryPercentageFee($deliveryMethod, $this->deliveryMethodOptions[$key]);
+                $this->handleDeliveryFeeByDistance($deliveryMethod, $this->deliveryMethodOptions[$key]);
+                $this->handleDeliveryFeeByPostalCode($deliveryMethod, $this->deliveryMethodOptions[$key]);
+
+            }
 
         }
     }
@@ -2247,25 +2274,11 @@ class ShoppingCartService
      */
     private function handleDeliveryFlatFee($deliveryMethod, &$deliveryMethodOption): void
     {
-        if($deliveryMethod->fee_type != DeliveryMethodFeeType::FLAT_FEE->value) return;
+        if($deliveryMethod->fee_type == DeliveryMethodFeeType::FLAT_FEE->value) {
 
-        $name = 'Delivery fee';
-        $rateType = RateType::FLAT->value;
-        $amount = $this->freeDelivery ? 0 : $deliveryMethod->flat_fee_rate->amount;
-
-        $deliveryMethodOption['amount'] = MoneyService::convertToMoneyFormat($amount, $this->currency);
-
-        if($deliveryMethodOption['is_selected']) {
-
-            $data = [
-                'name' => $name,
-                'amount' => $amount,
-                'key_name' => null,
-                'rate_type' => $rateType,
-                'percentage_rate' => null
-            ];
-
-            $this->addFee($data);
+            $this->deliveryName = 'Delivery fee';
+            $this->deliveryFee = $this->freeDelivery ? 0 : $deliveryMethod->flat_fee_rate->amount;
+            $deliveryMethodOption['amount'] = MoneyService::convertToMoneyFormat($this->deliveryFee, $this->currency);
 
         }
     }
@@ -2277,26 +2290,12 @@ class ShoppingCartService
      */
     private function handleDeliveryPercentageFee($deliveryMethod, &$deliveryMethodOption): void
     {
-        if($deliveryMethod->fee_type != DeliveryMethodFeeType::PERCENTAGE_FEE->value) return;
+        if($deliveryMethod->fee_type == DeliveryMethodFeeType::PERCENTAGE_FEE->value) {
 
-        $name = 'Delivery fee';
-        $rateType = RateType::PERCENTAGE->value;
-        $percentageRate = $deliveryMethod->percentage_fee_rate;
-        $amount = $this->freeDelivery ? 0 : $this->subtotalAfterDiscount * ($percentageRate / 100);
-
-        $deliveryMethodOption['amount'] = MoneyService::convertToMoneyFormat($amount, $this->currency);
-
-        if($deliveryMethodOption['is_selected']) {
-
-            $data = [
-                'name' => $name,
-                'amount' => $amount,
-                'key_name' => null,
-                'rate_type' => $rateType,
-                'percentage_rate' => $percentageRate
-            ];
-
-            $this->addFee($data);
+            $this->deliveryName = 'Delivery fee';
+            $percentageRate = $deliveryMethod->percentage_fee_rate;
+            $this->deliveryFee = $this->freeDelivery ? 0 : $this->subtotalAfterDiscount * ($percentageRate / 100);
+            $deliveryMethodOption['amount'] = MoneyService::convertToMoneyFormat($this->deliveryFee, $this->currency);
 
         }
     }
@@ -2308,60 +2307,46 @@ class ShoppingCartService
      */
     private function handleDeliveryFeeByDistance($deliveryMethod, &$deliveryMethodOption): void
     {
-        if($deliveryMethod->fee_type !== DeliveryMethodFeeType::FEE_BY_DISTANCE->value) return;
+        if($deliveryMethod->fee_type == DeliveryMethodFeeType::FEE_BY_DISTANCE->value) {
 
-        $storeLocation = $deliveryMethod->address;
-        $customerLocation = $this->deliveryAddress;
+            $storeLocation = $deliveryMethod->address;
+            $customerLocation = $this->deliveryAddress;
 
-        if(!$storeLocation || ($storeLocation && (empty($storeLocation->latitude) || empty($storeLocation->longitude)))) {
-            return;
-        }
+            if(!$storeLocation || ($storeLocation && (empty($storeLocation->latitude) || empty($storeLocation->longitude)))) {
+                return;
+            }
 
-        if(!$customerLocation || ($customerLocation && (empty($customerLocation->latitude) || empty($customerLocation->longitude)))) {
-            return;
-        }
+            if(!$customerLocation || ($customerLocation && (empty($customerLocation->latitude) || empty($customerLocation->longitude)))) {
+                return;
+            }
 
-        $origin = "{$storeLocation['latitude']},{$storeLocation['longitude']}";
-        $destination = "{$customerLocation['latitude']},{$customerLocation['longitude']}";
+            $origin = "{$storeLocation['latitude']},{$storeLocation['longitude']}";
+            $destination = "{$customerLocation['latitude']},{$customerLocation['longitude']}";
 
-        [$deliveryMethodOption['distance'], $deliveryMethodOption['duration']] = $this->getDistanceFromGoogleMaps($origin, $destination);
+            [$deliveryMethodOption['distance'], $deliveryMethodOption['duration']] = $this->getDistanceFromGoogleMaps($origin, $destination);
 
-        if($deliveryMethodOption['distance']) {
+            if($deliveryMethodOption['distance']) {
 
-            foreach ($deliveryMethod->distance_zones as $zone) {
+                foreach ($deliveryMethod->distance_zones as $zone) {
 
-                if($deliveryMethodOption['distance']['value'] <= $zone['distance']) {
+                    if($deliveryMethodOption['distance']['value'] <= $zone['distance']) {
 
-                    $rateType = RateType::FLAT->value;
-                    $amount = $this->freeDelivery ? 0 : $zone['fee'];
-                    $name = 'Delivery fee ('.$deliveryMethodOption['distance']['text'].')';
+                        $this->deliveryFee = $this->freeDelivery ? 0 : $zone['fee'];
+                        $this->deliveryName = 'Delivery fee ('.$deliveryMethodOption['distance']['text'].')';
+                        $deliveryMethodOption['amount'] = MoneyService::convertToMoneyFormat($this->deliveryFee, $this->currency);
 
-                    $deliveryMethodOption['amount'] = MoneyService::convertToMoneyFormat($amount, $this->currency);
-
-                    if($deliveryMethodOption['is_selected']) {
-
-                        $data = [
-                            'name' => $name,
-                            'amount' => $amount,
-                            'rate_type' => $rateType,
-                            'percentage_rate' => null,
-                            'key_name' => 'Delivery fee',
-                        ];
-
-                        $this->addFee($data);
+                        return;
 
                     }
-
-                    return;
 
                 }
 
             }
 
-        }
+            // If no zone matches, apply fallback fee
+            $this->addFallbackDeliveryFee($deliveryMethodOption['distance']['text'] ?? null, $deliveryMethodOption);
 
-        // If no zone matches, apply fallback fee
-        $this->addFallbackFee($deliveryMethodOption['distance']['text'] ?? null, $deliveryMethodOption);
+        }
     }
 
     /**
@@ -2371,51 +2356,40 @@ class ShoppingCartService
      */
     private function handleDeliveryFeeByPostalCode($deliveryMethod, &$deliveryMethodOption): void
     {
-        if($deliveryMethod->fee_type !== DeliveryMethodFeeType::FEE_BY_POSTAL_CODE->value) return;
+        if($deliveryMethod->fee_type == DeliveryMethodFeeType::FEE_BY_POSTAL_CODE->value) {
 
-        // Retrieve the customer's postal code or attempt to fetch it using coordinates
-        $customerPostalCode = $this->deliveryAddress->postal_code ?? null;
 
-        if(!$customerPostalCode && $this->deliveryAddress->latitude && $this->deliveryAddress->longitude) {
-            $customerPostalCode = $this->getPostalCodeFromCoordinates(
-                $this->deliveryAddress->latitude,
-                $this->deliveryAddress->longitude
-            );
-        }
+            // Retrieve the customer's postal code or attempt to fetch it using coordinates
+            $customerPostalCode = $this->deliveryAddress->postal_code ?? null;
 
-        if($customerPostalCode) {
-            foreach ($deliveryMethod->postal_code_zones as $zone) {
-                foreach ($zone['postal_codes'] as $postalCode) {
-                    if($this->isPostalCodeMatch($customerPostalCode, $postalCode)) {
+            if(!$customerPostalCode && $this->deliveryAddress->latitude && $this->deliveryAddress->longitude) {
+                $customerPostalCode = $this->getPostalCodeFromCoordinates(
+                    $this->deliveryAddress->latitude,
+                    $this->deliveryAddress->longitude
+                );
+            }
 
-                        $rateType = RateType::FLAT->value;
-                        $amount = $this->freeDelivery ? 0 : $zone['fee'];
-                        $name = 'Delivery fee (Zone ' . $postalCode . ')';
+            if($customerPostalCode) {
+                foreach ($deliveryMethod->postal_code_zones as $zone) {
+                    foreach ($zone['postal_codes'] as $postalCode) {
+                        if($this->isPostalCodeMatch($customerPostalCode, $postalCode)) {
 
-                        $deliveryMethodOption['amount'] = MoneyService::convertToMoneyFormat($amount, $this->currency);
+                            $this->deliveryFee = $this->freeDelivery ? 0 : $zone['fee'];
+                            $this->deliveryName = 'Delivery fee (Zone ' . $postalCode . ')';
 
-                        if($deliveryMethodOption['is_selected']) {
+                            $deliveryMethodOption['amount'] = MoneyService::convertToMoneyFormat($this->deliveryFee, $this->currency);
 
-                            $data = [
-                                'name' => $name,
-                                'amount' => $amount,
-                                'rate_type' => $rateType,
-                                'percentage_rate' => null,
-                                'key_name' => 'Delivery fee',
-                            ];
-
-                            $this->addFee($data);
+                            return;
 
                         }
-
-                        return;
                     }
                 }
             }
-        }
 
-        // If no zone matches, apply fallback fee
-        $this->addFallbackFee($customerPostalCode ? 'Zone ' . $customerPostalCode . ')' : null, $deliveryMethodOption);
+            // If no zone matches, apply fallback fee
+            $this->addFallbackDeliveryFee($customerPostalCode ? 'Zone ' . $customerPostalCode . ')' : null, $deliveryMethodOption);
+
+        }
     }
 
     /**
@@ -2425,48 +2399,36 @@ class ShoppingCartService
      */
     private function handleDeliveryFeeByWeight($deliveryMethod, &$deliveryMethodOption): void
     {
-        if($deliveryMethod->fee_type !== DeliveryMethodFeeType::FEE_BY_WEIGHT->value) return;
+        if($deliveryMethod->fee_type == DeliveryMethodFeeType::FEE_BY_WEIGHT->value) {
 
-        $totalWeight = $this->calculateTotalWeight();
-        $weightUnit = $this->store->weight_unit;
+            $totalWeight = $this->calculateTotalWeight();
+            $weightUnit = $this->store->weight_unit;
 
-        $deliveryMethodOption['weight'] = [
-            'unit' => $weightUnit,
-            'value' => $totalWeight,
-            'text' => $totalWeight . $weightUnit
-        ];
+            $deliveryMethodOption['weight'] = [
+                'unit' => $weightUnit,
+                'value' => $totalWeight,
+                'text' => $totalWeight . $weightUnit
+            ];
 
-        foreach ($deliveryMethod->weight_categories as $category) {
-            foreach ($category['weights'] as $weight) {
-                if($this->isWeightMatch($totalWeight, $weight)) {
+            foreach ($deliveryMethod->weight_categories as $category) {
+                foreach ($category['weights'] as $weight) {
+                    if($this->isWeightMatch($totalWeight, $weight)) {
 
-                    $rateType = RateType::FLAT->value;
-                    $name = 'Delivery fee ('.$weight . $weightUnit.')';
-                    $amount = $this->freeDelivery ? 0 : $category['fee'];
+                        $this->deliveryName = 'Delivery fee ('.$weight . $weightUnit.')';
+                        $this->deliveryFee = $this->freeDelivery ? 0 : $category['fee'];
 
-                    $deliveryMethodOption['amount'] = MoneyService::convertToMoneyFormat($amount, $this->currency);
+                        $deliveryMethodOption['amount'] = MoneyService::convertToMoneyFormat($this->deliveryFee, $this->currency);
 
-                    if($deliveryMethodOption['is_selected']) {
-
-                        $data = [
-                            'name' => $name,
-                            'amount' => $amount,
-                            'rate_type' => $rateType,
-                            'percentage_rate' => null,
-                            'key_name' => 'Delivery fee',
-                        ];
-
-                        $this->addFee($data);
+                        return;
 
                     }
-
-                    return;
                 }
             }
-        }
 
-        // If no category matches, apply fallback fee
-        $this->addFallbackFee($deliveryMethodOption['weight']['text'], $deliveryMethodOption);
+            // If no category matches, apply fallback fee
+            $this->addFallbackDeliveryFee($deliveryMethodOption['weight']['text'], $deliveryMethodOption);
+
+        }
     }
 
     /**
@@ -2645,66 +2607,37 @@ class ShoppingCartService
     }
 
     /**
-     * Add a fallback fee when other calculations fail.
+     * Add a fallback delivery fee when other calculations fail.
      *
      * @param string|null $unit
      * @return void
      */
-    private function addFallbackFee(string|null $info = null, &$deliveryMethodOption): void
+    private function addFallbackDeliveryFee(string|null $info = null, &$deliveryMethodOption): void
     {
-        $name = 'Delivery fee';
-        if($info) $name .= ' ('.$info.')';
+        $this->deliveryName = 'Delivery fee';
+        if($info) $this->deliveryName .= ' ('.$info.')';
         $rateType = $this->deliveryMethod->fallback_fee_type;
 
         switch ($rateType) {
 
             case DeliveryMethodFeeType::FLAT_FEE->value:
-                $amount = $this->freeDelivery ? 0 : $this->deliveryMethod->fallback_flat_fee_rate->amount;
 
-                $deliveryMethodOption['amount'] = MoneyService::convertToMoneyFormat($amount, $this->currency);
+                $this->deliveryFee = $this->freeDelivery ? 0 : $this->deliveryMethod->fallback_flat_fee_rate->amount;
 
-                if($deliveryMethodOption['is_selected']) {
-
-                    $data = [
-                        'name' => $name,
-                        'amount' => $amount,
-                        'rate_type' => $rateType,
-                        'percentage_rate' => null,
-                        'key_name' => 'Delivery fee',
-                    ];
-
-                    $this->addFee($data);
-
-                }
+                $deliveryMethodOption['amount'] = MoneyService::convertToMoneyFormat($this->deliveryFee, $this->currency);
 
                 break;
 
             case DeliveryMethodFeeType::PERCENTAGE_FEE->value:
 
                 $percentageRate = $this->deliveryMethod->fallback_percentage_fee_rate;
-                $amount = $this->freeDelivery ? 0 : $this->subtotalAfterDiscount * ($percentageRate / 100);
+                $this->deliveryFee = $this->freeDelivery ? 0 : $this->subtotalAfterDiscount * ($percentageRate / 100);
 
-                $deliveryMethodOption['amount'] = MoneyService::convertToMoneyFormat($amount, $this->currency);
-
-                if($deliveryMethodOption['is_selected']) {
-
-                    $data = [
-                        'name' => $name,
-                        'amount' => $amount,
-                        'rate_type' => $rateType,
-                        'key_name' => 'Delivery fee',
-                        'percentage_rate' => $percentageRate,
-                    ];
-
-                    $this->addFee($data);
-
-                }
+                $deliveryMethodOption['amount'] = MoneyService::convertToMoneyFormat($this->deliveryFee, $this->currency);
 
                 break;
         }
     }
-
-
 
     /**
      * Calculate tip fee totals.

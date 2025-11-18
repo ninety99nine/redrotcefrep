@@ -122,7 +122,7 @@
                     this.changeHistoryState.actionButtons[1].loading = true;
 
                     const data = {
-                        inspect: true,
+                        inspect: false,
                         ...this.orderForm,
                         store_id: this.store.id,
                         association: 'team member'
@@ -152,7 +152,7 @@
                     this.changeHistoryState.actionButtons[1].loading = true;
 
                     const data = {
-                        inspect: true,
+                        inspect: false,
                         ...this.orderForm,
                         store_id: this.store.id,
                         association: 'team member'
@@ -176,6 +176,8 @@
 
             },
             onView(order) {
+                console.log('order');
+                console.log(order);
                 this.$router.push({
                     name: 'show-order',
                     params: {

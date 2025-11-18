@@ -59,6 +59,7 @@ class Order extends Model
             'vat_amount' => Money::class,
             'paid_total' => Money::class,
             'grand_total' => Money::class,
+            'delivery_fee' => Money::class,
             'discount_total' => Money::class,
             'adjustment_total' => Money::class,
             'outstanding_total' => Money::class,
@@ -67,7 +68,6 @@ class Order extends Model
             'customer_mobile_number' => E164PhoneNumberCast::class
         ];
     }
-
     /**
      * The attributes that are mass assignable.
      *
@@ -75,7 +75,7 @@ class Order extends Model
      */
     protected $fillable = [
         'number', 'summary','status','currency','subtotal','discount_total','subtotal_after_discount','vat_method','vat_rate',
-        'vat_amount','fee_total','adjustment_total','grand_total','payment_status','paid_total','paid_percentage',
+        'vat_amount','fee_total','delivery_name','delivery_fee','adjustment_total','grand_total','payment_status','paid_total','paid_percentage',
         'outstanding_total','outstanding_percentage','total_products',
         'total_cancelled_products','total_uncancelled_products','total_product_quantities','total_cancelled_product_quantities',
         'total_uncancelled_product_quantities','total_promotions','total_cancelled_promotions','total_uncancelled_promotions',

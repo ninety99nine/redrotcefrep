@@ -30,7 +30,7 @@
 
             <template v-if="order || shoppingCart">
 
-                <template v-if="!isReady || hasDiscounts || hasFees">
+                <template v-if="!isReady || hasDiscounts || hasFees || hasDeliveryName">
 
                     <!-- Subtotal -->
                     <div class="flex items-center justify-between text-sm border-b border-gray-300 border-dashed pb-2 mb-2">
@@ -126,6 +126,25 @@
 
                 </template>
 
+                <template v-if="!isReady || hasDeliveryName">
+
+                    <div class="border-b border-dashed border-gray-300 pb-2 mb-2">
+
+                        <!-- Delivery Amount -->
+                        <div class="flex items-center justify-between text-sm text-gray-500">
+
+                            <Skeleton v-if="!isReady" width="w-20" color="bg-blue-200" :shine="true"></Skeleton>
+                            <span v-else>{{ shoppingCart.totals.delivery.name }}</span>
+
+                            <Skeleton v-if="!isReady" width="w-16" color="bg-blue-200" :shine="true"></Skeleton>
+                            <span v-else>{{ shoppingCart.totals.delivery.fee.amount_with_currency }}</span>
+
+                        </div>
+
+                    </div>
+
+                </template>
+
                 <!-- Grand Total -->
                 <div class="flex items-center justify-between text-lg">
 
@@ -176,6 +195,9 @@
             },
             isInspectingShoppingCart() {
                 return this.orderState.isInspectingShoppingCart;
+            },
+            hasDeliveryName() {
+                return this.isLoadingOrder ? false : this.shoppingCart.totals.delivery.name != null;
             },
             hasFees() {
                 return Object.keys(this.shoppingCart ? this.shoppingCart.totals.fees : this.order.order_fees).length > 0;

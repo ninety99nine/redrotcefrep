@@ -130,7 +130,7 @@ class StoreService extends BaseService
             'creator' => true,
             'joined_at' => now(),
             'invited_at' => null,
-            'role_id' => $adminRole->id,
+            'role_id' => $adminRole->id
         ]);
 
         // 8. Assign as store follower

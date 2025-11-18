@@ -801,6 +801,8 @@ class OrderService extends BaseService
             'vat_rate' => $isc['totals']['vat']['rate']['value'],
             'vat_amount' => $isc['totals']['vat']['amount']->amount,
             'fee_total' => $isc['totals']['fee_total']->amount,
+            'delivery_name' => $isc['totals']['delivery']['name'],
+            'delivery_fee' => $isc['totals']['delivery']['fee']->amount,
             'adjustment_total' => $isc['totals']['adjustment_total']->amount,
             'grand_total' => $isc['totals']['grand_total']->amount,
 

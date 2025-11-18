@@ -2,7 +2,7 @@
 
     <div class="bg-blue-50 border border-blue-400 rounded-lg p-4">
 
-        <template v-if="isLoadingOrder || !hasOrder || hasTaxTotal || hasDiscountTotal || hasFeeTotal">
+        <template v-if="isLoadingOrder || !hasOrder || hasTaxTotal || hasDiscountTotal || hasFeeTotal || hasDeliveryName">
 
             <!-- Subtotal -->
             <div class="flex items-center justify-between text-sm border-b border-dashed border-gray-300 pb-2 mb-2">
@@ -77,6 +77,25 @@
 
         </template>
 
+        <template v-if="isLoadingOrder || !hasOrder || hasDeliveryName">
+
+            <div class="border-b border-dashed border-gray-300 pb-2 mb-2">
+
+                <!-- Delivery Amount -->
+                <div class="flex items-center justify-between text-sm text-gray-500">
+
+                    <Skeleton v-if="isLoadingOrder || !hasOrder" width="w-20" color="bg-blue-200" :shine="true"></Skeleton>
+                    <span v-else>{{ order.delivery_name }}</span>
+
+                    <Skeleton v-if="isLoadingOrder || !hasOrder" width="w-16" color="bg-blue-200" :shine="true"></Skeleton>
+                    <span v-else>{{ order.delivery_fee.amount_with_currency }}</span>
+
+                </div>
+
+            </div>
+
+        </template>
+
         <!-- Grand Total -->
         <div class="flex items-center justify-between text-base pt-2">
 
@@ -114,6 +133,12 @@
             },
             hasFeeTotal() {
                 return this.isLoadingOrder ? false : this.order.fee_total.amount > 0;
+            },
+            deliveryFee() {
+                return this.isLoadingOrder ? this.order.delivery_fee.amount : null;
+            },
+            hasDeliveryName() {
+                return this.isLoadingOrder ? false : this.order.delivery_name != null;
             },
             hasDiscountTotal() {
                 return this.isLoadingOrder ? false : this.order.discount_total.amount > 0;

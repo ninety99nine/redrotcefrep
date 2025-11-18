@@ -30,6 +30,8 @@ return new class extends Migration
             $table->decimal('vat_rate', 5, 2)->default(0);
             $table->decimal('vat_amount', 12, 3)->default(0);
             $table->decimal('fee_total', 12, 3)->default(0);
+            $table->string('delivery_name')->nullable();
+            $table->decimal('delivery_fee', 12, 3)->default(0);
             $table->decimal('adjustment_total', 12, 3)->default(0);
             $table->decimal('grand_total', 12, 3)->default(0);
 
