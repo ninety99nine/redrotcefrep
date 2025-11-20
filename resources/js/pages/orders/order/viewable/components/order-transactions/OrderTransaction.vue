@@ -14,7 +14,7 @@
                 <div class="flex items-center space-x-2 whitespace-nowrap">
 
                     <span class="text-gray-500 text-xs mr-4">{{ formattedDatetime(transaction.created_at) }}</span>
-                    <Pill type="success" size="xs" :showDot="false">{{ transaction.payment_status }}</Pill>
+                    <Pill :type="transaction.payment_status == 'paid' ? 'success' : 'warning'" size="xs" :showDot="false">{{ transaction.payment_status }}</Pill>
                     <span class="text-sm">{{ transaction.amount.amount_with_currency }}</span>
 
                     <div :class="['flex items-center justify-center w-10 h-10 hover:bg-white rounded-lg cursor-pointer', { 'border border-dashed border-gray-200' : !hasPhoto }]">

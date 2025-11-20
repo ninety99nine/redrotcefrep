@@ -11,16 +11,17 @@ use App\Mail\UserRegistered;
 use App\Mail\PasswordResetLink;
 use App\Mail\VerifyUpdatedEmail;
 use Illuminate\Support\Facades\DB;
+use App\Mail\TeamMemberInvitation;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use App\Http\Resources\UserResource;
 use App\Enums\EmailVerificationType;
-use App\Mail\TeamMemberInvitation;
 use App\Mail\VerifyRegistrationEmail;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Session;
 use Laravel\Socialite\Facades\Socialite;
+use Laravel\Sanctum\PersonalAccessToken;
 use Illuminate\Validation\ValidationException;
 
 class AuthService extends BaseService
@@ -458,6 +459,20 @@ class AuthService extends BaseService
         if ($storeId) {
             Session::put('social_login_store_id', $storeId);
         }
+
+        // Authenticate via token if provided
+        if ($token = request('token')) {
+
+            $accessToken = PersonalAccessToken::findToken($token);
+
+            if ($accessToken && $accessToken->tokenable) {
+
+                $user = $accessToken->tokenable;
+                Auth::guard('web')->login($user);
+
+            }
+        }
+
         return Socialite::driver('google')->redirect();
     }
 
@@ -468,93 +483,11 @@ class AuthService extends BaseService
      */
     public function handleGoogleCallback(): RedirectResponse
     {
-        $params = [
-            'provider' => 'google',
-            'logo_url' => asset("/images/social-login-icons/google.png"),
-        ];
-
-        // Retrieve store_id from session
-        $storeId = Session::get('social_login_store_id');
-
-        if ($storeId) {
-            $params['store_id'] = $storeId;
-            Session::forget('social_login_store_id'); // Clean up session
-        }
-
-        if (request()->has('error')) {
-
-            $params = array_merge($params, [
-                'error' => request()->get('error')
-            ]);
-
-            return redirect()->away(
-                config('app.url'). '/auth/social-login' . '?' . http_build_query($params)
-            );
-
-        }
-
         try {
-
             $googleUser = Socialite::driver('google')->user();
-
-            $email = $googleUser->getEmail();
-            $googleId = $googleUser->getId();
-            $lastName = $googleUser->user['family_name'] ?? null;
-            $firstName = $googleUser->user['given_name'] ?? 'Unknown';
-
-            $user = User::firstOrCreate(
-                !empty($email)
-                    ? ['email' => $email]
-                    : ['google_id' => $googleId],
-                [
-                    'email' => $email,
-                    'google_id' => $googleId,
-                    'last_name' => $lastName,
-                    'first_name' => $firstName,
-                    'email_verified_at' => !empty($email) ? now() : null,
-                ]
-            );
-
-            if ($user->wasRecentlyCreated) {
-                Mail::to($user->email)->queue(new UserRegistered($user->email, $user->first_name));
-            }
-
-            $token = $user->createToken('auth_token')->plainTextToken;
-
-            $params = array_merge($params, [
-                'token' => $token
-            ]);
-
-            return redirect()->away(
-                config('app.url'). '/auth/social-login' . '?' . http_build_query($params)
-            );
-
-        } catch (\GuzzleHttp\Exception\ClientException $e) {
-
-            // Handle errors returned by Google
-            $errorResponse = json_decode($e->getResponse()->getBody()->getContents(), true);
-
-            $params = array_merge($params, [
-                'error' => $errorResponse['error'] ?? 'unknown_error',
-                'error_description' => $errorResponse['error_description'] ?? 'An unknown error occurred while communicating with Google.',
-            ]);
-
-            return redirect()->away(
-                config('app.url'). '/auth/social-login' . '?' . http_build_query($params)
-            );
-
+            return $this->handleSocialCallback($googleUser, 'google');
         } catch (\Exception $e) {
-
-            // Handle unexpected errors
-            $params = array_merge($params, [
-                'error' => 'server_error',
-                'error_description' => $e->getMessage()
-            ]);
-
-            return redirect()->away(
-                config('app.url'). '/auth/social-login' . '?' . http_build_query($params)
-            );
-
+            return redirect()->to('/settings/account')->with('error', 'Failed to connect Google account.');
         }
     }
 
@@ -569,6 +502,20 @@ class AuthService extends BaseService
         if ($storeId) {
             Session::put('social_login_store_id', $storeId);
         }
+
+        // Authenticate via token if provided
+        if ($token = request('token')) {
+
+            $accessToken = PersonalAccessToken::findToken($token);
+
+            if ($accessToken && $accessToken->tokenable) {
+
+                $user = $accessToken->tokenable;
+                Auth::guard('web')->login($user);
+
+            }
+        }
+
         return Socialite::driver('facebook')->redirect();
     }
 
@@ -579,102 +526,11 @@ class AuthService extends BaseService
      */
     public function handleFacebookCallback(): RedirectResponse
     {
-        $params = [
-            'provider' => 'facebook',
-            'logo_url' => asset("/images/social-login-icons/facebook.png"),
-        ];
-
-        // Retrieve store_id from session
-        $storeId = Session::get('social_login_store_id');
-
-        if ($storeId) {
-            $params['store_id'] = $storeId;
-            Session::forget('social_login_store_id'); // Clean up session
-        }
-
-        if (request()->has('error')) {
-
-            $params = array_merge($params, [
-                'error' => request()->get('error'),
-                'error_reason' => request()->get('error_reason'),
-                'error_description' => request()->get('error_description')
-            ]);
-
-            return redirect()->away(
-                config('app.url'). '/auth/social-login' . '?' . http_build_query($params)
-            );
-
-        }
-
         try {
-
-            $facebookUser = Socialite::driver('facebook')->user();
-
-            $name = $facebookUser->user['name'] ?? '';
-            $nameParts = explode(' ', $name, 2);
-
-            $lastName = $nameParts[1] ?? null;
-            $email = $facebookUser->getEmail();
-            $facebookId = $facebookUser->getId();
-            $firstName = $nameParts[0] ?? 'Unknown';
-
-            if(!$email) {
-                throw new Exception('This facebook account does not have an email');
-            }
-
-            $user = User::firstOrCreate(
-                !empty($email)
-                    ? ['email' => $email]
-                    : ['facebook_id' => $facebookId],
-                [
-                    'email' => $email,
-                    'last_name' => $lastName,
-                    'first_name' => $firstName,
-                    'facebook_id' => $facebookId,
-                    'email_verified_at' => !empty($email) ? now() : null,
-                ]
-            );
-
-            if ($user->wasRecentlyCreated) {
-                Mail::to($user->email)->queue(new UserRegistered($user->email, $user->first_name));
-            }
-
-            $token = $user->createToken('auth_token')->plainTextToken;
-
-            $params = array_merge($params, [
-                'token' => $token
-            ]);
-
-            return redirect()->away(
-                config('app.url'). '/auth/social-login' . '?' . http_build_query($params)
-            );
-
-        } catch (\GuzzleHttp\Exception\ClientException $e) {
-
-            // Handle errors returned by Facebook
-            $errorResponse = json_decode($e->getResponse()->getBody()->getContents(), true);
-
-            $params = array_merge($params, [
-                'error' => $errorResponse['error'] ?? 'unknown_error',
-                'error_description' => $errorResponse['error_description'] ?? 'An unknown error occurred while communicating with Facebook.',
-            ]);
-
-            return redirect()->away(
-                config('app.url'). '/auth/social-login' . '?' . http_build_query($params)
-            );
-
+            $fbUser = Socialite::driver('facebook')->user();
+            return $this->handleSocialCallback($fbUser, 'facebook');
         } catch (\Exception $e) {
-
-            // Handle unexpected errors
-            $params = array_merge($params, [
-                'error' => 'server_error',
-                'error_description' => $e->getMessage()
-            ]);
-
-            return redirect()->away(
-                config('app.url'). '/auth/social-login' . '?' . http_build_query($params)
-            );
-
+            return redirect()->to('/settings/account')->with('error', 'Failed to connect Facebook account.');
         }
     }
 
@@ -689,6 +545,20 @@ class AuthService extends BaseService
         if ($storeId) {
             Session::put('social_login_store_id', $storeId);
         }
+
+        // Authenticate via token if provided
+        if ($token = request('token')) {
+
+            $accessToken = PersonalAccessToken::findToken($token);
+
+            if ($accessToken && $accessToken->tokenable) {
+
+                $user = $accessToken->tokenable;
+                Auth::guard('web')->login($user);
+
+            }
+        }
+
         return Socialite::driver('linkedin-openid')->redirect();
     }
 
@@ -699,95 +569,92 @@ class AuthService extends BaseService
      */
     public function handleLinkedInCallback(): RedirectResponse
     {
-        $params = [
-            'provider' => 'linkedin',
-            'logo_url' => asset("/images/social-login-icons/linkedin.png"),
-        ];
+        try {
+            $liUser = Socialite::driver('linkedin-openid')->user();
+            return $this->handleSocialCallback($liUser, 'linkedin');
+        } catch (\Exception $e) {
+            return redirect()->to('/settings/account')->with('error', 'Failed to connect LinkedIn account.');
+        }
+    }
 
-        // Retrieve store_id from session
-        $storeId = Session::get('social_login_store_id');
+    /**
+     * Handle social callback
+     */
+    private function handleSocialCallback($providerUser, $provider)
+    {
+        $email = $providerUser->getEmail();
+        $providerId = $providerUser->getId();
+        $storeId = Session::pull('social_login_store_id');
+
+        // Map provider to column
+        $providerColumn = "{$provider}_id";
+
+        // If user is already authenticated (i.e. linking account)
+        if (Auth::check()) {
+
+            $user = Auth::user();
+
+            // Prevent linking if already connected to another user
+            $existing = User::where($providerColumn, $providerId)->first();
+
+            if ($existing && $existing->id !== $user->id) {
+                return redirect()->to('/settings/account')->with('error', ucfirst($provider) . ' account is already linked to another user.');
+            }
+
+            // Link the account
+            $user->update([
+                $providerColumn => $providerId,
+                'email' => $email ?? $user->email,
+                'email_verified_at' => $email ? now() : $user->email_verified_at,
+            ]);
+
+            return redirect()->away(
+                config('app.url') . '/dashboard/settings/account?' . http_build_query(['store_id' => $storeId])
+            );
+
+        }
+
+        // Otherwise: normal login / register flow
+        $name = $providerUser->getName() ?? null;
+
+        if($name) {
+            $nameParts = explode(' ', $name, 2);
+            $firstName = $nameParts[0] ?? null;
+            $lastName = $nameParts[1] ?? null;
+        }else{
+            $firstName = null;
+            $lastName = null;
+        }
+
+        $user = User::firstOrCreate(
+            !empty($email) ? ['email' => $email] : [$providerColumn => $providerId],
+            [
+                'email' => $email,
+                'last_name' => $lastName,
+                'first_name' => $firstName,
+                $providerColumn => $providerId,
+                'email_verified_at' => !empty($email) ? now() : null,
+            ]
+        );
+
+        if ($user->wasRecentlyCreated && $email) {
+            Mail::to($user->email)->queue(new UserRegistered($user->email, $user->first_name));
+        }
+
+        $token = $user->createToken('auth_token')->plainTextToken;
+
+        $params = [
+            'token' => $token,
+            'provider' => $provider
+        ];
 
         if ($storeId) {
             $params['store_id'] = $storeId;
-            Session::forget('social_login_store_id'); // Clean up session
         }
 
-        if (request()->has('error')) {
-
-            $params = array_merge($params, [
-                'error' => request()->get('error'),
-                'error_description' => request()->get('error_description')
-            ]);
-
-            return redirect()->away(
-                config('app.url'). '/auth/social-login' . '?' . http_build_query($params)
-            );
-
-        }
-
-        try{
-
-            $linkedinUser = Socialite::driver('linkedin-openid')->user();
-
-            $email = $linkedinUser->getEmail();
-            $linkedinId = $linkedinUser->getId();
-            $lastName = $linkedinUser->user['family_name'] ?? null;
-            $firstName = $linkedinUser->user['given_name'] ?? 'Unknown';
-
-            $user = User::firstOrCreate(
-                !empty($email)
-                    ? ['email' => $email]
-                    : ['linkedin_id' => $linkedinId],
-                [
-                    'email' => $email,
-                    'last_name' => $lastName,
-                    'first_name' => $firstName,
-                    'linkedin_id' => $linkedinId,
-                    'email_verified_at' => !empty($email) ? now() : null,
-                ]
-            );
-
-            if ($user->wasRecentlyCreated) {
-                Mail::to($user->email)->queue(new UserRegistered($user->email, $user->first_name));
-            }
-
-            $token = $user->createToken('auth_token')->plainTextToken;
-
-            $params = array_merge($params, [
-                'token' => $token
-            ]);
-
-            return redirect()->away(
-                config('app.url'). '/auth/social-login' . '?' . http_build_query($params)
-            );
-
-        } catch (\GuzzleHttp\Exception\ClientException $e) {
-
-            // Handle errors returned by Linkedin
-            $errorResponse = json_decode($e->getResponse()->getBody()->getContents(), true);
-
-            $params = array_merge($params, [
-                'error' => $errorResponse['error'] ?? 'unknown_error',
-                'error_description' => $errorResponse['error_description'] ?? 'An unknown error occurred while communicating with Linkedin.',
-            ]);
-
-            return redirect()->away(
-                config('app.url'). '/auth/social-login' . '?' . http_build_query($params)
-            );
-
-        } catch (\Exception $e) {
-
-            // Handle unexpected errors
-            $params = array_merge($params, [
-                'error' => 'server_error',
-                'error_description' => $e->getMessage()
-            ]);
-
-            return redirect()->away(
-                config('app.url'). '/auth/social-login' . '?' . http_build_query($params)
-            );
-
-        }
+        return redirect()->away(
+            config('app.url') . '/auth/social-login?' . http_build_query($params)
+        );
     }
 
     /**

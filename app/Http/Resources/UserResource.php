@@ -28,6 +28,16 @@ class UserResource extends JsonResource
             'email_verified_at' => $this->email_verified_at ? $this->email_verified_at->toDateTimeString() : null,
             'mobile_number' => $this->mobile_number ? PhoneNumberService::formatPhoneNumber($this->mobile_number) : null,
 
+            'has_password' => !is_null($this->password),
+            'has_google'   => !is_null($this->google_id),
+            'has_facebook' => !is_null($this->facebook_id),
+            'has_linkedin' => !is_null($this->linkedin_id),
+
+            // Optional: count of social logins
+            'social_login_count' => ($this->google_id ? 1 : 0) +
+                                    ($this->facebook_id ? 1 : 0) +
+                                    ($this->linkedin_id ? 1 : 0),
+
             'roles' => RoleResource::collection($this->whenLoaded('roles')),
             'stores' => StoreResource::collection($this->whenLoaded('stores')),
             'ai_assistant' => AiAssistantResource::make($this->whenLoaded('aiAssistant')),

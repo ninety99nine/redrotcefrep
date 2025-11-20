@@ -599,6 +599,11 @@ const routes = [
                         component: () => import('@Pages/settings/checkout/Checkout.vue')
                     },
                     {
+                        path: 'Account',
+                        name: 'show-account-settings',
+                        component: () => import('@Pages/settings/account/Account.vue')
+                    },
+                    {
                         path: 'seo',
                         name: 'show-seo-settings',
                         component: () => import('@Pages/settings/seo/SEO.vue')

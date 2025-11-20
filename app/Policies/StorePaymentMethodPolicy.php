@@ -40,7 +40,7 @@ class StorePaymentMethodPolicy extends BasePolicy
      */
     public function create(User $user): bool
     {
-        return $user->hasPermissionTo('manage store');
+        return $this->isStoreUserWithPermission($user, 'manage store');
     }
 
     /**
@@ -48,7 +48,7 @@ class StorePaymentMethodPolicy extends BasePolicy
      */
     public function update(User $user, StorePaymentMethod $storePaymentMethod): bool
     {
-        return $user->hasPermissionTo('manage store');
+        return $this->isStoreUserWithPermission($user, 'manage store');
     }
 
     /**
@@ -56,7 +56,7 @@ class StorePaymentMethodPolicy extends BasePolicy
      */
     public function delete(User $user, StorePaymentMethod $storePaymentMethod): bool
     {
-        return $user->hasPermissionTo('manage store');
+        return $this->isStoreUserWithPermission($user, 'manage store');
     }
 
     /**
@@ -67,7 +67,7 @@ class StorePaymentMethodPolicy extends BasePolicy
      */
     public function updateAny(User $user): bool
     {
-        return $user->hasPermissionTo('manage store');
+        return $this->isStoreUserWithPermission($user, 'manage store');
     }
 
     /**
@@ -78,6 +78,6 @@ class StorePaymentMethodPolicy extends BasePolicy
      */
     public function deleteAny(User $user): bool
     {
-        return $user->hasPermissionTo('manage store');
+        return $this->isStoreUserWithPermission($user, 'manage store');
     }
 }

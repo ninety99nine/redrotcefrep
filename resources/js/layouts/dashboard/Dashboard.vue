@@ -506,6 +506,10 @@
                             associatedRouteNames: ['edit-domain', 'buy-domain', 'add-domain'],
                         },
                         {
+                            name: 'Account',
+                            routeName: 'show-account-settings',
+                        },
+                        {
                             name: 'Billing',
                             routeName: 'show-billing-settings',
                         },

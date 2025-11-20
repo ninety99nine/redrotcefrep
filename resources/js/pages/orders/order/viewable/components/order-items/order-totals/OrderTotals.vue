@@ -96,6 +96,27 @@
 
         </template>
 
+        <template v-if="isLoadingOrder || !hasOrder || hasAdjustmentTotal">
+
+            <div class="border-b border-gray-300 border-dashed pb-2 mb-2">
+
+                <!-- Adjustment -->
+                <div class="flex items-center justify-between text-sm text-gray-500">
+
+                    <Skeleton v-if="isLoadingOrder || !hasOrder" width="w-20" color="bg-blue-200" :shine="true"></Skeleton>
+                    <span v-else>Adjustment</span>
+
+                    <Skeleton v-if="isLoadingOrder || !hasOrder" width="w-16" color="bg-blue-200" :shine="true"></Skeleton>
+                    <span v-else :class="[adjustmentTotalPositive ? 'text-green-500' : 'text-red-500']">
+                        {{ adjustmentTotalPositive ? '+' : '-' }} {{ `${order.adjustment_total.amount_with_currency}`.replace('-', '') }}
+                    </span>
+
+                </div>
+
+            </div>
+
+        </template>
+
         <!-- Grand Total -->
         <div class="flex items-center justify-between text-base pt-2">
 
@@ -148,6 +169,12 @@
             },
             orderDiscounts() {
                 return this.isLoadingOrder ? [] : this.order.order_discounts;
+            },
+            hasAdjustmentTotal() {
+                return this.isLoadingOrder ? false : this.order.adjustment_total.amount != 0;
+            },
+            adjustmentTotalPositive() {
+                return this.isLoadingOrder ? false : this.order.adjustment_total.amount > 0;
             },
         },
         methods: {

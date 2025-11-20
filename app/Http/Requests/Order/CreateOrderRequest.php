@@ -32,13 +32,14 @@ class CreateOrderRequest extends FormRequest
      */
     public function rules(): array
     {
+        $inspect = $this->input('inspect') ?? false;
         $store = $this->input('store_id') ? Store::find($this->input('store_id')) : null;
         $deliveryMethod = $store && $this->input('delivery_method_id') ? $store->deliveryMethods()->active()->find($this->input('delivery_method_id')) : null;
 
         $requiresDate = $deliveryMethod && $deliveryMethod->set_schedule;
         $requiresTimeslot = $requiresDate && $deliveryMethod->schedule_type === DeliveryMethodScheduleType::DATE_AND_TIME->value;
 
-        return [
+        $rules = [
             'inspect' => ['sometimes', 'boolean'],
             'association' => ['sometimes', Rule::in([Association::SHOPPER->value, Association::TEAM_MEMBER->value])],
             'store_id' => ['required', 'uuid'],
@@ -74,11 +75,6 @@ class CreateOrderRequest extends FormRequest
             'delivery_date' => $requiresDate ? ['nullable', 'date'] : ['exclude'],
             'delivery_timeslot' => $requiresTimeslot ? ['nullable', 'string', 'regex:/^(?:[01]\d|2[0-3]):[0-5]\d\s*-\s*(?:[01]\d|2[0-3]):[0-5]\d$/'] : ['exclude'],
             'delivery_method_id' => ['nullable', 'uuid'],
-            'customer_first_name' => ['nullable', 'string', 'min:1', 'max:255'],
-            'customer_last_name' => ['nullable', 'string', 'min:1', 'max:255'],
-            'customer_email' => ['nullable', 'email', 'max:255'],
-            'customer_mobile_number' => ['nullable', 'phone:INTERNATIONAL'],
-            'customer_birthday' => ['nullable', 'date', 'before:today'],
             'remark' => ['nullable', 'string'],
             'internal_note' => ['nullable', 'string'],
             'collection_note' => ['nullable', 'string'],
@@ -89,6 +85,20 @@ class CreateOrderRequest extends FormRequest
             'assigned_to_user_id' => ['nullable', 'uuid'],
             'payment_status' => ['nullable', Rule::enum(OrderPaymentStatus::class)],
         ];
+
+        if(!$inspect) {
+
+            $rules = array_merge($rules, [
+                'customer_first_name' => ['nullable', 'string', 'min:1', 'max:255'],
+                'customer_last_name' => ['nullable', 'string', 'min:1', 'max:255'],
+                'customer_email' => ['nullable', 'email', 'max:255'],
+                'customer_mobile_number' => ['nullable', 'phone:INTERNATIONAL'],
+                'customer_birthday' => ['nullable', 'date', 'before:today'],
+            ]);
+
+        }
+
+        return $rules;
     }
 
     /**
