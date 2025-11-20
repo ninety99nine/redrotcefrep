@@ -1,0 +1,1 @@
+import{c as t,o}from"./app-Ckd9AbVO.js";import{_ as e}from"./_plugin-vue_export-helper-DlAUqK2U.js";const r={data(){return{}}},a={class:"text-gray-300"};function c(s,n,_,p,d,i){return o(),t("div",a,"...")}const m=e(r,[["render",c]]);export{m as N};
