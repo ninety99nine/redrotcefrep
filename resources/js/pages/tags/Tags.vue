@@ -60,13 +60,13 @@
                 :searchTerm="searchTerm"
                 :pagination="pagination"
                 :isLoading="isLoadingTags"
+                searchPlaceholder="Tag name"
                 @updatedColumns="updatedColumns"
                 @updatedFilters="updatedFilters"
                 @updatedSorting="updatedSorting"
                 @updatedPerPage="updatedPerPage"
                 :filterExpressions="filterExpressions"
-                :sortingExpressions="sortingExpressions"
-                searchPlaceholder="Search by tag name">
+                :sortingExpressions="sortingExpressions">
 
                 <template #afterRefreshButton>
 
@@ -371,7 +371,7 @@
 <script>
 
     import axios from 'axios';
-    import isEqual from 'lodash.isEqual';
+    import isEqual from 'lodash.isequal';
     import Pill from '@Partials/Pill.vue';
     import Input from '@Partials/Input.vue';
     import Modal from '@Partials/Modal.vue';

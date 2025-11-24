@@ -82,7 +82,7 @@
                 @updatedPerPage="updatedPerPage"
                 :filterExpressions="filterExpressions"
                 :sortingExpressions="sortingExpressions"
-                searchPlaceholder="Search by name, comment or rating e.g 3">
+                searchPlaceholder="Name, comment or rating e.g 3">
 
                 <template #afterRefreshButton>
 
@@ -349,7 +349,7 @@
 
 <script>
     import axios from 'axios';
-    import isEqual from 'lodash.isEqual';
+    import isEqual from 'lodash.isequal';
     import Copy from '@Partials/Copy.vue';
     import Pill from '@Partials/Pill.vue';
     import Input from '@Partials/Input.vue';

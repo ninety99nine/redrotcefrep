@@ -62,7 +62,7 @@
                 @updatedPerPage="updatedPerPage"
                 :filterExpressions="filterExpressions"
                 :sortingExpressions="sortingExpressions"
-                searchPlaceholder="Search by customer name, phone, email or notes">
+                searchPlaceholder="Customer name, phone, email or notes">
 
                 <template #afterRefreshButton>
 
@@ -559,7 +559,7 @@
 <script>
 
     import axios from 'axios';
-    import isEqual from 'lodash.isEqual';
+    import isEqual from 'lodash.isequal';
     import Input from '@Partials/Input.vue';
     import Modal from '@Partials/Modal.vue';
     import Loader from '@Partials/Loader.vue';

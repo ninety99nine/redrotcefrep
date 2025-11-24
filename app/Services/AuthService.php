@@ -146,7 +146,7 @@ class AuthService extends BaseService
             ['token' => hash('sha256', $token), 'created_at' => now()]
         );
 
-        $resetUrl = config('app.url') . '/auth/reset-password?token=' . $token . '&email=' . urlencode($user->email);
+        $resetUrl = rtrim(config('app.url'), '/') . '/auth/reset-password?token=' . $token . '&email=' . urlencode($user->email);
         Mail::to($user->email)->queue(new PasswordResetLink($user->email, $resetUrl));
 
         return [
@@ -408,7 +408,7 @@ class AuthService extends BaseService
      */
     public function showTermsAndConditions(): array
     {
-        $website = config('app.url').'/terms-and-conditions';
+        $website = rtrim(config('app.url'), '/').'/terms-and-conditions';
 
         return [
             'website' => $website,
@@ -609,7 +609,7 @@ class AuthService extends BaseService
             ]);
 
             return redirect()->away(
-                config('app.url') . '/dashboard/settings/account?' . http_build_query(['store_id' => $storeId])
+                rtrim(config('app.url'), '/') . '/dashboard/settings/account?' . http_build_query(['store_id' => $storeId])
             );
 
         }
@@ -653,7 +653,7 @@ class AuthService extends BaseService
         }
 
         return redirect()->away(
-            config('app.url') . '/auth/social-login?' . http_build_query($params)
+            rtrim(config('app.url'), '/') . '/auth/social-login?' . http_build_query($params)
         );
     }
 
@@ -766,7 +766,7 @@ class AuthService extends BaseService
             ]
         );
 
-        $verificationUrl = config('app.url') . '/auth/verify-email?' .
+        $verificationUrl = rtrim(config('app.url'), '/') . '/auth/verify-email?' .
                           'token=' . $token .
                           '&email=' . urlencode($user->email) .
                           '&type=' . $emailVerificationType->value;

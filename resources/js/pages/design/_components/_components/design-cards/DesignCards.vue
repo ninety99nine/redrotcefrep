@@ -188,7 +188,7 @@
 
     import { v4 as uuidv4 } from 'uuid';
     import Pill from '@Partials/Pill.vue';
-    import cloneDeep from 'lodash.cloneDeep';
+    import cloneDeep from 'lodash.clonedeep';
     import Tooltip from '@Partials/Tooltip.vue';
     import VueSlideUpDown from 'vue-slide-up-down';
     import { isNotEmpty } from '@Utils/stringUtils';

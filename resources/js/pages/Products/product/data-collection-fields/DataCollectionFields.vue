@@ -333,11 +333,11 @@
 <script>
 
     import { v4 as uuidv4 } from 'uuid';
-    import isEqual from 'lodash.isEqual';
+    import isEqual from 'lodash.isequal';
     import Pill from '@Partials/Pill.vue';
     import Input from '@Partials/Input.vue';
     import Modal from '@Partials/Modal.vue';
-    import cloneDeep from 'lodash.cloneDeep';
+    import cloneDeep from 'lodash.clonedeep';
     import Button from '@Partials/Button.vue';
     import Select from '@Partials/Select.vue';
     import { VueDraggableNext } from 'vue-draggable-next';

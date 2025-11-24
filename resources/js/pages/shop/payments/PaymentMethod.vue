@@ -22,7 +22,7 @@
                 <div class="col-span-1 flex items-center justify-center">
 
                     <!-- Logo -->
-                    <Skeleton v-if="isLoadingOrder || isLoadingStorePaymentMethod" width="w-20" height="h-20" :shine="true"></Skeleton>
+                    <Skeleton v-if="isLoadingOrder || isLoadingStorePaymentMethod || !hasOrder" width="w-20" height="h-20" :shine="true"></Skeleton>
                     <div v-else class="w-16 h-16 rounded-full overflow-hidden flex items-center justify-center">
                         <img
                             alt="Payment Method Logo"
@@ -36,11 +36,11 @@
             </div>
 
             <!-- Heading -->
-            <Skeleton v-if="isLoadingOrder || isLoadingStorePaymentMethod" width="w-40" height="h-8" :shine="true" class="mb-2"></Skeleton>
+            <Skeleton v-if="isLoadingOrder || isLoadingStorePaymentMethod || !hasOrder" width="w-40" height="h-8" :shine="true" class="mb-2"></Skeleton>
             <h2 v-else class="text-4xl font-semibold text-center mb-2">{{ order.outstanding_total.amount_with_currency }}</h2>
 
             <!-- Instruction -->
-            <Skeleton v-if="isLoadingOrder || isLoadingStorePaymentMethod" width="w-1/2" :shine="true" class="mb-8"></Skeleton>
+            <Skeleton v-if="isLoadingOrder || isLoadingStorePaymentMethod || !hasOrder" width="w-1/2" :shine="true" class="mb-8"></Skeleton>
             <p v-else class="text-gray-500 text-center mb-8">You're almost done! Just complete your payment.</p>
 
             <!-- Payment Success Alert -->
@@ -65,7 +65,7 @@
 
         <div class="space-y-3 mb-4">
 
-            <template v-if="isLoadingOrder || isLoadingStorePaymentMethod">
+            <template v-if="isLoadingOrder || isLoadingStorePaymentMethod || !hasOrder">
 
                 <!-- Order Summary (Loading Placeholder) -->
                 <div class="flex items-center space-x-4 bg-white p-4 shadow-sm rounded-xl">
@@ -97,7 +97,7 @@
                     <div class="border-b border-gray-300 shadow-sm rounded-lg py-6 px-4 bg-white space-y-4">
 
                         <div class="flex items-center space-x-4">
-                            <Skeleton width="w-8" height="h-8" :shine="true" class="flex-shrink-0"></Skeleton>
+                            <Skeleton width="w-8" height="h-8" :shine="true" class="shrink-0"></Skeleton>
                             <Skeleton width="w-40" :shine="true"></Skeleton>
                         </div>
 
@@ -411,6 +411,9 @@
             order() {
                 return this.orderState.order;
             },
+            hasOrder() {
+                return this.orderState.hasOrder;
+            },
             isLoadingOrder() {
                 return this.orderState.isLoadingOrder;
             },
@@ -487,8 +490,7 @@
                 return parts[0] + '*' + parts[1].replace('#', '') + '#';
             },
             paymentLink() {
-                if (this.isLoadingOrder || this.isLoadingStorePaymentMethod || this.isConvertingCurrency) return null;
-                if (!this.storePaymentMethod) return null;
+                if (!this.order || !this.storePaymentMethod || this.isConvertingCurrency) return null;
 
                 let url = null;
                 const type = this.paymentMethod.type;
@@ -669,8 +671,7 @@
                 return this.emvcoQrCodeString || this.epcQrCodeString || this.mpesaQrCodeString || this.orangeMoneyQrCodeString;
             },
             emvcoQrCodeString() {
-                if (this.isLoadingOrder || this.isLoadingStorePaymentMethod || this.isConvertingCurrency) return null;
-                if (!this.storePaymentMethod) return null;
+                if (!this.order || !this.storePaymentMethod || this.isConvertingCurrency) return null;
 
                 const type = this.paymentMethod.type;
                 const configs = this.storePaymentMethod.configs;
@@ -857,8 +858,7 @@
                 return null;
             },
             epcQrCodeString() {
-                if (this.isLoadingOrder || this.isLoadingStorePaymentMethod || this.isConvertingCurrency) return null;
-                if (!this.storePaymentMethod) return null;
+                if (!this.order || !this.storePaymentMethod || this.isConvertingCurrency) return null;
 
                 const type = this.paymentMethod.type;
                 const configs = this.storePaymentMethod.configs;
@@ -893,8 +893,7 @@
                 return null;
             },
             mpesaQrCodeString() {
-                if (this.isLoadingOrder || this.isLoadingStorePaymentMethod || this.isConvertingCurrency) return null;
-                if (!this.storePaymentMethod) return null;
+                if (!this.order || !this.storePaymentMethod || this.isConvertingCurrency) return null;
 
                 const type = this.paymentMethod.type;
                 const configs = this.storePaymentMethod.configs;
@@ -922,8 +921,7 @@
                 return null;
             },
             orangeMoneyQrCodeString() {
-                if (this.isLoadingOrder || this.isLoadingStorePaymentMethod || this.isConvertingCurrency) return null;
-                if (!this.storePaymentMethod) return null;
+                if (!this.order || !this.storePaymentMethod || this.isConvertingCurrency) return null;
 
                 const type = this.paymentMethod.type;
                 const configs = this.storePaymentMethod.configs;
@@ -1878,7 +1876,7 @@
                 await this.$router.push({
                     name: 'show-shop-confirming-payment',
                     query: {
-                        payment_method: this.storePaymentMethod.custom_name
+                        store_payment_method_id: this.storePaymentMethod.id
                     },
                     params: {
                         alias: this.store.alias,
@@ -1890,7 +1888,7 @@
                 await this.$router.push({
                     name: 'show-shop-pending-payment',
                     query: {
-                        payment_method: this.storePaymentMethod.custom_name
+                        store_payment_method_id: this.storePaymentMethod.id
                     },
                     params: {
                         alias: this.store.alias,

@@ -484,7 +484,7 @@ class DomainService extends BaseService
     private function prepareDpoPaymentLinkPayload($user, $store, $transaction, $domain): array
     {
         $customerPhone = $customerCountry = $customerDialCode = null;
-        $redirectUrl = config('app.url') . '/dashboard/settings/domains/verify-payment?transaction_id=' . $transaction->id . '&store_id=' . $transaction->store_id;
+        $redirectUrl = rtrim(config('app.url'), '/') . '/dashboard/settings/domains/verify-payment?transaction_id=' . $transaction->id . '&store_id=' . $transaction->store_id;
 
         if ($user->mobile_number) {
             $customerCountry = $customerDialCode = $user->mobile_number->getCountry();

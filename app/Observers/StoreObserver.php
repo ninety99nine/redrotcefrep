@@ -16,7 +16,7 @@ class StoreObserver
 
     public function creating(Store $store): void
     {
-        $idBasedWebLink = config('app.url').'/'.$store->id;
+        $idBasedWebLink = rtrim(config('app.url'), '/').'/'.$store->id;
         $store->qr_code_file_path = QrCodeService::generate($idBasedWebLink);
     }
 

@@ -25,7 +25,7 @@
             <div class="space-y-4 p-4 border border-gray-200 rounded-lg">
 
                 <h1 class="flex items-center font-lg font-bold">
-                    <WhatsappIcon class="flex-shrink-0 mr-2"></WhatsappIcon>
+                    <WhatsappIcon class="shrink-0 mr-2"></WhatsappIcon>
                     <span>WhatsApp Notifications</span>
                 </h1>
 

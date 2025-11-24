@@ -128,7 +128,7 @@
 
     import Input from '@Partials/Input.vue';
     import Modal from '@Partials/Modal.vue';
-    import cloneDeep from 'lodash.cloneDeep';
+    import cloneDeep from 'lodash.clonedeep';
     import Button from '@Partials/Button.vue';
     import Loader from '@Partials/Loader.vue';
     import Popover from '@Partials/Popover.vue';
@@ -225,7 +225,11 @@
         methods: {
             isEmpty,
             goBack() {
-                this.navigateToTags();
+                if (window.history.length > 1) {
+                    this.$router.back()
+                } else {
+                    this.navigateToTags();
+                }
             },
             async setup() {
                 if(this.tagForm == null) this.tagState.setTagForm(null);

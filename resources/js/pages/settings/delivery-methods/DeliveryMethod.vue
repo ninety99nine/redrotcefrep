@@ -518,7 +518,7 @@
     import Button from '@Partials/Button.vue';
     import { isEmpty } from '@Utils/stringUtils';
     import Skeleton from '@Partials/Skeleton.vue';
-    import { Info, Trash2, MoveLeft } from 'lucide-vue-next';
+    import { Plus, Info, Trash2, MoveLeft } from 'lucide-vue-next';
     import FeeByWeight from '@Pages/settings/delivery-methods/_components/FeeByWeight.vue';
     import FeeByDistance from '@Pages/settings/delivery-methods/_components/FeeByDistance.vue';
     import ScheduleSummary from '@Pages/settings/delivery-methods/_components/ScheduleSummary.vue';
@@ -534,6 +534,7 @@
         },
         data() {
             return {
+                Plus,
                 Trash2,
                 MoveLeft,
                 feeTypes: [
@@ -620,9 +621,10 @@
         },
         methods: {
             isEmpty,
-            setup() {
+            async setup() {
                 this.deliveryMethodState.setDeliveryMethodForm(null, true);
-                if(this.store && this.deliveryMethodId) this.showDeliveryMethod();
+                if(this.store && this.deliveryMethodId) await this.showDeliveryMethod();
+                this.changeHistoryState.showActionButtons = true;
             },
             setActionButtons() {
                 this.changeHistoryState.removeButtons();
@@ -631,7 +633,7 @@
                     this.isEditing ? 'Save Changes' : 'Add Delivery Method',
                     this.isEditing ? this.updateDeliveryMethod : this.createDeliveryMethod,
                     'primary',
-                    null,
+                    this.isEditing ? null : Plus,
                 );
             },
             async navigateToShowDeliveryMethods() {
@@ -796,6 +798,7 @@
         },
         beforeUnmount() {
             this.deliveryMethodState.reset();
+            this.changeHistoryState.showActionButtons = false;
         },
         created() {
 

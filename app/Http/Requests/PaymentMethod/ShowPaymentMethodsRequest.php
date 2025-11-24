@@ -29,7 +29,7 @@ class ShowPaymentMethodsRequest extends FormRequest
             'store_id' => ['sometimes', 'uuid'],
             'match_store_country' => ['sometimes', 'boolean'],
             'automated_verification' => ['sometimes', 'boolean'],
-            'association' => ['sometimes', Rule::enum(Association::class)->only([Association::ASSOCIATED, Association::UNASSOCIATED])],
+            'association' => ['sometimes', Rule::enum(Association::class)->only([Association::TEAM_MEMBER, Association::ASSOCIATED, Association::UNASSOCIATED])],
         ];
     }
 
@@ -42,7 +42,7 @@ class ShowPaymentMethodsRequest extends FormRequest
     {
         return [
             'store_id.uuid' => 'The store ID must be a valid UUID.',
-            'association.enum' => 'The association must be one of: ' . Arr::join([Association::ASSOCIATED->value, Association::UNASSOCIATED->value], ', ', ' or '),
+            'association.enum' => 'The association must be one of: ' . Arr::join([Association::TEAM_MEMBER->value, Association::ASSOCIATED->value, Association::UNASSOCIATED->value], ', ', ' or '),
         ];
     }
 }

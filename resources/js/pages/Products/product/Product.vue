@@ -373,7 +373,7 @@
                                                 v-if="productForm.variants[index].photos.length"
                                                 class="flex items-center justify-center w-16 h-16">
 
-                                                <img class="w-full max-h-full object-contain rounded-lg flex-shrink-0" :src="productForm.variants[index].photos[0].path">
+                                                <img class="w-full max-h-full object-contain rounded-lg shrink-0" :src="productForm.variants[index].photos[0].path">
 
                                             </div>
 
@@ -772,9 +772,9 @@
 
                                 <div :class="['flex items-center justify-center w-10 h-10 rounded-lg', { 'border border-dashed border-gray-200' : !variant.photo }]">
 
-                                    <img v-if="variant.photo" class="w-full max-h-full object-contain rounded-lg flex-shrink-0" :src="variant.photo.path">
+                                    <img v-if="variant.photo" class="w-full max-h-full object-contain rounded-lg shrink-0" :src="variant.photo.path">
 
-                                    <Image v-else size="20" class="text-gray-400 flex-shrink-0"></Image>
+                                    <Image v-else size="20" class="text-gray-400 shrink-0"></Image>
 
                                 </div>
 
@@ -813,7 +813,7 @@
                 <div
                     v-if="deletableVariant.photos.length"
                     class="flex justify-center space-x-2 mb-8">
-                    <img class="w-20 max-h-20 object-contain rounded-lg flex-shrink-0" :src="deletableVariant.photos[0].path">
+                    <img class="w-20 max-h-20 object-contain rounded-lg shrink-0" :src="deletableVariant.photos[0].path">
                 </div>
             </template>
         </Modal>
@@ -854,12 +854,12 @@
 
 <script>
 
-    import isEqual from 'lodash.isEqual';
+    import isEqual from 'lodash.isequal';
     import Pill from '@Partials/Pill.vue';
     import Alert from '@Partials/Alert.vue';
     import Input from '@Partials/Input.vue';
     import Modal from '@Partials/Modal.vue';
-    import cloneDeep from 'lodash.cloneDeep';
+    import cloneDeep from 'lodash.clonedeep';
     import Button from '@Partials/Button.vue';
     import Loader from '@Partials/Loader.vue';
     import Switch from '@Partials/Switch.vue';
@@ -1010,7 +1010,11 @@
         methods: {
             isEmpty,
             goBack() {
-                this.navigateToProducts();
+                if (window.history.length > 1) {
+                    this.$router.back()
+                } else {
+                    this.navigateToProducts();
+                }
             },
             async setup() {
                 if(this.productForm == null) this.productState.setProductForm(null, this.isCreating);

@@ -62,7 +62,7 @@
                 @updatedPerPage="updatedPerPage"
                 :filterExpressions="filterExpressions"
                 :sortingExpressions="sortingExpressions"
-                searchPlaceholder="Search by product, variant names or SKU">
+                searchPlaceholder="Product, variant names or SKU">
 
                 <template #afterRefreshButton>
 
@@ -173,7 +173,7 @@
                                             v-if="productForm.photo"
                                             class="flex items-center justify-center w-10 h-10">
 
-                                            <img class="w-full max-h-full object-contain rounded-lg flex-shrink-0" :src="productForm.photo.path">
+                                            <img class="w-full max-h-full object-contain rounded-lg shrink-0" :src="productForm.photo.path">
 
                                         </div>
                                         <Input
@@ -197,7 +197,7 @@
                                             v-if="productForm.photo"
                                             class="flex items-center justify-center w-10 h-10">
 
-                                            <img class="w-full max-h-full object-contain rounded-lg flex-shrink-0" :src="productForm.photo.path">
+                                            <img class="w-full max-h-full object-contain rounded-lg shrink-0" :src="productForm.photo.path">
 
                                         </div>
                                         <Input
@@ -851,7 +851,7 @@
 <script>
 
     import axios from 'axios';
-    import isEqual from 'lodash.isEqual';
+    import isEqual from 'lodash.isequal';
     import Pill from '@Partials/Pill.vue';
     import Input from '@Partials/Input.vue';
     import Modal from '@Partials/Modal.vue';

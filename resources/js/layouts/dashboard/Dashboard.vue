@@ -31,7 +31,8 @@
                                     class="w-48"
                                     :search="false"
                                     :options="storeOptions"
-                                    v-model="selectedStoreId">
+                                    v-model="selectedStoreId"
+                                    @change="() => navigateToShowStoreHome(selectedStoreId)">
 
                                     <template #footer>
 
@@ -79,7 +80,7 @@
 
                     </div>
 
-                    <template v-if="changeHistoryState.hasChangeHistory || duplicateOrderId">
+                    <template v-if="changeHistoryState.showActionButtons || changeHistoryState.hasChangeHistory || duplicateOrderId">
 
                         <ChangeHistoryNavigation></ChangeHistoryNavigation>
 
@@ -204,12 +205,7 @@
 
                     <template v-if="isShowingSettings">
 
-                        <div class="flex items-center space-x-2 py-2.5 px-6 bg-yellow-100 text-black border-b border-gray-100 mb-4">
-                            <Settings size="16"></Settings>
-                            <span class="text-sm">Settings</span>
-                        </div>
-
-                        <div class="flex justify-center mb-4">
+                        <div class="flex justify-center my-4">
 
                             <!-- Return to dashboard -->
                             <Button
@@ -382,18 +378,13 @@
             }
         },
         watch: {
-            storeId() {
+            storeId(newValue, oldValue) {
                 this.showStore();
-                if(!this.hasStores) this.showStores();
+                if(!oldValue && newValue) this.showStores();
             },
             '$route'() {
                 this.navMenus = this.buildNavMenus();
-            },
-            selectedStoreId(newValue, oldValue) {
-                if(oldValue) {
-                    this.navigateToShowStoreHome(newValue);
-                }
-            },
+            }
         },
         computed: {
             store() {
@@ -478,17 +469,8 @@
 
                     navMenus = [
                         {
-                            name: 'General',
+                            name: 'Store Settings',
                             routeName: 'show-general-settings'
-                        },
-                        {
-                            name: 'Checkout',
-                            routeName: 'show-checkout-settings',
-                        },
-                        {
-                            name: 'Workflows',
-                            routeName: 'show-workflows',
-                            associatedRouteNames: ['add-workflow', 'edit-workflow'],
                         },
                         {
                             name: 'Payment Methods',
@@ -499,6 +481,15 @@
                             name: 'Delivery Methods',
                             routeName: 'show-delivery-methods',
                             associatedRouteNames: ['add-delivery-method', 'edit-delivery-method'],
+                        },
+                        {
+                            name: 'Workflows',
+                            routeName: 'show-workflows',
+                            associatedRouteNames: ['add-workflow', 'edit-workflow'],
+                        },
+                        {
+                            name: 'Checkout',
+                            routeName: 'show-checkout-settings',
                         },
                         {
                             name: 'Domains',
@@ -740,7 +731,7 @@
             },
             async showStores() {
                 try {
-
+                    console.log('showStores');
                     this.isLoadingStores = true;
 
                     let config = {
@@ -768,6 +759,7 @@
 
                     if(!this.storeId) return;
 
+                    console.log('showStore');
                     this.selectedStoreId = this.storeId;
 
                     if(!silentUpdate) this.storeState.isLoadingStore = true;

@@ -351,7 +351,7 @@
             clearSelectedOption() {
                 this.localModelValue = null;
             },
-            handleClickOutside(event) {
+            handleClickOutside(event) {// This WILL fire now
                 if (this.$refs.dropdown && !this.$refs.dropdown.contains(event.target)) {
                     this.isOpen = false;
                     this.searchQuery = null;
@@ -359,10 +359,10 @@
             },
         },
         mounted() {
-            document.addEventListener("click", this.handleClickOutside);
+            document.addEventListener("click", this.handleClickOutside, true);
         },
         beforeUnmount() {
-            document.removeEventListener("click", this.handleClickOutside);
+            document.removeEventListener("click", this.handleClickOutside, true);
         },
     }
 

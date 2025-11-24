@@ -115,7 +115,7 @@
     import Alert from '@Partials/Alert.vue';
     import Input from '@Partials/Input.vue';
     import Modal from '@Partials/Modal.vue';
-    import cloneDeep from 'lodash.cloneDeep';
+    import cloneDeep from 'lodash.clonedeep';
     import Button from '@Partials/Button.vue';
     import Loader from '@Partials/Loader.vue';
     import Select from '@Partials/Select.vue';
@@ -200,7 +200,11 @@
         methods: {
             isEmpty,
             goBack() {
-                this.navigateToTeamMembers();
+                if (window.history.length > 1) {
+                    this.$router.back()
+                } else {
+                    this.navigateToTeamMembers();
+                }
             },
             async setup() {
                 if(this.teamMemberForm == null) this.teamMemberState.setTeamMemberForm(null, this.isAdding);

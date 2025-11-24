@@ -65,7 +65,7 @@
                 @updatedPerPage="updatedPerPage"
                 :filterExpressions="filterExpressions"
                 :sortingExpressions="sortingExpressions"
-                searchPlaceholder="Search by customer, product, order number or phone">
+                searchPlaceholder="Order number, customer, product, phone or email">
 
                 <template #afterRefreshButton>
 
@@ -658,7 +658,7 @@
 
     import dayjs from 'dayjs';
     import axios from 'axios';
-    import isEqual from 'lodash.isEqual';
+    import isEqual from 'lodash.isequal';
     import Input from '@Partials/Input.vue';
     import Modal from '@Partials/Modal.vue';
     import Loader from '@Partials/Loader.vue';

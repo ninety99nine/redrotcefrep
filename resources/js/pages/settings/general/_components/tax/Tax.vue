@@ -3,7 +3,7 @@
     <div class="bg-white p-8 shadow-sm rounded-xl mb-2">
 
         <h1 class="flex items-center font-bold mb-4">
-            <CircleDollarSign size="20" class="mr-2 flex-shrink-0"></CircleDollarSign>
+            <CircleDollarSign size="20" class="mr-2 shrink-0"></CircleDollarSign>
             <span>Tax</span>
         </h1>
 

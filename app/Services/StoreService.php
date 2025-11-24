@@ -269,7 +269,7 @@ class StoreService extends BaseService
             $mediaFileService->deleteMediaFile($mediaFile);
         }
 
-        $deleted = $store->delete();
+        $deleted = $store->forceDelete();
 
         if($forgetCache) {
 

@@ -86,7 +86,7 @@
 
                         <Skeleton v-if="isInspectingShoppingCart" width="w-1/3" :shine="true"></Skeleton>
                         <div v-else class="flex items-center space-x-1 md:space-x-2">
-                            <Info size="16" :class="['flex-shrink-0', isSelectedDeliveryMethod ? 'text-red-500' : 'text-blue-500']"></Info>
+                            <Info size="16" :class="['shrink-0', isSelectedDeliveryMethod ? 'text-red-500' : 'text-blue-500']"></Info>
                             <span :class="['font-medium italic text-xs md:text-sm', isSelectedDeliveryMethod ? 'text-red-500' : 'text-blue-500']">{{ shoppingCartDeliveryMethodUnavailabilityReason }}</span>
                         </div>
 
@@ -105,7 +105,7 @@
 
                         <Skeleton v-if="isInspectingShoppingCart" width="w-1/3" :shine="true"></Skeleton>
                         <div v-else class="flex items-center space-x-1 md:space-x-2">
-                            <Info size="16" class="flex-shrink-0 text-blue-500"></Info>
+                            <Info size="16" class="shrink-0 text-blue-500"></Info>
                             <span class="font-medium italic text-xs md:text-sm text-blue-500 ">{{ shoppingCartDeliveryMethodTip }}</span>
                         </div>
 

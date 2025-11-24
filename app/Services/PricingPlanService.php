@@ -602,7 +602,7 @@ class PricingPlanService extends BaseService
         $companyAccRef = ucwords($pricingPlan->type);
         $metadata = ['Transaction ID' => $transaction->id];
         $customerPhone = $customerCountry = $customerDialCode = null;
-        $redirectUrl = config('app.url').'/dashboard/pricing-plans/verify-payment?transaction_id='.$transaction->id;
+        $redirectUrl = rtrim(config('app.url'), '/').'/dashboard/pricing-plans/verify-payment?transaction_id='.$transaction->id;
 
         if ($user->mobile_number) {
             $customerCountry = $customerDialCode = $user->mobile_number->getCountry();

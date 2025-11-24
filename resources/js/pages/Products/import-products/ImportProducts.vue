@@ -152,6 +152,10 @@
                         required: false
                     },
                     {
+                        name: 'Images',
+                        required: false
+                    },
+                    {
                         name: 'Position',
                         required: false
                     }

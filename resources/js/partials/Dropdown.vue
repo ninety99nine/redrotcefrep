@@ -16,7 +16,9 @@
                 :leftIcon="triggerLeftIcon"
                 :leftIconSize="triggerLeftIconSize">
 
-                <div class="flex items-center space-x-1">
+                <div
+                    class="flex items-center space-x-1"
+                    v-if="$slots.triggerText || triggerText || showTriggerArrow">
 
                     <slot v-if="$slots.triggerText" name="triggerText"></slot>
                     <span v-else-if="triggerText">{{ triggerText }}</span>

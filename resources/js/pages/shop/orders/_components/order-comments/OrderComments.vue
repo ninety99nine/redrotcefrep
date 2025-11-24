@@ -46,7 +46,7 @@
                                     <!-- File Upload Trigger -->
                                     <div
                                         @click.stop="props.handleClick"
-                                        class="z-10 w-10 h-10 flex flex-shrink-0 items-center justify-center bg-gray-50 border border-gray-300 rounded-lg hover:bg-blue-50 cursor-pointer">
+                                        class="z-10 w-10 h-10 flex shrink-0 items-center justify-center bg-gray-50 border border-gray-300 rounded-lg hover:bg-blue-50 cursor-pointer">
                                         <Image size="20" :class="[{ 'text-gray-400' : !props.filesLeftToUpload }]"></Image>
                                     </div>
 
@@ -61,7 +61,7 @@
                     <Button
                         size="sm"
                         type="primary"
-                        buttonClass="flex-shrink-0"
+                        buttonClass="shrink-0"
                         :action="createOrderComment"
                         :disabled="isCreatingOrderComment || isUploading">
                         <span>Post</span>
@@ -102,7 +102,7 @@
 
                         <div class="flex items-center justify-center w-10 h-10 rounded-lg border border-dashed border-gray-200">
 
-                            <Image size="16" class="text-gray-400 flex-shrink-0"></Image>
+                            <Image size="16" class="text-gray-400 shrink-0"></Image>
 
                         </div>
                     </div>

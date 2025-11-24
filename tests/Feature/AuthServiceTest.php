@@ -390,7 +390,7 @@ test('user can register with email and requires verification', function () {
     Mail::assertSent(VerifyRegistrationEmail::class, function ($mail) {
         return $mail->hasTo('john.doe@example.com') &&
                $mail->firstName === 'John' &&
-               str_contains($mail->verificationUrl, config('app.url') . '/auth/verify-email?') &&
+               str_contains($mail->verificationUrl, rtrim(config('app.url'), '/') . '/auth/verify-email?') &&
                str_contains($mail->verificationUrl, 'email=' . urlencode('john.doe@example.com')) &&
                str_contains($mail->verificationUrl, '&type=' . EmailVerificationType::REGISTRATION_EMAIL->value) &&
                str_contains($mail->verificationUrl, 'token='); // Ensure a token is present without matching it exactly
@@ -616,7 +616,7 @@ test('registration succeeds with both email and mobile number and requires verif
     Mail::assertSent(VerifyRegistrationEmail::class, function ($mail) {
         return $mail->hasTo('john.doe@example.com') &&
                $mail->firstName === 'John' &&
-               str_contains($mail->verificationUrl, config('app.url') . '/auth/verify-email?') &&
+               str_contains($mail->verificationUrl, rtrim(config('app.url'), '/') . '/auth/verify-email?') &&
                str_contains($mail->verificationUrl, 'email=' . urlencode('john.doe@example.com')) &&
                str_contains($mail->verificationUrl, '&type=' . EmailVerificationType::REGISTRATION_EMAIL->value) &&
                str_contains($mail->verificationUrl, 'token='); // Ensure a token is present without matching it exactly
@@ -1083,7 +1083,7 @@ test('user can view their profile with eager loaded relationships', function () 
                     'country' => 'BW',
                     'currency' => 'BWP',
                     'language' => 'en',
-                    'web_link' => config('app.url').'/test-store',
+                    'web_link' => rtrim(config('app.url'), '/').'/test-store',
                     'description' => 'A test store',
                     'opening_hours' => [],
                     'offer_rewards' => false,
@@ -1253,7 +1253,7 @@ test('update user sends verification email on email change', function () {
     Mail::assertSent(VerifyUpdatedEmail::class, function ($mail) {
         return $mail->hasTo('new@example.com') && // Corrected to new email
                $mail->firstName === 'John' &&
-               str_contains($mail->verificationUrl, config('app.url') . '/auth/verify-email?') &&
+               str_contains($mail->verificationUrl, rtrim(config('app.url'), '/') . '/auth/verify-email?') &&
                str_contains($mail->verificationUrl, 'email=' . urlencode('new@example.com')) &&
                str_contains($mail->verificationUrl, '&type=' . EmailVerificationType::UPDATED_EMAIL->value) &&
                str_contains($mail->verificationUrl, 'token='); // Ensure a token is present without matching it exactly
@@ -1426,7 +1426,7 @@ test('resend email verification sends new verification email for registration', 
     Mail::assertSent(VerifyRegistrationEmail::class, function ($mail) {
         return $mail->hasTo('test@example.com') &&
                $mail->firstName === 'John' &&
-               str_contains($mail->verificationUrl, config('app.url') . '/auth/verify-email?') &&
+               str_contains($mail->verificationUrl, rtrim(config('app.url'), '/') . '/auth/verify-email?') &&
                str_contains($mail->verificationUrl, 'email=' . urlencode('test@example.com')) &&
                str_contains($mail->verificationUrl, '&type=' . EmailVerificationType::REGISTRATION_EMAIL->value) &&
                str_contains($mail->verificationUrl, 'token='); // Ensure a token is present without matching it exactly
@@ -1469,7 +1469,7 @@ test('resend email verification sends new verification email for updated email',
     Mail::assertSent(VerifyUpdatedEmail::class, function ($mail) {
         return $mail->hasTo('new@example.com') && // Corrected to new email
                $mail->firstName === 'John' &&
-               str_contains($mail->verificationUrl, config('app.url') . '/auth/verify-email?') &&
+               str_contains($mail->verificationUrl, rtrim(config('app.url'), '/') . '/auth/verify-email?') &&
                str_contains($mail->verificationUrl, 'email=' . urlencode('new@example.com')) &&
                str_contains($mail->verificationUrl, '&type=' . EmailVerificationType::UPDATED_EMAIL->value) &&
                str_contains($mail->verificationUrl, 'token='); // Ensure a token is present without matching it exactly
@@ -1511,7 +1511,7 @@ test('resend email verification defaults to registration email type', function (
     Mail::assertSent(VerifyRegistrationEmail::class, function ($mail) {
         return $mail->hasTo('test@example.com') &&
                $mail->firstName === 'John' &&
-               str_contains($mail->verificationUrl, config('app.url') . '/auth/verify-email?') &&
+               str_contains($mail->verificationUrl, rtrim(config('app.url'), '/') . '/auth/verify-email?') &&
                str_contains($mail->verificationUrl, 'email=' . urlencode('test@example.com')) &&
                str_contains($mail->verificationUrl, '&type=' . EmailVerificationType::REGISTRATION_EMAIL->value) &&
                str_contains($mail->verificationUrl, 'token='); // Ensure a token is present without matching it exactly

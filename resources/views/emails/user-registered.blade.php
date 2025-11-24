@@ -12,7 +12,7 @@ We’re thrilled to have you on board. Your account has been successfully create
 
 Get started by exploring your dashboard and setting up your e-commerce store.
 
-@component('mail::button', ['url' => config('app.url') . '/dashboard/stores', 'color' => 'primary'])
+@component('mail::button', ['url' => rtrim(config('app.url'), '/') . '/dashboard/stores', 'color' => 'primary'])
 Go to Dashboard
 @endcomponent
 

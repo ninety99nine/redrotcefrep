@@ -154,10 +154,15 @@
                 </div>
 
                 <WhatsappMessage
-                    class="mb-8"
+                    :animate="false"
+                    class="h-60 mb-8"
+                    :loopAnimation="false"
                     v-if="activeTab == 'preview'"
-                    :message="sendableWhatsappMessage">
-                </WhatsappMessage>
+                    :messages="[
+                        {
+                            sender: 'You', text: sendableWhatsappMessage, timestamp: now, isOwnMessage: true
+                        },
+                    ]"/>
 
                 <div v-else class="space-y-4 mb-8">
 
@@ -252,6 +257,7 @@
 
 <script>
 
+    import dayjs from 'dayjs';
     import Pill from '@Partials/Pill.vue';
     import { Move } from 'lucide-vue-next';
     import Input from '@Partials/Input.vue';
@@ -272,6 +278,7 @@
                 activeTab: 'edit',
                 whatsappAction: null,
                 whatsappMessage: null,
+                now: dayjs().format('HH:mm'),
                 includeOrderFieldNames: true,
                 sendableWhatsappMessage: null,
                 whatsappFields: this.prepareWhatsappFields(),
@@ -299,6 +306,18 @@
             },
             isLoadingStore() {
                 return this.storeState.isLoadingStore;
+            },
+            reviewLink() {
+                if(!this.store) return null;
+                const resolvedRoute = this.$router.resolve({
+                    name: 'create-shop-review',
+                    params: {
+                        alias: this.store.alias
+                    }
+                });
+
+                const baseUrl = window.location.origin;
+                return `${baseUrl}${resolvedRoute.href}`;
             },
         },
         methods: {
@@ -346,9 +365,9 @@
             setWhatsappMessage() {
 
                 const messages = {
-                    'Request review': `Hello ${this.order.customer_first_name}, we hope you enjoyed your order! Could you take a moment to leave us a review? Your feedback is greatly appreciated!`,
+                    'Request review': `Hello ${this.order.customer_first_name}, we hope you enjoyed your order! Could you take a moment to leave us a review? Your feedback is greatly appreciated!\n\n${this.reviewLink}`,
 
-                    'Share order details': `Hello ${this.order.customer_first_name}, here are the details of your order:\n\nOrder #${this.order.number}\n`+`----------------------\n`,
+                    'Share order details': `Hello ${this.order.customer_first_name}, here are the details of your order:\n\nOrder #${this.order.number}\n`+`------------`,
 
                     'Remind about payment': `Hello ${this.order.customer_first_name}, just a friendly reminder that your order (#${this.order.number}) is currently unpaid. The total amount due is ${this.order.outstanding_total.amount_with_currency}. Kindly make payment at your earliest convenience. Let us know if you need assistance!`,
 
@@ -394,10 +413,10 @@
                                     orderMessage += `${this.order.summary}\n`;
                                     break;
                                 case "Status":
-                                    orderMessage += `${this.order.status.name}\n`;
+                                    orderMessage += `${this.order.status}\n`;
                                     break;
                                 case "Payment Status":
-                                    orderMessage += `${this.order.payment_status.name}\n`;
+                                    orderMessage += `${this.order.payment_status}\n`;
                                     break;
                                 case "Collection Status":
                                     orderMessage += `${this.order.collection_verified}\n`;

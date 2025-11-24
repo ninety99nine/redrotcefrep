@@ -16,7 +16,11 @@ use App\Enums\SortProductBy;
 use App\Enums\ProductUnitType;
 use App\Enums\UploadFolderName;
 use App\Enums\StockQuantityType;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Http;
+use Symfony\Component\Mime\MimeTypes;
 use App\Http\Resources\ProductResource;
 use App\Http\Resources\ProductResources;
 use Illuminate\Database\Eloquent\Builder;
@@ -361,6 +365,7 @@ class ProductService extends BaseService
                         'tags' => empty($record['Tags'] ?? null) ? null : array_map('trim', explode(',', $record['Tags'])),
                         'categories' => empty($record['Categories'] ?? null) ? null : array_map('trim', explode(',', $record['Categories'])),
 
+                        'images' => empty($record['Images'] ?? null) ? null : $record['Images'],
                     ];
 
                     // Validate product data
@@ -499,6 +504,22 @@ class ProductService extends BaseService
                         $this->createProductCategories($product, $productData['categories']);
                     }
 
+                    //  Handle Images
+                    if (!empty($productData['images'])) {
+
+                        $imageUrls = $productData['images'];
+
+                        $urls = array_filter(explode('|', $imageUrls));
+
+                        foreach ($urls as $url) {
+                            $url = trim($url);
+                            if (filter_var($url, FILTER_VALIDATE_URL)) {
+                                $this->importImageFromUrl($product, $url);
+                            }
+                        }
+
+                    }
+
                 }
 
             } catch (\Exception $e) {
@@ -524,6 +545,22 @@ class ProductService extends BaseService
                     // Handle categories
                     if (!empty($productData['categories'])) {
                         $this->createProductCategories($product, $productData['categories']);
+                    }
+
+                    //  Handle Images
+                    if (!empty($productData['images'])) {
+
+                        $imageUrls = $productData['images'];
+
+                        $urls = array_filter(explode('|', $imageUrls));
+
+                        foreach ($urls as $url) {
+                            $url = trim($url);
+                            if (filter_var($url, FILTER_VALIDATE_URL)) {
+                                $this->importImageFromUrl($product, $url);
+                            }
+                        }
+
                     }
 
                 }
@@ -921,5 +958,106 @@ class ProductService extends BaseService
         }
 
         $product->categories()->sync($categoryIds);
+    }
+
+    /**
+     * Import image from URL.
+     *
+     * @param Product $product
+     * @param string $url - Image URL
+     */
+    private function importImageFromUrl(Product $product, string $url): void
+    {
+        try {
+
+            $response = Http::timeout(20)
+            ->withHeaders([
+                // Some servers block default Laravel User-Agent
+                'User-Agent' => 'Mozilla/5.0 (compatible; ProductImportBot/1.0)',
+            ])
+            ->get($url);
+
+            if (!$response->successful()) {
+                Log::warning("Failed to download image: {$url}");
+                return;
+            }
+
+            $contents = $response->body();
+            $contentType = $response->header('Content-Type');
+
+            // Strict MIME type check — ONLY allow known image types
+            $allowedMimeTypes = [
+                'image/jpeg',
+                'image/jpg',
+                'image/png',
+                'image/gif',
+                'image/avif',
+                'image/webp',
+                'image/svg+xml',
+            ];
+
+            if (!in_array($contentType, $allowedMimeTypes, true)) {
+                Log::warning("Blocked non-image file. MIME: {$contentType} | URL: {$url}");
+                return;
+            }
+
+            // Extra safety: verify actual file content (prevents fake headers)
+            $finfo = new \finfo(FILEINFO_MIME_TYPE);
+            $detectedMime = $finfo->buffer($contents);
+
+            if (!in_array($detectedMime, $allowedMimeTypes, true)) {
+                Log::warning("Blocked file with fake headers. Declared: {$contentType}, Actual: {$detectedMime} | URL: {$url}");
+                return;
+            }
+
+            // Size limit: max 5MB per image
+            if (strlen($contents) > 5 * 1024 * 1024) {
+                Log::warning("Image too large (>5MB): {$url}");
+                return;
+            }
+
+            // Get safe extension from actual content
+            $mimeTypes = new MimeTypes();
+            $extensions = $mimeTypes->getExtensions($detectedMime);
+            $extension = !empty($extensions) ? $extensions[0] : 'jpg';
+
+            // Special case: SVG is XML, not binary
+            if ($detectedMime === 'image/svg+xml') {
+                if (!str_contains($contents, '<svg') || str_contains($contents, '<?php')) {
+                    Log::warning("Invalid or dangerous SVG content blocked: {$url}");
+                    return;
+                }
+                $extension = 'svg';
+            }
+
+            // Generate unique filename
+            $filename = Str::uuid() . '.' . $extension;
+
+            // Temporary file
+            $tempPath = tempnam(sys_get_temp_dir(), 'csv_image_');
+            file_put_contents($tempPath, $contents);
+
+            // Create UploadedFile instance
+            $uploadedFile = new UploadedFile(
+                $tempPath,
+                $filename,
+                $detectedMime,
+                null,
+                true // mark as test (won't trigger validation issues)
+            );
+
+            app(MediaFileService::class)->createMediaFile([
+                'file' => $uploadedFile,
+                'mediable_type' => 'product',
+                'mediable_id' => $product->id,
+                'upload_folder_name' => UploadFolderName::PRODUCT_PHOTO->value
+            ]);
+
+            // Clean up
+            @unlink($tempPath);
+
+        } catch (Exception $e) {
+            Log::warning("Image import failed for product {$product->name}: " . $e->getMessage());
+        }
     }
 }

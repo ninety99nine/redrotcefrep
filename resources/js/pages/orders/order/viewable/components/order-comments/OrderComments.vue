@@ -46,7 +46,7 @@
                                     <!-- File Upload Trigger -->
                                     <div
                                         @click.stop="props.handleClick"
-                                        class="z-10 w-10 h-10 flex flex-shrink-0 items-center justify-center bg-gray-50 border border-gray-300 rounded-lg hover:bg-blue-50 cursor-pointer">
+                                        class="z-10 w-10 h-10 flex shrink-0 items-center justify-center bg-gray-50 border border-gray-300 rounded-lg hover:bg-blue-50 cursor-pointer">
                                         <Image size="20" :class="[{ 'text-gray-400' : !props.filesLeftToUpload }]"></Image>
                                     </div>
 
@@ -61,7 +61,7 @@
                     <Button
                         size="sm"
                         type="primary"
-                        buttonClass="flex-shrink-0"
+                        buttonClass="shrink-0"
                         :action="createOrderComment"
                         :disabled="isCreatingOrderComment || isUploading">
                         <span>Post</span>
@@ -102,7 +102,7 @@
 
                         <div class="flex items-center justify-center w-10 h-10 rounded-lg border border-dashed border-gray-200">
 
-                            <Image size="16" class="text-gray-400 flex-shrink-0"></Image>
+                            <Image size="16" class="text-gray-400 shrink-0"></Image>
 
                         </div>
                     </div>
@@ -115,7 +115,7 @@
 
         <template v-else>
 
-            <template v-if="hasOrderComments">
+            <div v-if="hasOrderComments" class="max-h-96 overflow-y-auto space-y-2 pr-2">
 
                 <OrderComment
                     :index="index"
@@ -127,7 +127,7 @@
                     :isDeletingOrderCommentIds="isDeletingOrderCommentIds">
                 </OrderComment>
 
-            </template>
+            </div>
 
         </template>
 
@@ -219,6 +219,19 @@
                     this.showOrderComments();
                 }
             },
+            order(newValue, oldValue) {
+                console.log('stage 1');
+                if(newValue && oldValue) {
+                console.log('stage 2');
+                    const paidTotalChanged = newValue.paid_total != oldValue.paid_total;
+                    const outstandingTotalChanged = newValue.outstanding_total != oldValue.outstanding_total;
+
+                    if(paidTotalChanged || outstandingTotalChanged) {
+                console.log('stage 3');
+                        this.showOrderComments();
+                    }
+                }
+            },
             isUploading(newValue) {
                 if(newValue == false) {
                     this.orderCommentCreationCompleted();
@@ -226,6 +239,9 @@
             },
         },
         computed: {
+            order() {
+                return this.orderState.store;
+            },
             store() {
                 return this.storeState.store;
             },

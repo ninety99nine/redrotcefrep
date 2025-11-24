@@ -451,7 +451,7 @@ class Store extends Model
     public function webLink(): Attribute
     {
         return new Attribute(
-            get: fn() => $this->alias ? config('app.url').'/'.$this->alias : null
+            get: fn() => $this->alias ? rtrim(config('app.url'), '/').'/'.$this->alias : null
         );
     }
 

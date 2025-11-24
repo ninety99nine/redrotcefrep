@@ -12,14 +12,14 @@
                 <div class="w-full flex justify-between space-x-4">
 
                     <div class="w-full">
-                        <Skeleton v-if="isLoadingStore || isLoadingOrder" width="w-40" height="h-2" :shine="true"></Skeleton>
+                        <Skeleton v-if="isLoadingStore || isLoadingOrder" width="w-40" height="h-2" class="mb-2" :shine="true"></Skeleton>
                         <p v-else class="text-gray-700 font-semibold text-sm">{{ order.customer_name }}</p>
 
                         <Skeleton v-if="isLoadingStore || isLoadingOrder" width="w-2/3" height="h-2" :shine="true"></Skeleton>
                         <p v-else class="text-gray-500 text-sm">{{ order.summary }}</p>
                     </div>
 
-                    <Skeleton v-if="isLoadingStore || isLoadingOrder" width="w-2/3" height="h-2" :shine="true"></Skeleton>
+                    <Skeleton v-if="isLoadingStore || isLoadingOrder" width="w-2/3" height="h-2" class="" :shine="true"></Skeleton>
                     <p v-else class="text-right text-gray-400 text-xs">Order #{{ order.number }}</p>
 
                 </div>
@@ -30,7 +30,8 @@
 
         <div class="w-full bg-gray-50 border border-gray-100 shadow rounded-xl p-10">
             <div class="w-16 h-16 mx-auto flex items-center justify-center bg-green-100 text-green-500 rounded-full mb-4">
-                <ReceiptText size="24"></ReceiptText>
+                <Loader v-if="isLoadingStorePaymentMethod || isCreatingTransaction" type="primary"></Loader>
+                <ReceiptText v-else size="24"></ReceiptText>
             </div>
             <p class="text-xl font-semibold text-center mb-2">Confirming Payment</p>
             <p class="text-sm text-gray-500 text-center mb-8">
@@ -150,7 +151,15 @@
 
                                         </div>
 
-                                        <WhatsappMessage :message="whatsappMessage"></WhatsappMessage>
+                                        <WhatsappMessage
+                                            class="h-60"
+                                            :animate="false"
+                                            :loopAnimation="false"
+                                            :messages="[
+                                                {
+                                                    sender: 'You', text: whatsappMessage, timestamp: now, isOwnMessage: true
+                                                },
+                                            ]"/>
 
                                     </template>
 
@@ -196,8 +205,10 @@
 
 <script>
 
+    import dayjs from 'dayjs';
     import QRCode from 'qrcode';
     import Copy from '@Partials/Copy.vue';
+    import Loader from '@Partials/Loader.vue';
     import Button from '@Partials/Button.vue';
     import Skeleton from '@Partials/Skeleton.vue';
     import VueSlideUpDown from 'vue-slide-up-down';
@@ -209,13 +220,17 @@
 
     export default {
         inject: ['formState', 'storeState', 'orderState', 'notificationState'],
-        components: { Copy, Button, Skeleton, VueSlideUpDown, ReceiptText, ChevronUp, ChevronDown, StoreLogo, WhatsappIcon, WhatsappMessage },
+        components: { Copy, Loader, Button, Skeleton, VueSlideUpDown, ReceiptText, ChevronUp, ChevronDown, StoreLogo, WhatsappIcon, WhatsappMessage },
         data() {
             return {
                 CopyIcon,
                 ArrowLeft,
                 qrCode: null,
                 clicked: false,
+                storePaymentMethod: null,
+                now: dayjs().format('HH:mm'),
+                isCreatingTransaction: false,
+                isLoadingStorePaymentMethod: false,
                 accordions: [
                     {
                         label: 'Open in external browser',
@@ -252,8 +267,8 @@
             isLoadingOrder() {
                 return this.orderState.isLoadingOrder;
             },
-            paymentMethod() {
-                return this.$route.query.payment_method ?? null;
+            storePaymentMethodId() {
+                return this.$route.query.store_payment_method_id ?? null;
             },
             orderUrl() {
                 return `${window.location.origin + this.$router.resolve({
@@ -306,15 +321,15 @@
                         message += `\n`;
                     }
 
-                    if(this.paymentMethod != null) {
-                        message += `\nPayment : ${this.paymentMethod} (Confirm Payment)\n`;
+                    if(this.storePaymentMethod != null) {
+                        message += `\nPayment : ${this.storePaymentMethod.name} (Confirm Payment)\n`;
                     }
 
                     if(this.order.delivery_method != null) {
                         message += `\nDelivery: ${this.order.delivery_method.name}`;
                     }
 
-                    if(this.order.paymentMethod != null) {
+                    if(this.order.delivery_address != null) {
                         message += `\nAddress: ${this.order.delivery_address.complete_address}`;
                     }
 
@@ -327,10 +342,11 @@
         },
         methods: {
             isNotEmpty,
-            setup() {
+            async setup() {
                 if(this.store && this.order) {
                     this.generateQRCode();
-                    if(!['paid', 'waiting confirmation'].includes(this.order.payment_status)) this.updateOrder();
+                    await this.showStorePaymentMethod();
+                    if(!['paid'].includes(this.order.payment_status)) this.createTransaction();
                 }
             },
             toggleAccordian(index) {
@@ -380,27 +396,61 @@
                 window.open(`https://wa.me/?${phone}text=${encodeURIComponent(this.whatsappMessage)}`, "_blank");
                 this.clicked = true;
             },
-            async updateOrder() {
+            async showStorePaymentMethod() {
+                try {
+
+                    this.isLoadingStorePaymentMethod = true;
+
+                    let config = {
+                        params: {
+                            _relationships: ['logo', 'paymentMethod'].join(',')
+                        }
+                    };
+
+                    const response = await axios.get(`/api/store-payment-methods/${this.storePaymentMethodId}`, config);
+
+                    this.storePaymentMethod = response.data;
+
+                } catch (error) {
+                    const message = error?.response?.data?.message || error?.message || 'Something went wrong while fetching payment method';
+                    this.notificationState.showWarningNotification(message);
+                    this.formState.setServerFormErrors(error);
+                    console.error('Failed to fetch payment method:', error);
+                } finally {
+                    this.isLoadingStorePaymentMethod = false;
+                }
+            },
+            async createTransaction() {
 
                 try {
 
-                    const paymentStatus = 'waiting confirmation';
+                    this.isCreatingTransaction = true;
 
                     const data = {
-                        payment_status: paymentStatus,
-                        store_id: this.store.id
+                        owner_type: 'order',
+                        owner_id: this.order.id,
+                        store_id: this.store.id,
+                        currency: this.store.currency,
+                        payment_status: 'waiting confirmation',
+                        amount: this.order.outstanding_total.amount,
+                        store_payment_method_id: this.storePaymentMethod.id,
                     };
 
-                    await axios.put(`/api/orders/${this.order.id}`, data);
-                    this.orderState.order.payment_status = paymentStatus;
+                    console.log('createTransaction !!!');
+                    console.log('createTransaction !!!');
+                    console.log('createTransaction !!!');
+                    console.log('createTransaction !!!');
+                    console.log('createTransaction !!!');
+                    await axios.post('/api/transactions', data);
 
                 } catch (error) {
-                    const message = error?.response?.data?.message || error?.message || 'Something went wrong while updating order';
+                    const message = error?.response?.data?.message || error?.message || 'Something went wrong while creating payment';
                     this.notificationState.showWarningNotification(message);
                     this.formState.setServerFormErrors(error);
-                    console.error('Failed to update order changes:', error);
+                    console.error('Failed to create payment:', error);
+                } finally {
+                    this.isCreatingTransaction = false;
                 }
-
             }
         },
         created() {

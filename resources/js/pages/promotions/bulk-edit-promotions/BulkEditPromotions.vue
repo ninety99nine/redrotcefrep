@@ -62,7 +62,7 @@
                 @updatedPerPage="updatedPerPage"
                 :filterExpressions="filterExpressions"
                 :sortingExpressions="sortingExpressions"
-                searchPlaceholder="Search by promotion name, code, or description">
+                searchPlaceholder="Promotion name, code, or description">
 
                 <template #afterRefreshButton>
                     <div class="flex items-center space-x-2">
@@ -776,7 +776,7 @@
 
 <script>
     import axios from 'axios';
-    import isEqual from 'lodash.isEqual';
+    import isEqual from 'lodash.isequal';
     import Input from '@Partials/Input.vue';
     import Modal from '@Partials/Modal.vue';
     import Loader from '@Partials/Loader.vue';

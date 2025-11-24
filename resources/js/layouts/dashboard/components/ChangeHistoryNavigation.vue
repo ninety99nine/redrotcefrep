@@ -18,8 +18,8 @@
                 dropdownClasses="w-96">
                 <template #trigger="props">
                     <div
-                        @click="props.toggleDropdown"
-                        :class="buttonClasses(canUndo || canRedo)">
+                        :class="buttonClasses(canUndo || canRedo)"
+                        @click="(canUndo || canRedo) ? props.toggleDropdown : null">
                         <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
                         </svg>
@@ -73,16 +73,21 @@
 
         <div class="flex items-center space-x-2">
 
-            <Button
-                size="sm"
+            <template
                 :key="index"
-                :type="actionButton.type"
-                :leftIcon="actionButton.icon"
-                :loading="actionButton.loading"
-                :action="() => actionButton.action()"
                 v-for="(actionButton, index) in changeHistoryState.actionButtons">
-                <span>{{ actionButton.label }}</span>
-            </Button>
+
+                <Button
+                    size="sm"
+                    :type="actionButton.type"
+                    :leftIcon="actionButton.icon"
+                    :loading="actionButton.loading"
+                    :action="() => actionButton.action()"
+                    v-if="actionButton.label != 'Discard' || (actionButton.label == 'Discard' && historyItems.length > 1)">
+                    <span>{{ actionButton.label }}</span>
+                </Button>
+
+            </template>
 
         </div>
 

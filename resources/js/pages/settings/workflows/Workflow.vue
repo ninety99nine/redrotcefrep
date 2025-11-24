@@ -532,6 +532,7 @@
                 this.workflowState.setWorkflowForm(null, false);
                 if (this.store) await this.showWorkflowConfigurations();
                 if (this.store && this.workflowId) await this.showWorkflow();
+                this.changeHistoryState.showActionButtons = true;
             },
             setActionButtons() {
                 this.changeHistoryState.removeButtons();
@@ -540,7 +541,7 @@
                     this.isEditing ? 'Save Changes' : 'Add Workflow',
                     this.isEditing ? this.updateWorkflow : this.createWorkflow,
                     'primary',
-                    null
+                    this.isEditing ? null : Plus,
                 );
             },
             delayTimeUnits(value) {
@@ -740,6 +741,7 @@
         },
         beforeUnmount() {
             this.workflowState.reset();
+            this.changeHistoryState.showActionButtons = false;
         },
         created() {
             this.setup();

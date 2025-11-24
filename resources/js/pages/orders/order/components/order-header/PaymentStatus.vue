@@ -56,7 +56,7 @@
                 } else if(this.paymentStatusName === 'partially paid') {
                     return 'primary';
                 } else if(this.paymentStatusName === 'waiting confirmation') {
-                    return 'success';
+                    return 'warning';
                 }
             }
         }

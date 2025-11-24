@@ -148,7 +148,7 @@
                                     <div
                                         v-if="orderProduct.photo"
                                         class="flex items-center justify-center w-8 h-auto">
-                                        <img class="w-full max-h-full object-contain rounded-sm flex-shrink-0" :src="orderProduct.photo.path">
+                                        <img class="w-full max-h-full object-contain rounded-sm shrink-0" :src="orderProduct.photo.path">
                                     </div>
                                     <span>{{ orderProduct.name }}</span>
                                 </div>

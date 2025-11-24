@@ -17,7 +17,7 @@
             <!-- Logo -->
             <div class="flex items-center justify-between border-b border-gray-200 border-dashed pb-4 mb-4">
 
-                <Skeleton v-if="isLoadingStore || isLoadingStorePaymentMethod || isLoadingPaymentMethod" width="w-16" height="h-16" rounded="rounded-full" :shine="true" class="flex-shrink-0"></Skeleton>
+                <Skeleton v-if="isLoadingStore || isLoadingStorePaymentMethod || isLoadingPaymentMethod" width="w-16" height="h-16" rounded="rounded-full" :shine="true" class="shrink-0"></Skeleton>
                 <div v-else class="w-16 h-16 rounded-full overflow-hidden shadow">
                     <img
                         alt="Payment Method Logo"
@@ -26,7 +26,7 @@
                     />
                 </div>
 
-                <Skeleton v-if="isLoadingStore || isLoadingStorePaymentMethod || isLoadingPaymentMethod" width="w-16" height="h-4" rounded="rounded-full" :shine="true" class="flex-shrink-0"></Skeleton>
+                <Skeleton v-if="isLoadingStore || isLoadingStorePaymentMethod || isLoadingPaymentMethod" width="w-16" height="h-4" rounded="rounded-full" :shine="true" class="shrink-0"></Skeleton>
 
                 <!-- Requires Verification Status -->
                 <Pill v-else-if="storePaymentMethod && storePaymentMethod.requires_verification" type="warning" size="xs">Requires verification</Pill>
@@ -253,8 +253,8 @@
     import Switch from '@Partials/Switch.vue';
     import Button from '@Partials/Button.vue';
     import Skeleton from '@Partials/Skeleton.vue';
-    import { Info, Trash2, MoveLeft } from 'lucide-vue-next';
     import { isEmpty, capitalize } from '@Utils/stringUtils.js';
+    import { Info, Trash2, MoveLeft, Plus } from 'lucide-vue-next';
     import JoinOurWhatsappGroup from '@Components/JoinOurWhatsappGroup.vue';
     import EmailConfig from '@Pages/settings/payment-methods/_components/PaymentMethodConfigInput/EmailConfig.vue';
     import ImageConfig from '@Pages/settings/payment-methods/_components/PaymentMethodConfigInput/ImageConfig.vue';
@@ -272,6 +272,7 @@
         },
         data() {
             return {
+                Plus,
                 Trash2,
                 MoveLeft,
                 isLoadingPaymentMethod: false,
@@ -396,7 +397,7 @@
                     this.isEditing ? 'Save Changes' : 'Add Payment Method',
                     this.isEditing ? this.updateStorePaymentMethod : this.createStorePaymentMethod,
                     'primary',
-                    null,
+                    this.isEditing ? null : Plus,
                 );
             },
             async navigateToShowPaymentMethods() {
@@ -429,6 +430,7 @@
                     const paymentMethod = response.data;
                     this.storePaymentMethodState.setPaymentMethod(paymentMethod);
                     this.storePaymentMethodState.setStorePaymentMethodForm(null, paymentMethod, true);
+                    this.changeHistoryState.showActionButtons = true;
 
                 } catch (error) {
                     const message = error?.response?.data?.message || error?.message || 'Something went wrong while fetching payment method';
@@ -760,6 +762,7 @@
         },
         beforeUnmount() {
             this.storePaymentMethodState.reset();
+            this.changeHistoryState.showActionButtons = false;
         },
         created() {
 

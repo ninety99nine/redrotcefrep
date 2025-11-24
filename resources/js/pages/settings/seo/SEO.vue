@@ -10,7 +10,7 @@
 
             <div class="border rounded-lg border-gray-300 p-4 flex">
                 <!-- SEO Image -->
-                <div v-if="previewImage" class="mr-4 flex-shrink-0">
+                <div v-if="previewImage" class="mr-4 shrink-0">
                     <img
                         :src="previewImage"
                         alt="SEO Image Preview"

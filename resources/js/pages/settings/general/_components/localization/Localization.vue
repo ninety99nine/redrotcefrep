@@ -3,7 +3,7 @@
     <div class="bg-white p-8 shadow-sm rounded-xl mb-2">
 
         <h1 class="flex items-center font-bold mb-4">
-            <Earth size="20" class="mr-2 flex-shrink-0"></Earth>
+            <Earth size="20" class="mr-2 shrink-0"></Earth>
             <span>Localization</span>
         </h1>
 

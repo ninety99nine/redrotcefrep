@@ -60,14 +60,14 @@
                             <div :class="[operationalHour.available ? 'cursor-pointer' : 'opacity-0']">
 
                                 <!-- Add Icon -->
-                                <div v-if="index2 == 0" @click="() => addOperationalHour(index)" class="flex-shrink-0 rounded-md border border-gray-300 p-1 hover:bg-blue-50 transition-all">
+                                <div v-if="index2 == 0" @click="() => addOperationalHour(index)" class="shrink-0 rounded-md border border-gray-300 p-1 hover:bg-blue-50 transition-all">
                                     <svg class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
                                     </svg>
                                 </div>
 
                                 <!-- Remove Icon -->
-                                <div v-else @click="() => removeOperationalHour(index, index2)" class="flex-shrink-0 rounded-md border border-gray-300 p-1 bg-red-50 hover:bg-red-100 transition-all">
+                                <div v-else @click="() => removeOperationalHour(index, index2)" class="shrink-0 rounded-md border border-gray-300 p-1 bg-red-50 hover:bg-red-100 transition-all">
                                     <svg class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M5 12h14" />
                                     </svg>
@@ -150,14 +150,14 @@
                             <div class="cursor-pointer">
 
                                 <!-- Add Icon -->
-                                <div v-if="index == 0" @click="() => addHour()" class="flex-shrink-0 rounded-md border border-gray-300 p-1 hover:bg-blue-50 transition-all">
+                                <div v-if="index == 0" @click="() => addHour()" class="shrink-0 rounded-md border border-gray-300 p-1 hover:bg-blue-50 transition-all">
                                     <svg class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
                                     </svg>
                                 </div>
 
                                 <!-- Remove Icon -->
-                                <div v-else @click="() => removeHour(index)" class="flex-shrink-0 rounded-md border border-gray-300 p-1 bg-red-50 hover:bg-red-100 transition-all">
+                                <div v-else @click="() => removeHour(index)" class="shrink-0 rounded-md border border-gray-300 p-1 bg-red-50 hover:bg-red-100 transition-all">
                                     <svg class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M5 12h14" />
                                     </svg>
@@ -201,7 +201,7 @@
     import { Clock } from 'lucide-vue-next';
     import Input from '@Partials/Input.vue';
     import Modal from '@Partials/Modal.vue';
-    import cloneDeep from 'lodash.cloneDeep';
+    import cloneDeep from 'lodash.clonedeep';
     import Tooltip from '@Partials/Tooltip.vue';
 
     export default {

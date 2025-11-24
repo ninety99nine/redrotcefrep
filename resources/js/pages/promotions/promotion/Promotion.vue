@@ -832,7 +832,11 @@
         methods: {
             isEmpty,
             goBack() {
-                this.navigateToPromotions();
+                if (window.history.length > 1) {
+                    this.$router.back()
+                } else {
+                    this.navigateToPromotions();
+                }
             },
             async setup() {
                 if (this.promotionForm == null) this.promotionState.setPromotionForm(null, this.isCreating);

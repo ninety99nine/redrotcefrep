@@ -8,10 +8,12 @@ use App\Enums\Association;
 use App\Models\Transaction;
 use App\Enums\UploadFolderName;
 use App\Enums\PaymentMethodType;
+use App\Enums\TransactionPaymentStatus;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Resources\TransactionResource;
 use App\Http\Resources\TransactionResources;
 use App\Models\Order;
+use App\Models\StorePaymentMethod;
 
 class TransactionService extends BaseService
 {
@@ -61,29 +63,51 @@ class TransactionService extends BaseService
      */
     public function createTransaction(array $data): array
     {
-        $transaction = Transaction::create($data);
+        $ownerType = $data['owner_type'];
+        $paymentStatus = $data['payment_status'] ?? null;
+        $storePaymentMethodId = $data['store_payment_method_id'] ?? null;
 
-        if($data['owner_type'] == 'order') {
-
-            $user = Auth::user();
-            $orderService = new OrderService;
-            $order = Order::find($data['owner_id']);
-            $orderService->updateOrderAmountBalance($order);
-
-            $comment = $transaction->amount->amount_with_currency.' payment added'. (!empty($user->name) ? (' by '.$user->name) : '');
-            $orderService->addOrderComment($order, $comment);
-
+        if($ownerType == 'order' && $paymentStatus == TransactionPaymentStatus::WAITING_CONFIRMATION->value) {
+            $transaction = Transaction::where($data)->first();
         }
 
-        // Create transaction photo if provided
-        if (isset($data['photo']) && !empty($data['photo'])) {
+        if(!isset($transaction)) {
 
-            (new MediaFileService)->createMediaFile([
-                'file' => $data['photo'],
-                'mediable_type' => 'transaction',
-                'mediable_id' => $transaction->id,
-                'upload_folder_name' => UploadFolderName::TRANSACTION_PHOTO->value
-            ]);
+            if($storePaymentMethodId) {
+                $paymentMethodId = StorePaymentMethod::find($storePaymentMethodId)->payment_method_id;
+                $data['payment_method_id'] = $paymentMethodId;
+            }
+
+            $transaction = Transaction::create($data);
+
+            // Create transaction photo if provided
+            if (isset($data['photo']) && !empty($data['photo'])) {
+
+                (new MediaFileService)->createMediaFile([
+                    'file' => $data['photo'],
+                    'mediable_type' => 'transaction',
+                    'mediable_id' => $transaction->id,
+                    'upload_folder_name' => UploadFolderName::TRANSACTION_PHOTO->value
+                ]);
+
+            }
+
+            if($ownerType == 'order') {
+
+                $user = Auth::user();
+                $orderService = new OrderService;
+                $order = Order::find($data['owner_id']);
+                $orderService->updateOrderAmountBalance($order);
+
+                if($transaction->payment_status == TransactionPaymentStatus::WAITING_CONFIRMATION->value) {
+                    $comment = $transaction->amount->amount_with_currency.' payment waiting confirmation'. ($user && !empty($user->name) ? ('. Submitted by '.$user->name) : '');
+                }else{
+                    $comment = $transaction->amount->amount_with_currency.' payment added'. ($user && !empty($user->name) ? (' by '.$user->name) : '');
+                }
+
+                $orderService->addOrderComment($order, $comment);
+
+            }
 
         }
 
@@ -137,6 +161,19 @@ class TransactionService extends BaseService
     public function updateTransaction(Transaction $transaction, array $data): array
     {
         $transaction->update($data);
+
+        if($transaction->owner_type == 'order') {
+
+            $user = Auth::user();
+            $order = $transaction->owner;
+            $orderService = new OrderService;
+            $orderService->updateOrderAmountBalance($order);
+
+            $comment = $transaction->amount->amount_with_currency.' payment approved'. (!empty($user->name) ? (' by '.$user->name) : '');
+            $orderService->addOrderComment($order, $comment);
+
+        }
+
         return $this->showUpdatedResource($transaction);
     }
 
@@ -164,7 +201,12 @@ class TransactionService extends BaseService
             $order = Order::find($transaction->owner_id);
             $orderService->updateOrderAmountBalance($order);
 
-            $comment = $transaction->amount->amount_with_currency.' payment removed'. (!empty($user->name) ? (' by '.$user->name) : '');
+            if($transaction->payment_status == TransactionPaymentStatus::WAITING_CONFIRMATION->value) {
+                $comment = $transaction->amount->amount_with_currency.' payment rejected'. (!empty($user->name) ? (' by '.$user->name) : '');
+            }else{
+                $comment = $transaction->amount->amount_with_currency.' payment removed'. (!empty($user->name) ? (' by '.$user->name) : '');
+            }
+
             $orderService->addOrderComment($order, $comment);
 
         }

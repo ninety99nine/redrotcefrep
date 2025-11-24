@@ -51,7 +51,7 @@
                             class="flex items-center space-x-2 border-b border-gray-300 shadow-sm rounded-lg p-2 bg-gray-50 w-full">
 
                             <!-- Skeleton Loading -->
-                            <Skeleton width="w-10" height="h-10" rounded="rounded-lg" :shine="true" class="flex-shrink-0"></Skeleton>
+                            <Skeleton width="w-10" height="h-10" rounded="rounded-lg" :shine="true" class="shrink-0"></Skeleton>
 
                             <div class="w-full space-y-2">
                                 <Skeleton width="w-2/3" :shine="true"></Skeleton>

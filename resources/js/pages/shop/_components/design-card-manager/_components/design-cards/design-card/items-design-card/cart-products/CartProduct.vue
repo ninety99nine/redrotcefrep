@@ -6,7 +6,7 @@
 
             <div :class="['flex items-center justify-center w-10 h-10 rounded-lg', { 'border border-dashed border-gray-200' : !hasPhotoPath }]">
 
-                <img v-if="hasPhotoPath" class="w-10 object-contain rounded-lg flex-shrink-0" :src="photoPath">
+                <img v-if="hasPhotoPath" class="w-10 object-contain rounded-lg shrink-0" :src="photoPath">
 
                 <Image v-else size="16" class="text-gray-300"></Image>
 
@@ -33,7 +33,7 @@
                 <!-- Remove Icon Button -->
                 <X
                     @click.stop="() => orderState.removeCartProduct(index, false)"
-                    class="w-4 h-4 flex-shrink-0 text-gray-400 cursor-pointer hover:opacity-90 active:opacity-80 active:scale-90 transition-all">
+                    class="w-4 h-4 shrink-0 text-gray-400 cursor-pointer hover:opacity-90 active:opacity-80 active:scale-90 transition-all">
                 </X>
 
             </div>

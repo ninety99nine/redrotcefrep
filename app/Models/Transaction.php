@@ -202,6 +202,16 @@ class Transaction extends Model
     }
 
     /**
+     *  Check if transaction is waiting confirmation
+     *
+     *  @return bool
+     */
+    public function isWaitingConfirmation()
+    {
+        return strtolower($this->getRawOriginal('payment_status')) === strtolower(TransactionPaymentStatus::WAITING_CONFIRMATION->value);
+    }
+
+    /**
      *  Check if transaction is subject to manual verification
      *
      *  @return bool

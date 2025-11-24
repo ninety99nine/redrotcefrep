@@ -152,7 +152,7 @@
 
     import Input from '@Partials/Input.vue';
     import Modal from '@Partials/Modal.vue';
-    import cloneDeep from 'lodash.cloneDeep';
+    import cloneDeep from 'lodash.clonedeep';
     import Button from '@Partials/Button.vue';
     import Loader from '@Partials/Loader.vue';
     import Select from '@Partials/Select.vue';
@@ -233,7 +233,11 @@
         methods: {
             isEmpty,
             goBack() {
-                this.navigateToCategories();
+                if (window.history.length > 1) {
+                    this.$router.back()
+                } else {
+                    this.navigateToCategories();
+                }
             },
             async setup() {
                 if(this.categoryForm == null) this.categoryState.setCategoryForm(null, this.isCreating);

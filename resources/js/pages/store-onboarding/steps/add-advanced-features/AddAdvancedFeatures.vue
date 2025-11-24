@@ -161,10 +161,10 @@
 </template>
 
 <script>
-    import isEqual from 'lodash.isEqual';
+    import isEqual from 'lodash.isequal';
     import Alert from '@Partials/Alert.vue';
     import Input from '@Partials/Input.vue';
-    import cloneDeep from 'lodash.cloneDeep';
+    import cloneDeep from 'lodash.clonedeep';
     import Button from '@Partials/Button.vue';
     import Switch from '@Partials/Switch.vue';
     import Skeleton from '@Partials/Skeleton.vue';

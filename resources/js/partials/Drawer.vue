@@ -38,7 +38,7 @@
                         <button
                             type="button"
                             aria-label="Close"
-                            @click.stop="closeOnX"
+                            @click.stop="closeOnX ? closeOnX() : hideDrawer()"
                             class="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full border border-transparent bg-gray-100 text-gray-700 hover:bg-gray-200 focus:outline-none focus:bg-gray-200 dark:bg-neutral-700 dark:hover:bg-neutral-600 dark:text-neutral-400">
                             <X size="20" />
                         </button>
@@ -265,9 +265,7 @@ export default {
         },
         closeOnX: {
             type: Function,
-            default: () => {
-                this.hideDrawer();
-            }
+            default: null
         },
         targetClass: {
             type: String,

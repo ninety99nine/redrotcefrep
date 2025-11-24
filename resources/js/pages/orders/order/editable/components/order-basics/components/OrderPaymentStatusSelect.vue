@@ -70,7 +70,7 @@
                 } else if(this.paymentStatusName === 'partially paid') {
                     classes.push('bg-blue-100 border border-blue-500');
                 }else if(this.paymentStatusName === 'waiting confirmation') {
-                    classes.push('bg-green-100 border border-green-500');
+                    classes.push('bg-yellow-100 border border-yellow-500');
                 }
 
                 return classes;
@@ -85,7 +85,7 @@
                 } else if(this.paymentStatusName === 'partially paid') {
                     classes.push('text-blue-800');
                 }else if(this.paymentStatusName === 'waiting confirmation') {
-                    classes.push('text-green-800');
+                    classes.push('text-yellow-800');
                 }
 
                 return classes;
@@ -102,7 +102,7 @@
                 } else if(paymentStatusName === 'partially paid') {
                     classes.push('bg-blue-500');
                 } else if(paymentStatusName === 'waiting confirmation') {
-                    classes.push('bg-green-500');
+                    classes.push('bg-yellow-500');
                 }
 
                 return classes;

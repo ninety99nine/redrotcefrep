@@ -10,6 +10,7 @@ export const useStoreStore = defineStore('store', {
         isLoadingStore: false,
         isUpdatingStore: false,
         isDeletingStore: false,
+        showActionButtons: false,
     }),
     actions: {
         reset() {
@@ -19,6 +20,7 @@ export const useStoreStore = defineStore('store', {
             this.isLoadingStore = false;
             this.isUpdatingStore = false;
             this.isDeletingStore = false;
+            this.showActionButtons = false;
             changeHistoryState().reset();
         },
         saveState(actionName) {

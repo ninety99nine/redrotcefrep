@@ -197,7 +197,7 @@
 
 <script>
 
-    import isEqual from 'lodash.isEqual';
+    import isEqual from 'lodash.isequal';
     import Input from '@Partials/Input.vue';
     import Modal from '@Partials/Modal.vue';
     import Button from '@Partials/Button.vue';
@@ -276,7 +276,11 @@
         methods: {
             isEmpty,
             goBack() {
-                this.navigateToCustomers();
+                if (window.history.length > 1) {
+                    this.$router.back()
+                } else {
+                    this.navigateToCustomers()
+                }
             },
             async setup() {
                 if(this.customerForm == null) this.customerState.setCustomerForm(null, this.isCreating);

@@ -13,7 +13,7 @@
                 <div class="w-full flex justify-between space-x-4">
 
                     <div class="w-full">
-                        <Skeleton v-if="isLoadingStore || isLoadingOrder" width="w-40" height="h-2" :shine="true"></Skeleton>
+                        <Skeleton v-if="isLoadingStore || isLoadingOrder" width="w-40" height="h-2" class="mb-2" :shine="true"></Skeleton>
                         <p v-else class="text-gray-700 font-semibold text-sm">{{ order.customer_name }}</p>
 
                         <Skeleton v-if="isLoadingStore || isLoadingOrder" width="w-2/3" height="h-2" :shine="true"></Skeleton>
@@ -151,7 +151,15 @@
 
                                         </div>
 
-                                        <WhatsappMessage :message="whatsappMessage"></WhatsappMessage>
+                                        <WhatsappMessage
+                                            class="h-60"
+                                            :animate="false"
+                                            :loopAnimation="false"
+                                            :messages="[
+                                                {
+                                                    sender: 'You', text: whatsappMessage, timestamp: now, isOwnMessage: true
+                                                },
+                                            ]"/>
 
                                     </template>
 
@@ -197,6 +205,7 @@
 
 <script>
 
+    import dayjs from 'dayjs';
     import QRCode from 'qrcode';
     import Copy from '@Partials/Copy.vue';
     import Button from '@Partials/Button.vue';
@@ -217,6 +226,7 @@
                 ArrowLeft,
                 qrCode: null,
                 clicked: false,
+                now: dayjs().format('HH:mm'),
                 accordions: [
                     {
                         label: 'Open in external browser',

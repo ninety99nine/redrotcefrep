@@ -5,7 +5,7 @@
 
         <div v-for="(_, index) in [1, 2]" :key="index" class="flex items-center space-x-4 border-b border-gray-300 shadow-sm rounded-lg p-2 bg-gray-50">
 
-            <div class="flex items-center justify-center w-10 h-10 border border-dashed border-gray-200 rounded-lg flex-shrink-0">
+            <div class="flex items-center justify-center w-10 h-10 border border-dashed border-gray-200 rounded-lg shrink-0">
 
                 <Image size="20" class="text-gray-400"></Image>
 

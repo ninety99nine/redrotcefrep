@@ -88,8 +88,8 @@ class AppController extends Controller
 
             $meta = [
                 'type' => 'website',
-                'url' => config('app.url'),
                 'title' => config('app.name'),
+                'url' => rtrim(config('app.url'), '/'),
                 'description' => 'Welcome to '.config('app.name'),
                 'image' => url('/images/logo-black-transparent.png')
             ];

@@ -57,7 +57,7 @@
 
                                 <div class="flex items-center space-x-2">
 
-                                    <Pill v-if="countActiveOptions(filter)" type="primary" size="xs" class="flex-shrink-0">{{ countActiveOptions(filter) }}</Pill>
+                                    <Pill v-if="countActiveOptions(filter)" type="primary" size="xs" class="shrink-0">{{ countActiveOptions(filter) }}</Pill>
 
                                     <ChevronUp v-if="filter.active" size="16"></ChevronUp>
                                     <ChevronDown v-else size="16"></ChevronDown>
@@ -174,10 +174,10 @@
 
 <script>
 import dayjs from 'dayjs';
-import isEqual from 'lodash.isEqual';
+import isEqual from 'lodash.isequal';
 import Pill from '@Partials/Pill.vue';
 import Input from '@Partials/Input.vue';
-import cloneDeep from 'lodash.cloneDeep';
+import cloneDeep from 'lodash.clonedeep';
 import Button from '@Partials/Button.vue';
 import Drawer from '@Partials/Drawer.vue';
 import Loader from '@Partials/Loader.vue';

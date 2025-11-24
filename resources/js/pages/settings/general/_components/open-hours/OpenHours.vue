@@ -3,7 +3,7 @@
     <div class="bg-white p-8 shadow-sm rounded-xl mb-2">
 
         <h1 class="flex items-center font-bold mb-4">
-            <Clock size="20" class="mr-2 flex-shrink-0"></Clock>
+            <Clock size="20" class="mr-2 shrink-0"></Clock>
             <span>Opening Hours</span>
         </h1>
 
@@ -89,14 +89,14 @@
                                 <div :class="[openingHour.available ? 'cursor-pointer' : 'opacity-0']">
 
                                     <!-- Add Icon -->
-                                    <div v-if="index2 == 0" @click="() => addOpeningHour(index)" class="flex-shrink-0 rounded-md border border-gray-300 p-1 hover:bg-blue-50 transition-all">
+                                    <div v-if="index2 == 0" @click="() => addOpeningHour(index)" class="shrink-0 rounded-md border border-gray-300 p-1 hover:bg-blue-50 transition-all">
                                         <svg class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
                                             <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
                                         </svg>
                                     </div>
 
                                     <!-- Remove Icon -->
-                                    <div v-else @click="() => removeOpeningHour(index, index2)" class="flex-shrink-0 rounded-md border border-gray-300 p-1 bg-red-50 hover:bg-red-100 transition-all">
+                                    <div v-else @click="() => removeOpeningHour(index, index2)" class="shrink-0 rounded-md border border-gray-300 p-1 bg-red-50 hover:bg-red-100 transition-all">
                                         <svg class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
                                             <path stroke-linecap="round" stroke-linejoin="round" d="M5 12h14" />
                                         </svg>

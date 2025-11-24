@@ -92,6 +92,7 @@
                     await new Promise(resolve => setTimeout(resolve, 500));    //  Wait for modal to close
 
                     this.notificationState.showSuccessNotification('Store deleted');
+                    this.storeState.setStore(null);
 
                     await this.navigateToShowStores();
 

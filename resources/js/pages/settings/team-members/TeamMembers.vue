@@ -22,7 +22,7 @@
                 @updatedPerPage="updatedPerPage"
                 :filterExpressions="filterExpressions"
                 :sortingExpressions="sortingExpressions"
-                searchPlaceholder="Search by team member name">
+                searchPlaceholder="Team member name or email">
 
                 <template #afterRefreshButton>
                     <div class="flex items-center space-x-2">
@@ -178,7 +178,7 @@
 
 <script>
     import axios from 'axios';
-    import isEqual from 'lodash.isEqual';
+    import isEqual from 'lodash.isequal';
     import Pill from '@Partials/Pill.vue';
     import Input from '@Partials/Input.vue';
     import Modal from '@Partials/Modal.vue';

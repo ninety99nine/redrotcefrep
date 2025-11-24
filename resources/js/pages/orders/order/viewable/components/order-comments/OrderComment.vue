@@ -15,7 +15,7 @@
                 :src="photo.path"
                 v-for="photo in photos"
                 @click="() => onViewPhoto(photo)"
-                class="max-h-20 object-contain rounded-lg flex-shrink-0 hover:scale-105 transition-all cursor-pointer" />
+                class="max-h-20 object-contain rounded-lg shrink-0 hover:scale-105 transition-all cursor-pointer" />
 
         </div>
 

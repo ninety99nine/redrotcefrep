@@ -40,7 +40,7 @@ class ProductExport implements FromCollection, WithHeadings, ShouldAutoSize, Wit
                 'Weight', 'Tax Override', 'Tax Override Amount', 'Show Price Per Unit', 'Unit Value',
                 'Unit Type', 'Set Daily Capacity', 'Daily Capacity', 'Stock Type', 'Stock Quantity',
                 'Set Min Order Quantity', 'Min Order Quantity', 'Set Max Order Quantity', 'Max Order Quantity',
-                'Categories', 'Tags', 'Position', 'Created Date'
+                'Categories', 'Tags', 'Images', 'Position', 'Created Date'
             ],
             'without_variants' => [
                 'ID', 'Name', 'Free', 'Estimated Price', 'Regular Price', 'Sale Price', 'Cost Price',
@@ -48,7 +48,7 @@ class ProductExport implements FromCollection, WithHeadings, ShouldAutoSize, Wit
                 'Weight', 'Tax Override', 'Tax Override Amount', 'Show Price Per Unit', 'Unit Value',
                 'Unit Type', 'Set Daily Capacity', 'Daily Capacity', 'Stock Type', 'Stock Quantity',
                 'Set Min Order Quantity', 'Min Order Quantity', 'Set Max Order Quantity', 'Max Order Quantity',
-                'Categories', 'Tags', 'Position', 'Created Date'
+                'Categories', 'Tags', 'Images', 'Position', 'Created Date'
             ]
         ];
 
@@ -57,7 +57,7 @@ class ProductExport implements FromCollection, WithHeadings, ShouldAutoSize, Wit
 
     private function exportWithVariants()
     {
-        return $this->query->with(['variants', 'categories', 'tags'])->get()->flatMap(function ($product) {
+        return $this->query->with(['photos', 'variants.photos', 'categories', 'tags'])->get()->flatMap(function ($product) {
             $rows = collect();
 
             // Add parent product if it has no parent (not a variant itself)
@@ -74,7 +74,7 @@ class ProductExport implements FromCollection, WithHeadings, ShouldAutoSize, Wit
 
     private function exportWithoutVariants()
     {
-        return $this->query->with(['categories', 'tags'])->get()->map(function ($product) {
+        return $this->query->with(['photos', 'categories', 'tags'])->get()->map(function ($product) {
             return $this->formatProductRow($product);
         });
     }
@@ -113,7 +113,7 @@ class ProductExport implements FromCollection, WithHeadings, ShouldAutoSize, Wit
             'Max Order Quantity' => $product->max_order_quantity,
             'Categories' => $product->categories->map(fn ($category) => $category->name)->implode(', '),
             'Tags' => $product->tags->map(fn ($tag) => $tag->name)->implode(', '),
-            'Position' => $product->position,
+            'Images' => $product->photos->map(fn ($photo) => $photo->path)->implode('|'),
             'Position' => $product->position,
             'Created Date' => $product->created_at->format('Y-m-d'),
         ];

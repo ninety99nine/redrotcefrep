@@ -217,6 +217,11 @@
 
                     this.notificationState.showSuccessNotification('Store created!');
 
+                    console.log({
+                        name: 'add-products',
+                        params: { 'store_id': response.data.store.id }
+                    });
+
                     this.$router.push({
                         name: 'add-products',
                         params: { 'store_id': response.data.store.id }

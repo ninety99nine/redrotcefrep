@@ -42,8 +42,8 @@
                             class="w-full"
                             v-model="searchTerm"
                             :skeleton="isLoadingStore"
-                            placeholder="Search by name, comment or rating e.g 3"
-                            @input="isLoadingReviews = true">
+                            @input="isLoadingReviews = true"
+                            placeholder="name, comment or rating e.g 3">
                         </Input>
 
                     </div>
@@ -173,7 +173,7 @@
             onAddReview() {
                 this.$router.push({
                     name: 'create-shop-review',
-                    query: {
+                    params: {
                         alias: this.store.alias
                     }
                 });

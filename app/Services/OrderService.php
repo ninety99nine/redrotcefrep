@@ -1124,10 +1124,14 @@ class OrderService extends BaseService
         $outstandingTotal = $grandTotal - $paidTotal < 0 ? 0 : $grandTotal - $paidTotal;
         $outstandingPercentage = (int) ($grandTotal > 0 ? ($outstandingTotal / $grandTotal * 100) : 0);
 
-        if( $paidPercentage == 0 ) {
-            $paymentStatus = OrderPaymentStatus::UNPAID;
-        }elseif( $paidPercentage == 100 ) {
+        $isWaitingConfirmation = collect($transactions)->filter(fn(Transaction $transaction) => $transaction->isWaitingConfirmation())->count() > 0;
+
+        if($isWaitingConfirmation) {
+            $paymentStatus = OrderPaymentStatus::WAITING_CONFIRMATION;
+        } else if( $paidPercentage == 100 ) {
             $paymentStatus = OrderPaymentStatus::PAID;
+        }else if( $paidPercentage == 0 ) {
+            $paymentStatus = OrderPaymentStatus::UNPAID;
         }else {
             $paymentStatus = OrderPaymentStatus::PARTIALLY_PAID;
         }
@@ -1184,7 +1188,7 @@ class OrderService extends BaseService
         $companyAccRef = $order->number;
         $customerPhone = $customerCountry = $customerDialCode = null;
 
-        $redirectUrl = config('app.url').'/'.$store->alias.'/orders/'.$order->id.'/verify-payment?transaction_id='.$transaction->id;
+        $redirectUrl = rtrim(config('app.url'), '/').'/'.$store->alias.'/orders/'.$order->id.'/verify-payment?transaction_id='.$transaction->id;
 
         $customerEmail = $order->customer_email;
 

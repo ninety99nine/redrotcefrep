@@ -63,7 +63,7 @@
                                 <div class="flex items-center space-x-2">
 
                                     <!-- Total Active Options -->
-                                    <Pill v-if="countActiveOptions(sorting)" type="primary" size="xs" class="flex-shrink-0">{{ countActiveOptions(sorting) }}</Pill>
+                                    <Pill v-if="countActiveOptions(sorting)" type="primary" size="xs" class="shrink-0">{{ countActiveOptions(sorting) }}</Pill>
 
                                     <!-- Drag & Drop Handle -->
                                     <Move v-if="countActiveOptions(sorting)" @click.stop size="16" class="draggable-handle cursor-grab active:cursor-grabbing text-gray-500 hover:text-yellow-500"></Move>
@@ -135,10 +135,10 @@
 
 <script>
 
-    import isEqual from 'lodash.isEqual';
+    import isEqual from 'lodash.isequal';
     import Pill from '@Partials/Pill.vue';
     import Input from '@Partials/Input.vue';
-    import cloneDeep from 'lodash.cloneDeep';
+    import cloneDeep from 'lodash.clonedeep';
     import Button from '@Partials/Button.vue';
     import Drawer from '@Partials/Drawer.vue';
     import Loader from '@Partials/Loader.vue';

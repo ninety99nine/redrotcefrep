@@ -1,6 +1,6 @@
 <template>
 
-    <div class="bg-white overflow-hidden rounded-lg space-y-4 p-4 mb-4">
+    <div class="bg-white rounded-lg space-y-4 p-4 mb-4">
 
         <div class="flex justify-between items-center">
 

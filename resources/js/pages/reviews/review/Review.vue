@@ -251,7 +251,11 @@
             formattedDatetime,
             formattedRelativeDate,
             goBack() {
-                this.navigateToReviews();
+                if (window.history.length > 1) {
+                    this.$router.back()
+                } else {
+                    this.navigateToReviews();
+                }
             },
             setRating(rating) {
                 this.reviewForm.rating = rating;

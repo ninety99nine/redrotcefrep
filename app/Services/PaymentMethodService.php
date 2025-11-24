@@ -29,7 +29,11 @@ class PaymentMethodService extends BaseService
             $store = Store::find($storeId);
             $association = isset($data['association']) ? Association::tryFrom($data['association']) : null;
 
-            if($association == Association::UNASSOCIATED) {
+            if($association == Association::TEAM_MEMBER) {
+
+                $query = PaymentMethod::where('automated_verification', '0')->whereNotIn('type', ['other']);
+
+            }else if($association == Association::UNASSOCIATED) {
 
                 $existingPaymentMethodTypes = $store->paymentMethods()->pluck('type');
 

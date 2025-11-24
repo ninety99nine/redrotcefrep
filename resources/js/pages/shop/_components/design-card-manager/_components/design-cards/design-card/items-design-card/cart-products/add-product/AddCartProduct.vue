@@ -39,7 +39,7 @@
                             class="flex items-center space-x-2 border-b border-gray-300 shadow-sm rounded-lg p-2 bg-gray-50 w-full">
 
                             <!-- Skeleton Loading -->
-                            <Skeleton width="w-10" height="h-10" rounded="rounded-lg" :shine="true" class="flex-shrink-0"></Skeleton>
+                            <Skeleton width="w-10" height="h-10" rounded="rounded-lg" :shine="true" class="shrink-0"></Skeleton>
 
                             <div class="w-full space-y-2">
                                 <Skeleton width="w-2/3" :shine="true"></Skeleton>
@@ -67,7 +67,7 @@
                         <div class="flex items-center space-x-2">
 
                             <div v-if="selectedProduct.photo.path" class="flex items-center justify-center w-10 h-10 rounded-lg">
-                                <img class="w-full max-h-10 object-contain rounded-lg flex-shrink-0" :src="selectedProduct.photo.path">
+                                <img class="w-full max-h-10 object-contain rounded-lg shrink-0" :src="selectedProduct.photo.path">
                             </div>
 
                             <p class="text-lg font-bold">

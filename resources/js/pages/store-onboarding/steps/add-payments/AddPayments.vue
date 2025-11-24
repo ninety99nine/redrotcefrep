@@ -183,8 +183,8 @@
 
 <script>
 
-    import isEqual from 'lodash.isEqual';
-    import cloneDeep from 'lodash.cloneDeep';
+    import isEqual from 'lodash.isequal';
+    import cloneDeep from 'lodash.clonedeep';
     import Button from '@Partials/Button.vue';
     import Switch from '@Partials/Switch.vue';
     import StoreLogo from '@Components/StoreLogo.vue';

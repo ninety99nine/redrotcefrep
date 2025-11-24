@@ -62,7 +62,7 @@
                                 v-for="(_, index) in [1, 2, 3]"
                                 class="flex items-center space-x-2 border-b border-gray-300 shadow-sm rounded-lg p-2 bg-gray-50 w-full">
 
-                                <Skeleton width="w-10" height="h-10" rounded="rounded-full" :shine="true" class="flex-shrink-0"></Skeleton>
+                                <Skeleton width="w-10" height="h-10" rounded="rounded-full" :shine="true" class="shrink-0"></Skeleton>
 
                                 <Skeleton width="w-1/3" :shine="true"></Skeleton>
 

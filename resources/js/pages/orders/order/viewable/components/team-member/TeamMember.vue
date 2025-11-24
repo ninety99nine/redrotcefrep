@@ -90,7 +90,7 @@
 
                 this.teamMembers.forEach((teamMember) => {
                     options.push({
-                        'label': teamMember.name,
+                        'label': teamMember.name || teamMember.email || teamMember.mobile_number?.international,
                         'value': teamMember.id
                     });
                 });

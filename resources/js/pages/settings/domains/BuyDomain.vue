@@ -290,16 +290,16 @@
             isNotEmpty,
             async goBack() {
                 if(this.viewMode === 'search') {
-                    this.navigateToShowDomains();
+                    if (window.history.length > 1) {
+                        this.$router.back()
+                    } else {
+                        this.navigateToShowDomains();
+                    }
                 }else{
                     this.viewMode = 'search';
                     this.selectedDomain = null;
                     this.selectedDomainIndex = null;
                 }
-                await this.$router.push({
-                    name: 'show-domains',
-                    query: { store_id: this.store.id }
-                });
             },
             async navigateToShowDomains() {
                 await this.$router.push({

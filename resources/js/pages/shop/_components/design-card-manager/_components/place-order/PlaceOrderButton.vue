@@ -128,7 +128,7 @@
                     this.notificationState.showSuccessNotification(`Order created`);
 
                     const order = response.data.order;
-                    await this.navigateToOrder(order);
+                    await this.navigateToShopPaymentMethods(order);
 
                 } catch (error) {
                     const message = error?.response?.data?.message || error?.message || 'Something went wrong while creating order';
@@ -140,7 +140,7 @@
                 }
 
             },
-            async navigateToOrder(order) {
+            async navigateToShopPaymentMethods(order) {
                 //  Refer to resources/js/layouts/shop/Shop.vue to see what happens
                 //  on the orderId wacher after order_id is set on the route.
 

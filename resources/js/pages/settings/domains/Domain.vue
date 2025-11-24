@@ -322,12 +322,12 @@
         methods: {
             isEmpty,
             isNotEmpty,
-            setup() {
+            async setup() {
                 this.domainState.setDomainForm(null, true);
-
                 if(this.store) this.showDomains();
                 if(this.store && this.domainId) this.showDomain();
-                if(this.store && !this.serverIp) this.showServerIp();
+                if(this.store && !this.serverIp) await this.showServerIp();
+                this.changeHistoryState.showActionButtons = true;
             },
             setActionButtons() {
                 this.changeHistoryState.removeButtons();
@@ -336,7 +336,7 @@
                     this.isEditing ? 'Save Changes' : 'Add Domain',
                     this.isEditing ? this.updateDomain : this.createDomain,
                     'primary',
-                    null
+                    this.isEditing ? null : Plus,
                 );
             },
             async navigateToShowDomains() {
@@ -642,6 +642,7 @@
         },
         beforeUnmount() {
             this.domainState.reset();
+            this.changeHistoryState.showActionButtons = false;
         },
         created() {
             this.setup();

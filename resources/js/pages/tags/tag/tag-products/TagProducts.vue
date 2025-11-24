@@ -26,7 +26,7 @@
                             v-if="props.option.product.photo"
                             class="flex items-center justify-center w-10 h-10">
 
-                            <img class="w-full max-h-full object-contain rounded-lg flex-shrink-0" :src="props.option.product.photo.path">
+                            <img class="w-full max-h-full object-contain rounded-lg shrink-0" :src="props.option.product.photo.path">
 
                         </div>
                         <span class="truncate">{{ props.option.label }}</span>
@@ -57,7 +57,7 @@
                                 v-if="product.photo"
                                 class="flex items-center justify-center w-10 h-10">
 
-                                <img class="w-full max-h-full object-contain rounded-lg flex-shrink-0" :src="product.photo.path">
+                                <img class="w-full max-h-full object-contain rounded-lg shrink-0" :src="product.photo.path">
 
                             </div>
                             <span class="text-sm truncate">{{ product.name }}</span>

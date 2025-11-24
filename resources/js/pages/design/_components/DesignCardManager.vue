@@ -20,8 +20,8 @@
 
 <script>
 
-    import isEqual from 'lodash.isEqual';
-    import cloneDeep from 'lodash.cloneDeep';
+    import isEqual from 'lodash.isequal';
+    import cloneDeep from 'lodash.clonedeep';
     import NoDesignCards from '@Pages/design/_components/_components/NoDesignCards.vue';
     import DesignCards from '@Pages/design/_components/_components/design-cards/DesignCards.vue';
     import LoadingDesignCards from '@Pages/design/_components/_components/LoadingDesignCards.vue';
