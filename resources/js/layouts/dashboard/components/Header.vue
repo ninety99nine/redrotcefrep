@@ -1,189 +1,359 @@
 <template>
 
-    <nav class="select-none fixed top-0 z-30 w-full bg-white border-b border-gray-200">
+    <nav :class="['select-none fixed top-0 z-30 w-full', { 'bg-white border-b border-gray-200' : !isOnboarding }]">
 
-        <div class="px-3 py-3 lg:px-5 lg:pl-3">
+            <div class="px-3 py-3 lg:px-5 lg:pl-3">
 
-            <div class="flex items-center justify-between">
+                <div class="flex items-center justify-between">
 
-                <div class="w-full flex items-center justify-start rtl:justify-end">
+                    <div class="w-full flex items-center justify-start rtl:justify-end space-x-4">
 
-                    <!-- Menu Toggle Button -->
-                    <button
-                        type="button"
-                        @click.prevent.stop
-                        class="inline-flex items-center p-2 text-sm text-gray-500 rounded-lg sm:hidden hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200">
-                        <span class="sr-only">Open sidebar</span>
-                        <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-                            <path clip-rule="evenodd" fill-rule="evenodd" d="M2 4.75A.75.75 0 012.75 4h14.5a.75.75 0 010 1.5H2.75A.75.75 0 012 4.75zm0 10.5a.75.75 0 01.75-.75h7.5a.75.75 0 010 1.5h-7.5a.75.75 0 01-.75-.75zM2 10a.75.75 0 01.75-.75h14.5a.75.75 0 010 1.5H2.75A.75.75 0 012 10z"></path>
-                        </svg>
-                    </button>
+                        <!-- Menu Toggle Button -->
+                        <Button v-if="storeMode" type="light" :leftIcon="Menu" buttonClass="block md:hidden"></Button>
 
-                    <div class="flex items-center space-x-4">
+                        <div class="flex items-center space-x-4">
 
-                        <template v-if="storeMode">
+                            <template v-if="storeMode">
 
-                            <!-- Logo -->
-                            <Skeleton v-if="isLoadingStore" width="w-8" height="h-8" :shine="true"></Skeleton>
-                            <StoreLogo v-else size="w-10 h-10" :showButton="false"></StoreLogo>
+                                <!-- Store Logo -->
+                                <Skeleton v-if="isLoadingStore" width="w-8" height="h-8" :shine="true"></Skeleton>
+                                <StoreLogo v-else size="w-10 h-10" :showButton="false"></StoreLogo>
 
-                            <!-- Store Name -->
-                            <Skeleton v-if="isLoadingStore" width="w-32" :shine="true"></Skeleton>
-                            <a v-else :href="this.store.web_link" target="_blank" class="cursor-pointer active:scale-95 transition-all duration-250">
-                                <h2 class="text-xl font-semibold">{{ store.name }}</h2>
-                            </a>
+                                <!-- Store Name -->
+                                <Skeleton v-if="isLoadingStore" width="w-32" :shine="true"></Skeleton>
+                                <Select
+                                    v-else
+                                    class="w-48"
+                                    :search="false"
+                                    :options="storeOptions"
+                                    v-model="localSelectedStoreId">
 
-                            <!-- Visit Store Icon -->
-                            <Skeleton v-if="isLoadingStore" width="w-8" :shine="true"></Skeleton>
-                            <a v-else :href="this.store.web_link" target="_blank" class="cursor-pointer rounded-md border p-1 border-transparent hover:border-gray-300 hover:bg-gray-50">
-                                <svg class="w-6 h-6 text-gray-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 6H5.25A2.25 2.25 0 0 0 3 8.25v10.5A2.25 2.25 0 0 0 5.25 21h10.5A2.25 2.25 0 0 0 18 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
-                                </svg>
-                            </a>
+                                    <template #footer>
 
-                        </template>
+                                        <div class="border-t border-dashed border-gray-300 pt-2 m-2">
 
-                        <template v-else>
+                                            <Button
+                                                size="xs"
+                                                type="light"
+                                                :leftIcon="Plus"
+                                                buttonClass="w-full"
+                                                :action="navigateToCreateStore">
+                                                <span class="ml-1">Create New Store</span>
+                                            </Button>
 
-                            <!-- Logo -->
-                            <Logo
-                                height="h-10"
-                                @click.stop="navigateToManageStores"
-                                class="cursor-pointer hover:shadow-sm active:scale-95 transition-all duration-250">
-                            </Logo>
+                                        </div>
 
-                        </template>
+                                    </template>
 
-                    </div>
+                                </Select>
 
-                </div>
+                                <!-- Visit Store Icon -->
+                                <Skeleton v-if="isLoadingStore" width="w-8" :shine="true"></Skeleton>
+                                <Button
+                                    size="xs"
+                                    type="light"
+                                    :action="openWebLink"
+                                    :leftIcon="ExternalLink">
+                                    <span class="ml-1">visit</span>
+                                </Button>
 
-                <div
-                    v-if="authUser"
-                    class="w-full flex justify-center items-center">
-                    <div
-                        @click.stop="navigateToManageStores"
-                        class="cursor-pointer animated-border-blue rounded-full overflow-hidden hover:shadow-sm active:scale-95 transition-all duration-250">
-                        <h2 class="py-2 px-8 text-xs text-blue-500 bg-blue-50 font-semibold whitespace-nowrap">
-                            Helping {{ authUser.firstName }} sell better
-                        </h2>
-                    </div>
-                </div>
+                            </template>
 
-                <div class="w-full flex justify-end items-center space-x-8">
+                            <template v-else-if="!isOnboarding">
 
-                    <div v-if="storeMode" class="flex items-center space-x-4">
+                                <!-- Application Logo -->
+                                <Logo
+                                    height="h-10"
+                                    @click.stop="() => navigateToShowStores()"
+                                    class="cursor-pointer hover:shadow-sm active:scale-95 transition-all duration-250">
+                                </Logo>
 
-                        <!-- Manage Stores -->
-                        <Button :action="navigateToManageStores" type="light" size="sm" :skeleton="isLoadingStore" icon="refresh">
-                            <span>Manage Stores</span>
-                        </Button>
+                            </template>
 
-                        <!-- Upgrade -->
-                        <Button :action="navigateToPricingPlans" type="primary" size="sm" :skeleton="isLoadingStore" icon="rocket">
-                            <span>Upgrade</span>
-                        </Button>
+                        </div>
 
                     </div>
 
-                    <div class="flex items-center ms-3">
+                    <template v-if="changeHistoryState.showActionButtons || changeHistoryState.hasChangeHistory || duplicateOrderId">
 
-                        <!-- Profile Avatar -->
-                        <div>
-                            <div id="profile-dropdown-trigger" class="cursor-pointer flex text-sm bg-gray-100 rounded-full focus:ring-4 focus:ring-gray-250">
-                                <span class="sr-only">Open user menu</span>
-                                <div class="w-8 h-8 border border-gray-300 text-gray-500 rounded-full p-2 hover:scale-110 transition-all duration-300">
-                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
-                                    </svg>
+                        <ChangeHistoryNavigation></ChangeHistoryNavigation>
+
+                    </template>
+
+                    <template v-else>
+
+                        <!-- Search Input -->
+                        <div
+                            v-if="!isOnboarding"
+                            class="relative w-full md:max-w-md group">
+
+                            <!-- Native HTML input -->
+                            <input
+                                type="text"
+                                @input="onSearch"
+                                autocomplete="off"
+                                spellcheck="false"
+                                v-model="searchTerm"
+                                placeholder="How can i help..."
+                                class="w-full pl-12 pr-12 py-3 text-xs font-medium
+                                    bg-white/90 backdrop-blur-xl
+                                    border border-gray-200 rounded-2xl
+                                    placeholder-gray-400 text-gray-800
+                                    focus:outline-none focus:ring-4 focus:ring-blue-500/20
+                                    focus:border-blue-400 focus:bg-white
+                                    shadow-inner shadow-blue-500/5
+                                    transition-all duration-300
+                                    group-hover:bg-white group-hover:shadow-lg
+                                    caret-blue-500"
+                            />
+
+                            <!-- Left: AI Icon + Badge -->
+                            <div class="absolute left-3.5 top-1/2 -translate-y-1/2 flex items-center gap-2 pointer-events-none">
+                                <div class="relative">
+                                <!-- Subtle pulse glow -->
+                                <div class="absolute -inset-1 rounded-lg bg-linear-to-br from-blue-500 to-purple-600
+                                                blur-xl opacity-30 group-focus-within:opacity-50 animate-pulse"></div>
                                 </div>
-                            </div>
-                        </div>
-
-                        <!-- Profile Menu -->
-                        <div id="profile-dropdown" class="w-72 border z-50 hidden my-4 text-base list-none bg-white divide-y divide-gray-100 rounded-lg shadow-sm">
-
-                            <div v-if="authUser" class="px-4 py-3 space-y-2" role="none">
-
-                                <!-- Name -->
-                                <p class="text-sm text-gray-900 font-medium truncate w-4/5" role="none">
-                                    {{ authUser._attributes.name }}
-                                </p>
-
-                                <!-- Email -->
-                                <p v-if="authUser.email" class="text-xs text-gray-500 truncate w-4/5" role="none">
-                                    {{ authUser.email }}
-                                </p>
-
-                                <!-- Mobile Number -->
-                                <p v-if="authUser.mobileNumber" class="text-xs text-gray-500 truncate w-4/5" role="none">
-                                    {{ authUser.mobileNumber.national }}
-                                </p>
-
-                            </div>
-
-                            <!-- Profile Menu Items -->
-                            <div class="py-1" role="none">
-
-                                <template
-                                    :key="index"
-                                    v-for="(navMenu, index) in profileNavMenus">
-
-                                    <div @click="navMenu.name == 'Sign Out' ? attemptLogout() : navigateToNavRoute(navMenu)" class="cursor-pointer flex space-x-2 items-center py-3 px-4 text-gray-900 hover:bg-gray-100 group">
-
-                                        <Loader v-if="navMenu.name == 'Sign Out' && isLoggingOut"></Loader>
-
-                                        <span class="text-sm text-gray-500 group-hover:text-gray-900">
-                                            {{ navMenu.name }}
-                                        </span>
-
-                                    </div>
-
-                                </template>
-
+                                <span class="text-md font-bold bg-linear-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent hidden sm:inline">
+                                    AI
+                                </span>
                             </div>
 
                         </div>
 
-                    </div>
+                        <div class="w-full flex justify-end items-center space-x-4">
+
+                            <!-- Upgrade -->
+                            <Button
+                                v-if="storeMode"
+                                :action="navigateToPricingPlans" type="primary" size="sm" :skeleton="isLoadingStore" icon="rocket">
+                                <span>Upgrade</span>
+                            </Button>
+
+                            <div class="flex items-center">
+
+                                <Dropdown
+                                    position="left"
+                                    dropdownClasses="w-72">
+
+                                    <template #trigger="props">
+
+                                        <div
+                                            @click="props.toggleDropdown"
+                                            class="flex items-center justify-center space-x-2 pl-4 cursor-pointer text-sm bg-gray-50 rounded-full focus:ring-4 focus:ring-gray-250">
+                                            <span class="text-xs font-semibold text-gray-700">{{ authUser.first_name }}</span>
+                                            <div class="flex items-center justify-center w-8 h-8 px-2 border border-gray-300 text-gray-500 rounded-full p-2 hover:scale-110 transition-all duration-300">
+                                                <UserRound size="12"></UserRound>
+                                            </div>
+                                        </div>
+
+                                    </template>
+
+                                    <template #content="props">
+
+                                        <!-- Profile Menu -->
+                                        <div class="max-h-60 overflow-auto">
+
+                                            <div v-if="authUser" class="p-4 space-y-2 border-b border-gray-100" role="none">
+
+                                                <!-- Name -->
+                                                <p class="text-sm text-gray-900 font-medium truncate w-4/5" role="none">
+                                                    {{ authUser.name }}
+                                                </p>
+
+                                                <!-- Email -->
+                                                <p v-if="authUser.email" class="text-xs text-gray-500 truncate w-4/5" role="none">
+                                                    {{ authUser.email }}
+                                                </p>
+
+                                                <!-- Mobile Number -->
+                                                <p v-if="authUser.mobile_number" class="text-xs text-gray-500 truncate w-4/5" role="none">
+                                                    {{ authUser.mobile_number.international }}
+                                                </p>
+
+                                            </div>
+
+                                            <!-- Profile Menu Items -->
+                                            <div class="py-1" role="none">
+
+                                                <template
+                                                    :key="index"
+                                                    v-for="(navMenu, index) in profileNavMenus">
+
+                                                    <div @click="(event) => navMenu.name == 'Sign Out' ? logout() : navMenu.action(props.toggleDropdown(event))" class="cursor-pointer flex space-x-2 items-center py-3 px-4 text-gray-900 hover:bg-gray-100 group">
+
+                                                        <Loader v-if="navMenu.name == 'Sign Out' && isLoggingOut"></Loader>
+
+                                                        <span class="text-sm text-gray-500 group-hover:text-gray-900">
+                                                            {{ navMenu.name }}
+                                                        </span>
+
+                                                    </div>
+
+                                                </template>
+
+                                            </div>
+
+                                        </div>
+
+                                    </template>
+
+                                </Dropdown>
+
+                            </div>
+
+                        </div>
+
+                    </template>
 
                 </div>
 
             </div>
 
-        </div>
-
-    </nav>
+        </nav>
 
 </template>
 
 <script>
 
+    import Logo from '@Partials/Logo.vue';
+    import Input from '@Partials/Input.vue';
+    import Button from '@Partials/Button.vue';
+    import Loader from '@Partials/Loader.vue';
+    import Select from '@Partials/Select.vue';
+    import Dropdown from '@Partials/Dropdown.vue';
     import Skeleton from '@Partials/Skeleton.vue';
     import StoreLogo from '@Components/StoreLogo.vue';
+    import { Plus, Menu, ExternalLink, UserRound } from 'lucide-vue-next';
+    import ChangeHistoryNavigation from '@Layouts/dashboard/components/ChangeHistoryNavigation.vue';
 
     export default {
-        inject: [],
-        components: { Skeleton, StoreLogo },
-        props: ['storeMode'],
+        inject: ['storeState', 'authState', 'formState', 'notificationState', 'changeHistoryState'],
+        components: {
+            UserRound,
+            Logo, Input, Button, Loader, Select, Dropdown, Skeleton, StoreLogo, ChangeHistoryNavigation
+        },
+        props: {
+            stores: {
+                type: Array
+            },
+            storeMode: {
+                type: Boolean
+            },
+            isOnboarding: {
+                type: Boolean
+            },
+            isLoadingStore: {
+                type: Boolean
+            },
+            selectedStoreId: {
+                type: [String, null]
+            }
+        },
         data() {
             return {
-
+                Plus,
+                Menu,
+                ExternalLink,
+                searchTerm: '',
+                profileNavMenus: [
+                    {
+                        name: 'Manage Stores',
+                        action: this.navigateToShowStores
+                    },
+                    {
+                        name: 'Sign Out',
+                        routeName: null,
+                    }
+                ],
+                isLoggingOut: false
             }
         },
         computed: {
-            isLoadingStore() {
-                return this.storeState.isLoadingStore;
+            store() {
+                return this.storeState.store;
+            },
+            authUser() {
+                return this.authState.user;
+            },
+            localSelectedStoreId: {
+                get() {
+                    return this.selectedStoreId;
+                },
+                set(storeId) {
+                    console.log(storeId);
+                    this.navigateToShowStoreHome(storeId);
+                    this.$emit("update:selectedStoreId", storeId);
+                }
+            },
+            storeOptions() {
+                return this.stores.map((store) => {
+                    return {
+                        value: store.id,
+                        label: store.name
+                    }
+                });
+            },
+            hasStores() {
+                return this.stores.length > 0;
+            },
+            duplicateOrderId() {
+                return this.$route.query.duplicate_order_id;
             }
         },
         methods: {
+            navigateToCreateStore() {
+                this.$router.push({
+                    name: 'create-store',
+                    query: { can_go_back: 1 }
+                });
+            },
+            navigateToShowStoreHome(storeId) {
+                console.log('navigateToShowStoreHome');
+                this.$router.push({
+                    name: 'show-store-home',
+                    params: { store_id: storeId }
+                })
+            },
+            navigateToShowStores(toggleDropdown = null) {
+                this.$router.push({
+                    name: 'show-stores'
+                });
+                if(toggleDropdown) toggleDropdown();
+            },
+            navigateToPricingPlans() {
+                this.$router.push({
+                    name: 'show-pricing-plans',
+                    query: { store_id: this.store.id }
+                })
+            },
+            openWebLink() {
+                if (this.store.web_link) {
+                    window.open(this.store.web_link, '_blank');
+                }
+            },
+            onSearch() {
 
-        },
-        mounted() {
+            },
+            async logout() {
+                try {
 
-        },
-        created() {
+                    this.isLoggingOut = true;
+                    await axios.post('/api/auth/logout');
 
+                    this.authState.unsetUser();
+                    this.authState.unsetToken();
+                    this.$router.replace({ name: 'login' });
+
+                } catch (error) {
+                    const message = error?.response?.data?.message || error?.message || 'Something went wrong while signing out';
+                    this.notificationState.showWarningNotification(message);
+                    this.formState.setServerFormErrors(error);
+                    console.error('Failed to sign out:', error);
+                } finally {
+                    this.isLoggingOut = false;
+                }
+            },
         }
     };
 

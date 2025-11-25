@@ -9,7 +9,7 @@
                 <span>Welcome back, {{ authUser ? authUser.first_name : '' }}</span>
             </div>
             <div v-else
-                class="flex items-center">>
+                class="flex items-center space-x-2">
                 <Skeleton width="w-6" height="h-6" color="bg-white/50" rounded="rounded-md" :shine="true" />
                 <Skeleton width="w-40" height="h-2" color="bg-white/50" rounded="rounded-md" :shine="true" />
             </div>
