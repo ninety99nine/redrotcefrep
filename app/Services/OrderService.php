@@ -1188,7 +1188,7 @@ class OrderService extends BaseService
         $companyAccRef = $order->number;
         $customerPhone = $customerCountry = $customerDialCode = null;
 
-        $redirectUrl = rtrim(config('app.url'), '/').'/'.$store->alias.'/orders/'.$order->id.'/verify-payment?transaction_id='.$transaction->id;
+        $redirectUrl = rtrim(config('app.url'), '/').'/api/transactions/'.$transaction->id.'/verify-payment';
 
         $customerEmail = $order->customer_email;
 
@@ -1206,7 +1206,7 @@ class OrderService extends BaseService
         return [
             'ptl' => 24,
             'ptlType' => 'hours',
-            'companyRefUnique' => 1,
+            'companyRefUnique' => 0,
             'metadata' => $metadata,
             'customerEmail' => $customerEmail,
             'companyRef' => $transaction->id,

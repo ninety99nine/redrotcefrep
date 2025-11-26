@@ -103,7 +103,7 @@
 
                     let config = {
                         params: {
-                            _relationships: ['logo', 'categories'].join(',')
+                            _relationships: ['logo', 'categories', 'myMembership'].join(',')
                         }
                     };
 

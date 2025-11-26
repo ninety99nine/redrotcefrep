@@ -71,6 +71,7 @@ class Store extends Model
         'combine_discounts' => 'boolean',
         'show_line_channel' => 'boolean',
         'show_opening_hours' => 'boolean',
+        'skip_payment_page' => 'boolean',
         'show_whatsapp_channel' => 'boolean',
         'show_telegram_channel' => 'boolean',
         'show_messenger_channel' => 'boolean',
@@ -101,7 +102,7 @@ class Store extends Model
         'telegram_channel_username','messenger_channel_username','invoice_show_logo','invoice_show_qr_code','invoice_header',
         'invoice_footer','invoice_company_name','invoice_company_email','invoice_company_mobile_number','seo_title',
         'seo_description','seo_keywords','google_analytics_id','meta_pixel_id','tiktok_pixel_id',
-        'tips','checkout_fees','combine_fees','combine_discounts',
+        'tips','checkout_fees','combine_fees','combine_discounts', 'skip_payment_page'
     ];
 
     /**
@@ -401,7 +402,7 @@ class Store extends Model
      */
     public function activeSubscription(): MorphOne
     {
-        return $this->morphOne(Subscription::class, 'owner')->oldest()->active();
+        return $this->morphOne(Subscription::class, 'owner')->latest()->active();
     }
 
     /**

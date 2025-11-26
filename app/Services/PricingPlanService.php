@@ -282,10 +282,10 @@ class PricingPlanService extends BaseService
      * Verify pricing plan payment.
      *
      * @param Transaction $transaction
-     * @return TransactionResource
+     * @return Transaction
      * @throws Exception
      */
-    public function verifyPricingPlanPayment(Transaction $transaction): TransactionResource
+    public function verifyPricingPlanPayment(Transaction $transaction): Transaction
     {
         try {
 
@@ -341,7 +341,7 @@ class PricingPlanService extends BaseService
                 }
             }
 
-            return (new TransactionService)->showResource($transaction);
+            return $transaction;
 
         } catch (Exception $e) {
 
@@ -351,7 +351,7 @@ class PricingPlanService extends BaseService
                 'failure_type' => TransactionFailureType::PAYMENT_VERIFICATION_FAILED->value
             ]);
 
-            throw $e;
+            return $transaction;
 
         }
     }
@@ -385,6 +385,10 @@ class PricingPlanService extends BaseService
             $offersAiAssistantSubscription = $pricingPlan->offersAiAssistantSubscription();
 
             if ($offersStoreSubscription) {
+
+                $store->subscriptions()->active()->update([
+                    'cancelled' => true
+                ]);
 
                 $storeSubscriptionPayload = $this->prepareStoreSubscriptionPayload($user, $store, $pricingPlan, $transaction);
                 $storeSubscriptionResponse = (new SubscriptionService())->createSubscription($storeSubscriptionPayload);
@@ -512,7 +516,7 @@ class PricingPlanService extends BaseService
     {
         $duration = $pricingPlan->metadata['store_subscription']['duration'];
         $frequency = $pricingPlan->metadata['store_subscription']['frequency'];
-        $subscription = $store->subscriptions()->orderBy('end_at', 'DESC')->first();
+        $subscription = $store->subscriptions()->active()->orderBy('end_at', 'DESC')->first();
 
         $startAt = $subscription ? $subscription->end_at : now();
         $endAt = $transaction ? $this->calculateSubscriptionEndAt($startAt, $frequency, $duration) : (clone $startAt)->addDays($pricingPlan->trial_days);
@@ -602,27 +606,18 @@ class PricingPlanService extends BaseService
         $companyAccRef = ucwords($pricingPlan->type);
         $metadata = ['Transaction ID' => $transaction->id];
         $customerPhone = $customerCountry = $customerDialCode = null;
-        $redirectUrl = rtrim(config('app.url'), '/').'/dashboard/pricing-plans/verify-payment?transaction_id='.$transaction->id;
+
+        $redirectUrl = rtrim(config('app.url'), '/').'/api/transactions/'.$transaction->id.'/verify-payment';
 
         if ($user->mobile_number) {
             $customerCountry = $customerDialCode = $user->mobile_number->getCountry();
             $customerPhone = PhoneNumberService::getNationalPhoneNumberWithoutSpaces($user->mobile_number);
         }
 
-        if ($store = $transaction->store) {
-            $metadata['Store ID'] = $store->id;
-            $redirectUrl .= '&store_id='.$store->id;
-        }
-
-        if ($aiAssistant = $transaction->aiAssistant) {
-            $metadata['AI Assistant ID'] = $aiAssistant->id;
-            $redirectUrl .= '&ai_assistant_id='.$aiAssistant->id;
-        }
-
         return [
             'ptl' => 24,
             'ptlType' => 'hours',
-            'companyRefUnique' => 1,
+            'companyRefUnique' => 0,
             'metadata' => $metadata,
             'customerEmail' => $user->email,
             'companyRef' => $transaction->id,

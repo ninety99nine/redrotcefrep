@@ -14,6 +14,8 @@ use App\Http\Resources\TransactionResource;
 use App\Http\Resources\TransactionResources;
 use App\Models\Order;
 use App\Models\StorePaymentMethod;
+use Illuminate\Http\Response;
+use Illuminate\View\View;
 
 class TransactionService extends BaseService
 {
@@ -269,5 +271,46 @@ class TransactionService extends BaseService
             throw new Exception('The ' . $paymentMethod->name . ' payment method cannot be used to renew transaction payment link');
 
         }
+    }
+
+    /**
+     * Verify transaction payment.
+     *
+     * @param Transaction $transaction
+     * @return Response
+     * @throws Exception
+     */
+    public function verifyTransactionPayment(Transaction $transaction): Response
+    {
+        $error = null;
+        $baseUrl = rtrim(config('app.url'), '/');
+        $url = $baseUrl.'/'.$transaction->store->alias;
+
+        try {
+
+            if($transaction->owner_type == 'order') {
+                $transaction = (new OrderService)->verifyOrderPayment($transaction);
+                $url = $baseUrl.'/'.$transaction->store->alias.'/orders/'.$transaction->owner_id;
+            }else if($transaction->owner_type == 'domain') {
+                $transaction = (new DomainService)->verifyDomainPayment($transaction);
+                $url = $baseUrl.'/dashboard/settings/domains?store_id='.$transaction->store_id;
+            }else {
+                $transaction = (new PricingPlanService)->verifyPricingPlanPayment($transaction);
+                $url = $baseUrl.'/dashboard/stores/'.$transaction->store_id;
+            }
+
+        } catch (Exception $e) {
+
+            $error = $e->getMessage();
+
+        }
+
+        return response()
+            ->view('payment.verification', [
+                'transaction' => $transaction,
+                'error' => $error,
+                'url' => $url
+            ], 200)
+            ->header('Access-Control-Allow-Origin', 'https://secure.3gdirectpay.com');
     }
 }

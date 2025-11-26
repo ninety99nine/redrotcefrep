@@ -22,6 +22,7 @@ class SubscriptionResource extends JsonResource
             'id' => $this->id,
             'user_id' => $this->user_id,
             'owner_id' => $this->owner_id,
+            'cancelled' => $this->cancelled,
             'owner_type' => $this->owner_type,
             'transaction_id' => $this->transaction_id,
             'pricing_plan_id' => $this->pricing_plan_id,

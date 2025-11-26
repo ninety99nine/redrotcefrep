@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\View\View;
 use App\Models\Transaction;
 use App\Services\TransactionService;
 use App\Http\Resources\TransactionResource;
@@ -12,6 +13,7 @@ use App\Http\Requests\Transaction\CreateTransactionRequest;
 use App\Http\Requests\Transaction\UpdateTransactionRequest;
 use App\Http\Requests\Transaction\DeleteTransactionRequest;
 use App\Http\Requests\Transaction\DeleteTransactionsRequest;
+use App\Http\Requests\Transaction\VerifyTransactionPaymentRequest;
 use App\Http\Requests\Transaction\RenewTransactionPaymentLinkRequest;
 
 class TransactionController extends Controller
@@ -111,5 +113,17 @@ class TransactionController extends Controller
     public function renewTransactionPaymentLink(RenewTransactionPaymentLinkRequest $request, Transaction $transaction): TransactionResource
     {
         return $this->service->renewTransactionPaymentLink($transaction);
+    }
+
+    /**
+     * Verify transaction payment.
+     *
+     * @param VerifyTransactionPaymentRequest $request
+     * @param Transaction $transaction
+     * @return View
+     */
+    public function verifyTransactionPayment(VerifyTransactionPaymentRequest $request, Transaction $transaction)
+    {
+        return $this->service->verifyTransactionPayment($transaction);
     }
 }

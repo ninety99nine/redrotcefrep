@@ -77,6 +77,7 @@ export const useStoreStore = defineStore('store', {
                 message_footer: store?.message_footer ?? null,
                 show_sms_channel: store?.show_sms_channel ?? false,
                 show_line_channel: store?.show_line_channel ?? false,
+                skip_payment_page: store?.skip_payment_page ?? false,
                 show_whatsapp_channel: store?.show_whatsapp_channel ?? true,
                 line_channel_username: store?.line_channel_username ?? null,
                 show_telegram_channel: store?.show_telegram_channel ?? false,

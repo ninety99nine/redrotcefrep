@@ -6,6 +6,27 @@
 
         <div class="bg-white p-8 shadow-sm rounded-xl mb-2">
 
+            <h1 class="text-lg font-bold mb-4">Payment</h1>
+
+            <div class="space-y-4">
+
+                <!-- Skip Payment Page Toggle Switch -->
+                <Skeleton v-if="isLoadingStore || !store" width="w-8" :shine="true"></Skeleton>
+                <Switch
+                    v-else
+                    size="xs"
+                    suffixText="Skip payment page"
+                    v-model="storeForm.skip_payment_page"
+                    :errorText="formState.getFormError('skip_payment_page')"
+                    @change="storeState.saveStateDebounced('Skip payment page status changed')"
+                />
+
+            </div>
+
+        </div>
+
+        <div class="bg-white p-8 shadow-sm rounded-xl mb-2">
+
             <h1 class="text-lg font-bold mb-1">Message channel</h1>
 
             <p class="text-xs text-gray-500 mb-4">Choose apps to show message button when checkout completed.</p>

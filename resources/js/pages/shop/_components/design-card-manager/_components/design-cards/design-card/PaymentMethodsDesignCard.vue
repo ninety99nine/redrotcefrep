@@ -162,10 +162,8 @@
             }
         },
         watch: {
-            store(newValue, oldValue) {
-                if(!oldValue && newValue) {
-                    this.showStorePaymentMethods();
-                }
+            order() {
+                this.setup();
             }
         },
         computed: {
@@ -189,6 +187,22 @@
             }
         },
         methods: {
+            setup() {
+                if(this.order.payment_status === 'paid' || this.order.outstanding_total.amount == 0 || this.store.skip_payment_page) {
+                    this.navigateToShowShopOrder();
+                    return;
+                }
+                this.showStorePaymentMethods();
+            },
+            async navigateToShowShopOrder() {
+                await this.$router.push({
+                    name: 'show-shop-order',
+                    params: {
+                        alias: this.store.alias,
+                        order_id: this.order.id,
+                    }
+                });
+            },
             navigateToStorePaymentMethod(storePaymentMethod) {
                 if(this.isDesigning) {
                     this.notificationState.showSuccessNotification(`Only opens on the actual store`);
@@ -243,6 +257,9 @@
 
                     if(this.storePaymentMethods.length == 0) {
                         this.navigateToShowShopPendingPayment();
+                    }else if(this.storePaymentMethods.length == 1) {
+                        const storePaymentMethod = this.storePaymentMethods[0];
+                        this.navigateToStorePaymentMethod(storePaymentMethod);
                     }
 
                 } catch (error) {
@@ -256,7 +273,7 @@
             },
         },
         created() {
-            if(this.store) this.showStorePaymentMethods();
+            if(this.order) this.setup();
         }
     }
 </script>

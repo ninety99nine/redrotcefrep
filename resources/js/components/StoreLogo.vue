@@ -1,9 +1,9 @@
 <template>
 
-    <div :class="{ 'flex flex-col items-center space-y-2' : showButton }">
+    <div :class="['select-none', { 'flex flex-col items-center space-y-2' : showButton }]">
 
         <div
-            @click="editable ? triggerFileUpload() : null"
+            @click="editable && !isUploadingAny ? triggerFileUpload() : null"
             :class="[size, { 'cursor-pointer active:scale-95 transition-all relative group' : editable }, 'bg-gray-200 rounded-full flex items-center justify-center']">
 
             <template v-if="editable">
@@ -14,7 +14,7 @@
                 </div>
 
                 <!-- Edit Icon on Hover -->
-                <div class="absolute inset-0 text-white bg-black/80 bg-opacity-50 flex items-center justify-center rounded-full opacity-0 group-hover:opacity-100 transition-opacity">
+                <div v-else class="absolute inset-0 text-white bg-black/80 bg-opacity-50 flex items-center justify-center rounded-full opacity-0 group-hover:opacity-100 transition-opacity">
                     <RefreshCw v-if="filePath" size="16"></RefreshCw>
                     <Plus v-else size="16"></Plus>
                 </div>
@@ -33,15 +33,28 @@
             @change="handleFileUpload"
             accept="image/jpeg, image/jpg, image/png, image/gif" />
 
-        <Button
-            size="xs"
-            type="light"
-            v-if="showButton"
-            buttonClass="w-40"
-            :action="triggerFileUpload"
-            :leftIcon="filePath ? RefreshCw : Plus">
-            <span>{{ filePath ? 'Change' : 'Add' }} store logo</span>
-        </Button>
+        <div class="flex items-center space-x-1">
+
+            <Button
+                size="xs"
+                type="light"
+                v-if="showButton"
+                :action="triggerFileUpload"
+                :leftIcon="filePath ? RefreshCw : Plus"
+                :disabled="isUploadingAny || localDeleting">
+                <span>{{ filePath ? 'Change' : 'Add store logo' }}</span>
+            </Button>
+
+            <Button
+                size="xs"
+                type="danger"
+                :loading="localDeleting"
+                :action="deleteStoreLogo"
+                v-if="showButton && filePath && !isUploadingAny">
+                <span>Remove</span>
+            </Button>
+
+        </div>
 
     </div>
 
@@ -50,7 +63,7 @@
 <script>
 
     import Button from '@Partials/Button.vue';
-    import { Plus, RefreshCw } from 'lucide-vue-next';
+    import { Plus, Trash2, RefreshCw } from 'lucide-vue-next';
 
     export default {
         inject: ['formState', 'storeState', 'notificationState'],
@@ -81,19 +94,38 @@
         data() {
             return {
                 Plus,
+                Trash2,
                 RefreshCw,
                 filePath: null,
-                localStore: null,
-                isUploading: false,
-                filePathBefore: null
+                localDeleting: false,
+                localUploading: false
+            }
+        },
+        watch: {
+            localStore() {
+                this.setPath();
+            },
+            'localStore.logo'(newValue) {
+                this.filePath = newValue?.path;
             }
         },
         computed: {
+            stateStore() {
+                return this.storeState.store;
+            },
             isUploadingAny() {
-                return this.uploading ?? this.isUploading;
+                return this.uploading || this.localUploading;
+            },
+            localStore() {
+                return this.store ? this.store : this.stateStore;
             }
         },
         methods: {
+            setPath() {
+                if(this.localStore?.logo) {
+                    this.filePath = this.localStore.logo.path;
+                }
+            },
             triggerFileUpload() {
                 this.$refs.fileInput.click();
             },
@@ -125,7 +157,7 @@
                         headers: { 'Content-Type': 'multipart/form-data' }
                     };
 
-                    this.isUploading = true;
+                    this.localUploading = true;
 
                     const response = await axios.post('/api/media-files', formData, config);
 
@@ -134,7 +166,6 @@
                     if(this.storeState.store && this.localStore.id == this.storeState.store.id) {
                         this.storeState.store.logo = response.data.media_file;
                         this.filePath = response.data.media_file.path;
-                        this.filePathBefore = this.filePath;
                     }
 
                 } catch (error) {
@@ -142,20 +173,42 @@
                     this.notificationState.showWarningNotification(message);
                     this.formState.setServerFormErrors(error);
                     console.error('Failed to upload store logo:', error);
-                    this.filePath = this.filePathBefore;
                 } finally {
-                    this.isUploading = false;
+                    this.localUploading = false;
                     this.$refs.fileInput.value = '';
+                }
+            },
+            async deleteStoreLogo() {
+
+                try {
+
+                    this.localDeleting = true;
+
+                    const config = {
+                        data: {
+                            store_id: this.localStore.id
+                        }
+                    }
+
+                    await axios.delete(`/api/media-files/${this.localStore.logo.id}`, config);
+
+                    if(this.storeState.store && this.localStore.id == this.storeState.store.id) {
+                        this.storeState.store.logo = null;
+                        this.filePath = null;
+                    }
+
+                } catch (error) {
+                    const message = error?.response?.data?.message || error?.message || 'Something went wrong while deleting store logo';
+                    this.notificationState.showWarningNotification(message);
+                    this.formState.setServerFormErrors(error);
+                    console.error('Failed to delete store logo:', error);
+                } finally {
+                    this.localDeleting = false;
                 }
             }
         },
         created() {
-            this.localStore = this.store ? this.store : this.storeState.store;
-
-            if(this.localStore?.logo) {
-                this.filePath = this.localStore.logo.path;
-                this.filePathBefore = this.filePath;
-            }
+            this.setPath();
         }
     };
 

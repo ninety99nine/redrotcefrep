@@ -1102,6 +1102,7 @@ test('user can view their profile with eager loaded relationships', function () 
                     'message_footer' => null,
                     'show_sms_channel' => false,
                     'show_line_channel' => false,
+                    'skip_payment_page' => false,
                     'show_whatsapp_channel' => true,
                     'show_telegram_channel' => false,
                     'show_messenger_channel' => false,

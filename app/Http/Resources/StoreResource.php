@@ -47,6 +47,7 @@ class StoreResource extends JsonResource
             'message_footer' => $this->message_footer,
             'show_sms_channel' => $this->show_sms_channel,
             'show_line_channel' => $this->show_line_channel,
+            'skip_payment_page' => $this->skip_payment_page,
             'show_whatsapp_channel' => $this->show_whatsapp_channel,
             'show_telegram_channel' => $this->show_telegram_channel,
             'show_messenger_channel' => $this->show_messenger_channel,

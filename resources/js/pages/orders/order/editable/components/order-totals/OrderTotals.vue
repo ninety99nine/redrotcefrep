@@ -134,10 +134,10 @@
                         <div class="flex items-center justify-between text-sm text-gray-500">
 
                             <Skeleton v-if="!isReady" width="w-20" color="bg-blue-200" :shine="true"></Skeleton>
-                            <span v-else>{{ shoppingCart.totals.delivery.name }}</span>
+                            <span v-else>{{ shoppingCart ? shoppingCart.totals.delivery.name : order.delivery_name }}</span>
 
                             <Skeleton v-if="!isReady" width="w-16" color="bg-blue-200" :shine="true"></Skeleton>
-                            <span v-else>{{ shoppingCart.totals.delivery.fee.amount_with_currency }}</span>
+                            <span v-else>{{ shoppingCart ? shoppingCart.totals.delivery.fee.amount_with_currency : order.delivery_fee.amount_with_currency }}</span>
 
                         </div>
 

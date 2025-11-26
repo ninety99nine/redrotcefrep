@@ -17,5 +17,7 @@ Route::prefix('transactions')
             Route::put('/', 'updateTransaction')->name('update.transaction');
             Route::delete('/', 'deleteTransaction')->name('delete.transaction');
             Route::post('/renew', 'renewTransactionPaymentLink')->name('renew.transaction.payment.link');
+            //  Allow Guest on verifyTransactionPayment
+            Route::get('/verify-payment', 'verifyTransactionPayment')->withoutMiddleware(['auth:sanctum', 'store.permission'])->name('verify.transaction.payment');
         });
     });

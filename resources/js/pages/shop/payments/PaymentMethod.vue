@@ -382,15 +382,11 @@
             }
         },
         watch: {
-            order(newVal) {
-                if(newVal && this.storePaymentMethod && !this.isConvertingCurrency) {
-                    this.convertCurrency();
-                }
+            order() {
+                this.orderLoaded();
             },
-            storePaymentMethod(newVal) {
-                if(newVal && this.order && !this.isConvertingCurrency) {
-                    this.convertCurrency();
-                }
+            storePaymentMethod() {
+                this.storePaymentMethodLoaded();
             },
             async paymentLink(newVal) {
                 this.paymentLinkQrCode = await this.generateQRCode(newVal);
@@ -1872,6 +1868,30 @@
             },
         },
         methods: {
+            orderLoaded() {
+                if(this.order.payment_status === 'paid' || this.order.outstanding_total.amount == 0 || this.store.skip_payment_page) {
+                    this.navigateToShowShopOrder();
+                    return;
+                }
+
+                if(this.storePaymentMethod && !this.isConvertingCurrency) {
+                    this.convertCurrency();
+                }
+            },
+            storePaymentMethodLoaded() {
+                if(this.order && !this.isConvertingCurrency) {
+                    this.convertCurrency();
+                }
+            },
+            async navigateToShowShopOrder() {
+                await this.$router.push({
+                    name: 'show-shop-order',
+                    params: {
+                        alias: this.store.alias,
+                        order_id: this.order.id,
+                    }
+                });
+            },
             async navigateToShowShopConfirmingPayment() {
                 await this.$router.push({
                     name: 'show-shop-confirming-payment',
@@ -2070,6 +2090,7 @@
             }
         },
         created() {
+            if(this.order) this.orderLoaded();
             this.showStorePaymentMethod();
         }
     };

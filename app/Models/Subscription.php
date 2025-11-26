@@ -25,6 +25,7 @@ class Subscription extends Model
     protected $casts = [
         'end_at' => 'datetime',
         'start_at' => 'datetime',
+        'cancelled' => 'boolean',
         'created_at' => 'datetime',
         'updated_at' => 'datetime'
     ];
@@ -35,7 +36,7 @@ class Subscription extends Model
      * @var array
      */
     protected $fillable = [
-        'start_at','end_at','user_id','transaction_id','pricing_plan_id','owner_id','owner_type',
+        'start_at','end_at','cancelled','user_id','transaction_id','pricing_plan_id','owner_id','owner_type',
     ];
 
     /**
@@ -53,7 +54,7 @@ class Subscription extends Model
 
     public function scopeActive($query)
     {
-        return $query->where('start_at', '<=', Carbon::now())->where('end_at', '>=', Carbon::now());
+        return $query->where('start_at', '<=', Carbon::now())->where('end_at', '>=', Carbon::now())->where('cancelled', '0');
     }
 
     public function scopeExpired($query)
@@ -109,7 +110,9 @@ class Subscription extends Model
     {
         return new Attribute(
             get: function() {
-                if (Carbon::parse($this->end_at)->isPast()) {
+                if ($this->cancelled) {
+                    return 'Cancelled';
+                }else if (Carbon::parse($this->end_at)->isPast()) {
                     return 'Expired';
                 }else if (Carbon::parse($this->start_at)->isFuture()) {
                     return 'Scheduled';

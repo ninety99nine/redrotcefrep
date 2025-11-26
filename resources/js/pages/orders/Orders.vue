@@ -3,44 +3,44 @@
     <div class="pt-24 px-8 select-none">
 
         <!-- No Orders -->
-        <template v-if="hasInitialResults == false">
+        <template v-if="hasInitialResults == false && !this.hasFilterExpressions">
 
-        <div class="flex flex-col items-center justify-center bg-linear-to-b from-white p-8 rounded-2xl mb-20">
+            <div class="flex flex-col items-center justify-center bg-linear-to-b from-white p-8 rounded-2xl mb-20">
 
-            <div class="bg-blue-200 text-blue-900 rounded-full p-10 mt-8 mb-16">
-                <Inbox size="40"></Inbox>
+                <div class="bg-blue-200 text-blue-900 rounded-full p-10 mt-8 mb-16">
+                    <Inbox size="40"></Inbox>
+                </div>
+
+                <div class="text-center max-w-md">
+
+                    <h1 class="text-3xl font-extrabold mb-3">
+                        Start Receiving Orders
+                    </h1>
+
+                    <p class="text-base leading-relaxed">
+                        Your orders will appear here once customers start shopping. You can also create a new order
+                    </p>
+
+                </div>
+
+                <div class="mt-10">
+
+                    <Button
+                        size="lg"
+                        type="primary"
+                        :leftIcon="Plus"
+                        leftIconSize="20"
+                        :skeleton="!store"
+                        :action="onAddOrder">
+                        <span class="ml-1">Create New Order</span>
+                    </Button>
+
+                </div>
+
             </div>
 
-            <div class="text-center max-w-md">
-
-                <h1 class="text-3xl font-extrabold mb-3">
-                    Start Receiving Orders
-                </h1>
-
-                <p class="text-base leading-relaxed">
-                    Your orders will appear here once customers start shopping. You can also create a new order
-                </p>
-
-            </div>
-
-            <div class="mt-10">
-
-                <Button
-                    size="lg"
-                    type="primary"
-                    :leftIcon="Plus"
-                    leftIconSize="20"
-                    :skeleton="!store"
-                    :action="onAddOrder">
-                    <span class="ml-1">Create New Order</span>
-                </Button>
-
-            </div>
-
-        </div>
-
-        <!-- Join WhatsApp Group -->
-        <JoinOurWhatsappGroup :mockMessages="mockMessages" class="max-w-lg mx-auto mb-40"></JoinOurWhatsappGroup>
+            <!-- Join WhatsApp Group -->
+            <JoinOurWhatsappGroup :mockMessages="mockMessages" class="max-w-lg mx-auto mb-40"></JoinOurWhatsappGroup>
 
         </template>
 

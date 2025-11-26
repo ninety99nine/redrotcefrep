@@ -36,9 +36,9 @@ class ShoppingCartService
     public $discounts = [];
     public $grandTotal = 0;
     public $currency = null;
-    public $association = null;
-    public $discountTotal = 0;
     public $deliveryFee = 0;
+    public $discountTotal = 0;
+    public $association = null;
     public $cartProducts = [];
     public $tipFlatRate = null;
     public $deliveryName = null;
@@ -104,7 +104,8 @@ class ShoppingCartService
         $this->setCartFees();
         $this->setPromotionCode();
         $this->setCartTipRate();
-        $this->setDeliveryTotal();
+        $this->setDeliveryName();
+        $this->setDeliveryAmount();
         $this->setAdjustmentTotal();
         $this->setAddress();
 
@@ -255,14 +256,25 @@ class ShoppingCartService
     }
 
     /**
-     * Set delivery total.
+     * Set delivery name.
      *
      * @return void
      */
-    private function setDeliveryTotal(): void
+    private function setDeliveryName(): void
     {
         if($this->isTeamMember) {
             $this->deliveryName = request()->filled('delivery_name') ? (float) request()->input('delivery_name') : null;
+        }
+    }
+
+    /**
+     * Set delivery amount.
+     *
+     * @return void
+     */
+    private function setDeliveryAmount(): void
+    {
+        if($this->isTeamMember) {
             $this->deliveryFee = request()->filled('delivery_amount') ? (float) request()->input('delivery_amount') : 0;
         }
     }
@@ -2706,9 +2718,9 @@ class ShoppingCartService
     private function calculateGrandTotal(): void
     {
         if ($this->store->tax_method == TaxMethod::EXCLUSIVE->value) {
-            $this->grandTotal = $this->subtotalAfterDiscount + $this->vat + $this->feeTotal;
+            $this->grandTotal = $this->subtotalAfterDiscount + $this->vat + $this->feeTotal + $this->deliveryFee;
         } else {
-            $this->grandTotal = $this->subtotalAfterDiscount + $this->feeTotal;
+            $this->grandTotal = $this->subtotalAfterDiscount + $this->feeTotal + $this->deliveryFee;
         }
 
         if(($this->grandTotal + $this->adjustmentTotal) >= 0) {

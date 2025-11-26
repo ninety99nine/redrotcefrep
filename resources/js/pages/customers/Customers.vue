@@ -4,7 +4,7 @@
 
         <!-- No Customers -->
         <div
-            v-if="hasInitialResults == false"
+            v-if="hasInitialResults == false && !this.hasFilterExpressions"
             class="flex flex-col items-center justify-center bg-linear-to-b from-white p-8 rounded-2xl">
 
             <div class="bg-blue-200 text-blue-900 rounded-full p-10 mt-8 mb-16">

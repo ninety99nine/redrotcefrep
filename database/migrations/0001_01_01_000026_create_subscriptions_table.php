@@ -17,6 +17,7 @@ return new class extends Migration
             $table->uuid('id')->primary();
             $table->timestamp('start_at')->nullable();
             $table->timestamp('end_at')->nullable();
+            $table->boolean('cancelled')->default('0');
             $table->foreignUuid('user_id')->nullable();
             $table->foreignUuid('transaction_id')->nullable();
             $table->foreignUuid('pricing_plan_id')->nullable();

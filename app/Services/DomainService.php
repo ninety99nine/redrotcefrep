@@ -203,10 +203,10 @@ class DomainService extends BaseService
      * Verify domain payment.
      *
      * @param Transaction $transaction
-     * @return TransactionResource
+     * @return Transaction
      * @throws Exception
      */
-    public function verifyDomainPayment(Transaction $transaction): TransactionResource
+    public function verifyDomainPayment(Transaction $transaction): Transaction
     {
         try {
 
@@ -258,8 +258,6 @@ class DomainService extends BaseService
                 }
             }
 
-            return (new TransactionService)->showResource($transaction);
-
         } catch (Exception $e) {
 
             $transaction->update([
@@ -268,9 +266,9 @@ class DomainService extends BaseService
                 'failure_type' => TransactionFailureType::PAYMENT_VERIFICATION_FAILED->value
             ]);
 
-            throw $e;
-
         }
+
+        return $transaction;
     }
 
     /**
@@ -484,7 +482,7 @@ class DomainService extends BaseService
     private function prepareDpoPaymentLinkPayload($user, $store, $transaction, $domain): array
     {
         $customerPhone = $customerCountry = $customerDialCode = null;
-        $redirectUrl = rtrim(config('app.url'), '/') . '/dashboard/settings/domains/verify-payment?transaction_id=' . $transaction->id . '&store_id=' . $transaction->store_id;
+        $redirectUrl = rtrim(config('app.url'), '/').'/api/transactions/'.$transaction->id.'/verify-payment';
 
         if ($user->mobile_number) {
             $customerCountry = $customerDialCode = $user->mobile_number->getCountry();

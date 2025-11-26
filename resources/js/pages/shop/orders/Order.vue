@@ -2,15 +2,31 @@
 
     <div class="select-none max-w-xl mx-auto pt-16 pb-40">
 
-        <Button
-            size="xs"
-            type="light"
-            class="mb-4"
-            :leftIcon="MoveLeft"
-            v-if="hasMembership"
-            :action="navigateToShowOrder">
-            <span>Back to Dashboard</span>
-        </Button>
+       <div
+            v-if="!isLoadingStore"
+            :class="['flex items-center', hasMembership ? 'justify-start' : 'justify-end']">
+
+            <Button
+                size="xs"
+                type="light"
+                class="mb-4"
+                :leftIcon="MoveLeft"
+                v-if="hasMembership"
+                :action="navigateToShowOrder">
+                <span>Back to Dashboard</span>
+            </Button>
+
+            <Button
+                v-else
+                size="sm"
+                type="light"
+                class="mb-4"
+                :rightIcon="MoveRight"
+                :action="navigateToStoreLogin">
+                <span>Login</span>
+            </Button>
+
+       </div>
 
         <Advert></Advert>
 
@@ -29,7 +45,7 @@
 <script>
 
     import Button from '@Partials/Button.vue';
-    import { MoveLeft } from 'lucide-vue-next';
+    import { MoveLeft, MoveRight } from 'lucide-vue-next';
     import Advert from '@Pages/shop/orders/_components/advert/Advert.vue';
     import Actions from '@Pages/shop/orders/_components/actions/Actions.vue';
     import OrderDetails from '@Pages/shop/orders/_components/order-details/OrderDetails.vue';
@@ -41,7 +57,8 @@
         components: { Advert, Button, Actions, OrderDetails, OrderComments, DeliveryAddress },
         data() {
             return {
-                MoveLeft
+                MoveLeft,
+                MoveRight
             }
         },
         computed: {
@@ -50,6 +67,9 @@
             },
             order() {
                 return this.orderState.order;
+            },
+            isLoadingStore() {
+                return this.storeState.isLoadingStore;
             },
             hasMembership() {
                 return this.store?.my_membership != null
@@ -66,7 +86,16 @@
                         store_id: this.store.id
                     }
                 });
-            }
+            },
+            async navigateToStoreLogin() {
+                if(this.isDesigning) {
+                    this.notificationState.showSuccessNotification(`Only opens on the actual store`);
+                    return;
+                }
+                await this.$router.push({
+                    name: 'show-login'
+                });
+            },
         }
     };
 

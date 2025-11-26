@@ -55,6 +55,7 @@ return new class extends Migration
             $table->string('message_footer')->nullable();
             $table->boolean('show_sms_channel')->default(false);
             $table->boolean('show_line_channel')->default(false);
+            $table->boolean('skip_payment_page')->default(false);
             $table->boolean('show_whatsapp_channel')->default(true);
             $table->string('line_channel_username')->nullable();
             $table->boolean('show_telegram_channel')->default(false);

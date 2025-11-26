@@ -125,7 +125,8 @@
 
                             <!-- Upgrade -->
                             <Button
-                                v-if="storeMode"
+                                :leftIcon="Zap"
+                                v-if="storeMode && !isLoadingStore && !activeSubscription"
                                 :action="navigateToPricingPlans" type="primary" size="sm" :skeleton="isLoadingStore" icon="rocket">
                                 <span>Upgrade</span>
                             </Button>
@@ -154,45 +155,44 @@
                                         <!-- Profile Menu -->
                                         <div class="max-h-60 overflow-auto">
 
-                                            <div v-if="authUser" class="p-4 space-y-2 border-b border-gray-100" role="none">
+                                            <div
+                                                v-if="authUser"
+                                                class="p-4 space-y-2 border-b border-gray-100 cursor-pointer hover:bg-gray-100 group"
+                                                @click="(event) => navigateToAccountSettings(() => props.toggleDropdown(event))">
 
                                                 <!-- Name -->
-                                                <p class="text-sm text-gray-900 font-medium truncate w-4/5" role="none">
+                                                <p class="text-sm text-gray-900 font-medium truncate w-4/5">
                                                     {{ authUser.name }}
                                                 </p>
 
                                                 <!-- Email -->
-                                                <p v-if="authUser.email" class="text-xs text-gray-500 truncate w-4/5" role="none">
+                                                <p v-if="authUser.email" class="text-xs text-gray-500 truncate w-4/5">
                                                     {{ authUser.email }}
                                                 </p>
 
                                                 <!-- Mobile Number -->
-                                                <p v-if="authUser.mobile_number" class="text-xs text-gray-500 truncate w-4/5" role="none">
+                                                <p v-if="authUser.mobile_number" class="text-xs text-gray-500 truncate w-4/5">
                                                     {{ authUser.mobile_number.international }}
                                                 </p>
 
                                             </div>
 
                                             <!-- Profile Menu Items -->
-                                            <div class="py-1" role="none">
+                                            <template
+                                                :key="index"
+                                                v-for="(navMenu, index) in profileNavMenus">
 
-                                                <template
-                                                    :key="index"
-                                                    v-for="(navMenu, index) in profileNavMenus">
+                                                <div @click="(event) => navMenu.name == 'Sign Out' ? logout() : navMenu.action(() => props.toggleDropdown(event))" class="cursor-pointer flex space-x-2 items-center py-2.5 px-4 text-gray-900 hover:bg-gray-100 group">
 
-                                                    <div @click="(event) => navMenu.name == 'Sign Out' ? logout() : navMenu.action(props.toggleDropdown(event))" class="cursor-pointer flex space-x-2 items-center py-3 px-4 text-gray-900 hover:bg-gray-100 group">
+                                                    <Loader v-if="navMenu.name == 'Sign Out' && isLoggingOut"></Loader>
 
-                                                        <Loader v-if="navMenu.name == 'Sign Out' && isLoggingOut"></Loader>
+                                                    <span class="text-sm text-gray-500 group-hover:text-gray-900">
+                                                        {{ navMenu.name }}
+                                                    </span>
 
-                                                        <span class="text-sm text-gray-500 group-hover:text-gray-900">
-                                                            {{ navMenu.name }}
-                                                        </span>
+                                                </div>
 
-                                                    </div>
-
-                                                </template>
-
-                                            </div>
+                                            </template>
 
                                         </div>
 
@@ -224,7 +224,7 @@
     import Dropdown from '@Partials/Dropdown.vue';
     import Skeleton from '@Partials/Skeleton.vue';
     import StoreLogo from '@Components/StoreLogo.vue';
-    import { Plus, Menu, ExternalLink, UserRound } from 'lucide-vue-next';
+    import { Zap, Plus, Menu, ExternalLink, UserRound } from 'lucide-vue-next';
     import ChangeHistoryNavigation from '@Layouts/dashboard/components/ChangeHistoryNavigation.vue';
 
     export default {
@@ -252,20 +252,11 @@
         },
         data() {
             return {
+                Zap,
                 Plus,
                 Menu,
                 ExternalLink,
                 searchTerm: '',
-                profileNavMenus: [
-                    {
-                        name: 'Manage Stores',
-                        action: this.navigateToShowStores
-                    },
-                    {
-                        name: 'Sign Out',
-                        routeName: null,
-                    }
-                ],
                 isLoggingOut: false
             }
         },
@@ -276,12 +267,14 @@
             authUser() {
                 return this.authState.user;
             },
+            activeSubscription() {
+                return this.store.active_subscription;
+            },
             localSelectedStoreId: {
                 get() {
                     return this.selectedStoreId;
                 },
                 set(storeId) {
-                    console.log(storeId);
                     this.navigateToShowStoreHome(storeId);
                     this.$emit("update:selectedStoreId", storeId);
                 }
@@ -299,7 +292,31 @@
             },
             duplicateOrderId() {
                 return this.$route.query.duplicate_order_id;
-            }
+            },
+            profileNavMenus() {
+                let menus =  [
+                    {
+                        name: 'My Stores',
+                        action: this.navigateToShowStores
+                    }
+                ];
+
+                if(this.storeMode) {
+                    menus.push(
+                    {
+                        name: 'Billing',
+                        action: this.navigateToShowBillingSettings
+                    });
+                }
+
+                menus.push(
+                {
+                    name: 'Sign Out',
+                    routeName: null
+                });
+
+                return menus;
+            },
         },
         methods: {
             navigateToCreateStore() {
@@ -320,6 +337,20 @@
                     name: 'show-stores'
                 });
                 if(toggleDropdown) toggleDropdown();
+            },
+            navigateToAccountSettings(toggleDropdown) {
+                this.$router.push({
+                    name: 'show-account-settings',
+                    query: { store_id: this.localSelectedStoreId }
+                });
+                toggleDropdown();
+            },
+            navigateToShowBillingSettings(toggleDropdown) {
+                this.$router.push({
+                    name: 'show-billing-settings',
+                    query: { store_id: this.localSelectedStoreId }
+                });
+                toggleDropdown();
             },
             navigateToPricingPlans() {
                 this.$router.push({

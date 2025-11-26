@@ -256,7 +256,7 @@ class PricingPlanSeeder extends Seeder
                     'sms_credits' => 60
                 ],
                 'features' => [
-                    'Everything in Premium, plus:',
+                    'Everything in Premium plus:',
                     'Card payments (Stripe, PayPal)',
                     'Loyalty and store credits',
                     'Payment proof upload',
@@ -286,7 +286,7 @@ class PricingPlanSeeder extends Seeder
                     'sms_credits' => 720
                 ],
                 'features' => [
-                    'Everything in Premium, plus:',
+                    'Everything in Premium plus:',
                     'Card payments (Stripe, PayPal)',
                     'Loyalty and store credits',
                     'Payment proof upload',
