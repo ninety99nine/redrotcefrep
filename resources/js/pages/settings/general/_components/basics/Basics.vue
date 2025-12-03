@@ -56,7 +56,13 @@
                 tooltipContent="A short and sweet description of your store e.g The sweetest cakes in the world 🍰">
             </Input>
 
-            <StoreLogo @click.stop size="w-24 h-24" :showButton="true"></StoreLogo>
+            <div class="grid grid-cols-2">
+
+                <StoreLogo @click.stop size="w-24 h-24" :showButton="true"></StoreLogo>
+
+                <StoreBackgroundPhoto @click.stop size="w-24 h-24" :showButton="true"></StoreBackgroundPhoto>
+
+            </div>
 
         </div>
 
@@ -70,11 +76,12 @@
     import Switch from '@Partials/Switch.vue';
     import Skeleton from '@Partials/Skeleton.vue';
     import StoreLogo from '@Components/StoreLogo.vue';
+    import StoreBackgroundPhoto from '@Components/StoreBackgroundPhoto.vue';
 
     export default {
         inject: ['formState', 'storeState'],
         components: {
-            Input, Switch, Skeleton, StoreLogo
+            Input, Switch, Skeleton, StoreLogo, StoreBackgroundPhoto
         },
         computed: {
             store() {

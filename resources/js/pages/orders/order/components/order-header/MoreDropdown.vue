@@ -7,10 +7,11 @@
         <Dropdown
             v-else
             position="left"
+            triggerSize="xs"
             :options="options"
             dropdownClasses="w-40"
             :showTriggerArrow="false"
-            :triggerLeftIcon="Ellipsis">
+            :triggerLeftIcon="ChevronDown">
 
             <template #content="props">
 
@@ -61,7 +62,7 @@
     import Modal from '@Partials/Modal.vue';
     import Loader from '@Partials/Loader.vue';
     import Dropdown from '@Partials/Dropdown.vue';
-    import { Copy, Trash2, Printer, SquarePen, Ellipsis, ArrowDownToLine } from 'lucide-vue-next';
+    import { Copy, Trash2, Printer, SquarePen, ChevronDown, ArrowDownToLine } from 'lucide-vue-next';
 
     export default {
         inject: ['formState', 'orderState', 'storeState', 'notificationState'],
@@ -69,7 +70,7 @@
         data() {
             return {
                 Trash2,
-                Ellipsis,
+                ChevronDown,
                 isDeletingOrder: false,
                 isDownloadingOrder: false,
                 options: [

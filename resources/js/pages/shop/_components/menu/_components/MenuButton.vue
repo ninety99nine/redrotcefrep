@@ -13,7 +13,7 @@
 
             <Button
                 size="xs"
-                type="outline"
+                type="bare"
                 :leftIcon="Menu"
                 leftIconSize="18"
                 :action="props.showDrawer">

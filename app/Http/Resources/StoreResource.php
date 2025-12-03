@@ -29,6 +29,7 @@ class StoreResource extends JsonResource
             'language' => $this->language,
             'web_link' => $this->web_link,
             'bg_color' => $this->bg_color,
+            'show_background' => $this->show_background,
             'description' => $this->description,
             'opening_hours' => $this->opening_hours,
             'offer_rewards' => $this->offer_rewards,
@@ -92,6 +93,7 @@ class StoreResource extends JsonResource
             'categories' => CategoryResource::collection($this->whenLoaded('categories')),
             'my_membership' => StoreUserResource::make($this->whenLoaded('myMembership')),
             'media_files' => MediaFileResource::collection($this->whenLoaded('mediaFiles')),
+            'background_photo' => MediaFileResource::make($this->whenLoaded('backgroundPhoto')),
             'active_subscription' => SubscriptionResource::make($this->whenLoaded('activeSubscription')),
 
             'orders_count' => $this->whenCounted('orders'),

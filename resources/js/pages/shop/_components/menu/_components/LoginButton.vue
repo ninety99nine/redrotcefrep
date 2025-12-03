@@ -6,7 +6,7 @@
         :leftIcon="User"
         leftIconSize="18"
         :action="navigateToStoreLogin">
-        <span class="ml-1">Staff Login</span>
+        <span class="ml-1">Login</span>
     </Button>
 
 </template>

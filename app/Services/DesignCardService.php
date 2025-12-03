@@ -174,6 +174,7 @@ class DesignCardService extends BaseService
                         'description_color' => '#4B5563',
                         'product_name_color' => '#111827',
                         'product_price_color' => '#111827',
+                        'product_description_color' => '#9CA3AF',
                         'product_cancelled_price_color' => '#9CA3AF',
                     ]),
                 ],

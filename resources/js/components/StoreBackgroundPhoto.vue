@@ -1,0 +1,215 @@
+<template>
+
+    <div :class="['select-none', { 'flex flex-col items-center space-y-2' : showButton }]">
+
+        <div
+            @click="editable && !isUploadingAny ? triggerFileUpload() : null"
+            :class="[size, { 'cursor-pointer active:scale-95 transition-all relative group' : editable }, 'bg-gray-200 rounded-full flex items-center justify-center']">
+
+            <template v-if="editable">
+
+                <!-- Uploading -->
+                <div v-if="isUploadingAny" class="absolute inset-0 text-white bg-blue-500/80 bg-opacity-50 flex items-center justify-center rounded-full transition-opacity">
+                    <RefreshCw size="16" class="animate-spin"></RefreshCw>
+                </div>
+
+                <!-- Edit Icon on Hover -->
+                <div v-else class="absolute inset-0 text-white bg-black/80 bg-opacity-50 flex items-center justify-center rounded-full opacity-0 group-hover:opacity-100 transition-opacity">
+                    <RefreshCw v-if="filePath" size="16"></RefreshCw>
+                    <Plus v-else size="16"></Plus>
+                </div>
+
+            </template>
+
+            <!-- Store Logo -->
+            <img v-if="filePath" :src="filePath" alt="Store Logo" class="w-full h-full rounded-full" />
+
+        </div>
+
+        <input
+            type="file"
+            class="hidden"
+            ref="fileInput"
+            @change="handleFileUpload"
+            accept="image/jpeg, image/jpg, image/png, image/gif" />
+
+        <div class="flex items-center space-x-1">
+
+            <Button
+                size="xs"
+                type="light"
+                v-if="showButton"
+                :action="triggerFileUpload"
+                :leftIcon="filePath ? RefreshCw : Plus"
+                :disabled="isUploadingAny || localDeleting">
+                <span>{{ filePath ? 'Change' : 'Add background photo' }}</span>
+            </Button>
+
+            <Button
+                size="xs"
+                type="danger"
+                :loading="localDeleting"
+                :action="deleteStoreLogo"
+                v-if="showButton && filePath && !isUploadingAny">
+                <span>Remove</span>
+            </Button>
+
+        </div>
+
+    </div>
+
+</template>
+
+<script>
+
+    import Button from '@Partials/Button.vue';
+    import { Plus, Trash2, RefreshCw } from 'lucide-vue-next';
+
+    export default {
+        inject: ['formState', 'storeState', 'notificationState'],
+        components: { Plus, RefreshCw, Button },
+        props: {
+            size: {
+                type: String,
+                default: 'w-20 h-20'
+            },
+            store: {
+                type: [Object, null],
+                default: null
+            },
+            showButton: {
+                type: Boolean,
+                default: true
+            },
+            uploading: {
+                type: Boolean,
+                default: false
+            },
+            editable: {
+                type: Boolean,
+                default: true
+            }
+        },
+        emits: ['selectedFile'],
+        data() {
+            return {
+                Plus,
+                Trash2,
+                RefreshCw,
+                filePath: null,
+                localDeleting: false,
+                localUploading: false
+            }
+        },
+        watch: {
+            localStore() {
+                this.setPath();
+            },
+            'localStore.background_photo'(newValue) {
+                this.filePath = newValue?.path;
+            }
+        },
+        computed: {
+            stateStore() {
+                return this.storeState.store;
+            },
+            isUploadingAny() {
+                return this.uploading || this.localUploading;
+            },
+            localStore() {
+                return this.store ? this.store : this.stateStore;
+            }
+        },
+        methods: {
+            setPath() {
+                if(this.localStore?.background_photo) {
+                    this.filePath = this.localStore.background_photo.path;
+                }
+            },
+            triggerFileUpload() {
+                this.$refs.fileInput.click();
+            },
+            handleFileUpload(event) {
+                const file = event.target.files[0];
+                if (file) {
+                    this.filePath = URL.createObjectURL(file);
+                    this.$emit('selectedFile', this.$refs.fileInput.files[0]);
+                    if(this.localStore) {
+                        this.uploadStoreLogo();
+                    }
+                }
+            },
+            async uploadStoreLogo() {
+
+                try {
+
+                    if(this.isUploadingAny || this.$refs.fileInput.files.length == 0) return;
+
+                    let formData = new FormData();
+                    formData.append('return', 1);
+                    formData.append('mediable_type', 'store');
+                    formData.append('store_id', this.localStore.id);
+                    formData.append('mediable_id', this.localStore.id);
+                    formData.append('file', this.$refs.fileInput.files[0]);
+                    formData.append('upload_folder_name', 'store_background_photo');
+
+                    const config = {
+                        headers: { 'Content-Type': 'multipart/form-data' }
+                    };
+
+                    this.localUploading = true;
+
+                    const response = await axios.post('/api/media-files', formData, config);
+
+                    this.notificationState.showSuccessNotification('Store background photo updated!');
+
+                    if(this.storeState.store && this.localStore.id == this.storeState.store.id) {
+                        this.storeState.store.background_photo = response.data.media_file;
+                        this.filePath = response.data.media_file.path;
+                    }
+
+                } catch (error) {
+                    const message = error?.response?.data?.message || error?.message || 'Something went wrong while uploading store background photo';
+                    this.notificationState.showWarningNotification(message);
+                    this.formState.setServerFormErrors(error);
+                    console.error('Failed to upload store background photo:', error);
+                } finally {
+                    this.localUploading = false;
+                    this.$refs.fileInput.value = '';
+                }
+            },
+            async deleteStoreLogo() {
+
+                try {
+
+                    this.localDeleting = true;
+
+                    const config = {
+                        data: {
+                            store_id: this.localStore.id
+                        }
+                    }
+
+                    await axios.delete(`/api/media-files/${this.localStore.background_photo.id}`, config);
+
+                    if(this.storeState.store && this.localStore.id == this.storeState.store.id) {
+                        this.storeState.store.background_photo = null;
+                        this.filePath = null;
+                    }
+
+                } catch (error) {
+                    const message = error?.response?.data?.message || error?.message || 'Something went wrong while deleting store background photo';
+                    this.notificationState.showWarningNotification(message);
+                    this.formState.setServerFormErrors(error);
+                    console.error('Failed to delete store background photo:', error);
+                } finally {
+                    this.localDeleting = false;
+                }
+            }
+        },
+        created() {
+            this.setPath();
+        }
+    };
+
+</script>

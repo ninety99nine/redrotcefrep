@@ -4,50 +4,78 @@
 
         <div class="flex items-center justify-between">
 
-            <h1 class="text-lg text-gray-700 font-semibold">{{ product.name }}</h1>
+            <div>
 
-            <Dropdown
-                position="left"
-                :options="options"
-                dropdownClasses="w-40">
+                <h1 class="text-lg text-gray-700 font-semibold mb-2">{{ product.name }}</h1>
 
-                <template #trigger="props">
+                <Pill v-if="product.is_free" type="success" size="xs">free</Pill>
 
-                    <Button
-                        size="xs"
-                        type="light"
-                        leftIconSize="16"
-                        :leftIcon="Share2"
-                        :action="props.toggleDropdown">
-                        <span class="ml-1">Share</span>
-                    </Button>
+                <div v-else class="space-x-2">
 
-                </template>
+                    <span v-if="product.on_sale" class="text-right text-lg font-semibold text-gray-900">
+                        {{ product.unit_sale_price.amount_with_currency }}
+                    </span>
 
-                <template #content="props">
+                    <span :class="['text-right', { 'line-through text-xs text-gray-400': product.on_sale, 'text-lg text-gray-900 font-semibold': !product.on_sale }]">
+                        {{ product.unit_regular_price.amount_with_currency }}
+                    </span>
 
-                    <ul class="max-h-60 overflow-auto">
+                </div>
 
-                        <li
-                            :key="index"
-                            v-for="(option, index) in props.options"
-                            @click="() => props.handleItemClick(option)"
-                            :class="[
-                                'flex items-center space-x-2 px-4 py-1.5 text-sm cursor-pointer',
-                                option.label == 'Copy Link' ? 'hover:bg-blue-100 bg-blue-50' : 'hover:bg-gray-100 text-gray-700'
-                            ]">
-                            <div class="flex items-center space-x-2">
-                                <Link v-if="option.label == 'Copy Link'" size="14"></Link>
-                                <img v-else-if="option.icon" :src="`/images/social-media-icons/${option.icon}.png`" :alt="`${option.icon} Logo`" class="w-4 h-4" />
-                                <span class="truncate">{{ option.label }}</span>
-                            </div>
-                        </li>
+            </div>
 
-                    </ul>
+            <div class="flex space-x-4">
 
-                </template>
+                <Button
+                    size="xs"
+                    type="bare"
+                    :leftIcon="Search"
+                    :action="navigateToSearch">
+                </Button>
 
-            </Dropdown>
+                <Dropdown
+                    position="left"
+                    :options="options"
+                    dropdownClasses="w-40">
+
+                    <template #trigger="props">
+
+                        <Button
+                            size="xs"
+                            type="bare"
+                            leftIconSize="16"
+                            :leftIcon="Share2"
+                            :action="props.toggleDropdown">
+                        </Button>
+
+                    </template>
+
+                    <template #content="props">
+
+                        <ul class="max-h-60 overflow-auto">
+
+                            <li
+                                :key="index"
+                                v-for="(option, index) in props.options"
+                                @click="() => props.handleItemClick(option)"
+                                :class="[
+                                    'flex items-center space-x-2 px-4 py-1.5 text-sm cursor-pointer',
+                                    option.label == 'Copy Link' ? 'hover:bg-blue-100 bg-blue-50' : 'hover:bg-gray-100 text-gray-700'
+                                ]">
+                                <div class="flex items-center space-x-2">
+                                    <Link v-if="option.label == 'Copy Link'" size="14"></Link>
+                                    <img v-else-if="option.icon" :src="`/images/social-media-icons/${option.icon}.png`" :alt="`${option.icon} Logo`" class="w-4 h-4" />
+                                    <span class="truncate">{{ option.label }}</span>
+                                </div>
+                            </li>
+
+                        </ul>
+
+                    </template>
+
+                </Dropdown>
+
+            </div>
 
         </div>
 
@@ -114,27 +142,9 @@
 
         </div>
 
-        <div v-else class="flex items-center justify-between mt-4">
-
-            <span class="text-sm font-bold">Price</span>
-
-            <Pill v-if="product.is_free" type="success" size="xs">free</Pill>
-
-            <div v-else class="space-x-2">
-
-                <span v-if="product.on_sale" class="text-right text-sm font-semibold text-gray-900">
-                    {{ product.unit_sale_price.amount_with_currency }}
-                </span>
-
-                <span :class="['text-right', { 'line-through text-xs text-gray-400': product.on_sale, 'text-sm text-gray-900 font-semibold': !product.on_sale }]">
-                    {{ product.unit_regular_price.amount_with_currency }}
-                </span>
-
-            </div>
-
-        </div>
-
-        <div class="flex items-center justify-between space-x-4 border-t border-black/20 pt-4 mt-4">
+        <div
+            v-if="product.stock_quantity_type != 'sold out'"
+            class="flex items-center justify-between space-x-4 border-t border-black/20 pt-4 mt-4">
 
             <span class="text-sm font-bold">Quantity</span>
             <div class="w-fit text-sm flex items-center bg-white border border-black/20 rounded-full overflow-hidden">
@@ -312,6 +322,12 @@
         </div>
 
         <div
+            v-if="product.stock_quantity_type == 'sold out'"
+            class="px-2.5 py-2 text-xl text-center font-bold text-red-600 mt-8">
+            SOLD OUT
+        </div>
+
+        <div
             class="flex space-x-2"
             v-if="orderProduct && (isInspectingShoppingCart || !shouldGoBack)">
 
@@ -344,8 +360,8 @@
             type="primary"
             :action="addToCart"
             buttonClass="w-full"
-            v-else-if="!orderProduct"
-            :disabled="isInspectingShoppingCart">
+            :disabled="isInspectingShoppingCart"
+            v-else-if="product.stock_quantity_type != 'sold out' && !orderProduct">
             <span>Add</span>
             <span v-if="estimatedPrice">{{ estimatedPrice }}</span>
         </Button>
@@ -359,10 +375,10 @@
     import Pill from '@Partials/Pill.vue';
     import Input from '@Partials/Input.vue';
     import Button from '@Partials/Button.vue';
-    import { MoveLeft } from 'lucide-vue-next';
     import Dropdown from '@Partials/Dropdown.vue';
     import { Link, Share2 } from 'lucide-vue-next';
     import Datepicker from '@Partials/Datepicker.vue';
+    import { Search, MoveLeft } from 'lucide-vue-next';
     import { convertToMoneyWithSymbol } from '@Utils/numberUtils.js';
 
     export default {
@@ -370,6 +386,7 @@
         components: { Link, Pill, Input, Button, Dropdown, Datepicker },
         data() {
             return {
+                Search,
                 Share2,
                 MoveLeft,
                 quantity: '1',
@@ -435,7 +452,7 @@
                 if(oldValue && !newValue && this.shouldGoBack) {
                     this.goBack();
                 }
-            }
+            },
         },
         computed: {
             store() {
@@ -493,6 +510,14 @@
             goBack() {
                 this.$router.back();
             },
+            async navigateToSearch() {
+                await this.$router.push({
+                    name: 'show-search',
+                    params: {
+                        alias: this.store.alias
+                    }
+                });
+            },
             setInitialQuantity() {
                 if(this.orderProduct) {
                     this.quantity = this.orderProduct.quantity;
@@ -520,19 +545,6 @@
                 const url = `https://x.com/intent/post?text=${text}`;
                 window.open(url, '_blank');
             },
-            addToCart(goBack = true) {
-                if(this.selectedVariant) {
-                    this.orderState.addCartProductUsingProduct(this.selectedVariant, this.product, this.quantity, false);
-                }else{
-                    this.orderState.addCartProductUsingProduct(this.product, null, this.quantity, false);
-                }
-                this.shouldGoBack = goBack;
-            },
-            removeFromCart(goBack = true) {
-                const index = this.shoppingCart.order_products.findIndex(orderProduct => orderProduct.product_id == this.product.id);
-                this.orderState.removeCartProduct(index, false);
-                this.shouldGoBack = goBack;
-            },
             async copyLink() {
                 try {
 
@@ -546,6 +558,19 @@
                 } catch (err) {
                     console.error('Failed to copy:', err);
                 }
+            },
+            addToCart(goBack = true) {
+                if(this.selectedVariant) {
+                    this.orderState.addCartProductUsingProduct(this.selectedVariant, this.product, this.quantity, false);
+                }else{
+                    this.orderState.addCartProductUsingProduct(this.product, null, this.quantity, false);
+                }
+                this.shouldGoBack = goBack;
+            },
+            removeFromCart(goBack = true) {
+                const index = this.shoppingCart.order_products.findIndex(orderProduct => orderProduct.product_id == this.product.id);
+                this.orderState.removeCartProduct(index, false);
+                this.shouldGoBack = goBack;
             },
             increaseQuantity() {
                 const current = parseInt(this.quantity) || 0;

@@ -311,7 +311,10 @@
 
                                     <!-- Stock -->
                                     <td v-else-if="column.name == 'Stock'" class="align-center pr-4 py-4 text-sm">
-                                        <Pill :type="(product.variant ?? product).has_stock ? 'success' : 'warning'" size="xs">{{ (product.variant ?? product).has_stock ? ((product.variant ?? product).stock_quantity_type == 'unlimited' ? 'unlimited' : `${(product.variant ?? product).stock_quantity} left`) : 'no stock' }}</Pill>
+                                        <Pill v-if="product.stock_quantity_type == 'unlimited'" type="success" size="xs">Unlimited</Pill>
+                                        <Pill v-else-if="product.stock_quantity_type == 'limited' && product.has_stock" type="success" size="xs">{{ `${product.stock_quantity} left` }}</Pill>
+                                        <Pill v-else-if="product.stock_quantity_type == 'limited' && !product.has_stock" type="warning" size="xs">{{ `${product.stock_quantity} left` }}</Pill>
+                                        <Pill v-else-if="product.stock_quantity_type == 'sold out'" type="danger" size="xs">sold out</Pill>
                                     </td>
 
                                     <!-- Variants -->
@@ -857,7 +860,7 @@
                 }));
             },
             prepareWhatsappFields() {
-                const whatsappFieldNames = ['Name', 'Description', 'Unit Regular Price', 'Unit Sale Price', 'Unit Price', 'Visibility', 'Stock', 'Variants', 'Minimum Order Quantity', 'Maximum Order Quantity', 'Position', 'Created Date', 'Product Link'];
+                const whatsappFieldNames = ['Name', 'Description', 'Unit Regular Price', 'Unit Sale Price', 'Unit Price', 'Visibility', 'Sold Out', 'Stock', 'Variants', 'Minimum Order Quantity', 'Maximum Order Quantity', 'Position', 'Created Date', 'Product Link'];
                 const defaultWhatsappFieldNames  = ['Name', 'Description', 'Unit Price', 'Visibility', 'Stock', 'Variants', 'Position', 'Created Date'];
 
                 return whatsappFieldNames.map(name => ({
@@ -1281,6 +1284,9 @@
                                     break;
                                 case "Unit Price":
                                     productMessage += `${(checkedProducts[i].variant ?? checkedProducts[i]).unit_price.amount_with_currency}\n`;
+                                    break;
+                                case "Sold Out":
+                                    productMessage += `${checkedProducts[i].stock_quantity_type == 'sold out' ? 'yes' : 'no'}\n`;
                                     break;
                                 case "Stock":
                                     productMessage += `${(checkedProducts[i].variant ?? checkedProducts[i]).has_stock ? ((checkedProducts[i].variant ?? checkedProducts[i]).stock_quantity_type == 'unlimited' ? 'unlimited' : `${(checkedProducts[i].variant ?? checkedProducts[i]).stock_quantity} left`) : 'no stock'}\n`;

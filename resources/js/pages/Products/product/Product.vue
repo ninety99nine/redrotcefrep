@@ -8,7 +8,7 @@
 
                 <div class="select-none bg-white rounded-lg p-4 mb-4">
 
-                    <div class="flex items-center space-x-4">
+                    <div class="w-full flex items-center space-x-4">
 
                         <!-- Back Button -->
                         <Button
@@ -24,7 +24,7 @@
                             <Skeleton width="w-4"></Skeleton>
                         </div>
 
-                        <template v-else>
+                        <div v-else class="w-full flex items-center justify-between">
 
                             <!-- Heading -->
                             <div class="flex items-center space-x-1">
@@ -37,7 +37,85 @@
 
                             </div>
 
-                        </template>
+                            <div class="flex space-x-2">
+
+                                <Dropdown
+                                    v-if="product"
+                                    position="left"
+                                    :options="shareOptions"
+                                    dropdownClasses="w-40">
+
+                                    <template #trigger="props">
+
+                                        <Button
+                                            size="xs"
+                                            type="light"
+                                            leftIconSize="16"
+                                            :leftIcon="Share2"
+                                            :action="props.toggleDropdown">
+                                            <span class="ml-1">Share</span>
+                                        </Button>
+
+                                    </template>
+
+                                    <template #content="props">
+
+                                        <ul class="max-h-60 overflow-auto">
+
+                                            <li
+                                                :key="index"
+                                                v-for="(option, index) in props.options"
+                                                @click="() => props.handleItemClick(option)"
+                                                :class="[
+                                                    'flex items-center space-x-2 px-4 py-1.5 text-sm cursor-pointer',
+                                                    option.label == 'Copy Link' ? 'hover:bg-blue-100 bg-blue-50' : 'hover:bg-gray-100 text-gray-700'
+                                                ]">
+                                                <div class="flex items-center space-x-2">
+                                                    <Link v-if="option.label == 'Copy Link'" size="14"></Link>
+                                                    <img v-else-if="option.icon" :src="`/images/social-media-icons/${option.icon}.png`" :alt="`${option.icon} Logo`" class="w-4 h-4" />
+                                                    <span class="truncate">{{ option.label }}</span>
+                                                </div>
+                                            </li>
+
+                                        </ul>
+
+                                    </template>
+
+                                </Dropdown>
+
+                                <Dropdown
+                                    v-if="product"
+                                    position="left"
+                                    triggerSize="xs"
+                                    dropdownClasses="w-40"
+                                    :options="actionOptions"
+                                    :triggerLeftIcon="ChevronDown">
+
+                                    <template #content="props">
+
+                                        <ul class="max-h-60 overflow-auto">
+
+                                            <li
+                                                :key="index"
+                                                v-for="(option, index) in props.options"
+                                                @click="() => props.handleItemClick(option)"
+                                                :class="[
+                                                    'flex items-center space-x-2 px-4 py-2 text-xs cursor-pointer',
+                                                    option.label == 'Delete' ? 'hover:bg-red-100 text-red-700' : 'hover:bg-gray-100 text-gray-700'
+                                                ]">
+                                                <component :is="option.icon" size="16"></component>
+                                                <span class="truncate">{{ option.label }}</span>
+                                            </li>
+
+                                        </ul>
+
+                                    </template>
+
+                                </Dropdown>
+
+                            </div>
+
+                        </div>
 
                     </div>
 
@@ -102,27 +180,6 @@
                             description="Confirm your order to show download link on invoice">
                         </Input>
 
-                        <!-- Show Description Checkbox -->
-                        <Input
-                            type="checkbox"
-                            inputLabel="Show Description"
-                            v-model="productForm.show_description"
-                            @change="productState.saveStateDebounced('Show description status changed')">
-                        </Input>
-
-                        <!-- Description Textarea -->
-                        <Input
-                            rows="2"
-                            type="textarea"
-                            label="Description"
-                            v-model="productForm.description"
-                            v-if="productForm.show_description"
-                            placeholder="1 day show with popular artists"
-                            :errorText="formState.getFormError('description')"
-                            @input="productState.saveStateDebounced('Description changed')"
-                            tooltipContent="Sweet and short description of your product e.g 1 day show with popular artists">
-                        </Input>
-
                         <!-- Weight Input -->
                         <Input
                             type="text"
@@ -164,6 +221,37 @@
                             </Input>
 
                         </div>
+
+                    </div>
+
+                </div>
+
+                <div class="relative mb-4">
+
+                    <BackdropLoader v-if="isLoadingProduct || isSubmitting" :showSpinningLoader="false" class="rounded-lg"></BackdropLoader>
+
+                    <div class="bg-white rounded-lg space-y-4 p-4">
+
+                        <!-- Show Description Checkbox -->
+                        <Input
+                            type="checkbox"
+                            inputLabel="Show Description"
+                            v-model="productForm.show_description"
+                            @change="productState.saveStateDebounced('Show description status changed')">
+                        </Input>
+
+                        <!-- Description Textarea -->
+                        <Input
+                            rows="2"
+                            type="textarea"
+                            label="Description"
+                            v-model="productForm.description"
+                            :disabled="!productForm.show_description"
+                            placeholder="1 day show with popular artists"
+                            :errorText="formState.getFormError('description')"
+                            @input="productState.saveStateDebounced('Description changed')"
+                            tooltipContent="Sweet and short description of your product e.g 1 day show with popular artists">
+                        </Input>
 
                     </div>
 
@@ -599,81 +687,85 @@
                             tooltipContent="Select the available stock e.g Unlimited means that stock is always available while limited means that stock is limited to the quatities specified">
                         </Select>
 
-                        <!-- Stock Quantity Input -->
-                        <Input
-                            min="1"
-                            type="number"
-                            placeholder="100"
-                            label="Stock Quantity"
-                            v-model="productForm.stock_quantity"
-                            v-if="productForm.stock_quantity_type == 'limited'"
-                            :errorText="formState.getFormError('stock_quantity')"
-                            @input="productState.saveStateDebounced('Stock quantity changed')"
-                            tooltipContent="Set the stock quantity e.g 100 means that you only have 100 items for this product">
-                        </Input>
+                        <template v-if="productForm.stock_quantity_type != 'sold out'">
 
-                        <!-- Daily Capacity Switch -->
-                        <Switch
-                            size="xs"
-                            suffixText="Daily Capacity"
-                            v-model="productForm.set_daily_capacity"
-                            :errorText="formState.getFormError('set_daily_capacity')"
-                            tooltipContent="The maximum number number of items you can sell per day"
-                            @change="productState.saveStateDebounced('Daily capacity status changed')">
-                        </Switch>
+                            <!-- Stock Quantity Input -->
+                            <Input
+                                min="0"
+                                type="number"
+                                placeholder="100"
+                                label="Stock Quantity"
+                                v-model="productForm.stock_quantity"
+                                v-if="productForm.stock_quantity_type == 'limited'"
+                                :errorText="formState.getFormError('stock_quantity')"
+                                @input="productState.saveStateDebounced('Stock quantity changed')"
+                                tooltipContent="Set the stock quantity e.g 100 means that you only have 100 items for this product">
+                            </Input>
 
-                        <!-- Daily Capacity Input -->
-                        <Input
-                            min="1"
-                            type="number"
-                            placeholder="10"
-                            v-model="productForm.daily_capacity"
-                            v-if="productForm.set_daily_capacity"
-                            :errorText="formState.getFormError('daily_capacity')"
-                            @input="productState.saveStateDebounced('Daily capacity changed')">
-                        </Input>
+                            <!-- Daily Capacity Switch -->
+                            <Switch
+                                size="xs"
+                                suffixText="Daily Capacity"
+                                v-model="productForm.set_daily_capacity"
+                                :errorText="formState.getFormError('set_daily_capacity')"
+                                tooltipContent="The maximum number number of items you can sell per day"
+                                @change="productState.saveStateDebounced('Daily capacity status changed')">
+                            </Switch>
 
-                        <!-- Minimum Quantities Per Order Switch -->
-                        <Switch
-                            size="xs"
-                            suffixText="Minimum Order Quantity"
-                            v-model="productForm.set_min_order_quantity"
-                            :errorText="formState.getFormError('set_min_order_quantity')"
-                            @change="productState.saveStateDebounced('Minimum order quantity status changed')"
-                            tooltipContent="Set the minimum order quantity for this product (Used to manage supply and demand)">
-                        </Switch>
+                            <!-- Daily Capacity Input -->
+                            <Input
+                                min="1"
+                                type="number"
+                                placeholder="10"
+                                v-model="productForm.daily_capacity"
+                                v-if="productForm.set_daily_capacity"
+                                :errorText="formState.getFormError('daily_capacity')"
+                                @input="productState.saveStateDebounced('Daily capacity changed')">
+                            </Input>
 
-                        <!-- Minimum Allowed Quantity Per Order Input -->
-                        <Input
-                            min="1"
-                            type="number"
-                            placeholder="10"
-                            v-model="productForm.min_order_quantity"
-                            v-if="productForm.set_min_order_quantity"
-                            :errorText="formState.getFormError('min_order_quantity')"
-                            @input="productState.saveStateDebounced('Minimum order quantity changed')">
-                        </Input>
+                            <!-- Minimum Quantities Per Order Switch -->
+                            <Switch
+                                size="xs"
+                                suffixText="Minimum Order Quantity"
+                                v-model="productForm.set_min_order_quantity"
+                                :errorText="formState.getFormError('set_min_order_quantity')"
+                                @change="productState.saveStateDebounced('Minimum order quantity status changed')"
+                                tooltipContent="Set the minimum order quantity for this product (Used to manage supply and demand)">
+                            </Switch>
 
-                        <!-- Maximum Quantities Per Order Switch -->
-                        <Switch
-                            size="xs"
-                            suffixText="Maximum Order Quantity"
-                            v-model="productForm.set_max_order_quantity"
-                            :errorText="formState.getFormError('set_max_order_quantity')"
-                            @change="productState.saveStateDebounced('Maximum order quantity status changed')"
-                            tooltipContent="Set the maximum order quantity for this product (Used to manage supply and demand)">
-                        </Switch>
+                            <!-- Minimum Allowed Quantity Per Order Input -->
+                            <Input
+                                min="1"
+                                type="number"
+                                placeholder="10"
+                                v-model="productForm.min_order_quantity"
+                                v-if="productForm.set_min_order_quantity"
+                                :errorText="formState.getFormError('min_order_quantity')"
+                                @input="productState.saveStateDebounced('Minimum order quantity changed')">
+                            </Input>
 
-                        <!-- Maximum Allowed Quantity Per Order Input -->
-                        <Input
-                            min="1"
-                            type="number"
-                            placeholder="10"
-                            v-model="productForm.max_order_quantity"
-                            v-if="productForm.set_max_order_quantity"
-                            :errorText="formState.getFormError('max_order_quantity')"
-                            @input="productState.saveStateDebounced('Maximum order quantity changed')">
-                        </Input>
+                            <!-- Maximum Quantities Per Order Switch -->
+                            <Switch
+                                size="xs"
+                                suffixText="Maximum Order Quantity"
+                                v-model="productForm.set_max_order_quantity"
+                                :errorText="formState.getFormError('set_max_order_quantity')"
+                                @change="productState.saveStateDebounced('Maximum order quantity status changed')"
+                                tooltipContent="Set the maximum order quantity for this product (Used to manage supply and demand)">
+                            </Switch>
+
+                            <!-- Maximum Allowed Quantity Per Order Input -->
+                            <Input
+                                min="1"
+                                type="number"
+                                placeholder="10"
+                                v-model="productForm.max_order_quantity"
+                                v-if="productForm.set_max_order_quantity"
+                                :errorText="formState.getFormError('max_order_quantity')"
+                                @input="productState.saveStateDebounced('Maximum order quantity changed')">
+                            </Input>
+
+                        </template>
 
                     </div>
 
@@ -834,6 +926,7 @@
                     triggerText="Delete Product"
                     approveText="Delete Product"
                     :approveAction="deleteProduct"
+                    ref="confirmDeleteProductModal"
                     :triggerLoading="isDeletingProduct"
                     :approveLoading="isDeletingProduct">
 
@@ -866,23 +959,27 @@
     import Select from '@Partials/Select.vue';
     import Popover from '@Partials/Popover.vue';
     import { isEmpty } from '@Utils/stringUtils';
+    import Dropdown from '@Partials/Dropdown.vue';
     import Skeleton from '@Partials/Skeleton.vue';
     import SelectTags from '@Partials/SelectTags.vue';
     import { VueDraggableNext } from 'vue-draggable-next';
     import BackdropLoader from '@Partials/BackdropLoader.vue';
     import DataCollectionFields from '@Pages/products/product/data-collection-fields/DataCollectionFields.vue';
-    import { Move, X, Plus, Image, Split, Trash2, MoveLeft, ArrowDownUp, ChevronUp, ChevronDown } from 'lucide-vue-next';
+    import { Move, X, Eye, Copy, Link, Plus, Image, Split, Share2, Trash2, MoveLeft, ArrowDownUp, ChevronUp, ChevronDown } from 'lucide-vue-next';
 
     export default {
         inject: ['formState', 'storeState', 'productState', 'changeHistoryState', 'notificationState'],
         components: {
-            Move, Image, Split, Pill, Alert, Input, Modal, Button, Loader, Switch, Select, Popover,
-            Skeleton, SelectTags, draggable: VueDraggableNext, BackdropLoader, DataCollectionFields
+            Link, Move, Image, Split, Pill, Alert, Input, Modal, Button, Loader, Switch, Select, Popover,
+            Dropdown, Skeleton, SelectTags, draggable: VueDraggableNext, BackdropLoader, DataCollectionFields
         },
         data() {
             return {
                 X,
+                Eye,
+                Copy,
                 Plus,
+                Share2,
                 Trash2,
                 MoveLeft,
                 tags: [],
@@ -926,11 +1023,55 @@
                 stockQuantityTypes: [
                     { label: 'Unlimited', value: 'unlimited'},
                     { label: 'Limited', value: 'limited'},
+                    { label: 'Sold Out', value: 'sold out'},
                 ],
                 allowedQuantityPerOrder: [
                     { label: 'Unlimited', value: 'unlimited'},
                     { label: 'Limited', value: 'limited'},
-                ]
+                ],
+                actionOptions: [
+                    {
+                        label: 'View',
+                        icon: Eye,
+                        action: this.navigateToShopProduct,
+                    },
+                    {
+                        label: 'Duplicate',
+                        icon: Copy,
+                        action: this.duplicateOrder,
+                    },
+                    {
+                        label: 'Delete',
+                        icon: Trash2,
+                        action: this.showConfirmDeleteProductModal
+                    }
+                ],
+                shareOptions: [
+                    {
+                        label: 'Whatsapp',
+                        icon: 'whatsapp',
+                        action: this.shareViaWhatsapp,
+                    },
+                    {
+                        label: 'Facebook',
+                        icon: 'facebook',
+                        action: this.shareViaFacebook
+                    },
+                    {
+                        label: 'LinkedIn',
+                        icon: 'linkedin',
+                        action: this.shareViaLinkedIn
+                    },
+                    {
+                        label: 'X',
+                        icon: 'x',
+                        action: this.shareViaX
+                    },
+                    {
+                        label: 'Copy Link',
+                        action: this.copyLink
+                    }
+                ],
             }
         },
         watch: {
@@ -1005,7 +1146,20 @@
                         value: deliveryMethod.id
                     }
                 });
-            }
+            },
+            productLink() {
+                if(!this.store || !this.product) return null;
+                const resolvedRoute = this.$router.resolve({
+                    name: 'show-shop-product',
+                    params: {
+                        alias: this.store.alias,
+                        product_id: this.product.id
+                    },
+                });
+
+                const baseUrl = window.location.origin;
+                return `${baseUrl}${resolvedRoute.href}`;
+            },
         },
         methods: {
             isEmpty,
@@ -1042,6 +1196,17 @@
 
                 }
             },
+            async navigateToShopProduct() {
+                const routeData = this.$router.resolve({
+                    name: 'show-shop-product',
+                    params: {
+                        alias: this.store.alias,
+                        product_id: this.product.id
+                    },
+                });
+
+                window.open(routeData.href, '_blank');
+            },
             async navigateToProducts() {
                 await this.$router.replace({
                     name: 'show-products',
@@ -1067,9 +1232,48 @@
                     }
                 });
             },
+            shareViaWhatsapp() {
+                if (!this.productLink) return;
+                const text = encodeURIComponent(`Check out ${this.product.name} at ${this.store.name}:\n\n${this.productLink}`);
+                const url = `https://wa.me/?text=${text}`;
+                window.open(url, '_blank');
+            },
+            shareViaFacebook() {
+                if (!this.productLink) return;
+                const url = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(this.productLink)}`;
+                window.open(url, '_blank');
+            },
+            shareViaLinkedIn() {
+                if (!this.productLink) return;
+                const url = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(this.productLink)}`;
+                window.open(url, '_blank');
+            },
+            shareViaX() {
+                if (!this.productLink) return;
+                const text = encodeURIComponent(`Check out ${this.product.name} at ${this.store.name}: ${this.productLink}`);
+                const url = `https://x.com/intent/post?text=${text}`;
+                window.open(url, '_blank');
+            },
+            async copyLink() {
+                try {
+
+                    if(this.productLink) {
+                        await navigator.clipboard.writeText(this.productLink);
+                        this.notificationState.showSuccessNotification('Link copied');
+                    }else{
+                        this.notificationState.showWarningNotification('Link not ready');
+                    }
+
+                } catch (err) {
+                    console.error('Failed to copy:', err);
+                }
+            },
             addVariant() {
                 this.selectedVariants = [];
                 this.productState.addVariant();
+            },
+            showConfirmDeleteProductModal() {
+                this.$refs.confirmDeleteProductModal.showModal();
             },
             async removeVariant(index) {
                 this.selectedVariants = [];
@@ -1202,6 +1406,10 @@
                             this.formState.setFormError('name', 'The name is required');
                         }
 
+                        if(this.isEmpty(this.productForm.categories)) {
+                            this.formState.setFormError('categories', 'Must be in at least one category');
+                        }
+
                         for (let index = 0; index < this.productForm.variants.length; index++) {
                             const variant = this.productForm.variants[index];
 
@@ -1297,6 +1505,10 @@
 
                         if(this.isEmpty(this.productForm.name)) {
                             this.formState.setFormError('name', 'The name is required');
+                        }
+
+                        if(this.isEmpty(this.productForm.categories)) {
+                            this.formState.setFormError('categories', 'Must be in at least one category');
                         }
 
                         for (let index = 0; index < this.productForm.variants.length; index++) {

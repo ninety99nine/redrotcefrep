@@ -25,7 +25,7 @@
          }"
         v-if="designCard.metadata.category_id && (category || isLoadingCategory)">
 
-        <div class="space-y-4">
+        <div class="space-y-4 group">
 
             <!-- Loader -->
             <div
@@ -37,12 +37,17 @@
             <template v-else>
 
                 <!-- Category Name and Description -->
-                <div>
-                    <h3
-                        class="text-lg font-semibold mb-0"
-                        :style="{ color: designCard.metadata.design.title_color }">
-                        {{ category.name }}
-                    </h3>
+                <div
+                    @click.stop="navigateToShowShopCategory"
+                    class="hover:bg-black/2.5 hover:rounded-lg hover:p-2 active:hover:bg-black/5 cursor-pointer transition-all duration-300">
+                    <div class="flex items-center justify-between">
+                        <h3
+                            class="text-lg font-semibold mb-0"
+                            :style="{ color: designCard.metadata.design.title_color }">
+                            {{ category.name }}
+                        </h3>
+                        <ChevronRight size="16" class="opacity-0 group-hover:opacity-100 transition-all duration-300"></ChevronRight>
+                    </div>
                     <p
                         :style="{ color: designCard.metadata.design.description_color }"
                         v-if="category.description">
@@ -52,19 +57,22 @@
 
                 <!-- Products -->
                 <div
-                    v-if="category.products.length"
+                    v-if="filteredProducts.length"
                     :class="[
-                        { 'flex flex-col space-y-4' : designCard.metadata.layout === 'list'},
-                        { 'grid grid-cols-2 gap-4' : designCard.metadata.layout === 'grid' && isDesigning},
-                        { 'grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4' : designCard.metadata.layout === 'grid' && !isDesigning}
+                        { 'flex flex-col divide-y divide-black/5' : designCard.metadata.layout === 'list'},
+                        { 'grid grid-cols-2 gap-4' : designCard.metadata.layout === 'grid'}
                     ]">
 
                     <div
                         :key="product.id"
                         @click.stop="() => onView(product)"
+                        v-for="(product, index) in filteredProducts"
                         :style="{ color: designCard.metadata.design.title_color }"
-                        class="relative flex flex-col space-y-2 p-2 cursor-pointer rounded-lg hover:scale-105 transition-all duration-300"
-                        v-for="product in category.products.slice(0, parseInt(designCard.metadata.feature))">
+                        :class="[
+                            { 'rounded-lg' : designCard.metadata.layout === 'grid'},
+                            { 'pb-4 mb-4' : designCard.metadata.layout === 'list' && index != filteredProducts.length - 1},
+                            'relative flex flex-col cursor-pointer hover:scale-[102%] transition-all duration-300'
+                        ]">
 
                         <div
                             v-if="getSelectedQuantity(product)"
@@ -72,10 +80,12 @@
                             <span>{{ getSelectedQuantity(product) }}</span>
                         </div>
 
-                        <div :class="[
-                            'w-full aspect-square relative flex items-center justify-center bg-gray-100 rounded-lg overflow-hidden',
-                            designCard.metadata.layout === 'list' ? 'max-h-60' : 'max-h-60'
-                        ]">
+                        <div
+                            v-if="designCard.metadata.layout === 'grid' || (designCard.metadata.layout === 'list' && (product ?? product.variant).photo)"
+                            :class="[
+                                'w-full aspect-square relative flex items-center justify-center bg-gray-100 rounded-lg overflow-hidden mb-4',
+                                designCard.metadata.layout === 'list' ? 'max-h-60' : 'max-h-60'
+                            ]">
 
                             <img
                                 :alt="(product ?? product.variant).name"
@@ -85,20 +95,40 @@
 
                             <Image v-else size="40" class="text-gray-300"></Image>
 
+                            <div
+                                v-if="product.stock_quantity_type == 'sold out'"
+                                class="absolute top-5 -left-11 -rotate-45">
+                                <div class="w-40 select-none whitespace-nowrap px-2.5 py-2 text-xs text-center font-bold text-white bg-red-600 shadow-sm">
+                                    SOLD OUT
+                                </div>
+                            </div>
+
                         </div>
 
-
                         <h4
-                            class="text-sm font-medium truncate"
+                            class="font-medium truncate mb-2"
                             :style="{ color: designCard.metadata.design.product_name_color }">
                             {{ product.name }}
                         </h4>
+
+                        <p
+                            v-if="product.show_description"
+                            class="text-sm line-clamp-2 mb-2"
+                            :style="{ color: designCard.metadata.design.product_description_color }">
+                            {{ product.description }}
+                        </p>
+
+                        <div
+                            v-if="designCard.metadata.layout === 'list' && !(product ?? product.variant).photo && product.stock_quantity_type == 'sold out'"
+                            class="w-fit select-none whitespace-nowrap px-2.5 py-0.5 text-xs text-center rounded-full font-bold text-white bg-red-600 shadow-sm">
+                            SOLD OUT
+                        </div>
 
                         <div class="flex items-center space-x-2 flex-wrap gap-2">
 
                             <Pill v-if="(product.variant ?? product).is_free" type="success" size="xs">free</Pill>
 
-                            <template v-else>
+                            <div v-else class="flex items-center space-x-1">
 
                                 <span
                                     class="text-sm font-semibold"
@@ -113,7 +143,7 @@
                                     {{ (product.variant ?? product).unit_regular_price.amount_with_currency }}
                                 </span>
 
-                            </template>
+                            </div>
 
                             <Pill
                                 :type="(product.variant ?? product).has_stock ? 'success' : 'warning'" size="xs"
@@ -129,6 +159,14 @@
 
                 <p v-else class="text-gray-500 text-sm">No products available in this category.</p>
 
+                <button
+                    @click.stop="navigateToShowShopCategory"
+                    v-if="filteredProducts.length < category.products.length"
+                    class="flex items-center justify-center space-x-2 w-full rounded-lg py-2 border border-gray-200 hover:bg-gray-100 cursor-pointer transition-all duration-300">
+                    <span>View All</span>
+                    <ArrowRight size="16"></ArrowRight>
+                </button>
+
             </template>
 
         </div>
@@ -140,12 +178,12 @@
 <script>
 
     import Pill from '@Partials/Pill.vue';
-    import { Image } from 'lucide-vue-next';
     import Loader from '@Partials/Loader.vue';
+    import { Image, ArrowRight, ChevronRight } from 'lucide-vue-next';
 
     export default {
         inject: ['formState', 'designState', 'orderState', 'storeState', 'notificationState'],
-        components: { Image, Pill, Loader },
+        components: { ArrowRight, ChevronRight, Image, Pill, Loader },
         props: {
             designCard: {
                 type: Object
@@ -175,6 +213,9 @@
             },
             isDesigning() {
                 return ['edit-storefront', 'edit-checkout', 'edit-payment', 'edit-menu'].includes(this.$route.name);
+            },
+            filteredProducts() {
+                return this.category ? this.category.products.slice(0, parseInt(this.designCard.metadata.feature)) : [];
             }
         },
         methods: {
@@ -189,6 +230,15 @@
                     params: {
                         alias: this.store.alias,
                         product_id: product.id
+                    }
+                });
+            },
+            navigateToShowShopCategory() {
+                this.$router.push({
+                    name: 'show-shop-category',
+                    params: {
+                        alias: this.store.alias,
+                        category_id: this.categoryId
                     }
                 });
             },

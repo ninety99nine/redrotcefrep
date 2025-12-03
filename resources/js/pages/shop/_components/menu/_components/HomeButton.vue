@@ -2,11 +2,10 @@
 
     <Button
         size="sm"
-        type="outline"
+        type="bare"
         :leftIcon="House"
         leftIconSize="18"
         :action="navigateToStorefront">
-        <span class="ml-1">Shop</span>
     </Button>
 
 </template>

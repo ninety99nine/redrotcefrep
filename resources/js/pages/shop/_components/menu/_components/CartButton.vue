@@ -2,7 +2,7 @@
 
     <Button
         size="xs"
-        type="outline"
+        type="bare"
         leftIconSize="18"
         :leftIcon="ShoppingCart"
         :action="navigateToStorefront">

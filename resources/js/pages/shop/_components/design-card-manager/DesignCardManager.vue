@@ -19,7 +19,8 @@
             <DesignCards
                 v-if="hasDesignCards"
                 :placement="placement"
-                :designCards="designCards">
+                :designCards="designCards"
+                class="max-w-xl mx-auto pb-20">
             </DesignCards>
 
             <NoDesignCards v-else></NoDesignCards>
@@ -102,6 +103,10 @@
                 }
             },
             async navigateToStorefront() {
+                if(this.isDesigning) {
+                    this.notificationState.showSuccessNotification(`Only opens on the actual store`);
+                    return;
+                }
                 await this.$router.push({
                     name: 'show-storefront',
                     params: {

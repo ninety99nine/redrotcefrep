@@ -17,7 +17,8 @@ return new class extends Migration
         Schema::create('stores', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->string('name');
-            $table->string('description', 120)->nullable();
+            $table->string('description', 500)->nullable();
+            $table->boolean('show_background')->default(false);
             $table->string('bg_color', 7)->nullable();
             $table->boolean('online')->default(true);
             $table->string('offline_message', 120)->default('We are currently offline');

@@ -158,6 +158,12 @@
                         </div>
 
                         <div class="flex space-x-2 items-center justify-between"
+                            v-if="designCard.metadata.design.hasOwnProperty('product_description_color')">
+                            <span class="text-sm">Product Description Color</span>
+                            <Colorpicker v-model="designCard.metadata.design.product_description_color" shape="square" :disableHistory="true" :disableAlpha="true"></Colorpicker>
+                        </div>
+
+                        <div class="flex space-x-2 items-center justify-between"
                             v-if="designCard.metadata.design.hasOwnProperty('product_price_color')">
                             <span class="text-sm">Price Color</span>
                             <Colorpicker v-model="designCard.metadata.design.product_price_color" shape="square" :disableHistory="true" :disableAlpha="true"></Colorpicker>

@@ -37,7 +37,7 @@ class CreateStoreRequest extends FormRequest
             'ussd_mobile_number' => ['nullable', 'phone:INTERNATIONAL', 'max:20'],
             'whatsapp_mobile_number' => ['nullable', 'phone:INTERNATIONAL', 'max:20'],
             'call_to_action' => ['nullable', 'string', 'max:255'],
-            'description' => ['nullable', 'string', 'max:120'],
+            'description' => ['nullable', 'string', 'max:500'],
             'qr_code_file_path' => ['nullable', 'string', 'max:255'],
             'offer_rewards' => ['nullable', 'boolean'],
             'reward_percentage_rate' => ['nullable', 'numeric', 'min:0', 'max:100'],
@@ -57,9 +57,10 @@ class CreateStoreRequest extends FormRequest
             'opening_hours.*.hours.*' => ['required_with:opening_hours', 'array'],
             'opening_hours.*.hours.*.*' => ['required_with:opening_hours', 'string', 'regex:/^([01]\d|2[0-3]):[0-5]\d$/'],
             'online' => ['nullable', 'boolean'],
-            'bg_color' => ['nullable', 'string', 'max:7'],
             'offline_message' => ['nullable', 'string', 'max:120'],
             'sms_sender_name' => ['nullable', 'string', 'max:11'],
+            'show_background' => ['nullable', 'boolean'],
+            'bg_color' => ['nullable', 'string', 'max:7'],
             'order_number_padding' => ['nullable', 'integer', 'min:0', 'max:5'],
             'order_number_counter' => ['nullable', 'integer', 'min:0'],
             'order_number_prefix' => ['nullable', 'string', 'max:255'],
@@ -96,7 +97,8 @@ class CreateStoreRequest extends FormRequest
             'google_analytics_id' => ['nullable', 'string', 'max:20', 'regex:/^G-[A-Z0-9]+$/'],
             'meta_pixel_id' => ['nullable', 'string', 'max:20', 'regex:/^[0-9]+$/'],
             'tiktok_pixel_id' => ['nullable', 'string', 'max:20', 'regex:/^[A-Z0-9]+$/'],
-            'logo' => ['nullable', 'file', 'mimes:jpeg,png,jpg,gif,webp,svg', 'max:5120']
+            'logo' => ['nullable', 'file', 'mimes:jpeg,png,jpg,gif,webp,svg', 'max:5120'],
+            'background_photo' => ['nullable', 'file', 'mimes:jpeg,png,jpg,gif,webp,svg', 'max:5120'],
         ];
     }
 
@@ -124,7 +126,7 @@ class CreateStoreRequest extends FormRequest
             'call_to_action.string' => 'The call to action must be a string.',
             'call_to_action.max' => 'The call to action must not exceed 255 characters.',
             'description.string' => 'The description must be a string.',
-            'description.max' => 'The description must not exceed 120 characters.',
+            'description.max' => 'The description must not exceed 500 characters.',
             'qr_code_file_path.string' => 'The QR code file path must be a string.',
             'qr_code_file_path.max' => 'The QR code file path must not exceed 255 characters.',
             'offer_rewards.boolean' => 'The offer rewards field must be a boolean.',
@@ -156,6 +158,9 @@ class CreateStoreRequest extends FormRequest
             'online.boolean' => 'The online field must be a boolean.',
             'offline_message.string' => 'The offline message must be a string.',
             'offline_message.max' => 'The offline message must not exceed 120 characters.',
+            'show_background.boolean' => 'The show background field must be a boolean.',
+            'bg_color.string' => 'The bg color must be a string.',
+            'bg_color.max' => 'The bg color must not exceed 7 characters.',
             'sms_sender_name.string' => 'The SMS sender name must be a string.',
             'sms_sender_name.max' => 'The SMS sender name must not exceed 11 characters.',
             'order_number_padding.integer' => 'The order number padding must be an integer.',
@@ -225,7 +230,10 @@ class CreateStoreRequest extends FormRequest
             'tiktok_pixel_id.regex' => 'The TikTok Pixel ID must be an alphanumeric string.',
             'logo.file' => 'The logo must be a valid file.',
             'logo.mimes' => 'The logo must be a JPEG, PNG, JPG, GIF, or SVG.',
-            'logo.max' => 'The logo size must not exceed 5MB.'
+            'logo.max' => 'The logo size must not exceed 5MB.',
+            'background_photo.file' => 'The logo must be a valid file.',
+            'background_photo.mimes' => 'The logo must be a JPEG, PNG, JPG, GIF, or SVG.',
+            'background_photo.max' => 'The logo size must not exceed 5MB.'
         ];
     }
 }

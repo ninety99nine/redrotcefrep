@@ -2,6 +2,8 @@
 
     <div>
         <Notifications></Notifications>
+        <Menu v-if="showMenu"></Menu>
+        <Header v-if="showHeader"></Header>
         <router-view></router-view>
     </div>
 
@@ -10,11 +12,13 @@
 <script>
 
     import debounce from 'lodash.debounce';
+    import Menu from '@Pages/shop/_components/menu/Menu.vue';
     import Notifications from '@Layouts/shop/components/Notifications.vue';
+    import Header from '@Pages/shop/_components/design-card-manager/_components/header/Header.vue';
 
     export default {
         inject: ['formState', 'orderState', 'storeState', 'notificationState'],
-        components: { Notifications },
+        components: { Menu, Header, Notifications },
         data() {
             return {
                 orderAgain: false
@@ -78,6 +82,12 @@
             canInspectShoppingCart() {
                 return this.orderState.canInspectShoppingCart;
             },
+            showHeader() {
+                return ['show-storefront', 'show-search', 'show-shop-category'].includes(this.$route.name);
+            },
+            showMenu() {
+                return !['show-checkout', 'show-shop-payment-methods', 'show-shop-payment-method', 'show-shop-confirming-payment', 'show-shop-pending-payment'].includes(this.$route.name);
+            }
         },
         methods: {
             async prepareStoreForShopping(orderToOrderAgain = null) {
@@ -103,7 +113,7 @@
 
                     let config = {
                         params: {
-                            _relationships: ['logo', 'categories', 'myMembership'].join(',')
+                            _relationships: ['logo', 'backgroundPhoto', 'categories', 'myMembership'].join(',')
                         }
                     };
 

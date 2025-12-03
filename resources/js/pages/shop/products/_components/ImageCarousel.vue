@@ -44,6 +44,11 @@
     export default {
         inject: ['productState'],
         components: { Image, ChevronLeft, ChevronRight },
+        props: {
+            images: {
+                type: Array
+            }
+        },
         data() {
             return {
                 currentIndex: 0
@@ -62,24 +67,6 @@
             },
             selectedVariantId() {
                 return this.productState.selectedVariantId;
-            },
-            images() {
-                let allImages = [...(this.product?.photos || [])];
-
-                // If variants exist, add their photos
-                if (this.product?.variants?.length > 0) {
-
-                    this.product.variants.forEach(variant => {
-
-                        if (variant.photos?.length > 0) {
-                            allImages = [...allImages, ...variant.photos];
-                        }
-
-                    });
-
-                }
-
-                return allImages;
             },
             currentImage() {
                 return this.images[this.currentIndex] || {};

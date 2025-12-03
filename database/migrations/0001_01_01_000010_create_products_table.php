@@ -21,7 +21,7 @@ return new class extends Migration
             $table->boolean('visible')->default(true);
             $table->timestamp('visibility_expires_at')->nullable();
             $table->boolean('show_description')->default(false);
-            $table->string('description', 500)->nullable();
+            $table->string('description', 2000)->nullable();
             $table->string('sku', 50)->nullable();
             $table->string('barcode', 50)->nullable();
             $table->decimal('unit_weight', 12, 3)->default(0);

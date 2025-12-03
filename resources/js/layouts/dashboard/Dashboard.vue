@@ -78,7 +78,7 @@
                     let config = {
                         params: {
                             _relationships: [
-                                'logo', 'seoImage', 'productTags', 'customerTags', 'categories',
+                                'logo', 'backgroundPhoto', 'seoImage', 'productTags', 'customerTags', 'categories',
                                 'myMembership', 'activeSubscription.pricingPlan', 'address'
                             ].join(',')
                         }

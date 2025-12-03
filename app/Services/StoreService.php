@@ -173,6 +173,16 @@ class StoreService extends BaseService
             ]);
         }
 
+        // 14. Upload background photo if provided
+        if (!empty($data['background_photo'] ?? null)) {
+            (new MediaFileService)->createMediaFile([
+                'file'              => $data['background_photo'],
+                'mediable_type'     => 'store',
+                'mediable_id'       => $store->id,
+                'upload_folder_name'=> UploadFolderName::STORE_BACKGROUND_PHOTO->value,
+            ]);
+        }
+
         return $this->showCreatedResource($store);
     }
 
@@ -832,6 +842,7 @@ class StoreService extends BaseService
                         'description_color' => '#4B5563',
                         'product_name_color' => '#111827',
                         'product_price_color' => '#111827',
+                        'product_description_color' => '#9CA3AF',
                         'product_cancelled_price_color' => '#9CA3AF'
                     ],
                 ],

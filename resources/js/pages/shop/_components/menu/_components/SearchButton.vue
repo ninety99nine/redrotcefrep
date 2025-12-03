@@ -2,11 +2,10 @@
 
     <Button
         size="xs"
-        type="outline"
+        type="bare"
         leftIconSize="18"
         :leftIcon="Search"
         :action="navigateToSearch">
-        <span class="ml-1">Search</span>
     </Button>
 
 </template>

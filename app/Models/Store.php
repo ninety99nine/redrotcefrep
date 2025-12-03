@@ -67,6 +67,7 @@ class Store extends Model
         'online' => 'boolean',
         'combine_fees' => 'boolean',
         'offer_rewards' => 'boolean',
+        'show_background' => 'boolean',
         'show_sms_channel' => 'boolean',
         'combine_discounts' => 'boolean',
         'show_line_channel' => 'boolean',
@@ -94,7 +95,7 @@ class Store extends Model
      * @var array
      */
     protected $fillable = [
-        'name','description','bg_color','offline_message','alias','email','sms_sender_name','ussd_mobile_number','whatsapp_mobile_number',
+        'name','description','offline_message','show_background','bg_color','alias','email','sms_sender_name','ussd_mobile_number','whatsapp_mobile_number',
         'call_to_action','qr_code_file_path','offer_rewards','reward_percentage_rate','country','currency','language','weight_unit',
         'distance_unit','tax_method','tax_percentage_rate','tax_id','show_opening_hours','allow_checkout_on_closed_hours','opening_hours',
         'online','order_number_padding','order_number_counter','order_number_prefix','order_number_suffix','message_footer','show_sms_channel',
@@ -198,6 +199,16 @@ class Store extends Model
     public function logo(): MorphOne
     {
         return $this->morphOne(MediaFile::class, 'mediable')->where('type', UploadFolderName::STORE_LOGO->value);
+    }
+
+    /**
+     * Get background photo.
+     *
+     * @return MorphOne
+     */
+    public function backgroundPhoto(): MorphOne
+    {
+        return $this->morphOne(MediaFile::class, 'mediable')->where('type', UploadFolderName::STORE_BACKGROUND_PHOTO->value);
     }
 
     /**
