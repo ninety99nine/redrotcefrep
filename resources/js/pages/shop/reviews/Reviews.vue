@@ -1,6 +1,6 @@
 <template>
 
-    <div class="max-w-4xl mx-auto pt-8 pb-40">
+    <div class="max-w-4xl mx-auto pb-40 px-4 md:px-0">
 
         <div v-if="isLoadingStore" class="pt-8 flex items-center justify-center">
             <Loader>
@@ -12,13 +12,8 @@
 
             <div class="select-none">
 
-                <!-- Heading and Add Review Button -->
-                <div class="flex justify-between items-end mb-4">
-
-                    <div class="space-y-2">
-                        <h1 class="text-lg font-semibold">{{ store.name }}</h1>
-                        <h1 class="text-lg font-semibold">Customer Reviews</h1>
-                    </div>
+                <!-- Add Review Button -->
+                <div class="w-full flex justify-end mb-4">
 
                     <Button
                         size="sm"
@@ -40,7 +35,7 @@
                         v-model="searchTerm"
                         :skeleton="isLoadingStore"
                         @input="isLoadingReviews = true"
-                        placeholder="name, comment or rating e.g 3">
+                        placeholder="Search by name, comment or rating e.g 3">
                     </Input>
 
                 </div>

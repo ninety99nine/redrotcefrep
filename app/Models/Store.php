@@ -232,6 +232,16 @@ class Store extends Model
     }
 
     /**
+     * Get reviews.
+     *
+     * @return HasMany
+     */
+    public function reviews(): HasMany
+    {
+        return $this->hasMany(Review::class);
+    }
+
+    /**
      * Get orders.
      *
      * @return HasMany

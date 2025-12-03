@@ -26,7 +26,7 @@
                         </div>
                     </Button>
 
-                    <div class="absolute top-1/2 -translate-y-1/2 right-2 flex items-center justify-center rounded-full min-w-6 h-6 bg-red-500 text-white text-xs font-bold">
+                    <div :class="[store.whatsapp_mobile_number ? 'right-20' : 'right-2', 'absolute top-1/2 -translate-y-1/2 flex items-center justify-center rounded-full min-w-6 h-6 bg-red-500 text-white text-xs font-bold']">
                         <span class="p-2">{{ totalUncancelledProductQuantities }} {{ totalUncancelledProductQuantities == 1 ? 'item' : 'items'}}</span>
                     </div>
 

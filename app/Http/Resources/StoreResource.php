@@ -97,6 +97,7 @@ class StoreResource extends JsonResource
             'active_subscription' => SubscriptionResource::make($this->whenLoaded('activeSubscription')),
 
             'orders_count' => $this->whenCounted('orders'),
+            'reviews_count' => $this->whenCounted('reviews'),
             'products_count' => $this->whenCounted('products'),
             'customers_count' => $this->whenCounted('customers'),
             'promotions_count' => $this->whenCounted('promotions'),

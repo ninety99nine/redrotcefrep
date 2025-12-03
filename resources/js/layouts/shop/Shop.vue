@@ -1,10 +1,20 @@
 <template>
 
-    <div>
+    <div class="relative">
+
         <Notifications></Notifications>
         <Menu v-if="showMenu"></Menu>
         <Header v-if="showHeader"></Header>
+
+        <div
+            @click="openWhatsappChat"
+            v-if="whatsappMobileNumber"
+            class="fixed bottom-4 right-4 bg-green-500 hover:opacity-90 hover:scale-110 active:scale-100 transition-all duration-300 cursor-pointer rounded-full p-4 shadow-sm">
+            <WhatsappIcon size="w-8 h-8" color="#ffffff"></WhatsappIcon>
+        </div>
+
         <router-view></router-view>
+
     </div>
 
 </template>
@@ -12,13 +22,14 @@
 <script>
 
     import debounce from 'lodash.debounce';
+    import WhatsappIcon from '@Partials/WhatsappIcon.vue';
     import Menu from '@Pages/shop/_components/menu/Menu.vue';
     import Notifications from '@Layouts/shop/components/Notifications.vue';
     import Header from '@Pages/shop/_components/design-card-manager/_components/header/Header.vue';
 
     export default {
         inject: ['formState', 'orderState', 'storeState', 'notificationState'],
-        components: { Menu, Header, Notifications },
+        components: { Menu, WhatsappIcon, Header, Notifications },
         data() {
             return {
                 orderAgain: false
@@ -83,13 +94,22 @@
                 return this.orderState.canInspectShoppingCart;
             },
             showHeader() {
-                return ['show-storefront', 'show-search', 'show-shop-category'].includes(this.$route.name);
+                return ['show-storefront', 'show-search', 'show-shop-reviews', 'create-shop-review', 'show-shop-category'].includes(this.$route.name);
             },
             showMenu() {
                 return !['show-checkout', 'show-shop-payment-methods', 'show-shop-payment-method', 'show-shop-confirming-payment', 'show-shop-pending-payment'].includes(this.$route.name);
-            }
+            },
+            whatsappMobileNumber() {
+                return this.store?.whatsapp_mobile_number ?? null;
+            },
         },
         methods: {
+            openWhatsappChat() {
+                const message = `Hello, i\'m interested in what you are selling on ${this.store.name}.`;
+                const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(message)}&phone=${this.whatsappMobileNumber.international.replace('+', '')}`;
+                console.log(whatsappUrl);
+                window.open(whatsappUrl, "_blank");
+            },
             async prepareStoreForShopping(orderToOrderAgain = null) {
                 if(await this.orderState.hasStateFromLocalStorage()) {
                     await this.orderState.setStateFromLocalStorage();
@@ -113,7 +133,8 @@
 
                     let config = {
                         params: {
-                            _relationships: ['logo', 'backgroundPhoto', 'categories', 'myMembership'].join(',')
+                            _relationships: ['logo', 'backgroundPhoto', 'categories', 'myMembership'].join(','),
+                            _countable_relationships: ['reviews'].join(',')
                         }
                     };
 
@@ -157,7 +178,10 @@
                     let config = {
                         params: {
                             store_id: this.store.id,
-                            _relationships: ['orderProducts.photo', 'orderPromotions', 'orderFees', 'orderDiscounts', 'orderComments', 'customer', 'courier', 'deliveryMethod', 'deliveryAddress'].join(',')
+                            _relationships: [
+                                'orderProducts.photo', 'orderPromotions', 'orderFees', 'orderDiscounts',
+                                'orderComments', 'customer', 'courier', 'deliveryMethod', 'deliveryAddress'
+                            ].join(',')
                         }
                     };
 

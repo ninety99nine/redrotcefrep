@@ -2,7 +2,7 @@
 
     <div
         v-if="hasImages"
-        class="lg:max-w-6xl max-w-xl mx-auto grid grid-cols-1 lg:grid-cols-2 lg:divide-x lg:divide-black/20">
+        class="lg:max-w-6xl max-w-xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-4 lg:divide-x lg:divide-black/20 pb-40">
 
         <div class="lg:p-8 px-4 pt-8">
 
@@ -29,7 +29,7 @@
 
     <div v-else class="max-w-xl mx-auto sm:px-4 p-8">
 
-        <div class="flex items-center justify-between mb-4">
+        <div class="flex items-center justify-between mb-8">
 
             <Button
                 size="xs"

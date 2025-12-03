@@ -1,6 +1,6 @@
 <template>
 
-    <div class="max-w-5xl mx-auto pt-8 pb-40">
+    <div class="max-w-5xl mx-auto md:pt-8 pb-40 px-4">
 
         <div
             v-if="isLoadingStore"
@@ -12,13 +12,13 @@
 
         <template v-else>
 
-            <div class="select-none grid grid-cols-1 md:grid-cols-4 md:gap-8">
+            <div
+                v-if="hasCategories"
+                class="select-none grid grid-cols-1 md:grid-cols-4 gap-y-4 md:gap-8">
 
-                <div class="col-span-1 space-y-4">
+                <div class="col-span-1">
 
-                    <div
-                        v-if="hasCategories"
-                        class="w-full bg-gray-50 p-4 border border-gray-300 rounded-lg relative">
+                    <div class="w-full bg-gray-50 p-4 border border-gray-300 rounded-lg relative">
 
                         <h1 class="text-gray-900 font-medium mb-4">Categories</h1>
 

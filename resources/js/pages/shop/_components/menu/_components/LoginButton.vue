@@ -5,8 +5,8 @@
         type="primary"
         :leftIcon="User"
         leftIconSize="18"
-        :action="navigateToStoreLogin">
-        <span class="ml-1">Login</span>
+        :action="authUser ? navigateToStoreHome : navigateToStoreLogin">
+        <span class="ml-1">{{ authUser ? 'Dashboard' : 'Login' }}</span>
     </Button>
 
 </template>
@@ -17,7 +17,7 @@
     import Button from '@Partials/Button.vue';
 
     export default {
-        inject: ['storeState', 'notificationState'],
+        inject: ['authState', 'storeState', 'notificationState'],
         components: { Button },
         data() {
             return {
@@ -28,11 +28,20 @@
             store() {
                 return this.storeState.store;
             },
+            authUser() {
+                return this.authState.user;
+            },
             isDesigning() {
                 return ['edit-storefront', 'edit-checkout', 'edit-payment', 'edit-menu'].includes(this.$route.name);
             }
         },
         methods: {
+            navigateToStoreHome() {
+                this.$router.push({
+                    name: 'show-store-home',
+                    params: { store_id: this.store.id }
+                });
+            },
             async navigateToStoreLogin() {
                 if(this.isDesigning) {
                     this.notificationState.showSuccessNotification(`Only opens on the actual store`);
@@ -41,7 +50,7 @@
                 await this.$router.push({
                     name: 'show-login'
                 });
-            },
+            }
         }
     };
 

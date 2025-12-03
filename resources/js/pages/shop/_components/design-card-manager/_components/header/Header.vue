@@ -27,24 +27,30 @@
 
             <StoreLogo v-else size="w-24 h-24" class="mt-8" :editable="false" :showButton="false"></StoreLogo>
 
-            <h1 class="text-xl font-bold">{{ store.name }}</h1>
+            <h1 class="text-lg md:text-xl font-bold">{{ store.name }}</h1>
 
-            <p v-if="store.description" :class="['text-center max-w-xl', isDesigning ? 'px-4' : 'px-4 lg:px-0']">{{ store.description }}</p>
+            <p v-if="store.description" :class="['text-center text-sm md:text-base max-w-xl', isDesigning ? 'px-4' : 'px-4 lg:px-0']">{{ store.description }}</p>
 
         </div>
 
-        <div class="flex justify-center mb-4">
+        <div class="select-none flex justify-center mb-4">
             <div
                 @click="navigateToStorefront"
                 :class="['flex items-center space-x-2 py-2 px-4 border-b-4 hover:border-gray-300 transition-all duration-300 cursor-pointer', homeMenuActive ? 'border-gray-300' : 'border-transparent']">
                 <Home size="20"></Home>
-                <span>Home</span>
+                <span class="text-sm md:text-base">Home</span>
             </div>
             <div
                 @click="navigateToSearch"
                 :class="['flex items-center space-x-2 py-2 px-4 border-b-4 hover:border-gray-300 transition-all duration-300 cursor-pointer', searchMenuActive ? 'border-gray-300' : 'border-transparent']">
                 <Search size="20"></Search>
-                <span>Search</span>
+                <span class="text-sm md:text-base">Search</span>
+            </div>
+            <div
+                @click="navigateToReviews"
+                :class="['flex items-center space-x-2 py-2 px-4 border-b-4 hover:border-gray-300 transition-all duration-300 cursor-pointer', reviewMenuActive ? 'border-gray-300' : 'border-transparent']">
+                <Star size="20"></Star>
+                <span class="text-sm md:text-base">Reviews{{ store.reviews_count ? ` (${store.reviews_count})` : '' }}</span>
             </div>
         </div>
 
@@ -54,13 +60,13 @@
 
 <script>
 
-    import { Home, Search } from 'lucide-vue-next';
+    import { Home, Star, Search } from 'lucide-vue-next';
     import StoreLogo from '@Components/StoreLogo.vue';
 
     export default {
         inject: ['storeState'],
         components: {
-            Home, Search, StoreLogo
+            Home, Star, Search, StoreLogo
         },
         computed: {
             store() {
@@ -74,6 +80,9 @@
             },
             searchMenuActive() {
                 return this.$route.name == 'show-search';
+            },
+            reviewMenuActive() {
+                return this.$route.name == 'show-shop-reviews' || this.$route.name == 'create-shop-review';
             }
         },
         methods: {
@@ -96,6 +105,18 @@
                 }
                 await this.$router.push({
                     name: 'show-search',
+                    params: {
+                        alias: this.store.alias
+                    }
+                });
+            },
+            async navigateToReviews() {
+                if(this.isDesigning) {
+                    this.notificationState.showSuccessNotification(`Only opens on the actual store`);
+                    return;
+                }
+                await this.$router.push({
+                    name: 'show-shop-reviews',
                     params: {
                         alias: this.store.alias
                     }

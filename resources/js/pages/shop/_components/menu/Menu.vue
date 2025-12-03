@@ -4,8 +4,8 @@
             <MenuButton></MenuButton>
             <div class="flex items-center justify-between space-x-4">
                 <LoginButton></LoginButton>
-                <HomeButton v-if="!onStorefront && !onSearchPage"></HomeButton>
-                <SearchButton v-if="!onStorefront && !onSearchPage"></SearchButton>
+                <HomeButton v-if="!onStorefront && !onSearchPage && !onReviewsPage"></HomeButton>
+                <SearchButton v-if="!onStorefront && !onSearchPage && !onReviewsPage"></SearchButton>
                 <CartButton></CartButton>
             </div>
         </div>
@@ -32,7 +32,10 @@
             },
             onSearchPage() {
                 return this.$route.name === 'show-search';
-            }
+            },
+            onReviewsPage() {
+                return ['show-shop-reviews', 'create-shop-review'].includes(this.$route.name);
+            },
         },
         methods: {},
         created() {}

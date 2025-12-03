@@ -1,6 +1,6 @@
 <template>
 
-    <div class="max-w-4xl mx-auto pt-8 pb-40">
+    <div class="max-w-4xl mx-auto pb-40">
 
         <div v-if="isLoadingStore || isLoadingUser" class="pt-8 flex items-center justify-center">
             <Loader>
@@ -25,7 +25,7 @@
                             <span>Reviews</span>
                         </Button>
 
-                        <h1 class="text-2xl font-semibold">Write A Review</h1>
+                        <h1 class="sm:text-lg text-xl font-semibold">Write A Review</h1>
 
                     </div>
 
