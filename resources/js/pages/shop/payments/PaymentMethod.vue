@@ -2070,8 +2070,15 @@
 
                     if(successful) {
 
-                        const dpoPaymentUrl = response.data.transaction.metadata.dpo_payment_url;
-                        window.location.href = dpoPaymentUrl;
+                        const transaction = response.data.transaction;
+
+                        if(transaction.metadata.hasOwnProperty('message')) {
+                            const message = transaction.metadata.message;
+                            this.notificationState.showWarningNotification(message);
+                        }else{
+                            const dpoPaymentUrl = response.data.transaction.metadata.dpo_payment_url;
+                            window.location.href = dpoPaymentUrl;
+                        }
 
                     }else{
                         const message = response.data.message;
