@@ -136,7 +136,7 @@
 
                     </div>
 
-                    <div v-if="isConvertingCurrency || conversion" class="bg-gray-50 text-xs text-center border-t border-dashed border-gray-300 py-4">
+                    <div v-if="requiresCurrencyConversion && (isConvertingCurrency || conversion)" class="bg-gray-50 text-xs text-center border-t border-dashed border-gray-300 py-4">
 
                         <Skeleton v-if="isConvertingCurrency" width="w-1/3" :shine="true" class="mx-auto"></Skeleton>
                         <p v-else-if="conversion">
@@ -416,22 +416,25 @@
             storePaymentMethodId() {
                 return this.$route.params.store_payment_method_id;
             },
+            requiresCurrencyConversion() {
+                return this.conversionCurrency != this.order.currency.toUpperCase();
+            },
             conversionCurrency() {
 
                 if(this.storePaymentMethod.configs?.currency) {
                     return this.storePaymentMethod.configs?.currency;
                 }
 
+                const orderCurrency = this.order?.currency.toUpperCase();
                 const supportedCurrencies = this.paymentMethod?.currencies ?? [];
 
-                if (supportedCurrencies.length === 0) {
-                    return 'USD';   // fallback if currencies are not defined
+                if (orderCurrency && supportedCurrencies.includes(orderCurrency)) {
+                    return orderCurrency; // use order currency if supported
                 }
 
-                const orderCurrency = this.order?.currency.toUpperCase();
-
-                if (orderCurrency && supportedCurrencies.includes(orderCurrency)) {
-                    return orderCurrency; // use store currency if supported
+                if (supportedCurrencies.length === 0) {
+                    //  return 'USD';   // fallback if supported currencies are not defined
+                    return orderCurrency;
                 }
 
                 return supportedCurrencies[0]; // fallback to first supported
@@ -1874,13 +1877,22 @@
                     return;
                 }
 
-                if(this.storePaymentMethod && !this.isConvertingCurrency) {
+                if(this.storePaymentMethod && this.requiresCurrencyConversion && !this.isConvertingCurrency) {
                     this.convertCurrency();
                 }
+
+                this.automaticPayments();
             },
             storePaymentMethodLoaded() {
-                if(this.order && !this.isConvertingCurrency) {
+                if(this.order && this.requiresCurrencyConversion && !this.isConvertingCurrency) {
                     this.convertCurrency();
+                }
+
+                this.automaticPayments();
+            },
+            automaticPayments() {
+                if(this.order && this.storePaymentMethod && ['dpo'].includes(this.storePaymentMethod.payment_method.type)) {
+                    this.payOrder();
                 }
             },
             async navigateToShowShopOrder() {
