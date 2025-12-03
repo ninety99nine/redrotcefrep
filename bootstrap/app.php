@@ -39,17 +39,12 @@ return Application::configure(basePath: dirname(__DIR__))
         //  Reference: https://spatie.be/docs/laravel-permission/v6/basic-usage/teams-permissions
         $middleware->prependToPriorityList(
             before: SubstituteBindings::class,
-            prepend: StorePermission::class
+            prepend: StorePermission::class,
         );
 
         $middleware->prependToPriorityList(
             before: AuthenticatesRequests::class,
-            prepend: SetUssdUser::class
-        );
-
-        $middleware->prependToPriorityList(
-            before: RecordStoreVisit::class,
-            prepend: SetUssdUser::class
+            prepend: SetUssdUser::class,
         );
 
         //  Global registration to execute for every api route
