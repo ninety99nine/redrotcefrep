@@ -11,6 +11,7 @@ use App\Models\StoreVisitor;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use App\Services\CacheService;
+use App\Services\PlatformService;
 use App\Services\UssdService;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
@@ -56,9 +57,23 @@ class RecordStoreVisit
 
             }
 
-            // Validate frontend headers
-            $pageName = $request->headers->get('frontend-page-name');
-            $pageUrl = $request->headers->get('frontend-page-url') ?? null;
+            $platformService = (new PlatformService);
+
+            if ($platformService->isUssd()) {
+
+                $ussdService = (new UssdService);
+                $country = $user->mobile_number->getCountry();
+
+                $pageName = $ussdService->getMainShortcode($country);
+                $pageUrl = null;
+
+            }else{
+
+                // Validate frontend headers
+                $pageName = $request->headers->get('frontend-page-name');
+                $pageUrl = $request->headers->get('frontend-page-url') ?? null;
+
+            }
 
             if(!empty($pageName)) {
 

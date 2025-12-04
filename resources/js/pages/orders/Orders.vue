@@ -999,7 +999,8 @@
                         params: {
                             page: page,
                             per_page: this.perPage,
-                            store_id: this.store.id
+                            store_id: this.store.id,
+                            association: 'team member'
                         },
                         cancelToken: this.cancelTokenSource.token // Attach cancel token
                     }

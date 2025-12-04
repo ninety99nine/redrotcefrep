@@ -23,6 +23,7 @@ class UssdService
             return [
                 'id' => $user->id,
                 'name' => $user->name,
+                'email' => $user->email,
                 'last_name' => $user->last_name,
                 'first_name' => $user->first_name,
                 'mobile_number' => $user->mobile_number ? PhoneNumberService::formatPhoneNumber($user->mobile_number) : null,
