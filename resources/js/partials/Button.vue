@@ -128,9 +128,9 @@
 
                 const fontSizeClasses = {
                     xs: "text-xs",
-                    sm: "text-sm",
-                    md: "text-base",
-                    lg: "text-lg"
+                    sm: "text-xs md:text-sm",
+                    md: "text-sm md:text-base",
+                    lg: "text-base md:text-lg"
                 };
 
                 const typeClasses = {

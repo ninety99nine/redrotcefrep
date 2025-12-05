@@ -18,12 +18,16 @@
 
             <DesignCards
                 v-if="hasDesignCards"
-                :placement="placement"
-                :designCards="designCards"
-                class="max-w-xl mx-auto pb-20">
+                :designCards="designCards">
             </DesignCards>
 
             <NoDesignCards v-else></NoDesignCards>
+
+            <PlaceOrderButton
+                :placement="placement"
+                :designCards="designCards"
+                v-if="showingCheckout && shoppingCart">
+            </PlaceOrderButton>
 
         </template>
 
@@ -36,13 +40,14 @@
     import Button from '@Partials/Button.vue';
     import { MoveLeft } from 'lucide-vue-next';
     import NoDesignCards from '@Pages/shop/_components/design-card-manager/_components/NoDesignCards.vue';
+    import PlaceOrderButton from '@Pages/shop/_components/design-card-manager/_components/PlaceOrderButton.vue';
     import DesignCards from '@Pages/shop/_components/design-card-manager/_components/design-cards/DesignCards.vue';
     import LoadingDesignCards from '@Pages/shop/_components/design-card-manager/_components/LoadingDesignCards.vue';
 
     export default {
-        inject: ['formState', 'designState', 'storeState', 'notificationState'],
+        inject: ['formState', 'designState', 'orderState', 'storeState', 'notificationState'],
         components: {
-            Button, NoDesignCards, DesignCards, LoadingDesignCards
+            Button, NoDesignCards, PlaceOrderButton, DesignCards, LoadingDesignCards
         },
         props: {
             placement: {
@@ -76,6 +81,18 @@
             },
             isDesigning() {
                 return ['edit-storefront', 'edit-checkout', 'edit-payment', 'edit-menu'].includes(this.$route.name);
+            },
+            shoppingCart() {
+                return this.orderState.shoppingCart;
+            },
+            isMenuDesignCards() {
+                return this.placement == 'menu';
+            },
+            showingCheckout() {
+                return this.$route.name == 'show-checkout';
+            },
+            showingStorefront() {
+                return this.$route.name == 'show-storefront';
             },
             loadFromApi() {
                 return (this.$route.name == 'edit-storefront' && this.placement == 'menu') ||

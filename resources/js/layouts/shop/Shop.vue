@@ -5,11 +5,13 @@
         <Notifications></Notifications>
         <Menu v-if="showMenu"></Menu>
         <Header v-if="showHeader"></Header>
+        <CartDrawer v-if="showCartDrawer"></CartDrawer>
+        <MyCartButton v-if="showMyCartButton"></MyCartButton>
 
         <div
             @click="openWhatsappChat"
             v-if="whatsappMobileNumber"
-            class="fixed bottom-4 right-4 bg-green-500 hover:opacity-90 hover:scale-110 active:scale-100 transition-all duration-300 cursor-pointer rounded-full p-4 shadow-sm">
+            class="fixed z-10 bottom-4 right-4 bg-green-500 hover:opacity-90 hover:scale-110 active:scale-100 transition-all duration-300 cursor-pointer rounded-full p-4 shadow-sm">
             <WhatsappIcon size="w-8 h-8" color="#ffffff"></WhatsappIcon>
         </div>
 
@@ -25,11 +27,13 @@
     import WhatsappIcon from '@Partials/WhatsappIcon.vue';
     import Menu from '@Pages/shop/_components/menu/Menu.vue';
     import Notifications from '@Layouts/shop/components/Notifications.vue';
+    import CartDrawer from '@Pages/shop/_components/cart-drawer/CartDrawer.vue';
     import Header from '@Pages/shop/_components/design-card-manager/_components/header/Header.vue';
+    import MyCartButton from '@Pages/shop/_components/design-card-manager/_components/MyCartButton.vue';
 
     export default {
         inject: ['formState', 'orderState', 'storeState', 'notificationState'],
-        components: { Menu, WhatsappIcon, Header, Notifications },
+        components: { Menu, WhatsappIcon, Header, CartDrawer, Notifications, MyCartButton },
         data() {
             return {
                 orderAgain: false
@@ -62,10 +66,31 @@
                 }
             },
             orderForm: {
-                handler() {
-                    if(this.canInspectShoppingCart) {
+                handler(newValue, oldValue) {
+                    if(newValue && newValue.cart_products.length > 0) {
+
+                        if(oldValue) {
+                            const emailChanged = newValue.customer_email != oldValue.customer_email;
+                            const lastNameChanged = newValue.customer_last_name != oldValue.customer_last_name;
+                            const firstNameChanged = newValue.customer_first_name != oldValue.customer_first_name;
+                            const mobileNumberChanged = newValue.customer_mobile_number != oldValue.customer_mobile_number;
+
+                            console.log(newValue);
+                            console.log(oldValue);
+                            console.log(`emailChanged: ${emailChanged}`);
+                            console.log(`lastNameChanged: ${lastNameChanged}`);
+                            console.log(`firstNameChanged: ${firstNameChanged}`);
+                            console.log(`mobileNumberChanged: ${mobileNumberChanged}`);
+
+                            if(firstNameChanged || lastNameChanged || mobileNumberChanged || emailChanged) {
+                                return;
+                            }
+                        }
+
                         this.orderState.setIsInspectingShoppingCart(true);
                         this.inspectShoppingCartDelayed();
+                    }else {
+                        this.orderState.shoppingCart = null;
                     }
                 },
                 deep: true
@@ -90,14 +115,20 @@
             orderForm() {
                 return this.orderState.orderForm;
             },
-            canInspectShoppingCart() {
-                return this.orderState.canInspectShoppingCart;
+            shoppingCart() {
+                return this.orderState.shoppingCart;
             },
             showHeader() {
                 return ['show-storefront', 'show-search', 'show-shop-reviews', 'create-shop-review', 'show-shop-category'].includes(this.$route.name);
             },
             showMenu() {
                 return !['show-checkout', 'show-shop-payment-methods', 'show-shop-payment-method', 'show-shop-confirming-payment', 'show-shop-pending-payment'].includes(this.$route.name);
+            },
+            showCartDrawer() {
+                return ['show-storefront', 'show-search', 'show-shop-reviews', 'create-shop-review', 'show-shop-category', 'show-shop-product'].includes(this.$route.name);
+            },
+            showMyCartButton() {
+                return this.showCartDrawer && this.shoppingCart != null;
             },
             whatsappMobileNumber() {
                 return this.store?.whatsapp_mobile_number ?? null;
@@ -113,15 +144,12 @@
             async prepareStoreForShopping(orderToOrderAgain = null) {
                 if(await this.orderState.hasStateFromLocalStorage()) {
                     await this.orderState.setStateFromLocalStorage();
-                    await this.inspectShoppingCart();
                 }else{
                     //  If we want to order again
                     if(orderToOrderAgain) {
                         this.orderState.setOrderForm(orderToOrderAgain, false);
-                        this.orderState.canInspectShoppingCart = true;
                     }else{
                         this.orderState.setOrderForm(null, false);
-                        setTimeout(() => { this.orderState.canInspectShoppingCart = true }, 1000);
                     }
                 }
             },
@@ -133,7 +161,7 @@
 
                     let config = {
                         params: {
-                            _relationships: ['logo', 'backgroundPhoto', 'categories', 'myMembership'].join(','),
+                            _relationships: ['logo', 'backgroundPhoto', 'categories', 'activeSubscription', 'myMembership'].join(','),
                             _countable_relationships: ['reviews'].join(',')
                         }
                     };

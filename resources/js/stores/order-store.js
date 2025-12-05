@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia';
 import { v4 as uuidv4 } from 'uuid';
-import { formattedDate } from '@Utils/dateUtils.js';
+import { useAuthStore as authState } from '@Stores/auth-store.js';
 import { useStoreStore as storeState } from '@Stores/store-store.js';
 import { useChangeHistoryStore as changeHistoryState } from '@Stores/change-history-store.js';
 
@@ -12,7 +12,6 @@ export const useOrderStore = defineStore('order', {
         deliveryMethods: [],
         isLoadingOrder: false,
         isCreatingOrder: false,
-        canInspectShoppingCart: false,
         isLoadingDeliveryMethods: false,
         isInspectingShoppingCart: false
     }),
@@ -24,7 +23,6 @@ export const useOrderStore = defineStore('order', {
             this.deliveryMethods = [];
             this.isLoadingOrder = false;
             this.isCreatingOrder = false;
-            this.canInspectShoppingCart = false;
             this.isLoadingDeliveryMethods = false;
             this.isInspectingShoppingCart = false;
             this.removeStateOnLocalStorage();
@@ -33,7 +31,6 @@ export const useOrderStore = defineStore('order', {
         resetOrderForm() {
             this.reset();
             this.setOrderForm(null, false);
-            setTimeout(() => { this.canInspectShoppingCart = true }, 1000);
         },
         async hasStateFromLocalStorage() {
             return (await this.getStateFromLocalStorage()) !== null;
@@ -99,10 +96,10 @@ export const useOrderStore = defineStore('order', {
                 adjustment: order?.adjustment_total?.amount_without_currency ?? null,
 
                 update_profile: true,
-                customer_email: order?.customer_email ?? null,
-                customer_last_name: order?.customer_last_name ?? null,
-                customer_first_name: order?.customer_first_name ?? null,
-                customer_mobile_number: order?.customer_mobile_number?.international ?? null,
+                customer_email: order?.customer_email ?? authState().user?.email ?? null,
+                customer_last_name: order?.customer_last_name ?? authState().user?.last_name ?? null,
+                customer_first_name: order?.customer_first_name ?? authState().user?.first_name ?? null,
+                customer_mobile_number: order?.customer_mobile_number?.international ?? authState().user?.mobile_number?.international ?? null,
 
                 delivery_address: order?.delivery_address ?? null,
                 delivery_timeslot: order?.delivery_timeslot ?? null,

@@ -1,29 +1,31 @@
 <template>
 
-    <div :style="{
-        color: designCard.metadata.design.title_color,
-        backgroundColor: designCard.metadata.design.bg_color,
+    <div
+        class="select-none"
+        :style="{
+            color: designCard.metadata.design.title_color,
+            backgroundColor: designCard.metadata.design.bg_color,
 
-        marginTop: `${designCard.metadata.design.t_margin ?? 0}px`,
-        marginLeft: `${designCard.metadata.design.l_margin ?? 0}px`,
-        marginRight: `${designCard.metadata.design.r_margin ?? 0}px`,
-        marginBottom: `${designCard.metadata.design.b_margin ?? 0}px`,
+            marginTop: `${designCard.metadata.design.t_margin ?? 0}px`,
+            marginLeft: `${designCard.metadata.design.l_margin ?? 0}px`,
+            marginRight: `${designCard.metadata.design.r_margin ?? 0}px`,
+            marginBottom: `${designCard.metadata.design.b_margin ?? 0}px`,
 
-        paddingTop: `${designCard.metadata.design.t_padding ?? 0}px`,
-        paddingLeft: `${designCard.metadata.design.l_padding ?? 0}px`,
-        paddingRight: `${designCard.metadata.design.r_padding ?? 0}px`,
-        paddingBottom: `${designCard.metadata.design.b_padding ?? 0}px`,
+            paddingTop: `${designCard.metadata.design.t_padding ?? 0}px`,
+            paddingLeft: `${designCard.metadata.design.l_padding ?? 0}px`,
+            paddingRight: `${designCard.metadata.design.r_padding ?? 0}px`,
+            paddingBottom: `${designCard.metadata.design.b_padding ?? 0}px`,
 
-        borderTopLeftRadius: `${designCard.metadata.design.tl_border_radius ?? 0}px`,
-        borderTopRightRadius: `${designCard.metadata.design.tr_border_radius ?? 0}px`,
-        borderBottomLeftRadius: `${designCard.metadata.design.bl_border_radius ?? 0}px`,
-        borderBottomRightRadius: `${designCard.metadata.design.br_border_radius ?? 0}px`,
+            borderTopLeftRadius: `${designCard.metadata.design.tl_border_radius ?? 0}px`,
+            borderTopRightRadius: `${designCard.metadata.design.tr_border_radius ?? 0}px`,
+            borderBottomLeftRadius: `${designCard.metadata.design.bl_border_radius ?? 0}px`,
+            borderBottomRightRadius: `${designCard.metadata.design.br_border_radius ?? 0}px`,
 
-        borderTop: `${designCard.metadata.design.t_border ?? 0}px solid ${designCard.metadata.design.border_color ?? '#000000'}`,
-        borderLeft: `${designCard.metadata.design.l_border ?? 0}px solid ${designCard.metadata.design.border_color ?? '#000000'}`,
-        borderRight: `${designCard.metadata.design.r_border ?? 0}px solid ${designCard.metadata.design.border_color ?? '#000000'}`,
-        borderBottom: `${designCard.metadata.design.b_border ?? 0}px solid ${designCard.metadata.design.border_color ?? '#000000'}`,
-    }">
+            borderTop: `${designCard.metadata.design.t_border ?? 0}px solid ${designCard.metadata.design.border_color ?? '#000000'}`,
+            borderLeft: `${designCard.metadata.design.l_border ?? 0}px solid ${designCard.metadata.design.border_color ?? '#000000'}`,
+            borderRight: `${designCard.metadata.design.r_border ?? 0}px solid ${designCard.metadata.design.border_color ?? '#000000'}`,
+            borderBottom: `${designCard.metadata.design.b_border ?? 0}px solid ${designCard.metadata.design.border_color ?? '#000000'}`,
+        }">
 
         <!-- Case 1: Title is set, becomes outermost dropdown -->
         <div v-if="designCard.metadata.title">
@@ -32,7 +34,7 @@
                 class="cursor-pointer text-gray-900 group"
                 :class="{ 'hover:bg-gray-100': !expanded['root'] }">
                 <div class="flex items-center text-gray-700 hover:bg-gray-100 pr-4">
-                    <span class="w-full text-lg font-semibold py-2 pl-4 ms-3 group-hover:text-gray-900">{{ designCard.metadata.title }}</span>
+                    <span class="w-full text-sm md:text-base py-2 pl-4 ms-3 group-hover:text-gray-900">{{ designCard.metadata.title }}</span>
                     <div
                         class="p-2">
                         <ChevronUp size="20" v-if="expanded['root'] && categories?.length"></ChevronUp>
@@ -50,7 +52,7 @@
                     class="cursor-pointer text-gray-900 group"
                     @click.stop="() => navigateToShowShopCategory(category)">
                     <div class="flex items-center text-gray-700 hover:bg-gray-100 pr-4">
-                        <span class="w-full text-lg font-semibold py-2 pl-8 ms-3 group-hover:text-gray-900">{{ category.name }}</span>
+                        <span class="w-full text-sm md:text-base py-2 pl-8 ms-3 group-hover:text-gray-900">{{ category.name }}</span>
                         <div
                             class="p-2"
                             v-if="category.sub_categories?.length"
@@ -69,7 +71,7 @@
                         class="cursor-pointer text-gray-900 group">
                         <div
                             class="flex items-center text-gray-700 hover:bg-gray-100 pr-4">
-                            <span class="w-full text-lg font-semibold py-2 pl-12 ms-3 group-hover:text-gray-900">{{ sub.name }}</span>
+                            <span class="w-full text-sm md:text-base py-2 pl-12 ms-3 group-hover:text-gray-900">{{ sub.name }}</span>
                             <div
                                 class="p-2"
                                 v-if="sub.sub_categories?.length"
@@ -87,7 +89,7 @@
                                     @click.stop="toggleExpanded(subSub.id)"
                                     class="cursor-pointer text-gray-900 group hover:bg-gray-100">
                                     <div class="flex items-center text-gray-700">
-                                        <span class="w-full text-lg font-semibold py-2 pl-16 ms-3 group-hover:text-gray-900">{{ subSub.name }}</span>
+                                        <span class="w-full text-sm md:text-base py-2 pl-16 ms-3 group-hover:text-gray-900">{{ subSub.name }}</span>
                                         <!-- No further nesting beyond level 3; no chevron if no deeper subs -->
                                     </div>
                                 </div>
@@ -107,7 +109,7 @@
                 class="cursor-pointer text-gray-900 group"
                 @click.stop="() => navigateToShowShopCategory(category)">
                 <div class="flex items-center text-gray-700 hover:bg-gray-100 pr-4">
-                    <span class="w-full text-lg font-semibold py-2 pl-4 ms-3 group-hover:text-gray-900">{{ category.name }}</span>
+                    <span class="w-full text-sm md:text-base py-2 pl-4 ms-3 group-hover:text-gray-900">{{ category.name }}</span>
                     <div
                         class="p-2"
                         v-if="category.sub_categories?.length"
@@ -125,7 +127,7 @@
                         @click.stop="() => navigateToShowShopCategory(sub)"
                         class="cursor-pointer text-gray-900 group">
                         <div class="flex items-center text-gray-700 hover:bg-gray-100 pr-4">
-                            <span class="w-full text-lg font-semibold py-2 pl-8 ms-3 group-hover:text-gray-900">{{ sub.name }}</span>
+                            <span class="w-full text-sm md:text-base py-2 pl-8 ms-3 group-hover:text-gray-900">{{ sub.name }}</span>
                             <div
                                 class="p-2"
                                 v-if="sub.sub_categories?.length"
@@ -143,7 +145,7 @@
                                 @click.stop="() => navigateToShowShopCategory(subSub)"
                                 class="cursor-pointer text-gray-900 group hover:bg-gray-100">
                                 <div class="flex items-center text-gray-700">
-                                    <span class="w-full text-lg font-semibold py-2 pl-16 ms-3 group-hover:text-gray-900">{{ subSub.name }}</span>
+                                    <span class="w-full text-sm md:text-base py-2 pl-16 ms-3 group-hover:text-gray-900">{{ subSub.name }}</span>
                                     <!-- No further nesting beyond level 3; no chevron if no deeper subs -->
                                 </div>
                             </div>
@@ -227,6 +229,10 @@
 
                     const pagination = response.data;
                     this.categories = pagination.data;
+
+                    if(this.designCard.metadata.title) {
+                        this.toggleExpanded('root');
+                    }
 
                 } catch (error) {
                     const message = error?.response?.data?.message || error?.message || 'Something went wrong while fetching categories';

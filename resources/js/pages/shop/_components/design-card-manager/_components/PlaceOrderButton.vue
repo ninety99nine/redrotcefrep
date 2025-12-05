@@ -2,8 +2,8 @@
 
     <Button
         size="lg"
-        class="mb-20"
         type="primary"
+        class="mx-4 mb-40"
         buttonClass="w-full"
         :action="createOrder">
         <span>Place order</span>
@@ -128,7 +128,12 @@
                     this.notificationState.showSuccessNotification(`Order created`);
 
                     const order = response.data.order;
-                    await this.navigateToShopPaymentMethods(order);
+
+                    if(this.store.skip_payment_page) {
+                        await this.navigateToShowShopOrder(order);
+                    }else{
+                        await this.navigateToShopPaymentMethods(order);
+                    }
 
                 } catch (error) {
                     const message = error?.response?.data?.message || error?.message || 'Something went wrong while creating order';
@@ -139,6 +144,18 @@
                     this.orderState.creatingOrder = false;
                 }
 
+            },
+            async navigateToShowShopOrder(order) {
+                //  Refer to resources/js/layouts/shop/Shop.vue to see what happens
+                //  on the orderId wacher after order_id is set on the route.
+
+                await this.$router.push({
+                    name: 'show-shop-order',
+                    params: {
+                        order_id: order.id,
+                        alias: this.store.alias
+                    }
+                });
             },
             async navigateToShopPaymentMethods(order) {
                 //  Refer to resources/js/layouts/shop/Shop.vue to see what happens

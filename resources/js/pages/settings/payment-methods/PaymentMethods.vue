@@ -8,16 +8,11 @@
             <Modal
                 size="md"
                 :onShow="onShow"
-                triggerSize="md"
                 contentClass="px-4"
-                triggerType="primary"
-                :leftTriggerIcon="Plus"
                 :scrollOnContent="false"
                 :showApproveButton="false"
                 ref="addPaymentMethodModal"
-                header="Add Payment Method"
-                :triggerLoading="isLoadingStore"
-                :triggerText="hasStorePaymentMethods ? 'Add Payment Method' : null">
+                header="Add Payment Method">
 
                 <template #content v-if="!isLoadingStore && !isLoadingStorePaymentMethods">
 
@@ -158,65 +153,96 @@
 
         </div>
 
-        <!-- Payment Methods -->
-        <draggable
-            class="space-y-3 mt-4"
-            handle=".draggable-handle"
-            ghost-class="bg-yellow-50"
-            v-model="storePaymentMethods"
-            v-else-if="hasStorePaymentMethods"
-            @change="changeStorePaymentMethodArrangement">
+        <template v-else-if="hasStorePaymentMethods">
 
-            <div
-                :key="storePaymentMethod.id"
-                v-for="storePaymentMethod in storePaymentMethods"
-                @click.stop="() => navigateToEditPaymentMethod(storePaymentMethod)"
-                class="bg-white p-4 shadow-sm rounded-xl transition-all duration-300 border border-transparent hover:border-gray-300 hover:shadow-lg cursor-pointer">
+            <div class="bg-white p-8 shadow-sm rounded-xl mb-2">
 
-                <div class="flex justify-between items-center">
+                <h1 class="text-lg font-bold mb-4">Payment</h1>
 
-                    <div class="flex items-center space-x-2 font-bold">
+                <div class="flex items-center justify-between">
 
-                        <!-- Logo -->
-                        <div class="w-8 h-8 rounded-full overflow-hidden flex items-center justify-center">
-                            <img
-                                alt="Payment Method Logo"
-                                class="h-full object-contain"
-                                :src="storePaymentMethod.logo ? storePaymentMethod.logo.path : storePaymentMethod.payment_method.image_url"
-                            />
-                        </div>
+                    <Switch
+                        size="xs"
+                        suffixText="Skip payment page"
+                        v-model="storeForm.skip_payment_page"
+                        :errorText="formState.getFormError('skip_payment_page')"
+                        tooltipContent="Skip the payment page when placing an order"
+                        @change="storeState.saveStateDebounced('Skip payment page status changed')"
+                    />
 
-                        <!-- Name -->
-                        <span class="text-sm">{{ storePaymentMethod.custom_name }}</span>
+                    <Button
+                        size="md"
+                        type="primary"
+                        :leftIcon="Plus"
+                        :action="() => $refs.addPaymentMethodModal.showModal()">
+                        <span>Add Payment Method</span>
+                    </Button>
 
-                    </div>
-
-                    <div class="flex items-center space-x-4">
-
-                        <!-- Requires Verification Status -->
-                        <Pill v-if="storePaymentMethod.requires_verification" type="warning" size="xs">Requires verification</Pill>
-
-                        <!-- Active Status -->
-                        <Pill v-else :type="storePaymentMethod.active ? 'success' : 'warning'" size="xs">{{ storePaymentMethod.active ? 'active' : 'inactive'}}</Pill>
-
-                        <!-- Delete Button -->
-                        <Button
-                            size="xs"
-                            type="bareDanger"
-                            :leftIcon="Trash2"
-                            :action="() => showDeleteStorePaymentMethodModal(storePaymentMethod)">
-                        </Button>
-
-                        <!-- Drag & Drop Handle -->
-                        <Move @click.stop size="16" class="draggable-handle cursor-grab active:cursor-grabbing text-gray-500 hover:text-yellow-500"></Move>
-
-                    </div>
 
                 </div>
 
             </div>
 
-        </draggable>
+            <!-- Payment Methods -->
+            <draggable
+                class="space-y-3 mt-4"
+                handle=".draggable-handle"
+                ghost-class="bg-yellow-50"
+                v-model="storePaymentMethods"
+                @change="changeStorePaymentMethodArrangement">
+
+                <div
+                    :key="storePaymentMethod.id"
+                    v-for="storePaymentMethod in storePaymentMethods"
+                    @click.stop="() => navigateToEditPaymentMethod(storePaymentMethod)"
+                    class="bg-white p-4 shadow-sm rounded-xl transition-all duration-300 border border-transparent hover:border-gray-300 hover:shadow-lg cursor-pointer">
+
+                    <div class="flex justify-between items-center">
+
+                        <div class="flex items-center space-x-2 font-bold">
+
+                            <!-- Logo -->
+                            <div class="w-8 h-8 rounded-full overflow-hidden flex items-center justify-center">
+                                <img
+                                    alt="Payment Method Logo"
+                                    class="h-full object-contain"
+                                    :src="storePaymentMethod.logo ? storePaymentMethod.logo.path : storePaymentMethod.payment_method.image_url"
+                                />
+                            </div>
+
+                            <!-- Name -->
+                            <span class="text-sm">{{ storePaymentMethod.custom_name }}</span>
+
+                        </div>
+
+                        <div class="flex items-center space-x-4">
+
+                            <!-- Requires Verification Status -->
+                            <Pill v-if="storePaymentMethod.requires_verification" type="warning" size="xs">Requires verification</Pill>
+
+                            <!-- Active Status -->
+                            <Pill v-else :type="storePaymentMethod.active ? 'success' : 'warning'" size="xs">{{ storePaymentMethod.active ? 'active' : 'inactive'}}</Pill>
+
+                            <!-- Delete Button -->
+                            <Button
+                                size="xs"
+                                type="bareDanger"
+                                :leftIcon="Trash2"
+                                :action="() => showDeleteStorePaymentMethodModal(storePaymentMethod)">
+                            </Button>
+
+                            <!-- Drag & Drop Handle -->
+                            <Move @click.stop size="16" class="draggable-handle cursor-grab active:cursor-grabbing text-gray-500 hover:text-yellow-500"></Move>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </draggable>
+
+        </template>
 
         <div
             v-else
@@ -275,6 +301,7 @@
     import Alert from '@Partials/Alert.vue';
     import Input from '@Partials/Input.vue';
     import Modal from '@Partials/Modal.vue';
+    import Switch from '@Partials/Switch.vue';
     import Button from '@Partials/Button.vue';
     import Skeleton from '@Partials/Skeleton.vue';
     import { VueDraggableNext } from 'vue-draggable-next';
@@ -282,8 +309,8 @@
     import { Plus, Move, Trash2, CircleDollarSign } from 'lucide-vue-next';
 
     export default {
-        inject: ['formState', 'storeState', 'notificationState'],
-        components: { CircleDollarSign, Pill, Alert, Input, Modal, Button, Skeleton, Move, draggable: VueDraggableNext },
+        inject: ['formState', 'storeState', 'changeHistoryState', 'notificationState'],
+        components: { CircleDollarSign, Pill, Alert, Input, Modal, Switch, Button, Skeleton, Move, draggable: VueDraggableNext },
         data() {
             return {
                 Plus,
@@ -320,6 +347,9 @@
             store() {
                 return this.storeState.store;
             },
+            storeForm() {
+                return this.storeState.storeForm;
+            },
             isLoadingStore() {
                 return this.storeState.isLoadingStore;
             },
@@ -339,7 +369,20 @@
             setup() {
                 if(this.store) {
                     this.showStorePaymentMethods();
+                    this.storeState.setStoreForm(this.store, true);
+                }else{
+                    this.storeState.setStoreForm(null, false);
                 }
+            },
+            setActionButtons() {
+                this.changeHistoryState.removeButtons();
+                this.changeHistoryState.addDiscardButton();
+                this.changeHistoryState.addActionButton(
+                    'Save Changes',
+                    this.updateStore,
+                    'primary',
+                    null,
+                );
             },
             onShow() {
                 this.hasLoadedInitialPaymentMethods = false;
@@ -352,7 +395,6 @@
                 this.deletableStorePaymentMethod = storePaymentMethod;
                 this.$refs.deleteStorePaymentMethodModal.showModal();
             },
-
             async navigateToAddPaymentMethod(paymentMethod) {
                 await this.$router.push({
                     name: 'add-payment-method',
@@ -505,9 +547,52 @@
                 }
 
             },
+            async updateStore() {
+
+                try {
+
+                    if(this.storeState.isUpdatingStore) return;
+
+                    this.storeState.isUpdatingStore = true;
+                    this.changeHistoryState.actionButtons[1].loading = true;
+
+                    const data = {
+                        ...this.storeForm,
+                        store_id: this.store.id
+                    }
+
+                    await axios.put(`/api/stores/${this.store.id}`, data);
+
+                    this.notificationState.showSuccessNotification(`Store updated`);
+                    this.storeState.saveOriginalState('Original store');
+
+                } catch (error) {
+                    const message = error?.response?.data?.message || error?.message || 'Something went wrong while updating store';
+                    this.notificationState.showWarningNotification(message);
+                    this.formState.setServerFormErrors(error);
+                    console.error('Failed to update store:', error);
+                } finally {
+                    this.storeState.isUpdatingStore = false;
+                    this.changeHistoryState.actionButtons[1].loading = false;
+                }
+
+            },
+            setStoreForm(storeForm) {
+                this.storeState.storeForm = storeForm;
+            },
         },
         created() {
+
             this.setup();
+            this.setActionButtons();
+
+            const listeners = ['undo', 'redo', 'jumpToHistory', 'resetHistoryToCurrent', 'resetHistoryToOriginal'];
+
+            for (let i = 0; i < listeners.length; i++) {
+                let listener = listeners[i];
+                this.changeHistoryState.listeners[listener] = this.setStoreForm;
+            }
+
         }
     };
 

@@ -1,6 +1,7 @@
 <template>
 
     <div class="max-w-4xl mx-auto pb-40">
+
         <div
             v-if="isLoadingStore"
             class="pt-8 flex items-center justify-center">
@@ -10,6 +11,7 @@
         </div>
 
         <template v-else>
+
             <div class="select-none">
 
                 <!-- Breadcrumb Trail -->
@@ -135,7 +137,6 @@
                 </p>
             </div>
 
-            <MyCartButton v-if="shoppingCart"></MyCartButton>
         </template>
     </div>
 
@@ -149,12 +150,11 @@
     import Skeleton from '@Partials/Skeleton.vue';
     import { isNotEmpty } from '@Utils/stringUtils.js';
     import { Image, ChevronRight } from 'lucide-vue-next';
-    import MyCartButton from '@Pages/shop/_components/design-card-manager/_components/my-cart/MyCartButton.vue';
 
     export default {
         inject: ['formState', 'orderState', 'storeState', 'notificationState'],
         components: {
-            Pill, Image, Input, Loader, Button, Skeleton, ChevronRight, MyCartButton
+            Pill, Image, Input, Loader, Button, Skeleton, ChevronRight
         },
         data() {
             return {

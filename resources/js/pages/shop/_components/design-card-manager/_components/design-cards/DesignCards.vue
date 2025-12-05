@@ -1,6 +1,6 @@
 <template>
 
-    <div class="space-y-2">
+    <div class="max-w-2xl mx-auto space-y-2">
 
         <div :class="[{ 'mb-20' : showingStorefront }]">
 
@@ -41,17 +41,6 @@
 
         </div>
 
-        <MyCartButton
-            v-if="showingStorefront && shoppingCart">
-        </MyCartButton>
-
-        <PlaceOrderButton
-            class="mt-8"
-            :placement="placement"
-            :designCards="designCards"
-            v-else-if="showingCheckout && shoppingCart">
-        </PlaceOrderButton>
-
     </div>
 
 </template>
@@ -60,8 +49,6 @@
 
     import Button from '@Partials/Button.vue';
     import { ShoppingCart } from 'lucide-vue-next';
-    import MyCartButton from '@Pages/shop/_components/design-card-manager/_components/my-cart/MyCartButton.vue';
-    import PlaceOrderButton from '@Pages/shop/_components/design-card-manager/_components/place-order/PlaceOrderButton.vue';
     import MapDesignCard from '@Pages/shop/_components/design-card-manager/_components/design-cards/design-card/MapDesignCard.vue';
     import LogoDesignCard from '@Pages/shop/_components/design-card-manager/_components/design-cards/design-card/LogoDesignCard.vue';
     import LinkDesignCard from '@Pages/shop/_components/design-card-manager/_components/design-cards/design-card/LinkDesignCard.vue';
@@ -86,46 +73,19 @@
     import PromoCodeDesignCard from '@Pages/shop/_components/design-card-manager/_components/design-cards/design-card/promo-code-design-card/PromoCodeDesignCard.vue';
 
     export default {
-        inject: ['designState', 'orderState', 'storeState'],
         components: {
-            ShoppingCart, Button, MyCartButton, PlaceOrderButton, MapDesignCard, LogoDesignCard, LinkDesignCard, TextDesignCard, ImageDesignCard, VideoDesignCard, ContactDesignCard,
+            ShoppingCart, Button, MapDesignCard, LogoDesignCard, LinkDesignCard, TextDesignCard, ImageDesignCard, VideoDesignCard, ContactDesignCard,
             BannerDesignCard, DividerDesignCard, SocialsDesignCard, CustomerDesignCard, ProductsDesignCard, CountdownDesignCard, CategoriesDesignCard, InstallAppDesignCard,
             TipsDesignCard, DataCollectionDesignCard, PaymentMethodsDesignCard, ItemsDesignCard, DeliveryDesignCard, OrderSummaryCard, PromoCodeDesignCard
         },
         props: {
-            placement: {
-                type: String
-            },
             designCards: {
                 type: Array
             }
         },
-        data() {
-            return {
-                localDesignCards: []
-            }
-        },
         computed: {
-            designForm() {
-                return this.designState.designForm;
-            },
-            isDesigning() {
-                return ['edit-storefront', 'edit-checkout', 'edit-payment', 'edit-menu'].includes(this.$route.name);
-            },
-            shoppingCart() {
-                return this.orderState.shoppingCart;
-            },
-            showingCheckout() {
-                return this.$route.name == 'show-checkout';
-            },
             showingStorefront() {
                 return this.$route.name == 'show-storefront';
-            },
-            grandTotal() {
-                return this.shoppingCart ? this.shoppingCart.totals.grand_total.amount_with_currency : null;
-            },
-            totalUncancelledProductQuantities() {
-                return this.shoppingCart ? this.shoppingCart.totals_summary.order_products.total_uncancelled_product_quantities : null;
             }
         },
         methods: {

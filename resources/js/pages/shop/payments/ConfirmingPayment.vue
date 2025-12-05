@@ -1,5 +1,6 @@
 <template>
-    <div class="select-none max-w-xl mx-auto pt-16">
+
+    <div class="select-none max-w-xl mx-auto pt-8 px-4 pb-40">
 
         <div
             @click="navigateToShowShopOrder"

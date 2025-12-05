@@ -27,10 +27,10 @@
                 <!-- Store Name and Link -->
                 <div class="w-full">
                     <Skeleton v-if="isLoadingStore || isLoadingOrder || !hasOrder" width="w-20" :shine="true" class="mb-4"></Skeleton>
-                    <p v-else class="text-xl font-bold">{{ store.name ?? 'Store' }}</p>
+                    <p v-else class="text-lg md:text-xl font-bold">{{ store.name ?? 'Store' }}</p>
 
                     <Skeleton v-if="isLoadingStore || isLoadingOrder || !hasOrder" width="w-1/3" :shine="true"></Skeleton>
-                    <a v-else :href="store.web_link" class="text-sm text-blue-500 hover:underline cursor-pointer">
+                    <a v-else :href="store.web_link" class="text-xs md:text-sm text-blue-500 hover:underline cursor-pointer">
                         {{ store.web_link }}
                     </a>
                 </div>
@@ -55,19 +55,19 @@
             v-if="isLoadingStore || isLoadingOrder || !hasOrder || store.email || store.whatsapp_mobile_number">
 
             <Skeleton v-if="isLoadingStore || isLoadingOrder || !hasOrder" :shine="true"></Skeleton>
-            <p v-else-if="store.whatsapp_mobile_number?.international" class="text-sm">
+            <p v-else-if="store.whatsapp_mobile_number?.international" class="text-xs md:text-sm">
                 WhatsApp: {{ store.whatsapp_mobile_number.international }}
             </p>
 
             <Skeleton v-if="isLoadingStore || isLoadingOrder || !hasOrder" :shine="true"></Skeleton>
-            <p v-else-if="store.email" class="text-sm">Email: {{ store.email }}</p>
+            <p v-else-if="store.email" class="text-xs md:text-sm">Email: {{ store.email }}</p>
 
         </div>
 
         <!-- Order Details -->
         <div class="mb-6">
 
-            <div class="grid grid-cols-2 gap-1 text-sm">
+            <div class="grid grid-cols-2 gap-1 text-xs md:text-sm">
 
                 <div class="col-span-1 flex items-center space-x-1">
                     <span class="font-semibold whitespace-nowrap">Order No:</span>
@@ -101,7 +101,7 @@
                     v-if="isLoadingStore || isLoadingOrder || !hasOrder || order.courier">
                     <span class="font-semibold whitespace-nowrap">Tracking No:</span>
                     <Skeleton v-if="isLoadingStore || isLoadingOrder || !hasOrder" :shine="true"></Skeleton>
-                    <a v-else :href="order.courier.tracking_page" target="_blank" class="text-sm text-blue-500 hover:underline cursor-pointer">
+                    <a v-else :href="order.courier.tracking_page" target="_blank" class="text-blue-500 hover:underline cursor-pointer">
                         {{ order.tracking_number }}
                     </a>
                 </div>
@@ -168,7 +168,7 @@
 
             <div class="w-full md:w-3/4 lg:w-1/2">
 
-                <table class="w-full text-sm">
+                <table class="w-full text-xs md:text-sm">
                 <tbody>
                     <tr class="border-b border-gray-300 border-dashed">
                     <td class="text-right py-1">Subtotal:</td>
@@ -226,24 +226,24 @@
         </div>
 
         <!-- Customer -->
-        <div class="border-b border-gray-200 pb-4">
+        <div class="text-xs md:text-sm border-b border-gray-200 space-y-1 pb-4">
 
-            <p class="text-sm font-semibold mb-2">Customer</p>
-
-            <Skeleton v-if="isLoadingStore || isLoadingOrder || !hasOrder" :shine="true" class="mb-2"></Skeleton>
-            <p v-else-if="order.customer_name" class="text-sm">{{ order.customer_name }}</p>
+            <p class="text-sm md:text-base font-semibold mb-2">Customer</p>
 
             <Skeleton v-if="isLoadingStore || isLoadingOrder || !hasOrder" :shine="true" class="mb-2"></Skeleton>
-            <p v-else-if="order.customer_mobile_number?.international" class="text-sm">
+            <p v-else-if="order.customer_name">{{ order.customer_name }}</p>
+
+            <Skeleton v-if="isLoadingStore || isLoadingOrder || !hasOrder" :shine="true" class="mb-2"></Skeleton>
+            <p v-else-if="order.customer_mobile_number?.international">
                 {{ order.customer_mobile_number.international }}
             </p>
 
             <Skeleton v-if="isLoadingStore || isLoadingOrder || !hasOrder" :shine="true"></Skeleton>
-            <p v-else-if="order.customer_email" class="text-sm">{{ order.customer_email }}</p>
+            <p v-else-if="order.customer_email">{{ order.customer_email }}</p>
 
         </div>
 
-        <p class="text-sm text-center mt-4">Thank you!</p>
+        <p class="text-xs md:text-sm text-center mt-4">Thank you!</p>
 
     </div>
 

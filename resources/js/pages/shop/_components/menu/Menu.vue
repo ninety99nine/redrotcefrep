@@ -1,6 +1,6 @@
 <template>
     <div :style="{ height: '52px' }" class="relative">
-        <div class="fixed top-0 left-0 right-0 z-10 boder-b flex items-center justify-between space-x-2 bg-white shadow px-6 py-2.5 mx-auto">
+        <div class="fixed top-0 left-0 right-0 z-20 boder-b flex items-center justify-between space-x-2 bg-white shadow px-4 py-2.5 mx-auto">
             <MenuButton></MenuButton>
             <div class="flex items-center justify-between space-x-4">
                 <LoginButton></LoginButton>

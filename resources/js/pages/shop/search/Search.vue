@@ -178,8 +178,6 @@
 
             </div>
 
-            <MyCartButton v-if="shoppingCart"></MyCartButton>
-
         </template>
 
     </div>
@@ -195,12 +193,11 @@
     import Button from '@Partials/Button.vue';
     import Skeleton from '@Partials/Skeleton.vue';
     import { isNotEmpty } from '@Utils/stringUtils.js';
-    import MyCartButton from '@Pages/shop/_components/design-card-manager/_components/my-cart/MyCartButton.vue';
 
     export default {
         inject: ['formState', 'orderState', 'storeState', 'notificationState'],
         components: {
-            Pill, Image, Input, Loader, Button, Skeleton, MyCartButton
+            Pill, Image, Input, Loader, Button, Skeleton
         },
         data() {
             return {

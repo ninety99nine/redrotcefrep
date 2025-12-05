@@ -1,6 +1,6 @@
 <template>
 
-    <div class="select-none max-w-xl mx-auto pt-16 pb-40">
+    <div class="select-none max-w-xl mx-auto p-4 md:pt-8 pb-40">
 
        <div
             v-if="!isLoadingStore"
@@ -28,7 +28,7 @@
 
        </div>
 
-        <Advert></Advert>
+        <Advert v-if="!activeSubscription"></Advert>
 
         <OrderDetails></OrderDetails>
 
@@ -73,7 +73,10 @@
             },
             hasMembership() {
                 return this.store?.my_membership != null
-            }
+            },
+            activeSubscription() {
+                return this.store.active_subscription;
+            },
         },
         methods: {
             navigateToShowOrder() {

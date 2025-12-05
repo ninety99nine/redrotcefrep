@@ -55,7 +55,7 @@
 <script>
 
     import Skeleton from '@Partials/Skeleton.vue';
-    import CartProduct from '@Pages/shop/_components/design-card-manager/_components/my-cart/_components/CartProduct.vue';
+    import CartProduct from '@Pages/shop/_components/cart-drawer/_components/CartProduct.vue';
 
     export default {
         inject: ['storeState', 'orderState'],

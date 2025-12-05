@@ -2,9 +2,9 @@
 
     <div class="bg-gray-100 p-2 rounded-lg leading-0">
 
-        <p v-if="user" class="font-bold text-sm">{{ user.name }}</p>
+        <p v-if="user" class="font-bold text-xs md:text-sm">{{ user.name }}</p>
 
-        <p class="text-sm">{{ orderComment.comment }}</p>
+        <p class="text-xs md:text-sm">{{ orderComment.comment }}</p>
 
         <div
             v-if="hasPhotos"

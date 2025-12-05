@@ -2,12 +2,12 @@
 
     <div class="space-y-2 mb-8">
 
+        <PayButton></PayButton>
+
         <div class="flex items-center justify-center space-x-2">
             <EmailInvoiceButton></EmailInvoiceButton>
             <OrderAgainButton></OrderAgainButton>
         </div>
-
-        <PayButton></PayButton>
 
     </div>
 

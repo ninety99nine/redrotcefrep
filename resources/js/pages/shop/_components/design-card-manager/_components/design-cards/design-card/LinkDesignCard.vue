@@ -38,7 +38,7 @@
                 v-if="designCard.metadata.title"
                 class="flex items-center justify-center space-x-4">
                 <Link size="20" :style="{ color: designCard.metadata.design.icon_color }"></Link>
-                <h3 class="text-lg font-semibold">{{ designCard.metadata.title }}</h3>
+                <h3 class="text-sm md:text-base font-semibold">{{ designCard.metadata.title }}</h3>
             </div>
 
         </div>

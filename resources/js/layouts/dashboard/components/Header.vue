@@ -82,12 +82,14 @@
 
                     <template v-else>
 
-                        <!-- Search Input -->
+                        <!--
+
+                        AI Search Input
+
                         <div
                             v-if="!isOnboarding"
                             class="relative w-full md:max-w-md group">
 
-                            <!-- Native HTML input -->
                             <input
                                 type="text"
                                 @input="onSearch"
@@ -107,10 +109,8 @@
                                     caret-blue-500"
                             />
 
-                            <!-- Left: AI Icon + Badge -->
                             <div class="absolute left-3.5 top-1/2 -translate-y-1/2 flex items-center gap-2 pointer-events-none">
                                 <div class="relative">
-                                <!-- Subtle pulse glow -->
                                 <div class="absolute -inset-1 rounded-lg bg-linear-to-br from-blue-500 to-purple-600
                                                 blur-xl opacity-30 group-focus-within:opacity-50 animate-pulse"></div>
                                 </div>
@@ -120,6 +120,8 @@
                             </div>
 
                         </div>
+
+                        -->
 
                         <div class="w-full flex justify-end items-center space-x-4">
 
